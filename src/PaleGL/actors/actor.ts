@@ -19,9 +19,9 @@ export type ActorFixedUpdateArgs = {
     fixedDeltaTime: number;
 };
 export type ActorUpdateArgs = { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number };
-export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; renderer: Renderer, time: number; deltaTime: number };
+export type ActorLastUpdateArgs = { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number };
 
-type OnStartCallback = (args: { scene: Scene; renderer: Renderer, gpu: Gpu }) => void;
+type OnStartCallback = (args: { scene: Scene; renderer: Renderer; gpu: Gpu }) => void;
 type OnSetSizeCallback = (
     width: number,
     height: number,
@@ -29,7 +29,7 @@ type OnSetSizeCallback = (
     uiCamera: OrthographicCamera | null
 ) => void;
 type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer, time: number; deltaTime: number }) => void;
+type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
 type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(key: string, value: T) => void;
@@ -53,9 +53,9 @@ export type Actor = {
     onUpdate: OnUpdateCallback[];
     onLastUpdate: OnLastUpdateCallback[];
     onBeforeRender: OnBeforeRenderCallback[];
-    onProcessPropertyBinder: OnProcessPropertyBinder | null;
-    onPreProcessTimeline: OnProcessTimeline | null;
-    onPostProcessTimeline: OnProcessTimeline | null;
+    onProcessPropertyBinder: OnProcessPropertyBinder[];
+    onPreProcessTimeline: OnProcessTimeline[];
+    onPostProcessTimeline: OnProcessTimeline[];
     enabled: boolean;
 };
 
@@ -76,9 +76,9 @@ export const createActor = ({ name = '', type = ActorTypes.Null }: ActorArgs = {
     const onBeforeRender: OnBeforeRenderCallback[] = [];
     // TODO: timeline
     // let _onProcessClipFrame: OnProcessPropertyBinder | null = null;
-    const onProcessPropertyBinder: OnProcessPropertyBinder | null = null;
-    const onPreProcessTimeline: OnProcessTimeline | null = null;
-    const onPostProcessTimeline: OnProcessTimeline | null = null;
+    const onProcessPropertyBinder: OnProcessPropertyBinder[] = [];
+    const onPreProcessTimeline: OnProcessTimeline[] = [];
+    const onPostProcessTimeline: OnProcessTimeline[] = [];
     const enabled: boolean = true;
 
     const actor = {
@@ -129,6 +129,18 @@ export const subscribeActorOnSetSize = (actor: Actor, value: OnSetSizeCallback) 
 
 export const subscribeActorOnUpdate = (actor: Actor, value: OnUpdateCallback) => {
     actor.onUpdate.push(value);
+};
+
+export const subscribeActorProcessPropertyBinder = (actor: Actor, value: OnProcessPropertyBinder) => {
+    actor.onProcessPropertyBinder.push(value);
+};
+
+export const subscribeActorPreProcessTimeline = (actor: Actor, value: OnProcessTimeline) => {
+    actor.onPreProcessTimeline.push(value);
+};
+
+export const subscribeActorPostProcessTimeline = (actor: Actor, value: OnProcessTimeline) => {
+    actor.onPostProcessTimeline.push(value);
 };
 
 export const addActorComponent = (actor: Actor, component: Component) => {

@@ -159,27 +159,22 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
 };
 
 export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T) => {
-    if (actor.onProcessPropertyBinder) {
-        actor.onProcessPropertyBinder(key, value);
-    }
+    actor.onProcessPropertyBinder.forEach((cb) => cb(key, value));
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onProcessPropertyBinder?.(actor, model, key, value);
     });
 };
 
 export const preProcessActorTimeline = (actor: Actor, timelineTime: number) => {
-    if (actor.onPreProcessTimeline) {
-        actor.onPreProcessTimeline(timelineTime);
-    }
+    actor.onPreProcessTimeline.forEach((cb) => cb(timelineTime));
+    // TODO
     // _components.forEach((component) => {
     //     component.processTimeline?.(timelineTime, timelinePrevTime, timelineDeltaTime);
     // });
 };
 
 export const postProcessActorTimeline = (actor: Actor, timelineTime: number) => {
-    if (actor.onPostProcessTimeline) {
-        actor.onPostProcessTimeline(timelineTime);
-    }
+    actor.onPostProcessTimeline.forEach((cb) => cb(timelineTime));
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onPostProcessTimeline?.(actor, model, timelineTime);
     });

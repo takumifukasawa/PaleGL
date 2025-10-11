@@ -52,8 +52,21 @@ export function setMainCamera(scene: Scene, camera: Camera) {
     scene.mainCamera = camera;
 }
 
-export function findActorByName(actors: Actor[], name: string) {
-    return actors.find((child) => child.name === name);
+export function findActorByName(actors: Actor[], name: string): Actor | null {
+    // return actors.find((child) => child.name === name);
+    for (let i = 0; i < actors.length; i++) {
+        const child = actors[i];
+        if (child.name === name) {
+            return child;
+        }
+        if (getActorHasChild(child)) {
+            const found = findActorByName(child.children, name);
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return null;
 }
 
 export function addActorToScene(scene: Scene, actor: Actor) {

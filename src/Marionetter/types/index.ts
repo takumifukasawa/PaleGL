@@ -1,8 +1,9 @@
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Color } from '@/PaleGL/math/color.ts';
-import { RawVector3 } from '@/PaleGL/math/vector3.ts';
-import { RawVector4 } from '@/PaleGL/math/vector4.ts';
+import { RawVector2 } from '@/PaleGL/math/vector2.ts';
+import { RawVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { RawVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 //
 // settings
@@ -27,13 +28,28 @@ export const MarionetterReceiveDataType = {
     StopTimeline: 'stopTimeline',
     ExportScene: 'exportScene',
     ExportHotReloadScene: 'exportHotReloadScene',
+    SetSceneViewData: 'setSceneViewData',
+    SetSceneViewEnabled: 'setSceneViewEnabled',
 } as const;
 
 export type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
 
 export type MarionetterReceiveData = {
     type: MarionetterReceiveDataType;
+};
+
+export type MarionetterReceiveTimeData = MarionetterReceiveData & {
     currentTime: number;
+};
+
+export type MarionetterReceiveSceneViewData = MarionetterReceiveData & {
+    cameraPosition: Vector3;
+    cameraRotation: Vector4;
+    cameraFov: number;
+};
+
+export type MarionetterReceiveSceneViewEnabledData = MarionetterReceiveData & {
+    enabled: boolean;
 };
 
 export type Marionetter = {
@@ -41,6 +57,8 @@ export type Marionetter = {
     getCurrentTime: () => number;
     setCurrentTime: (time: number) => void;
     setHotReloadCallback: (callback: () => void) => void;
+    setSceneViewDataCallback: (callback: (data: MarionetterReceiveSceneViewData) => void) => void;
+    setSceneViewEnabledCallback: (callback: (data: MarionetterReceiveSceneViewEnabledData) => void) => void;
 };
 
 export type MarionetterArgs = {
@@ -548,7 +566,7 @@ export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
     ti: RawVector4;
     m: number;
     r: number;
-    e : string; // hex string (rgbi ... i is intensity)
+    e: string; // hex string (rgbi ... i is intensity)
     rs: number;
 };
 
@@ -620,6 +638,22 @@ export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterC
 export const MarionetterObjectMoveAndLookAtControllerComponentInfoProperty = {
     localPosition: NeedsShorten ? 'lp' : 'localPosition',
     lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
+} as const;
+
+export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterComponentInfoBase & {
+    gridSize: RawVector2;
+    octaves: number;
+    amplitude: number;
+    frequency: number;
+    factor: number;
+};
+
+export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
+    gridSize: NeedsShorten ? 'gs' : 'gridSize',
+    octaves: NeedsShorten ? 'o' : 'octaves',
+    amplitude: NeedsShorten ? 'a' : 'amplitude',
+    frequency: NeedsShorten ? 'f' : 'frequency',
+    factor: NeedsShorten ? 'fa' : 'factor',
 } as const;
 
 //

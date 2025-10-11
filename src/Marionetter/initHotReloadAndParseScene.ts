@@ -19,14 +19,20 @@ export const initHotReloadAndParseScene = (
                 const sceneJson = (await res.json()) as unknown as MarionetterScene;
                 console.log('hot reload scene', sceneJson);
                 // if (marionetterSceneStructure) {
-                    // console.log('hot reload: marionetterSceneStructure', marionetterSceneStructure);
-                    onHotReload(sceneJson);
+                // console.log('hot reload: marionetterSceneStructure', marionetterSceneStructure);
+                onHotReload(sceneJson);
                 // }
             });
         }
     };
     marionetter.setHotReloadCallback(() => {
         hotReloadScene();
+    });
+    marionetter.setSceneViewEnabledCallback((data) => {
+        console.log(data);
+    });
+    marionetter.setSceneViewDataCallback((data) => {
+        console.log(data);
     });
     // hotReloadScene();
 

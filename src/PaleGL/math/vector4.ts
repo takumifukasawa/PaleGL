@@ -105,6 +105,23 @@ export function createVector4zero() {
     return createVector4(0, 0, 0, 0);
 }
 
+export function setVector4Component(v4: Vector4, key: string, value: number) {
+    switch (key) {
+        case 'x':
+            setV4x(v4, value);
+            break;
+        case 'y':
+            setV4y(v4, value);
+            break;
+        case 'z':
+            setV4z(v4, value);
+            break;
+        case 'w':
+            setV4w(v4, value);
+            break;
+    }
+}
+
 export function createVector4FromRawVector4(obj: { x: number; y: number; z: number; w: number }) {
     return createVector4(obj.x, obj.y, obj.z, obj.w);
 }

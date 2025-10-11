@@ -61,6 +61,13 @@
 //     }
 // }
 
+
+export type RawVector2 = { x: number; y: number; };
+
+export function createVector2FromRaw(raw: RawVector2) {
+    return createVector2(raw.x, raw.y);
+}
+
 export type Vector2 = {
     e: Float32Array;
 };

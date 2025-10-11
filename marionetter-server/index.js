@@ -16,6 +16,8 @@ const messageType = {
     stopTimeline: 'stopTimeline',
     exportScene: 'exportScene',
     exportHotReloadScene: 'exportHotReloadScene',
+    setSceneViewData: 'setSceneViewData',
+    setSceneViewEnabled: 'setSceneViewEnabled',
 };
 
 const clientType = {
@@ -29,7 +31,7 @@ let wsBrowserClient;
 console.log(`begin websocket server... port: ${PORT}`);
 
 /**
- * 
+ *
  * @param ws
  * @param json
  */
@@ -42,7 +44,7 @@ const auth = (ws, json) => {
 };
 
 /**
- * 
+ *
  * @param json
  */
 const seekTimeline = (json) => {
@@ -55,13 +57,13 @@ const seekTimeline = (json) => {
         currentTime: json.currentTime,
     };
     if (logEnabled) {
-        console.log(`send to browser data: ${newData}`);
+        console.log(`[seekTimeline] send to browser data: ${newData}`);
     }
     wsBrowserClient.send(JSON.stringify(newData));
 };
 
 /**
- * 
+ *
  * @param json
  */
 const playTimeline = (json) => {
@@ -73,13 +75,13 @@ const playTimeline = (json) => {
         currentTime: json.currentTime,
     };
     if (logEnabled) {
-        console.log(`send to browser data: ${newData}`);
+        console.log(`[playTimeline] send to browser data: ${newData}`);
     }
     wsBrowserClient.send(JSON.stringify(newData));
-}
+};
 
 /**
- * 
+ *
  * @param json
  */
 const stopTimeline = (json) => {
@@ -90,13 +92,13 @@ const stopTimeline = (json) => {
         type: messageType.stopTimeline,
     };
     if (logEnabled) {
-        console.log(`send to browser data: ${newData}`);
+        console.log(`[stopTimeline] send to browser data: ${newData}`);
     }
     wsBrowserClient.send(JSON.stringify(newData));
-}
+};
 
 /**
- * 
+ *
  * @param json
  */
 const exportScene = (json) => {
@@ -108,13 +110,13 @@ const exportScene = (json) => {
         type: messageType.exportScene,
     };
     if (logEnabled) {
-        console.log(`send to browser data: ${newData}`);
+        console.log(`[exportScene] send to browser data: ${newData}`);
     }
     wsBrowserClient.send(JSON.stringify(newData));
 };
 
 /**
- * 
+ *
  * @param json
  */
 const exportHotReloadScene = (json) => {
@@ -126,7 +128,39 @@ const exportHotReloadScene = (json) => {
         type: messageType.exportHotReloadScene,
     };
     if (logEnabled) {
-        console.log(`send to browser data: ${newData}`);
+        console.log(`[exportHotReloadScene] send to browser data: ${newData}`);
+    }
+    wsBrowserClient.send(JSON.stringify(newData));
+};
+
+const setSceneViewData = (json) => {
+    if (!wsBrowserClient) {
+        return;
+    }
+    // console.log(json);
+    const newData = {
+        type: messageType.setSceneViewData,
+        cameraPosition: json.cameraPosition,
+        cameraRotation: json.cameraRotation,
+        cameraFov: json.cameraFov,
+    };
+    if (logEnabled) {
+        console.log(`[setSceneViewData] send to browser data: ${newData}`);
+    }
+    wsBrowserClient.send(JSON.stringify(newData));
+};
+
+const setSceneViewEnabled = (json) => {
+    if (!wsBrowserClient) {
+        return;
+    }
+    // console.log(json);
+    const newData = {
+        type: messageType.setSceneViewEnabled,
+        enabled: json.enabled,
+    };
+    if (logEnabled) {
+        console.log(`[setSceneViewEnabled] send to browser data: ${newData}`);
     }
     wsBrowserClient.send(JSON.stringify(newData));
 };
@@ -176,6 +210,12 @@ wsServer.on('connection', (ws) => {
                 break;
             case messageType.exportHotReloadScene:
                 exportHotReloadScene(json);
+                break;
+            case messageType.setSceneViewData:
+                setSceneViewData(json);
+                break;
+            case messageType.setSceneViewEnabled:
+                setSceneViewEnabled(json);
                 break;
             default:
                 console.error(`invalid message type: ${json.type}`);

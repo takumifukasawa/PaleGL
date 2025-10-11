@@ -147,7 +147,7 @@ export function createPlayer(
     );
 
     // for debug
-    // console.log('marionetterSceneStructure', marionetterSceneStructure);
+    console.log('marionetterSceneStructure', marionetterSceneStructure);
 
     if (timelineDuration) {
         player.timelineDuration = timelineDuration;

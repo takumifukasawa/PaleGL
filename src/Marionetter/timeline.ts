@@ -1,21 +1,27 @@
-import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import {
-    copyVector3,
-    createVector3One,
-    createVector3Zero,
-    negateVector3,
-    setV3x,
-    setV3y,
-    setV3z,
-    v3x,
-    v3y,
-    v3z,
-    Vector3,
-} from '@/PaleGL/math/vector3.ts';
-import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
-import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { findActorByName, Scene } from '@/PaleGL/core/scene.ts';
-import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera';
+    PROPERTY_COLOR_A,
+    PROPERTY_COLOR_B,
+    PROPERTY_COLOR_G,
+    PROPERTY_COLOR_R,
+    PROPERTY_FIELD_OF_VIEW,
+    PROPERTY_LIGHT_INTENSITY,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_X,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_Y,
+    PROPERTY_LOCAL_EULER_ANGLES_RAW_Z,
+    PROPERTY_LOCAL_POSITION_X,
+    PROPERTY_LOCAL_POSITION_Y,
+    PROPERTY_LOCAL_POSITION_Z,
+    PROPERTY_LOCAL_SCALE_X,
+    PROPERTY_LOCAL_SCALE_Y,
+    PROPERTY_LOCAL_SCALE_Z,
+    PROPERTY_MATERIAL_BASE_COLOR_A,
+    PROPERTY_MATERIAL_BASE_COLOR_B,
+    PROPERTY_MATERIAL_BASE_COLOR_G,
+    PROPERTY_MATERIAL_BASE_COLOR_R,
+    PROPERTY_SPOTLIGHT_RANGE,
+} from '@/Marionetter/constants.ts';
+import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
+import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
 import {
     MarionetterActivationControlClip,
     MarionetterActivationControlClipInfo,
@@ -56,44 +62,19 @@ import {
     MarionetterTrackInfoBaseProperty,
     MarionetterTrackInfoType,
 } from '@/Marionetter/types';
-import {
-    PROPERTY_COLOR_A,
-    PROPERTY_COLOR_B,
-    PROPERTY_COLOR_G,
-    PROPERTY_COLOR_R,
-    PROPERTY_FIELD_OF_VIEW,
-    PROPERTY_LIGHT_INTENSITY,
-    PROPERTY_LOCAL_EULER_ANGLES_RAW_X,
-    PROPERTY_LOCAL_EULER_ANGLES_RAW_Y,
-    PROPERTY_LOCAL_EULER_ANGLES_RAW_Z,
-    PROPERTY_LOCAL_POSITION_X,
-    PROPERTY_LOCAL_POSITION_Y,
-    PROPERTY_LOCAL_POSITION_Z,
-    PROPERTY_LOCAL_SCALE_X,
-    PROPERTY_LOCAL_SCALE_Y,
-    PROPERTY_LOCAL_SCALE_Z,
-    PROPERTY_MATERIAL_BASE_COLOR_A,
-    PROPERTY_MATERIAL_BASE_COLOR_B,
-    PROPERTY_MATERIAL_BASE_COLOR_G,
-    PROPERTY_MATERIAL_BASE_COLOR_R,
-    PROPERTY_SPOTLIGHT_RANGE,
-} from '@/Marionetter/constants.ts';
-import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
+import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
     postProcessActorTimeline,
     preProcessActorTimeline,
     processActorPropertyBinder,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import {
-    createRotationXMatrix,
-    createRotationYMatrix,
-    createRotationZMatrix,
-    multiplyMat4Array,
-} from '@/PaleGL/math/matrix4.ts';
+import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera';
+import { Light } from '@/PaleGL/actors/lights/light.ts';
+import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { ObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { ActorTypes, DEG_TO_RAD, LightTypes } from '@/PaleGL/constants.ts';
-import { createQuaternionInvertAxis, rotationMatrixToQuaternion } from '@/PaleGL/math/quaternion.ts';
-import { createRotator } from '@/PaleGL/math/rotator.ts';
+import { findActorByName, Scene } from '@/PaleGL/core/scene.ts';
 import { setRotation } from '@/PaleGL/core/transform.ts';
 import {
     Color,
@@ -108,8 +89,38 @@ import {
     setColorG,
     setColorR,
 } from '@/PaleGL/math/color.ts';
-import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { ObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
+import {
+    createRotationXMatrix,
+    createRotationYMatrix,
+    createRotationZMatrix,
+    multiplyMat4Array,
+} from '@/PaleGL/math/matrix4.ts';
+import { createQuaternionInvertAxis, rotationMatrixToQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { createRotator } from '@/PaleGL/math/rotator.ts';
+import { createVector2, Vector2 } from '@/PaleGL/math/vector2.ts';
+import {
+    copyVector3,
+    createVector3,
+    createVector3One,
+    createVector3Zero,
+    negateVector3,
+    setV3x,
+    setV3y,
+    setV3z,
+    v3x,
+    v3y,
+    v3z,
+    Vector3,
+} from '@/PaleGL/math/vector3.ts';
+import {
+    createVector4,
+    createVector4zero,
+    setVector4Component,
+    v4x,
+    v4y,
+    v4z,
+    Vector4,
+} from '@/PaleGL/math/vector4.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
@@ -124,9 +135,9 @@ export function buildMarionetterTimeline(
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrackKinds[] = [];
-    
+
     const { d } = marionetterPlayableDirectorComponentInfo;
-    
+
     // for debug
     // console.log(
     //     `[buildMarionetterTimeline] marionetterPlayableDirectorComponentInfo:`,
@@ -329,7 +340,7 @@ function createMarionetterClips(
                 console.error(`[createMarionetterClips] invalid animation clip type`);
         }
     }
-    
+
     return marionetterClips;
 }
 
@@ -351,7 +362,13 @@ function createMarionetterAnimationClip(
         const localRotationEulerDegree: Vector3 = createVector3Zero();
         const localScale: Vector3 = createVector3One();
 
+        // TODO: 負荷対策のためにキャッシュしたい
         const numberPropertyMap = new Map<string, number>();
+        const vector2PropertyMap = new Map<string, Vector2>();
+        const vector3PropertyMap = new Map<string, Vector3>();
+        const vector4PropertyMap = new Map<string, Vector4>();
+        const tmpVector4PropertyMap = new Map<string, Vector4>();
+        const tmpVector4LengthMap = new Map<string, number>();
         const colorPropertyMap = new Map<string, Color>();
 
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
@@ -442,6 +459,12 @@ function createMarionetterAnimationClip(
                             case 'y':
                             case 'z':
                             case 'w':
+                                if (!tmpVector4PropertyMap.has(accessorKey)) {
+                                    tmpVector4PropertyMap.set(accessorKey, createVector4zero());
+                                    tmpVector4LengthMap.set(accessorKey, 0);
+                                }
+                                setVector4Component(tmpVector4PropertyMap.get(accessorKey)!, accessorElement, value);
+                                tmpVector4LengthMap.set(accessorKey, tmpVector4LengthMap.get(accessorKey)! + 1)
                                 break;
                             case 'r':
                             case 'g':
@@ -514,6 +537,38 @@ function createMarionetterAnimationClip(
         // numberの場合はすぐにセットしちゃう
         numberPropertyMap.forEach((numberValue, numberKey) => {
             processActorPropertyBinder(actor, numberKey, numberValue);
+        });
+
+        // iterate vector4
+        tmpVector4PropertyMap.forEach((v4, key) => {
+            // processActorPropertyBinder(actor, key, vector4);
+            switch (tmpVector4LengthMap.get(key)) {
+                case 2:
+                    vector2PropertyMap.set(key, createVector2(v4x(v4), v4y(v4)));
+                    break;
+                case 3:
+                    vector3PropertyMap.set(key, createVector3(v4x(v4), v4y(v4), v4z(v4)));
+                    break;
+                case 4:
+                    vector4PropertyMap.set(key, v4);
+                    break;
+                default:
+                    console.error(`[createMarionetterAnimationClip] invalid vector4 length: ${v4.e.length}`);
+                    break;
+            }
+        });
+
+        // set vector2
+        vector2PropertyMap.forEach((vector2, key) => {
+            processActorPropertyBinder(actor, key, vector2);
+        });
+        // set vector3
+        vector3PropertyMap.forEach((vector3, key) => {
+            processActorPropertyBinder(actor, key, vector3);
+        });
+        // set vector4
+        vector4PropertyMap.forEach((vector4, key) => {
+            processActorPropertyBinder(actor, key, vector4);
         });
 
         // set color

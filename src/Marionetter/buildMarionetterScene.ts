@@ -5,6 +5,7 @@ import {
     MarionetterComponentInfoBaseProperty,
     MarionetterComponentType,
     MarionetterDirectionalLightComponentInfo,
+    MarionetterFbmNoiseTextureControllerComponentInfoProperty,
     MarionetterLightComponentInfo,
     MarionetterLightComponentInfoProperty,
     MarionetterLitMaterialInfoProperty,
@@ -194,6 +195,11 @@ export function buildMarionetterScene(
                 obj,
                 MarionetterComponentType.ObjectMoveAndLookAtController
             );
+        const fbmNoiseTextureControllerComponent =
+            findMarionetterComponent<MarionetterFbmNoiseTextureControllerComponentInfoProperty>(
+                obj,
+                MarionetterComponentType.FbmNoiseTextureController
+            );
 
         let actor: Actor | null = null;
 
@@ -331,11 +337,18 @@ export function buildMarionetterScene(
             }
         }
 
-        //
-        // transform情報
-        //
+        if (fbmNoiseTextureControllerComponent) {
+            console.warn(
+                `[buildMarionetterActors] FBM Noise Texture Controller is not supported yet. - ${name}`,
+                fbmNoiseTextureControllerComponent
+            );
+        }
 
         if (actor) {
+            //
+            // transform情報
+            //
+
             // actors.push(actor);
             setScaling(
                 actor.transform,
