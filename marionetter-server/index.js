@@ -143,6 +143,8 @@ const setSceneViewData = (json) => {
         cameraPosition: json.cameraPosition,
         cameraRotation: json.cameraRotation,
         cameraFov: json.cameraFov,
+        cameraNear: json.cameraNear,
+        cameraFar: json.cameraFar,
     };
     if (logEnabled) {
         console.log(`[setSceneViewData] send to browser data: ${newData}`);
