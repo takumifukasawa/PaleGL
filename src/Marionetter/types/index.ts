@@ -2,8 +2,8 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { RawVector2 } from '@/PaleGL/math/vector2.ts';
-import { RawVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
-import { RawVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
+import { RawVector3 } from '@/PaleGL/math/vector3.ts';
+import { RawVector4 } from '@/PaleGL/math/vector4.ts';
 
 //
 // settings
@@ -43,9 +43,11 @@ export type MarionetterReceiveTimeData = MarionetterReceiveData & {
 };
 
 export type MarionetterReceiveSceneViewData = MarionetterReceiveData & {
-    cameraPosition: Vector3;
-    cameraRotation: Vector4;
+    cameraPosition: RawVector3;
+    cameraRotation: RawVector4;
     cameraFov: number;
+    cameraNear: number;
+    cameraFar: number;
 };
 
 export type MarionetterReceiveSceneViewEnabledData = MarionetterReceiveData & {
@@ -57,8 +59,8 @@ export type Marionetter = {
     getCurrentTime: () => number;
     setCurrentTime: (time: number) => void;
     setHotReloadCallback: (callback: () => void) => void;
-    setSceneViewDataCallback: (callback: (data: MarionetterReceiveSceneViewData) => void) => void;
-    setSceneViewEnabledCallback: (callback: (data: MarionetterReceiveSceneViewEnabledData) => void) => void;
+    // setSceneViewDataCallback: (callback: (data: MarionetterReceiveSceneViewData) => void) => void;
+    // setSceneViewEnabledCallback: (callback: (data: MarionetterReceiveSceneViewEnabledData) => void) => void;
 };
 
 export type MarionetterArgs = {
@@ -67,6 +69,9 @@ export type MarionetterArgs = {
     onPlay?: (time: number) => void;
     onSeek?: (time: number) => void;
     onStop?: () => void;
+    // onHotReload?: () => void;
+    onSetSceneViewData?: (data: MarionetterReceiveSceneViewData) => void;
+    onSceneViewEnabled?: (data: MarionetterReceiveSceneViewEnabledData) => void;
 };
 
 //

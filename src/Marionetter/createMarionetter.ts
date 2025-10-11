@@ -20,11 +20,14 @@ export function createMarionetter({
     onSeek,
     onPlay,
     onStop,
+    // onHotReload,
+    onSetSceneViewData,
+    onSceneViewEnabled,
 }: MarionetterArgs = {}): Marionetter {
     let currentTime: number = 0;
     let onHotReloadCallback: (() => void) | null = null;
-    let onSetSceneViewDataCallback: ((data: MarionetterReceiveSceneViewData) => void) | null = null;
-    let onSceneViewEnabledCallback: ((data: MarionetterReceiveSceneViewEnabledData) => void) | null = null;
+    // let onSetSceneViewDataCallback: ((data: MarionetterReceiveSceneViewData) => void) | null = null;
+    // let onSceneViewEnabledCallback: ((data: MarionetterReceiveSceneViewEnabledData) => void) | null = null;
 
     const getCurrentTime = () => {
         return currentTime;
@@ -100,7 +103,7 @@ export function createMarionetter({
                 case MarionetterReceiveDataType.ExportHotReloadScene:
                     if (showLog) {
                         console.log(`[marionetter] hotReloadScene`);
-                    }
+                   }
                     onHotReloadCallback?.();
                     break;
                 case MarionetterReceiveDataType.SetSceneViewData:
@@ -108,14 +111,14 @@ export function createMarionetter({
                     if (showLog) {
                         console.log(`[marionetter] viewScene`);
                     }
-                    onSetSceneViewDataCallback?.(sceneViewData);
+                    onSetSceneViewData?.(sceneViewData);
                     break;
                 case MarionetterReceiveDataType.SetSceneViewEnabled:
                     const sceneViewEnabledData = json as MarionetterReceiveSceneViewEnabledData;
                     if (showLog) {
                         console.log(`[marionetter] setSceneViewEnabled: ${sceneViewEnabledData.enabled}`);
                     }
-                    onSceneViewEnabledCallback?.(sceneViewEnabledData);
+                    onSceneViewEnabled?.(sceneViewEnabledData);
                     break;
                 default:
                     console.warn('invalid type', json.type);
@@ -135,20 +138,20 @@ export function createMarionetter({
         onHotReloadCallback = callback;
     };
 
-    const setSceneViewDataCallback = (callback: (data: MarionetterReceiveSceneViewData) => void) => {
-        onSetSceneViewDataCallback = callback;
-    };
+    // const setSceneViewDataCallback = (callback: (data: MarionetterReceiveSceneViewData) => void) => {
+    //     onSetSceneViewDataCallback = callback;
+    // };
 
-    const setSceneViewEnabledCallback = (callback: (data: MarionetterReceiveSceneViewEnabledData) => void) => {
-        onSceneViewEnabledCallback = callback;
-    };
+    // const setSceneViewEnabledCallback = (callback: (data: MarionetterReceiveSceneViewEnabledData) => void) => {
+    //     onSceneViewEnabledCallback = callback;
+    // };
 
     return {
         connect,
         getCurrentTime,
         setCurrentTime,
         setHotReloadCallback,
-        setSceneViewDataCallback,
-        setSceneViewEnabledCallback,
+        // setSceneViewDataCallback,
+        // setSceneViewEnabledCallback,
     };
 }

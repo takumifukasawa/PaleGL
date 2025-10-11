@@ -28,12 +28,6 @@ export const initHotReloadAndParseScene = (
     marionetter.setHotReloadCallback(() => {
         hotReloadScene();
     });
-    marionetter.setSceneViewEnabledCallback((data) => {
-        console.log(data);
-    });
-    marionetter.setSceneViewDataCallback((data) => {
-        console.log(data);
-    });
     // hotReloadScene();
 
     // return {

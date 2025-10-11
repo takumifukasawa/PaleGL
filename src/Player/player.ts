@@ -1,11 +1,23 @@
-import { buildMarionetterScene, buildMarionetterTimelineFromScene } from '@/Marionetter/buildMarionetterScene.ts';
+import {
+    buildMarionetterScene,
+    buildMarionetterTimelineFromScene,
+    resolveInvertRotationLeftHandAxisToRightHandAxis,
+} from '@/Marionetter/buildMarionetterScene.ts';
 import { createMarionetter } from '@/Marionetter/createMarionetter.ts';
 import { initHotReloadAndParseScene } from '@/Marionetter/initHotReloadAndParseScene.ts';
 import { snapToStep } from '@/Marionetter/timelineUtilities.ts';
-import { Marionetter, MarionetterScene, MarionetterSceneStructure } from '@/Marionetter/types';
+import {
+    Marionetter,
+    MarionetterObjectInfoProperty,
+    MarionetterReceiveSceneViewData,
+    MarionetterReceiveSceneViewEnabledData,
+    MarionetterScene,
+    MarionetterSceneStructure,
+    MarionetterTransformInfoProperty,
+} from '@/Marionetter/types';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
+import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import {
     createEngine,
     Engine,
@@ -18,12 +30,12 @@ import {
     warmRender,
 } from '@/PaleGL/core/engine.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import {
-    createOrbitCameraController,
-    fixedUpdateOrbitCameraController,
-    setOrbitCameraControllerDelta,
-    startOrbitCameraController,
-} from '@/PaleGL/core/orbitCameraController.ts';
+// import {
+//     createOrbitCameraController,
+//     fixedUpdateOrbitCameraController,
+//     setOrbitCameraControllerDelta,
+//     startOrbitCameraController,
+// } from '@/PaleGL/core/orbitCameraController.ts';
 import { createRenderer, Renderer, renderRenderer, updateTimelineUniforms } from '@/PaleGL/core/renderer.ts';
 import {
     addActorToScene,
@@ -35,9 +47,9 @@ import {
     setMainCamera,
 } from '@/PaleGL/core/scene.ts';
 import { InputController } from '@/PaleGL/inputs/inputController.ts';
-import { v2o } from '@/PaleGL/math/vector2.ts';
-import { createVector3 } from '@/PaleGL/math/vector3.ts';
-import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
+// import { v2o } from '@/PaleGL/math/vector2.ts';
+// import { createVector3 } from '@/PaleGL/math/vector3.ts';
+import { PostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
 import {
     getSoundCurrentTime,
     GLSLSoundWrapper,
@@ -45,6 +57,12 @@ import {
     stopSound,
 } from '@/PaleGL/utilities/createGLSLSoundWrapper.ts';
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
+import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
+import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
+import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { v4w, v4x, v4y, v4z } from '@/PaleGL/math/vector4.ts';
+import { CameraTypes } from '@/PaleGL/constants.ts';
+import { createVector3 } from '@/PaleGL/math/vector3.ts';
 
 export type Player = {
     gpu: Gpu;
@@ -64,12 +82,13 @@ export type Player = {
     marionetterSceneStructure: MarionetterSceneStructure | null;
     timelineDuration: number;
     onHotReload?: () => void;
-    // onBeforeUpdate?: (time: number, deltaTime: number) => void;
 };
 
-let isOrbitCameraEnabled = false;
-let orbitCameraEntity: Camera | null = null;
+// let isOrbitCameraEnabled = false;
+let isSceneViewCameraEnabled = false;
+// let orbitCameraEntity: Camera | null = null;
 let cachedPlayerCamera: Camera | null = null;
+let sceneViewCameraEntity: Camera | null = null;
 
 export function createPlayer(
     gpu: Gpu,
@@ -132,6 +151,40 @@ export function createPlayer(
             console.log(`[marionetter.onStop]`);
             stopMarionetter(player);
         },
+        onSceneViewEnabled: (data: MarionetterReceiveSceneViewEnabledData) => {
+            isSceneViewCameraEnabled = data.enabled;
+            if (sceneViewCameraEntity && cachedPlayerCamera) {
+                setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
+            }
+        },
+        onSetSceneViewData: (data: MarionetterReceiveSceneViewData) => {
+            if (sceneViewCameraEntity) {
+                sceneViewCameraEntity.near = data.cameraNear;
+                sceneViewCameraEntity.far = data.cameraFar;
+                if (sceneViewCameraEntity.type === CameraTypes.Perspective) {
+                    (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
+                }
+                setTranslation(
+                    sceneViewCameraEntity.transform,
+                    createVector3(data.cameraPosition.x, data.cameraPosition.y, data.cameraPosition.z)
+                );
+                setRotation(
+                    sceneViewCameraEntity.transform,
+                    createRotatorFromQuaternion(
+                        resolveInvertRotationLeftHandAxisToRightHandAxis(
+                            createQuaternion(
+                                data.cameraRotation.x,
+                                data.cameraRotation.y,
+                                data.cameraRotation.z,
+                                data.cameraRotation.w
+                            ),
+                            sceneViewCameraEntity,
+                            true
+                        )
+                    )
+                );
+            }
+        },
     });
 
     const marionetterSceneStructure = rebuildScene(
@@ -142,7 +195,7 @@ export function createPlayer(
         JSON.parse(sceneJson) as unknown as MarionetterScene,
         // marionetterSceneStructure,
         inputController,
-        cameraPostProcess,
+        cameraPostProcess
         // true
     );
 
@@ -169,7 +222,7 @@ export function createPlayer(
                 marionetter,
                 sceneJson,
                 inputController,
-                cameraPostProcess,
+                cameraPostProcess
                 // false
             );
             onHotReload();
@@ -177,20 +230,17 @@ export function createPlayer(
     }
 
     setOnBeforeUpdateEngine(engine, ({ time, deltaTime }) => {
-        // if (player.onBeforeUpdate) {
-        //     player.onBeforeUpdate(time, deltaTime);
-        // }
         beforeUpdatePlayer(player, time, deltaTime);
     });
 
     let isRenderEnabled = true;
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'o') {
-            isOrbitCameraEnabled = !isOrbitCameraEnabled;
-            setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity! : cachedPlayerCamera!);
-        }
-    });
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key === 'o') {
+    //         isOrbitCameraEnabled = !isOrbitCameraEnabled;
+    //         setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity! : cachedPlayerCamera!);
+    //     }
+    // });
 
     window.addEventListener('keydown', (e) => {
         if (e.key === 'p') {
@@ -203,8 +253,6 @@ export function createPlayer(
         if (isRenderEnabled) {
             renderRenderer(renderer, scene, player.camera!, player.engine.sharedTextures, {
                 time,
-                // timelineTime,
-                // timelineDeltaTime
             });
         }
     });
@@ -218,10 +266,8 @@ function rebuildScene(
     player: Player,
     marionetter: Marionetter,
     sceneJson: MarionetterScene,
-    // structure: MarionetterSceneStructure,
     inputController: InputController,
-    cameraPostProcess: PostProcess,
-    // isFirst: boolean
+    cameraPostProcess: PostProcess
 ) {
     // sceneを空にする
     disposeScene(player.scene);
@@ -236,29 +282,26 @@ function rebuildScene(
     }
 
     // timelineにactorをbind
-    structure.marionetterTimeline = buildMarionetterTimelineFromScene(
-        sceneJson,
-        player.scene.children
-        // structure.actors
-    );
+    structure.marionetterTimeline = buildMarionetterTimelineFromScene(sceneJson, player.scene.children);
     structure.marionetterTimeline?.bindActors(player.scene.children);
 
     // camera
     const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
     setMainCamera(player.scene, camera);
     createSceneUICamera(player.scene);
-    // setPlayerCamera(player, camera);
-    // isOrbitCameraEnabled = false;
 
-    // orbit camera controller
-    orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
-    
+    // // orbit camera controller
+    // orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
+
+    sceneViewCameraEntity = createSeneViewCamera(player, cameraPostProcess);
+
     cachedPlayerCamera = camera;
 
     player.marionetter = marionetter;
     player.marionetterSceneStructure = structure;
 
-    setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
+    // setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
+    setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
 
     return structure;
 }
@@ -368,46 +411,54 @@ function stopMarionetter(player: Player) {
     player.isPlaying = false;
 }
 
-function createOrbitCamera(player: Player, inputController: InputController, cameraPostProcess: PostProcess) {
-    // window.addEventListener('resize', () => {
-    //     resizePlayer(player);
-    // });
-
+function createSeneViewCamera(player: Player, cameraPostProcess: PostProcess) {
     // orbit camera の切り替え
     const entity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
-    // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
-    const orbitCameraController = createOrbitCameraController(entity);
-    // for orbit camera
-    orbitCameraController.enabled = true;
-    orbitCameraController.distance = 5;
-    orbitCameraController.attenuation = 0.01;
-    orbitCameraController.dampingFactor = 0.2;
-    orbitCameraController.azimuthSpeed = 100;
-    orbitCameraController.altitudeSpeed = 100;
-    orbitCameraController.deltaAzimuthPower = 2;
-    orbitCameraController.deltaAltitudePower = 2;
-    orbitCameraController.maxAltitude = 5;
-    orbitCameraController.minAltitude = -45;
-    orbitCameraController.maxAzimuth = 55;
-    orbitCameraController.minAzimuth = -55;
-    orbitCameraController.defaultAzimuth = 10;
-    orbitCameraController.defaultAltitude = -10;
-    orbitCameraController.lookAtTarget = createVector3(0, 0, 0);
-    entity.onFixedUpdate.push(() => {
-        // 1: fixed position
-        // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
-
-        // 2: orbit controls
-        // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
-        if (inputController.isDown && orbitCameraController.enabled) {
-            setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
-        }
-        fixedUpdateOrbitCameraController(orbitCameraController);
-    });
-    startOrbitCameraController(orbitCameraController);
     addActorToScene(player.scene, entity);
-
     setCameraPostProcess(entity, cameraPostProcess);
-    
     return entity;
 }
+
+// function createOrbitCamera(player: Player, inputController: InputController, cameraPostProcess: PostProcess) {
+//     // window.addEventListener('resize', () => {
+//     //     resizePlayer(player);
+//     // });
+// 
+//     // orbit camera の切り替え
+//     const entity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
+//     // const captureSceneCamera = findActorByName(player.scene.children, 'MainCamera')! as PerspectiveCamera;
+//     const orbitCameraController = createOrbitCameraController(entity);
+//     // for orbit camera
+//     orbitCameraController.enabled = true;
+//     orbitCameraController.distance = 5;
+//     orbitCameraController.attenuation = 0.01;
+//     orbitCameraController.dampingFactor = 0.2;
+//     orbitCameraController.azimuthSpeed = 100;
+//     orbitCameraController.altitudeSpeed = 100;
+//     orbitCameraController.deltaAzimuthPower = 2;
+//     orbitCameraController.deltaAltitudePower = 2;
+//     orbitCameraController.maxAltitude = 5;
+//     orbitCameraController.minAltitude = -45;
+//     orbitCameraController.maxAzimuth = 55;
+//     orbitCameraController.minAzimuth = -55;
+//     orbitCameraController.defaultAzimuth = 10;
+//     orbitCameraController.defaultAltitude = -10;
+//     orbitCameraController.lookAtTarget = createVector3(0, 0, 0);
+//     entity.onFixedUpdate.push(() => {
+//         // 1: fixed position
+//         // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
+// 
+//         // 2: orbit controls
+//         // if (inputController.isDown && debuggerStates.orbitControlsEnabled) {
+//         if (inputController.isDown && orbitCameraController.enabled) {
+//             setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
+//         }
+//         fixedUpdateOrbitCameraController(orbitCameraController);
+//     });
+//     startOrbitCameraController(orbitCameraController);
+//     addActorToScene(player.scene, entity);
+// 
+//     setCameraPostProcess(entity, cameraPostProcess);
+//     
+//     return entity;
+// }
