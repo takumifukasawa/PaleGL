@@ -1,6 +1,6 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
-    DepthFuncTypes,
+    DepthFuncTypes, FaceSide,
     FragmentShaderModifierPragmas,
     MaterialTypes,
     ShadingModelIds,
@@ -148,6 +148,8 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         // ...options,
         name: 'ObjectSpaceRaymarchGBufferMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
+        
+        // faceSide: FaceSide.Double,
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,

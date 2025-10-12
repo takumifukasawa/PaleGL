@@ -5,7 +5,8 @@ import {
     MarionetterComponentInfoBaseProperty,
     MarionetterComponentType,
     MarionetterDirectionalLightComponentInfo,
-    MarionetterFbmNoiseTextureControllerComponentInfoProperty,
+    MarionetterFbmNoiseTextureControllerComponentInfo,
+    MarionetterHumanControllerComponentInfo,
     MarionetterLightComponentInfo,
     MarionetterLightComponentInfoProperty,
     MarionetterLitMaterialInfoProperty,
@@ -49,6 +50,7 @@ import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quat
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
 import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
+import { createHuman } from '@/PaleGL/actors/meshes/createHuman.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
 // import { Light } from '@/PaleGL/actors/Light.ts';
@@ -196,10 +198,14 @@ export function buildMarionetterScene(
                 MarionetterComponentType.ObjectMoveAndLookAtController
             );
         const fbmNoiseTextureControllerComponent =
-            findMarionetterComponent<MarionetterFbmNoiseTextureControllerComponentInfoProperty>(
+            findMarionetterComponent<MarionetterFbmNoiseTextureControllerComponentInfo>(
                 obj,
                 MarionetterComponentType.FbmNoiseTextureController
             );
+        const humanControllerComponent = findMarionetterComponent<MarionetterHumanControllerComponentInfo>(
+            obj,
+            MarionetterComponentType.HumanController
+        );
 
         let actor: Actor | null = null;
 
@@ -207,6 +213,7 @@ export function buildMarionetterScene(
         // component情報
         //
 
+        // mesh actor
         if (mrComponent && mfComponent) {
             const meshFilter = mfComponent;
             const meshRenderer = mrComponent;
@@ -269,6 +276,8 @@ export function buildMarionetterScene(
             if (geometry && material) {
                 actor = createMesh({ name, geometry, material });
             }
+            
+        // camera actor
         } else if (cameraComponent) {
             const camera = cameraComponent;
             if (camera[MarionetterCameraComponentInfoProperty.cameraType] === 'Perspective') {
@@ -279,6 +288,8 @@ export function buildMarionetterScene(
                     `[buildMarionetterActors] invalid camera type: ${camera[MarionetterCameraComponentInfoProperty.cameraType]}`
                 );
             }
+            
+        // light actor
         } else if (lightComponent) {
             // light
             const light = lightComponent;
@@ -311,6 +322,10 @@ export function buildMarionetterScene(
             // ORIGINAL: volumeも一旦生のactorとみなす
             // } else if (volumeComponent) {
             //     actor = buildPostProcessVolumeActor({ name, volumeComponent });
+       
+       } else if (humanControllerComponent) {
+            actor = createHuman(gpu);
+            
         } else {
             // others
             actor = createActor({ name });
