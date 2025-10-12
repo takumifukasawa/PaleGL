@@ -113,7 +113,6 @@ import {
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
 import {
-    createVector4,
     createVector4zero,
     setVector4Component,
     v4x,

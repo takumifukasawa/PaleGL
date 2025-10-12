@@ -367,7 +367,7 @@ export const MarionetterComponentType = {
     Volume: 6,
     ObjectMoveAndLookAtController: 7,
     FbmNoiseTextureController: 8,
-    HumanController: 9,
+    // CUSTOM
 } as const;
 
 export type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
@@ -661,14 +661,6 @@ export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
     amplitude: NeedsShorten ? 'a' : 'amplitude',
     frequency: NeedsShorten ? 'f' : 'frequency',
     factor: NeedsShorten ? 'fa' : 'factor',
-} as const;
-
-export type MarionetterHumanControllerComponentInfo = MarionetterComponentInfoBase & {
-    leftShoulderRotation: RawVector4;
-};
-
-export const MarionetterHumanControllerComponentInfoProperty = {
-    leftShoulderRotation: NeedsShorten ? 'lsr' : 'leftShoulderRotation',
 } as const;
 
 //

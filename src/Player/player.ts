@@ -1,5 +1,6 @@
 import {
     buildMarionetterScene,
+    BuildMarionetterSceneGenerateActorHook,
     buildMarionetterTimelineFromScene,
     resolveInvertRotationLeftHandAxisToRightHandAxis,
 } from '@/Marionetter/buildMarionetterScene.ts';
@@ -8,12 +9,10 @@ import { initHotReloadAndParseScene } from '@/Marionetter/initHotReloadAndParseS
 import { snapToStep } from '@/Marionetter/timelineUtilities.ts';
 import {
     Marionetter,
-    MarionetterObjectInfoProperty,
     MarionetterReceiveSceneViewData,
     MarionetterReceiveSceneViewEnabledData,
     MarionetterScene,
     MarionetterSceneStructure,
-    MarionetterTransformInfoProperty,
 } from '@/Marionetter/types';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { setCameraPostProcess } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
@@ -46,10 +45,7 @@ import {
     Scene,
     setMainCamera,
 } from '@/PaleGL/core/scene.ts';
-import { InputController } from '@/PaleGL/inputs/inputController.ts';
-// import { v2o } from '@/PaleGL/math/vector2.ts';
-// import { createVector3 } from '@/PaleGL/math/vector3.ts';
-import { PostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
+import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import {
     getSoundCurrentTime,
     GLSLSoundWrapper,
@@ -60,7 +56,6 @@ import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
-import { v4w, v4x, v4y, v4z } from '@/PaleGL/math/vector4.ts';
 import { CameraTypes } from '@/PaleGL/constants.ts';
 import { createVector3 } from '@/PaleGL/math/vector3.ts';
 
@@ -97,15 +92,16 @@ export function createPlayer(
     sceneJson: string,
     hotReloadJsonUrl: string,
     onHotReload: () => void,
-    inputController: InputController,
+    // inputController: InputController,
     cameraPostProcess: PostProcess,
     options: {
+        generateActorHook?: BuildMarionetterSceneGenerateActorHook;
         timelineDuration?: number;
         glslSoundWrapper?: GLSLSoundWrapper;
         loop?: boolean;
     } = {}
 ): Player {
-    const { glslSoundWrapper, loop, timelineDuration } = options;
+    const { glslSoundWrapper, loop, timelineDuration, generateActorHook } = options;
 
     const renderer = createRenderer({
         gpu,
@@ -194,8 +190,9 @@ export function createPlayer(
         marionetter,
         JSON.parse(sceneJson) as unknown as MarionetterScene,
         // marionetterSceneStructure,
-        inputController,
-        cameraPostProcess
+        // inputController,
+        cameraPostProcess,
+        generateActorHook
         // true
     );
 
@@ -221,9 +218,10 @@ export function createPlayer(
                 player,
                 marionetter,
                 sceneJson,
-                inputController,
-                cameraPostProcess
-                // false
+                // inputController,
+                cameraPostProcess,
+                generateActorHook
+                // false,
             );
             onHotReload();
         });
@@ -266,14 +264,15 @@ function rebuildScene(
     player: Player,
     marionetter: Marionetter,
     sceneJson: MarionetterScene,
-    inputController: InputController,
-    cameraPostProcess: PostProcess
+    // inputController: InputController,
+    cameraPostProcess: PostProcess,
+    generateActorHook?: BuildMarionetterSceneGenerateActorHook
 ) {
     // sceneを空にする
     disposeScene(player.scene);
 
     // marionetterを構築
-    const structure = buildMarionetterScene(gpu, sceneJson);
+    const structure = buildMarionetterScene(gpu, sceneJson, generateActorHook);
 
     // sceneをreflesh
     const { actors } = structure;

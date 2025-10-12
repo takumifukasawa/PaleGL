@@ -3,15 +3,16 @@
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 
 // 1) HMR間で持続するストアを用意
-type Listener = (changedPaths: string[], all: Record<string, string>) => void;
+type Listener = (changedPath: string, changed: string, all: Record<string, string>) => void;
 type Store = {
     CURRENT: Record<string, string>;
     subs: Map<Listener, Set<string>>;
+    listeners: Set<Listener>;
     ready: boolean; // 初回起動かどうか
 };
 
 const hot = import.meta.hot;
-const store: Store = hot?.data.__shaderStore ?? { CURRENT: {}, subs: new Map(), ready: false };
+const store: Store = hot?.data.__shaderStore ?? { CURRENT: {}, subs: new Map(), listeners: new Set(), ready: false };
 if (hot) hot.data.__shaderStore = store;
 
 // 2) 全シェーダを vite-plugin-glsl で処理されたものとして eager import
@@ -68,7 +69,19 @@ store.CURRENT = NEXT;
 // 初回起動（ready=false）は通知しない。2回目以降のHMR時のみ通知
 if (store.ready && changed.length) {
     for (const [cb, set] of store.subs) {
-        if (changed.some((p) => set.has(p))) cb(changed, store.CURRENT);
+        if (changed.some((p) => set.has(p))) {
+            // console.log("hogehoge", changed, store.CURRENT);
+            // cb(changed, store.CURRENT);
+            const changedPath = changed[0];
+            const changedContent = store.CURRENT[changedPath];
+            cb(changedPath, changedContent, store.CURRENT);
+        }
+    }
+    // console.log("fugafuga", changed,  store.CURRENT, store.listeners.size);
+    for (const l of store.listeners) {
+        const changedPath = changed[0];
+        const changedContent = store.CURRENT[changedPath];
+        l(changedPath, changedContent, store.CURRENT);
     }
 }
 store.ready = true;
@@ -90,6 +103,15 @@ export function subscribeShaders(paths: string[], cb: Listener) {
     // 解除したい時だけ呼ぶ。呼ばなければずっと呼ばれ続けます。
     return () => store.subs.delete(cb);
 }
+
+export function subscribeSomeChangedShaders(cb: Listener) {
+    if (isNeededCompact()) return () => {}; // 何もしない関数を返す
+    store.listeners.add(cb);
+    // 解除したい時だけ呼ぶ。呼ばなければずっと呼ばれ続けます。
+    return () => store.listeners.delete(cb);
+}
+
+
 
 // 5) self-accept（depsなし）: 親に伝播させず、このモジュールだけをホット更新
 if (import.meta.hot) {
