@@ -135,6 +135,8 @@ export const MarionetterTrackInfoType = {
     ActivationControlTrack: 3,
     MarkerTrack: 4,
     ObjectMoveAndLookAtTrack: 5,
+    // TODO: custom track は外から注入したい
+    HumanTrack: 6,
 } as const;
 
 export type MarionetterTrackInfoType = (typeof MarionetterTrackInfoType)[keyof typeof MarionetterTrackInfoType];
@@ -191,7 +193,9 @@ export type MarionetterClipInfoKinds =
     | MarionetterAnimationClipInfo
     | MarionetterLightControlClipInfo
     | MarionetterActivationControlClipInfo
-    | MarionetterObjectMoveAndLookAtClipInfo;
+    | MarionetterObjectMoveAndLookAtClipInfo
+    // custom
+    | MarionetterHumanClipInfo;
 
 // NOTE: unity側に合わせる
 export const MarionetterClipInfoType = {
@@ -201,6 +205,8 @@ export const MarionetterClipInfoType = {
     ActivationControlClip: 3,
     SignalEmitter: 4,
     ObjectMoveAndLookAtClip: 5,
+    // custom
+    HumanClip: 6,
 } as const;
 
 export type MarionetterClipInfoType = (typeof MarionetterClipInfoType)[keyof typeof MarionetterClipInfoType];
@@ -272,6 +278,20 @@ export const MarionetterObjectMoveAndLookAtClipInfoProperty = {
 
 export type MarionetterObjectMoveAndLookAtClipInfoProperty =
     (typeof MarionetterObjectMoveAndLookAtClipInfoProperty)[keyof typeof MarionetterObjectMoveAndLookAtClipInfoProperty];
+
+export type MarionetterHumanClipInfo = MarionetterClipInfoBase & {
+    leftShoulderRotation: RawVector3;
+};
+
+export const MarionetterHumanClipInfoProperty = {
+    bindings: NeedsShorten ? 'b' : 'bindings',
+    leftShoulderRotationX: NeedsShorten ? 'lsr.x' : 'LeftShoulderRotation.x',
+    leftShoulderRotationY: NeedsShorten ? 'lsr.y' : 'LeftShoulderRotation.y',
+    leftShoulderRotationZ: NeedsShorten ? 'lsr.z' : 'LeftShoulderRotation.z',
+} as const;
+
+export type MarionetterHumanClipInfoProperty =
+    (typeof MarionetterHumanClipInfoProperty)[keyof typeof MarionetterHumanClipInfoProperty];
 
 export type MarionetterClipBinding = {
     propertyName: string;
@@ -751,6 +771,8 @@ export const MarionetterAnimationClipType = {
     ActivationControlClip: 3,
     SignalEmitter: 4,
     ObjectMoveAndLookAtClip: 5,
+    // CUSTOM
+    HumanClip: 6
 } as const;
 
 export type MarionetterAnimationClipType =
@@ -785,6 +807,12 @@ export type MarionetterActivationControlClip = MarionetterAnimationClipBase & {
 export type MarionetterObjectMoveAndLookAtClip = MarionetterAnimationClipBase & {
     // type: MarionetterAnimationClipType.ObjectMoveAndLookAtClip;
     clipInfo: MarionetterObjectMoveAndLookAtClipInfo;
+    execute: (args: MarionetterClipArgs) => void;
+};
+
+export type MarionetterHumanClip = MarionetterAnimationClipBase & {
+    // type: MarionetterAnimationClipType.HumanClip;
+    clipInfo: MarionetterHumanClipInfo;
     execute: (args: MarionetterClipArgs) => void;
 };
 

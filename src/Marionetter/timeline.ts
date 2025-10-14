@@ -37,6 +37,9 @@ import {
     MarionetterClipKinds,
     MarionetterDefaultTrackInfo,
     MarionetterDefaultTrackInfoProperty,
+    MarionetterHumanClip,
+    MarionetterHumanClipInfo,
+    MarionetterHumanClipInfoProperty,
     MarionetterLightControlClip,
     MarionetterLightControlClipInfo,
     MarionetterLightControlClipInfoProperty,
@@ -112,14 +115,7 @@ import {
     v3z,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import {
-    createVector4zero,
-    setVector4Component,
-    v4x,
-    v4y,
-    v4z,
-    Vector4,
-} from '@/PaleGL/math/vector4.ts';
+import { createVector4zero, setVector4Component, v4x, v4y, v4z, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
@@ -335,6 +331,12 @@ function createMarionetterClips(
                     createMarionetterObjectMoveAndLookAtClip(clip as MarionetterObjectMoveAndLookAtClipInfo)
                 );
                 break;
+
+            case MarionetterClipInfoType.HumanClip:
+                // TODO: custom track は外から注入したい
+                marionetterClips.push(createMarionetterHumanClip(clip as MarionetterHumanClipInfo));
+                break;
+
             default:
                 console.error(`[createMarionetterClips] invalid animation clip type`);
         }
@@ -463,7 +465,7 @@ function createMarionetterAnimationClip(
                                     tmpVector4LengthMap.set(accessorKey, 0);
                                 }
                                 setVector4Component(tmpVector4PropertyMap.get(accessorKey)!, accessorElement, value);
-                                tmpVector4LengthMap.set(accessorKey, tmpVector4LengthMap.get(accessorKey)! + 1)
+                                tmpVector4LengthMap.set(accessorKey, tmpVector4LengthMap.get(accessorKey)! + 1);
                                 break;
                             case 'r':
                             case 'g':
@@ -758,7 +760,9 @@ function createMarionetterObjectMoveAndLookAtClip(
                         break;
                     default:
                         // propertyが紐づいていない場合はエラーにする
-                        console.error(`[createMarionetterAnimationClip] invalid declared property: ${propertyName}`);
+                        console.error(
+                            `[createMarionetterObjectMoveAndLookAtClip] invalid declared property: ${propertyName}`
+                        );
                 }
             });
 
@@ -766,6 +770,59 @@ function createMarionetterObjectMoveAndLookAtClip(
             if (component) {
                 const [, behaviour] = component;
                 behaviour?.execute({ actor, scene, localPosition });
+            }
+        },
+    };
+}
+
+function createMarionetterHumanClip(humanClip: MarionetterHumanClipInfo): MarionetterHumanClip {
+    return {
+        type: MarionetterAnimationClipType.HumanClip,
+        clipInfo: humanClip,
+        execute: (args: { actor: Actor; time: number; scene: Scene }) => {
+            const { actor, time, scene } = args;
+
+            // let hasLocalPosition: boolean = false;
+            // let hasLocalRotationEuler: boolean = false;
+            // let hasLocalScale: boolean = false;
+            // const localPosition: Vector3 = Vector3.zero;
+            // const localRotationEulerDegree: Vector3 = Vector3.zero;
+            // const localScale: Vector3 = Vector3.one;
+
+            // const start = animationClip.s;
+            // const bindings = animationClip.b;
+
+            const leftShoulderRotationEulerDegree: Vector3 = createVector3Zero();
+
+            const start = humanClip[MarionetterClipInfoBaseProperty.start];
+            const bindings = humanClip[MarionetterHumanClipInfoProperty.bindings];
+            
+            // TODO: typeがあった方がよい. ex) animation clip, light control clip
+            bindings.forEach((binding) => {
+                const propertyName = binding[MarionetterClipBindingProperty.propertyName];
+                const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+                const value = curveUtilityEvaluateCurve(time - start, keyframes);
+
+                switch (propertyName) {
+                    case MarionetterHumanClipInfoProperty.leftShoulderRotationX:
+                        setV3x(leftShoulderRotationEulerDegree, value);
+                        break;
+                    case MarionetterHumanClipInfoProperty.leftShoulderRotationY:
+                        setV3y(leftShoulderRotationEulerDegree, value);
+                        break;
+                    case MarionetterHumanClipInfoProperty.leftShoulderRotationZ:
+                        setV3z(leftShoulderRotationEulerDegree, value);
+                        break;
+                    default:
+                        // propertyが紐づいていない場合はエラーにする
+                        console.error(`[createMarionetterHumanClip] invalid declared property: ${propertyName}`);
+                }
+            });
+
+            const component = getActorComponent<HumanController>(actor);
+            if (component) {
+                const [, behaviour] = component;
+                behaviour?.execute({ actor, scene, leftShoulderRotationEulerDegree });
             }
         },
     };
