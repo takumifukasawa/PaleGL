@@ -128,7 +128,6 @@ export function subVectorsV3Ref(refV: Vector3, v1: Vector3, v2: Vector3) {
     return refV;
 }
 
-
 export function negateVector3(v: Vector3) {
     setV3(v, -v3x(v), -v3y(v), -v3z(v));
     return v;
@@ -318,6 +317,14 @@ export function averageVector3(...vectors: Vector3[]) {
     }
     const sum = vectors.reduce((acc, v) => addVector3AndVector3(acc, v), createVector3Zero());
     return scaleVector3ByScalar(sum, 1 / vectors.length);
+}
+
+export function eulerToRadianVector3(v: Vector3) {
+    return createVector3((v3x(v) / 180) * Math.PI, (v3y(v) / 180) * Math.PI, (v3z(v) / 180) * Math.PI);
+}
+
+export function eulerToRawRadianVector3(v: Vector3) {
+    return createVector3((v3x(v) / 180), (v3y(v) / 180), (v3z(v) / 180));
 }
 
 export function logVector3(v: Vector3) {
