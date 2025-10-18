@@ -104,7 +104,7 @@ export function createEngine({
 }: EngineArgs): Engine {
     const sharedTextures: SharedTextures = createSharedTextures({ gpu, renderer });
     // const sharedQuad = createPlaneGeometry({ gpu });
-    const stats: Stats | null = isDevelopment() ? createStats({ showStats, showPipeline }) : null;
+    const stats = isDevelopment() ? createStats({ showStats, showPipeline }) : null;
 
     const engineBase: EngineBase = {
         sharedTextures,
