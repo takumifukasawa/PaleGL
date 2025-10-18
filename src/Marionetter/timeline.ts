@@ -37,9 +37,6 @@ import {
     MarionetterClipKinds,
     MarionetterDefaultTrackInfo,
     MarionetterDefaultTrackInfoProperty,
-    MarionetterHumanClip,
-    MarionetterHumanClipInfo,
-    MarionetterHumanClipInfoProperty,
     MarionetterLightControlClip,
     MarionetterLightControlClipInfo,
     MarionetterLightControlClipInfoProperty,
@@ -332,10 +329,10 @@ function createMarionetterClips(
                 );
                 break;
 
-            case MarionetterClipInfoType.HumanClip:
-                // TODO: custom track は外から注入したい
-                marionetterClips.push(createMarionetterHumanClip(clip as MarionetterHumanClipInfo));
-                break;
+            // case MarionetterClipInfoType.HumanClip:
+            //     // TODO: custom track は外から注入したい
+            //     marionetterClips.push(createMarionetterHumanClip(clip as MarionetterHumanClipInfo));
+            //     break;
 
             default:
                 console.error(`[createMarionetterClips] invalid animation clip type`);
@@ -775,55 +772,55 @@ function createMarionetterObjectMoveAndLookAtClip(
     };
 }
 
-function createMarionetterHumanClip(humanClip: MarionetterHumanClipInfo): MarionetterHumanClip {
-    return {
-        type: MarionetterAnimationClipType.HumanClip,
-        clipInfo: humanClip,
-        execute: (args: { actor: Actor; time: number; scene: Scene }) => {
-            const { actor, time, scene } = args;
-
-            // let hasLocalPosition: boolean = false;
-            // let hasLocalRotationEuler: boolean = false;
-            // let hasLocalScale: boolean = false;
-            // const localPosition: Vector3 = Vector3.zero;
-            // const localRotationEulerDegree: Vector3 = Vector3.zero;
-            // const localScale: Vector3 = Vector3.one;
-
-            // const start = animationClip.s;
-            // const bindings = animationClip.b;
-
-            const leftShoulderRotationEulerDegree: Vector3 = createVector3Zero();
-
-            const start = humanClip[MarionetterClipInfoBaseProperty.start];
-            const bindings = humanClip[MarionetterHumanClipInfoProperty.bindings];
-            
-            // TODO: typeがあった方がよい. ex) animation clip, light control clip
-            bindings.forEach((binding) => {
-                const propertyName = binding[MarionetterClipBindingProperty.propertyName];
-                const keyframes = binding[MarionetterClipBindingProperty.keyframes];
-                const value = curveUtilityEvaluateCurve(time - start, keyframes);
-
-                switch (propertyName) {
-                    case MarionetterHumanClipInfoProperty.leftShoulderRotationX:
-                        setV3x(leftShoulderRotationEulerDegree, value);
-                        break;
-                    case MarionetterHumanClipInfoProperty.leftShoulderRotationY:
-                        setV3y(leftShoulderRotationEulerDegree, value);
-                        break;
-                    case MarionetterHumanClipInfoProperty.leftShoulderRotationZ:
-                        setV3z(leftShoulderRotationEulerDegree, value);
-                        break;
-                    default:
-                        // propertyが紐づいていない場合はエラーにする
-                        console.error(`[createMarionetterHumanClip] invalid declared property: ${propertyName}`);
-                }
-            });
-
-            const component = getActorComponent<HumanController>(actor);
-            if (component) {
-                const [, behaviour] = component;
-                behaviour?.execute({ actor, scene, leftShoulderRotationEulerDegree });
-            }
-        },
-    };
-}
+// function createMarionetterHumanClip(humanClip: MarionetterHumanClipInfo): MarionetterHumanClip {
+//     return {
+//         type: MarionetterAnimationClipType.HumanClip,
+//         clipInfo: humanClip,
+//         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
+//             const { actor, time, scene } = args;
+// 
+//             // let hasLocalPosition: boolean = false;
+//             // let hasLocalRotationEuler: boolean = false;
+//             // let hasLocalScale: boolean = false;
+//             // const localPosition: Vector3 = Vector3.zero;
+//             // const localRotationEulerDegree: Vector3 = Vector3.zero;
+//             // const localScale: Vector3 = Vector3.one;
+// 
+//             // const start = animationClip.s;
+//             // const bindings = animationClip.b;
+// 
+//             const leftShoulderRotationEulerDegree: Vector3 = createVector3Zero();
+// 
+//             const start = humanClip[MarionetterClipInfoBaseProperty.start];
+//             const bindings = humanClip[MarionetterHumanClipInfoProperty.bindings];
+//             
+//             // TODO: typeがあった方がよい. ex) animation clip, light control clip
+//             bindings.forEach((binding) => {
+//                 const propertyName = binding[MarionetterClipBindingProperty.propertyName];
+//                 const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+//                 const value = curveUtilityEvaluateCurve(time - start, keyframes);
+// 
+//                 switch (propertyName) {
+//                     case MarionetterHumanClipInfoProperty.leftShoulderRotationX:
+//                         setV3x(leftShoulderRotationEulerDegree, value);
+//                         break;
+//                     case MarionetterHumanClipInfoProperty.leftShoulderRotationY:
+//                         setV3y(leftShoulderRotationEulerDegree, value);
+//                         break;
+//                     case MarionetterHumanClipInfoProperty.leftShoulderRotationZ:
+//                         setV3z(leftShoulderRotationEulerDegree, value);
+//                         break;
+//                     default:
+//                         // propertyが紐づいていない場合はエラーにする
+//                         console.error(`[createMarionetterHumanClip] invalid declared property: ${propertyName}`);
+//                 }
+//             });
+// 
+//             const component = getActorComponent<HumanController>(actor);
+//             if (component) {
+//                 const [, behaviour] = component;
+//                 behaviour?.execute({ actor, scene, leftShoulderRotationEulerDegree });
+//             }
+//         },
+//     };
+// }

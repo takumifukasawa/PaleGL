@@ -1,6 +1,5 @@
-import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
-    DepthFuncTypes, FaceSide,
+    DepthFuncTypes,
     FragmentShaderModifierPragmas,
     MaterialTypes,
     ShadingModelIds,
@@ -8,15 +7,16 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { createVector3One } from '@/PaleGL/math/vector3.ts';
+import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
+import { createObjectSpaceRaymarchUniforms } from '@/PaleGL/materials/objectSpaceRaymarchMaterial.ts';
 import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.ts';
+import { createVector3One } from '@/PaleGL/math/vector3.ts';
+import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
+import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
 import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
-import {createObjectSpaceRaymarchUniforms} from "@/PaleGL/materials/objectSpaceRaymarchMaterial.ts";
 
 type ObjectSpaceRaymarchGBufferArgs = {
     fragmentShaderTemplate?: string;
@@ -130,7 +130,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
             type: UniformTypes.Color,
             value: emissiveColor,
         },
-        ...createObjectSpaceRaymarchUniforms()
+        ...createObjectSpaceRaymarchUniforms(),
     ];
     const shadingUniforms: UniformsData = [
         {
@@ -148,13 +148,13 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         // ...options,
         name: 'ObjectSpaceRaymarchGBufferMaterial',
         type: MaterialTypes.ObjectSpaceRaymarch,
-        
+
         // faceSide: FaceSide.Double,
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
-        
+
         // NOTE: GBufferMaterialの設定
         // useNormalMap: !!normalMap,
         // depthTest: true,
@@ -178,14 +178,14 @@ export function createObjectSpaceRaymarchGBufferMaterial(
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: fragmentShaderContent,
             },
-            ...(args.fragmentShaderModifiers ?? [])
+            ...(args.fragmentShaderModifiers ?? []),
         ],
         depthFragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
             },
-            ...(args.depthFragmentShaderModifiers ?? [])
+            ...(args.depthFragmentShaderModifiers ?? []),
         ],
     });
 }
