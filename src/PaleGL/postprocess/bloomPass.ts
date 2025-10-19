@@ -23,6 +23,7 @@ import {
     renderPostProcessPass,
     setPostProcessPassSize,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { NeedsShorten } from '@/Marionetter/types';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -34,15 +35,37 @@ const UNIFORM_NAME_BLUR_16_TEXTURE = 'uBlur16Texture';
 const UNIFORM_NAME_BLUR_32_TEXTURE = 'uBlur32Texture';
 const UNIFORM_NAME_BLUR_64_TEXTURE = 'uBlur64Texture';
 const UNIFORM_NAME_TONE = 'uTone';
-const UNIFORM_NAME_BLOOM_AMOUNT = 'uBloomAmount';
+export const UNIFORM_NAME_BLOOM_AMOUNT = 'uBloomAmount';
 const UNIFORM_NAME_THRESHOLD = 'uThreshold';
 const UNIFORM_NAME_EXTRACT_TEXTURE = 'uExtractTexture';
 
-type BloomPassParameters = {
+export type BloomPassParameters = {
     threshold: number;
     tone: number;
     bloomAmount: number;
 };
+
+export type BloomPassParametersProperty = BloomPassParameters & {
+    // shorten
+    bl_th: number;
+    bl_to: number;
+    bl_a: number;
+};
+
+export const BloomPassParametersProperty = {
+    threshold: NeedsShorten ? 'bl_th' : 'threshold',
+    tone: NeedsShorten ? 'bl_to' : 'tone',
+    bloomAmount: NeedsShorten ? 'bl_a' : 'bloomAmount',
+} as const;
+
+// type BloomPassParameters = {
+//     [BloomPassParameters.threshold]: number;
+//     [BloomPassParameters.tone]: number;
+//     [BloomPassParameters.bloomAmount]: number;
+//     // threshold: number;
+//     // tone: number;
+//     // bloomAmount: number;
+// };
 
 export type BloomPass = PostProcessPassBase &
     BloomPassParameters & {

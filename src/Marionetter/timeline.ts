@@ -61,7 +61,7 @@ import {
     MarionetterTimelineTrackKinds,
     MarionetterTrackInfoBaseProperty,
     MarionetterTrackInfoType,
-    MarionetterAnimationClipType,
+    // MarionetterAnimationClipType,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -370,7 +370,7 @@ function createMarionetterAnimationClip(
         const tmpVector4LengthMap = new Map<string, number>();
         const colorPropertyMap = new Map<string, Color>();
 
-        const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
+        // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
 
@@ -537,14 +537,8 @@ function createMarionetterAnimationClip(
             // ない場合はセットしない方（sceneに任せる）
             // copyVector3(actor.transform.position, createVector3Zero());
         }
-        
-        switch (animationClipType) {
-            case MarionetterAnimationClipType.GBufferMaterial:
-                break;
-        }
-        
+
         // カスタム値などhook的に流す ---
-        
 
         // set float
         // numberの場合はすぐにセットしちゃう
@@ -554,7 +548,6 @@ function createMarionetterAnimationClip(
 
         // iterate vector4
         tmpVector4PropertyMap.forEach((v4, key) => {
-            // processActorPropertyBinder(actor, key, vector4);
             switch (tmpVector4LengthMap.get(key)) {
                 case 2:
                     vector2PropertyMap.set(key, createVector2(v4x(v4), v4y(v4)));

@@ -310,7 +310,7 @@ function buildScene(
     }
 
     // marionetterを構築
-    const structure = buildMarionetterScene(gpu, sceneJson, fallbackGenerateActorHook, generatedActorHook);
+    const structure = buildMarionetterScene(gpu, player.renderer, sceneJson, fallbackGenerateActorHook, generatedActorHook);
 
     console.log('structure', structure, initialBuild);
 

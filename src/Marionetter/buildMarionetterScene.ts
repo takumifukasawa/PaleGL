@@ -21,6 +21,7 @@ import {
     MarionetterObjectMoveAndLookAtControllerComponentInfo,
     MarionetterObjectMoveAndLookAtControllerComponentInfoProperty,
     MarionetterPlayableDirectorComponentInfo,
+    MarionetterPostProcessControllerComponentInfo,
     MarionetterScene,
     MarionetterSceneProperty,
     MarionetterSceneStructure,
@@ -51,6 +52,8 @@ import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quat
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
 import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
+import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
 // import { createHuman } from '../../../src/pages/scripts/createHuman.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
@@ -172,6 +175,7 @@ export type BuildMarionetterSceneGeneratedActorHook = (gpu: Gpu, actor: Actor) =
  */
 export function buildMarionetterScene(
     gpu: Gpu,
+    renderer: Renderer,
     marionetterScene: MarionetterScene,
     fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook,
     generatedActorHook?: BuildMarionetterSceneGeneratedActorHook
@@ -208,6 +212,10 @@ export function buildMarionetterScene(
         //     obj,
         //     MarionetterComponentType.Volume
         // );
+        const postProcessControllerComponent = findMarionetterComponent<MarionetterPostProcessControllerComponentInfo>(
+            obj,
+        MarionetterComponentType.PostProcessController
+        );
         const objectMoveAndLookAtControllerComponent =
             findMarionetterComponent<MarionetterObjectMoveAndLookAtControllerComponentInfo>(
                 obj,
@@ -359,6 +367,11 @@ export function buildMarionetterScene(
         // component関連
         //
 
+        if (postProcessControllerComponent && actor) {
+            const postProcessController = createPostProcessController(renderer);
+            addActorComponent(actor, postProcessController);
+        }
+        
         if (objectMoveAndLookAtControllerComponent) {
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
                 localPosition: createVector3FromRaw(
@@ -383,10 +396,8 @@ export function buildMarionetterScene(
             );
         }
 
-        // console.log("hogehoge", actor.name, !!gBufferMaterialControllerComponent && !!actor, gBufferMaterialControllerComponent);
         if (gBufferMaterialControllerComponent && actor) {
             addActorComponent(actor, createGBufferMaterialController());
-            // console.log("hogehoge", "add", actor.components.length)
         }
 
         if (actor) {

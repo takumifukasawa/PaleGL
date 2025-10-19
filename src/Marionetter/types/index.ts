@@ -400,7 +400,7 @@ export const MarionetterComponentType = {
     Camera: 3,
     MeshRenderer: 4,
     MeshFilter: 5,
-    Volume: 6,
+    PostProcessController: 6,
     ObjectMoveAndLookAtController: 7,
     FbmNoiseTextureController: 8,
     GBufferMaterialController: 9,
@@ -669,6 +669,18 @@ export const MarionetterMeshFilterComponentInfoProperty = {
     meshName: NeedsShorten ? 'mn' : 'meshName',
 } as const;
 
+// post process controller component
+
+export type MarionetterPostProcessControllerComponentInfo = MarionetterComponentInfoBase & {
+    bloomAmount: number;
+    // shorten
+    bl_a: number;
+};
+
+export const MarionetterPostProcessControllerComponentInfoProperty = {
+    bloomAmount: NeedsShorten ? 'bl_a' : 'bloomAmount',
+} as const;
+
 // object move and look at controller component
 
 export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterComponentInfoBase & {
@@ -684,6 +696,8 @@ export const MarionetterObjectMoveAndLookAtControllerComponentInfoProperty = {
     lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
 } as const;
 
+// fbm noise texture controller component
+
 export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterComponentInfoBase & {
     gridSize: RawVector2;
     octaves: number;
@@ -691,6 +705,8 @@ export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterCompo
     frequency: number;
     factor: number;
 };
+
+// fbm noise texture controller component
 
 export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
     gridSize: NeedsShorten ? 'gs' : 'gridSize',
@@ -708,33 +724,33 @@ export const MarionetterGBufferMaterialControllerComponentInfoProperty = {
     emissiveColor: NeedsShorten ? 'ec' : 'emissiveColor',
 } as const;
 
-//
-// post process component properties
-//
+// //
+// // post process component properties
+// //
 
-export const MarionetterPostProcessBloom = {
-    bloomIntensity: NeedsShorten ? 'bl_i' : 'bloomIntensity',
-} as const;
-export type MarionetterPostProcessBloomIntensity =
-    (typeof MarionetterPostProcessBloom)[keyof typeof MarionetterPostProcessBloom];
-
-export const MarionetterPostProcessDepthOfField = {
-    focusDistance: NeedsShorten ? 'dof_fd' : 'depthOfFieldFocusDistance',
-} as const;
-export type MarionetterPostProcessDepthOfFieldFocusDistance =
-    (typeof MarionetterPostProcessDepthOfField)[keyof typeof MarionetterPostProcessDepthOfField];
-
-export const MarionetterPostProcessVignette = {
-    vignetteIntensity: NeedsShorten ? 'vi_i' : 'vignetteIntensity',
-} as const;
-export type MarionetterPostProcessVignetteIntensity =
-    (typeof MarionetterPostProcessVignette)[keyof typeof MarionetterPostProcessVignette];
-
-export const MarionetterPostProcessVolumetricLight = {
-    volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
-} as const;
-export type MarionetterPostProcessVolumetricLightRayStep =
-    (typeof MarionetterPostProcessVolumetricLight)[keyof typeof MarionetterPostProcessVolumetricLight];
+// export const MarionetterPostProcessBloom = {
+//     bloomAmount: NeedsShorten ? 'bl_i' : 'bloomAmount',
+// } as const;
+// export type MarionetterPostProcessBloomIntensity =
+//     (typeof MarionetterPostProcessBloom)[keyof typeof MarionetterPostProcessBloom];
+// 
+// export const MarionetterPostProcessDepthOfField = {
+//     focusDistance: NeedsShorten ? 'dof_fd' : 'depthOfFieldFocusDistance',
+// } as const;
+// export type MarionetterPostProcessDepthOfFieldFocusDistance =
+//     (typeof MarionetterPostProcessDepthOfField)[keyof typeof MarionetterPostProcessDepthOfField];
+// 
+// export const MarionetterPostProcessVignette = {
+//     vignetteIntensity: NeedsShorten ? 'vi_i' : 'vignetteIntensity',
+// } as const;
+// export type MarionetterPostProcessVignetteIntensity =
+//     (typeof MarionetterPostProcessVignette)[keyof typeof MarionetterPostProcessVignette];
+// 
+// export const MarionetterPostProcessVolumetricLight = {
+//     volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
+// } as const;
+// export type MarionetterPostProcessVolumetricLightRayStep =
+//     (typeof MarionetterPostProcessVolumetricLight)[keyof typeof MarionetterPostProcessVolumetricLight];
 
 //
 // timeline
