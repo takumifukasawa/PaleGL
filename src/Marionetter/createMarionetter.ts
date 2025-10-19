@@ -126,6 +126,7 @@ export function createMarionetter({
                     console.log(`[marionetter] beginPlayer`);
                     // }
                     onBeginPlayer?.();
+                    onPlay?.(0);
                     break;
                 default:
                     console.warn('invalid type', json.type);
