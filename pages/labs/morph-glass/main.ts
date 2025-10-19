@@ -64,7 +64,7 @@ import { initDebugger } from 'pages/labs/morph-glass/initDebugger.ts';
 // import { createObjectSpaceRaymarchGBufferMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts';
 // import { createObjectSpaceRaymarchUnlitMaterial } from '@/PaleGL/materials/objectSpaceRaymarchUnlitMaterial.ts';
 // import {createObjectSpaceRaymarchGBufferMaterial} from "@/PaleGL/materials/objectSpaceRaymarchGBufferMaterial.ts";
-import { replaceAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { replaceAllMeshMaterialsByArgs, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { createObjectSpaceRaymarchGlassMaterial } from '@/PaleGL/materials/objectSpaceRaymarchGlassMaterial.ts';
 // import {subscribeShader} from "./watchShader.ts";
@@ -548,7 +548,7 @@ const main = async () => {
     };
 
     const replaceGlassMaterial = (content: string) => {
-        replaceAllMeshMaterials(objectSpaceRaymarchMesh, gpu, {
+        replaceAllMeshMaterialsByArgs(objectSpaceRaymarchMesh, gpu, {
             fragmentShaderModifiers: [
                 {
                     pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
