@@ -1,10 +1,11 @@
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type StartupLayer = {
     rootElement: HTMLDivElement;
     menuContentElement: HTMLDivElement;
     loadingContentElement: HTMLDivElement;
     loadingGageElement: HTMLDivElement;
-}
+};
 
 export function createStartupLayer(onClickPlayButton: () => void): StartupLayer {
     const stylesText = `
@@ -136,7 +137,7 @@ canvas {
             });
         }
     });
-    
+
     const startupLayer = {
         rootElement: startupWrapperElement,
         menuContentElement,
@@ -144,10 +145,28 @@ canvas {
         loadingGageElement,
     };
 
-    playButtonElement.addEventListener('click', () => {
+    const startPlayer = () => {
         hideStartupLayerWrapper(startupLayer);
         onClickPlayButton();
+    };
+
+    playButtonElement.addEventListener('click', () => {
+        startPlayer();
     });
+
+    if (isDevelopment()) {
+        let isStarted = false;
+        window.addEventListener('keydown', (e) => {
+            console.log(e.key)
+            if (e.key === 'Enter') {
+                if (isStarted) {
+                    return;
+                }
+                isStarted = true;
+                startPlayer();
+            }
+        });
+    }
 
     // return {
     //     rootElement: startupWrapperElement,
@@ -156,7 +175,7 @@ canvas {
     //     showMenu,
     //     hideStartupWrapper,
     // };
-    
+
     return startupLayer;
 }
 
