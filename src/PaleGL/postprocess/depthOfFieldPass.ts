@@ -1,19 +1,15 @@
-﻿import {
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import {
     PostProcessPassType,
     RenderTargetTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
-import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
-import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';
-import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
-import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
-import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
 import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import {
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
@@ -22,6 +18,11 @@ import {
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import dofBokehBlurFragmentShader from '@/PaleGL/shaders/dof-bokeh-blur-fragment.glsl';
+import dofBokehFragmentShader from '@/PaleGL/shaders/dof-bokeh-fragment.glsl';
+import dofCircleOfConfusionFragmentShader from '@/PaleGL/shaders/dof-circle-of-confusion-fragment.glsl';
+import dofCompositeFragmentShader from '@/PaleGL/shaders/dof-composite-fragment.glsl';
+import dofPreFilterFragmentShader from '@/PaleGL/shaders/dof-pre-filter-fragment.glsl';
 
 const UNIFORM_NAME_COC_TEXTURE = 'uCocTexture';
 const UNIFORM_NAME_DOF_TEXTURE = 'uDofTexture';
@@ -37,6 +38,19 @@ export type DepthOfFieldPassParameters = {
     focusRange: number;
     bokehRadius: number;
 };
+
+export type DepthOfFieldPassParametersProperty = DepthOfFieldPassParameters & {
+    // shorten
+    dof_fd: number;
+    dof_fr: number;
+    dof_br: number;
+};
+
+export const DepthOfFieldPassParametersProperty = {
+    focusDistance: NeedsShorten ? 'dof_fd' : 'focusDistance',
+    focusRange: NeedsShorten ? 'dof_fr' : 'focusRange',
+    bokehRadius: NeedsShorten ? 'dof_br' : 'bokehRadius',
+} as const;
 
 export type DepthOfFieldPassArgs = PostProcessPassParametersBaseArgs & Partial<DepthOfFieldPassParameters>;
 

@@ -1,6 +1,7 @@
 import { Component, createComponent } from '@/PaleGL/components/component.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
-import { BloomPassParameters, BloomPassParametersProperty } from '@/PaleGL/postprocess/bloomPass.ts';
+import { BloomPassParametersProperty } from '@/PaleGL/postprocess/bloomPass.ts';
+import { DepthOfFieldPassParametersProperty } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
 
 export type PostProcessController = Component;
 
@@ -9,21 +10,33 @@ export type PostProcessController = Component;
 // timeline から操作される
 export function createPostProcessController(renderer: Renderer): PostProcessController {
     return createComponent({
-        onProcessPropertyBinder: (actor, _, key, value) => {
+        onProcessPropertyBinder: (_a, _b, key, value) => {
             // // for debug
             // console.log(
             //     `[PostProcessController] onProcessPropertyBinder: actor=${actor.name}, key=${key}, value=${value}`
             // );
             switch (key) {
+                // bloom
                 case BloomPassParametersProperty.bloomAmount:
                     renderer.bloomPass.bloomAmount = value as number;
-                    // console.log(`[PostProcessController] Set bloomAmount: ${renderer.bloomPass.bloomAmount}`);
+                    break;
+                case BloomPassParametersProperty.tone:
+                    renderer.bloomPass.tone = value as number;
+                    break;
+                case BloomPassParametersProperty.threshold:
+                    renderer.bloomPass.threshold = value as number;
+                    break;
+                // dof
+                case DepthOfFieldPassParametersProperty.focusDistance:
+                    renderer.depthOfFieldPass.focusDistance = value as number;
+                    break;
+                case DepthOfFieldPassParametersProperty.focusRange:
+                    renderer.depthOfFieldPass.focusRange = value as number;
+                    break;
+                case DepthOfFieldPassParametersProperty.bokehRadius:
+                    renderer.depthOfFieldPass.bokehRadius = value as number;
                     break;
             }
-            // if (bindings.has(key)) {
-            //     const uniformName = bindings.get(key)!;
-            //     setUniformValueToAllMeshMaterials(actor as Mesh, uniformName, value);
-            // }
         },
     });
 }
