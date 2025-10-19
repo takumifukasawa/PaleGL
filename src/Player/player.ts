@@ -67,6 +67,8 @@ import { CameraTypes } from '@/PaleGL/constants.ts';
 import { createVector3 } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 
+const HOT_REBUILD_SCENE = false;
+
 export type Player = {
     gpu: Gpu;
     engine: Engine;
@@ -84,7 +86,7 @@ export type Player = {
     marionetter: Marionetter | null;
     marionetterSceneStructure: MarionetterSceneStructure | null;
     timelineDuration: number;
-    onHotReload?: () => void;
+    onHotReload?: (hotReload: boolean) => void;
 };
 
 // let isOrbitCameraEnabled = false;
@@ -99,7 +101,7 @@ export function createPlayer(
     pixelRatio: number,
     sceneJson: string,
     hotReloadJsonUrl: string,
-    onHotReload: () => void,
+    onHotReload: (hotReload: boolean) => void,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
     options: {
@@ -192,7 +194,7 @@ export function createPlayer(
         },
     });
 
-    const marionetterSceneStructure = rebuildScene(
+    const marionetterSceneStructure = buildScene(
         // prettier-ignore
         gpu,
         player,
@@ -222,7 +224,7 @@ export function createPlayer(
     if (import.meta.env.VITE_HOT_RELOAD === 'true') {
         marionetter.connect();
         initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, (sceneJson) => {
-            rebuildScene(
+            buildScene(
                 // prettier-ignore
                 gpu,
                 player,
@@ -235,7 +237,7 @@ export function createPlayer(
                 generatedActorHook
                 // false,
             );
-            onHotReload();
+            onHotReload(true);
         });
     }
 
@@ -271,40 +273,36 @@ export function createPlayer(
 }
 
 // TODO: 差分更新
-function rebuildScene(
+function buildScene(
     gpu: Gpu,
     player: Player,
     marionetter: Marionetter,
     sceneJson: MarionetterScene,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
-    hotRebuild: boolean,
+    initialBuild: boolean,
     fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook,
     generatedActorHook?: BuildMarionetterSceneGeneratedActorHook
 ) {
-    // sceneを空にする
-    // disposeScene(player.scene);
-    // let tmpSceneViewCamera: Camera | null  = null;
-    // for (let i = 0; i <player.scene.children.length; i++) {
-    //     if (player.scene.children[i] === sceneViewCameraEntity) {
-    //         tmpSceneViewCamera = player.scene.children[i] as Camera;
-    //         console.log("fugafuga", tmpSceneViewCamera);
-    //         break;
-    //     }
-    // }
-    traverseScene(player.scene, (actor) => {
-        disposeActor(actor);
-    });
-    // player.scene.children = tmpSceneViewCamera ? [tmpSceneViewCamera] : [];
-    player.scene.children = [];
+    if (HOT_REBUILD_SCENE || initialBuild) {
+        // sceneを空にする
+        traverseScene(player.scene, (actor) => {
+            disposeActor(actor);
+        });
+        player.scene.children = [];
+    }
 
     // marionetterを構築
     const structure = buildMarionetterScene(gpu, sceneJson, fallbackGenerateActorHook, generatedActorHook);
 
+    console.log('structure', structure, initialBuild);
+
     // sceneをreflesh
-    const { actors } = structure;
-    for (let i = 0; i < actors.length; i++) {
-        addActorToScene(player.scene, actors[i]);
+    if (HOT_REBUILD_SCENE || initialBuild) {
+        const { actors } = structure;
+        for (let i = 0; i < actors.length; i++) {
+            addActorToScene(player.scene, actors[i]);
+        }
     }
 
     // timelineにactorをbind
@@ -312,9 +310,13 @@ function rebuildScene(
     structure.marionetterTimeline?.bindActors(player.scene.children);
 
     // camera
-    const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
-    setMainCamera(player.scene, camera);
-    createSceneUICamera(player.scene);
+    if (HOT_REBUILD_SCENE || initialBuild) {
+        const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
+        setMainCamera(player.scene, camera);
+        createSceneUICamera(player.scene);
+        setCameraPostProcess(camera, cameraPostProcess);
+        cachedPlayerCamera = camera;
+    }
 
     // // orbit camera controller
     // orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
@@ -322,19 +324,22 @@ function rebuildScene(
     // if (!tmpSceneViewCamera) {
     //     sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
     // }
-    sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
-
-    cachedPlayerCamera = camera;
+    if (HOT_REBUILD_SCENE || initialBuild) {
+        sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
+    }
 
     player.marionetter = marionetter;
     player.marionetterSceneStructure = structure;
 
-    // setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
-    setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
+    if (!cachedPlayerCamera || !sceneViewCameraEntity) {
+        console.error('[marionetter] camera not found');
+    } else {
+        setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
+    }
 
-    console.log('hogehoge', player.scene);
+    // console.log('hogehoge', player.scene);
 
-    if (!hotRebuild) {
+    if (HOT_REBUILD_SCENE || initialBuild) {
         hotRebuildRenderer(player.renderer);
     }
 
