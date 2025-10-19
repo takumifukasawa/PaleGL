@@ -117,4 +117,6 @@ void main() {
     // outGBufferD = EncodeGBufferD(-vBinormal);
     // // outGBufferD = EncodeGBufferD(vec3(uv * .1, 1.));
     // #endif
+    
+    #pragma AFTER_OUT
 }
