@@ -118,8 +118,9 @@ export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
 export const MaterialTypes = {
     Misc: 0,
     GBuffer: 1,
-    ObjectSpaceRaymarch: 2,
-    ScreenSpaceRaymarch: 3,
+    Unlit: 2,
+    ObjectSpaceRaymarch: 3,
+    ScreenSpaceRaymarch: 4,
 } as const;
 
 export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];

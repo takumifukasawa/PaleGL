@@ -482,6 +482,8 @@ function createMarionetterAnimationClip(
                     break;
             }
         });
+        
+        // assign value to properties ---
 
         // set local scale
         if (hasLocalScale) {

@@ -1,20 +1,21 @@
-import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
-    ShadingModelIds,
     DepthFuncTypes,
+    MaterialTypes,
+    ShadingModelIds,
+    UniformBlockNames,
     UniformNames,
     UniformTypes,
-    UniformBlockNames,
     VertexShaderModifiers,
 } from '@/PaleGL/constants';
-import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
+import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
 
-import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
-import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
+import gBufferDepthFrag from '@/PaleGL/shaders/gbuffer-depth-fragment.glsl';
+import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 
 export type UnlitMaterialArgs = {
     baseMap?: Texture;
@@ -79,11 +80,12 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
             type: UniformTypes.Color,
             value: baseColor || createColorWhite(),
         },
-        ...uniforms
+        ...uniforms,
     ];
 
     const material = createMaterial({
         name: 'UnlitMaterial',
+        type: MaterialTypes.Unlit,
         vertexShaderModifiers,
         vertexShader: gBufferVert,
         fragmentShader: unlitFrag,
