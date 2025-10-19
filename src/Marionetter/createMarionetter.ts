@@ -122,11 +122,17 @@ export function createMarionetter({
                     onSceneViewEnabled?.(sceneViewEnabledData);
                     break;
                 case MarionetterReceiveDataType.BeginPlayer:
-                    // if (showLog) {
-                    console.log(`[marionetter] beginPlayer`);
-                    // }
+                    if (showLog) {
+                        console.log(`[marionetter] beginPlayer`);
+                    }
                     onBeginPlayer?.();
                     onPlay?.(0);
+                    break;
+                case MarionetterReceiveDataType.Reload:
+                    if (showLog) {
+                        console.log(`[marionetter] reload`);
+                    }
+                    window.location.reload();
                     break;
                 default:
                     console.warn('invalid type', json.type);

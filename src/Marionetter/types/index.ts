@@ -31,6 +31,7 @@ export const MarionetterReceiveDataType = {
     SetSceneViewData: 'setSceneViewData',
     SetSceneViewEnabled: 'setSceneViewEnabled',
     BeginPlayer: 'beginPlayer',
+    Reload: 'reload'
 } as const;
 
 export type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
