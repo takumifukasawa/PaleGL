@@ -28,7 +28,7 @@ import {
     MarionetterAnimationClip,
     MarionetterAnimationClipInfo,
     MarionetterAnimationClipInfoProperty,
-    MarionetterAnimationClipType,
+    MarionetterClipType,
     MarionetterClipArgs,
     MarionetterClipBindingProperty,
     MarionetterClipInfoBaseProperty,
@@ -61,6 +61,7 @@ import {
     MarionetterTimelineTrackKinds,
     MarionetterTrackInfoBaseProperty,
     MarionetterTrackInfoType,
+    MarionetterAnimationClipType,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -369,8 +370,12 @@ function createMarionetterAnimationClip(
         const tmpVector4LengthMap = new Map<string, number>();
         const colorPropertyMap = new Map<string, Color>();
 
+        const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
+
+        // for debug
+        // console.log('bindings', bindings, animationClipType);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -482,8 +487,8 @@ function createMarionetterAnimationClip(
                     break;
             }
         });
-        
-        // assign value to properties ---
+
+        // 自動割り当て(transform関連など) ---
 
         // set local scale
         if (hasLocalScale) {
@@ -532,6 +537,14 @@ function createMarionetterAnimationClip(
             // ない場合はセットしない方（sceneに任せる）
             // copyVector3(actor.transform.position, createVector3Zero());
         }
+        
+        switch (animationClipType) {
+            case MarionetterAnimationClipType.GBufferMaterial:
+                break;
+        }
+        
+        // カスタム値などhook的に流す ---
+        
 
         // set float
         // numberの場合はすぐにセットしちゃう
@@ -578,7 +591,7 @@ function createMarionetterAnimationClip(
     };
 
     return {
-        type: MarionetterAnimationClipType.AnimationClip,
+        type: MarionetterClipType.AnimationClip,
         clipInfo: animationClip,
         // bind,
         execute,
@@ -687,7 +700,7 @@ function createMarionetterLightControlClip(
     };
 
     return {
-        type: MarionetterAnimationClipType.LightControlClip,
+        type: MarionetterClipType.LightControlClip,
         clipInfo: lightControlClip,
         // bind,
         execute,
@@ -711,7 +724,7 @@ function createMarionetterActivationControlClip(
     // };
 
     return {
-        type: MarionetterAnimationClipType.ActivationControlClip,
+        type: MarionetterClipType.ActivationControlClip,
         clipInfo: activationControlClip,
         execute: () => {},
     };
@@ -721,7 +734,7 @@ function createMarionetterObjectMoveAndLookAtClip(
     objectMoveAndLookAtClip: MarionetterObjectMoveAndLookAtClipInfo
 ): MarionetterObjectMoveAndLookAtClip {
     return {
-        type: MarionetterAnimationClipType.ObjectMoveAndLookAtClip,
+        type: MarionetterClipType.ObjectMoveAndLookAtClip,
         clipInfo: objectMoveAndLookAtClip,
         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
             const { actor, time, scene } = args;

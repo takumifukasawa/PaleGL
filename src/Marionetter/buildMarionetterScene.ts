@@ -6,6 +6,7 @@ import {
     MarionetterComponentType,
     MarionetterDirectionalLightComponentInfo,
     MarionetterFbmNoiseTextureControllerComponentInfo,
+    MarionetterGBufferMaterialControllerComponentInfo,
     MarionetterLightComponentInfo,
     MarionetterLightComponentInfoProperty,
     MarionetterLitMaterialInfoProperty,
@@ -34,6 +35,7 @@ import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -220,6 +222,11 @@ export function buildMarionetterScene(
         //     obj,
         //     MarionetterComponentType.HumanController
         // );
+        const gBufferMaterialControllerComponent =
+            findMarionetterComponent<MarionetterGBufferMaterialControllerComponentInfo>(
+                obj,
+                MarionetterComponentType.GBufferMaterialController
+            );
 
         let actor: Actor | null = null;
 
@@ -374,6 +381,12 @@ export function buildMarionetterScene(
                 `[buildMarionetterActors] FBM Noise Texture Controller is not supported yet. - ${name}`,
                 fbmNoiseTextureControllerComponent
             );
+        }
+
+        // console.log("hogehoge", actor.name, !!gBufferMaterialControllerComponent && !!actor, gBufferMaterialControllerComponent);
+        if (gBufferMaterialControllerComponent && actor) {
+            addActorComponent(actor, createGBufferMaterialController());
+            // console.log("hogehoge", "add", actor.components.length)
         }
 
         if (actor) {

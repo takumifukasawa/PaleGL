@@ -31,7 +31,7 @@ export const MarionetterReceiveDataType = {
     SetSceneViewData: 'setSceneViewData',
     SetSceneViewEnabled: 'setSceneViewEnabled',
     BeginPlayer: 'beginPlayer',
-    Reload: 'reload'
+    Reload: 'reload',
 } as const;
 
 export type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
@@ -230,17 +230,30 @@ export const MarionetterClipInfoBaseProperty = {
     duration: NeedsShorten ? 'd' : 'duration',
 } as const;
 
+// NOTE: unity側に合わせる
+export const MarionetterAnimationClipType = {
+    Default: 0,
+    GBufferMaterial: 1,
+    // custom
+} as const;
+
+export type MarionetterAnimationClipType =
+    (typeof MarionetterAnimationClipType)[keyof typeof MarionetterAnimationClipType];
+
 export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
+    animationClipType: MarionetterAnimationClipType;
     offsetPosition: { x: number; y: number; z: number };
     offsetRotation: { x: number; y: number; z: number };
     bindings: MarionetterClipBinding[];
     // shorten
+    act: MarionetterAnimationClipType;
     op: { x: number; y: number; z: number };
     or: { x: number; y: number; z: number };
     b: MarionetterClipBinding[];
 };
 
 export const MarionetterAnimationClipInfoProperty = {
+    animationClipType: NeedsShorten ? 'act' : 'animationClipType',
     offsetPosition: NeedsShorten ? 'op' : 'offsetPosition',
     offsetRotation: NeedsShorten ? 'or' : 'offsetRotation',
     bindings: NeedsShorten ? 'b' : 'bindings',
@@ -390,6 +403,7 @@ export const MarionetterComponentType = {
     Volume: 6,
     ObjectMoveAndLookAtController: 7,
     FbmNoiseTextureController: 8,
+    GBufferMaterialController: 9,
     // CUSTOM
 } as const;
 
@@ -686,6 +700,14 @@ export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
     factor: NeedsShorten ? 'fa' : 'factor',
 } as const;
 
+export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterComponentInfoBase & {
+    emissiveColor: string;
+};
+
+export const MarionetterGBufferMaterialControllerComponentInfoProperty = {
+    emissiveColor: NeedsShorten ? 'ec' : 'emissiveColor',
+} as const;
+
 //
 // post process component properties
 //
@@ -767,7 +789,7 @@ export type MarionetterClipKinds =
     | MarionetterActivationControlClip
     | MarionetterObjectMoveAndLookAtClip;
 
-export const MarionetterAnimationClipType = {
+export const MarionetterClipType = {
     None: 0,
     AnimationClip: 1,
     LightControlClip: 2,
@@ -778,13 +800,12 @@ export const MarionetterAnimationClipType = {
     // HumanClip: 6
 } as const;
 
-export type MarionetterAnimationClipType =
-    (typeof MarionetterAnimationClipType)[keyof typeof MarionetterAnimationClipType];
+export type MarionetterClipType = (typeof MarionetterClipType)[keyof typeof MarionetterClipType];
 
 export type MarionetterClipArgs = { actor: Actor; time: number; scene: Scene };
 
 export type MarionetterAnimationClipBase = {
-    type: MarionetterAnimationClipType;
+    type: MarionetterClipType;
 };
 
 export type MarionetterAnimationClip = MarionetterAnimationClipBase & {
