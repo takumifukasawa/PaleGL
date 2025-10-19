@@ -98,9 +98,9 @@ export function findActorInSceneByName(scene: Scene, name: string) {
     return result || null;
 }
 
-export function disposeScene(scene: Scene) {
-    traverseScene(scene, (actor) => {
-        disposeActor(actor);
-    });
-    scene.children = [];
-}
+// export function disposeScene(scene: Scene) {
+//     traverseScene(scene, (actor) => {
+//         disposeActor(actor);
+//     });
+//     scene.children = [];
+// }

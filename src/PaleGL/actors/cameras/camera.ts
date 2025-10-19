@@ -1,17 +1,14 @@
 ﻿import { Actor, createActor } from '@/PaleGL/actors/actor.ts';
+import { ActorTypes, CameraType } from '@/PaleGL/constants.ts';
 import { createMat4Identity, Matrix4 } from '@/PaleGL/math/matrix4.ts';
-import {createVector4, Vector4} from '@/PaleGL/math/vector4.ts';
-import {
-    ActorTypes,
-    CameraType,
-} from '@/PaleGL/constants.ts';
+import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 // import {Vector3} from "@/PaleGL/math/Vector3";
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
+import { MultipleRenderTarget } from '@/PaleGL/core/multipleRenderTargets.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import {MultipleRenderTarget} from "@/PaleGL/core/multipleRenderTargets.ts";
 
 export const FrustumDirection = {
     nlt: 'nlt',
@@ -98,7 +95,7 @@ export function createCamera({
         far,
         visibleFrustum,
         visibleFrustumMesh,
-        autoResize: true
+        autoResize: true,
         // // methods
         // getFrustumWorldPositions,
         // getFrustumLocalPositions,

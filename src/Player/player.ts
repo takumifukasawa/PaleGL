@@ -1,6 +1,7 @@
 import {
     buildMarionetterScene,
-    BuildMarionetterSceneGenerateActorHook,
+    BuildMarionetterSceneFallbackGenerateActorHook,
+    BuildMarionetterSceneGeneratedActorHook,
     buildMarionetterTimelineFromScene,
     resolveInvertRotationLeftHandAxisToRightHandAxis,
 } from '@/Marionetter/buildMarionetterScene.ts';
@@ -35,15 +36,21 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 //     setOrbitCameraControllerDelta,
 //     startOrbitCameraController,
 // } from '@/PaleGL/core/orbitCameraController.ts';
-import { createRenderer, Renderer, renderRenderer, updateTimelineUniforms } from '@/PaleGL/core/renderer.ts';
+import {
+    createRenderer,
+    hotRebuildRenderer,
+    Renderer,
+    renderRenderer,
+    updateTimelineUniforms,
+} from '@/PaleGL/core/renderer.ts';
 import {
     addActorToScene,
     createScene,
     createSceneUICamera,
-    disposeScene,
     findActorByName,
     Scene,
     setMainCamera,
+    traverseScene,
 } from '@/PaleGL/core/scene.ts';
 import { PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import {
@@ -58,6 +65,7 @@ import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { CameraTypes } from '@/PaleGL/constants.ts';
 import { createVector3 } from '@/PaleGL/math/vector3.ts';
+import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 
 export type Player = {
     gpu: Gpu;
@@ -95,13 +103,14 @@ export function createPlayer(
     // inputController: InputController,
     cameraPostProcess: PostProcess,
     options: {
-        generateActorHook?: BuildMarionetterSceneGenerateActorHook;
+        fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook;
+        generatedActorHook?: BuildMarionetterSceneGeneratedActorHook;
         timelineDuration?: number;
         glslSoundWrapper?: GLSLSoundWrapper;
         loop?: boolean;
     } = {}
 ): Player {
-    const { glslSoundWrapper, loop, timelineDuration, generateActorHook } = options;
+    const { glslSoundWrapper, loop, timelineDuration, fallbackGenerateActorHook, generatedActorHook } = options;
 
     const renderer = createRenderer({
         gpu,
@@ -192,8 +201,9 @@ export function createPlayer(
         // marionetterSceneStructure,
         // inputController,
         cameraPostProcess,
-        generateActorHook
-        // true
+        true,
+        fallbackGenerateActorHook,
+        generatedActorHook
     );
 
     // for debug
@@ -220,7 +230,9 @@ export function createPlayer(
                 sceneJson,
                 // inputController,
                 cameraPostProcess,
-                generateActorHook
+                false,
+                fallbackGenerateActorHook,
+                generatedActorHook
                 // false,
             );
             onHotReload();
@@ -266,13 +278,28 @@ function rebuildScene(
     sceneJson: MarionetterScene,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
-    generateActorHook?: BuildMarionetterSceneGenerateActorHook
+    hotRebuild: boolean,
+    fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook,
+    generatedActorHook?: BuildMarionetterSceneGeneratedActorHook
 ) {
     // sceneを空にする
-    disposeScene(player.scene);
+    // disposeScene(player.scene);
+    // let tmpSceneViewCamera: Camera | null  = null;
+    // for (let i = 0; i <player.scene.children.length; i++) {
+    //     if (player.scene.children[i] === sceneViewCameraEntity) {
+    //         tmpSceneViewCamera = player.scene.children[i] as Camera;
+    //         console.log("fugafuga", tmpSceneViewCamera);
+    //         break;
+    //     }
+    // }
+    traverseScene(player.scene, (actor) => {
+        disposeActor(actor);
+    });
+    // player.scene.children = tmpSceneViewCamera ? [tmpSceneViewCamera] : [];
+    player.scene.children = [];
 
     // marionetterを構築
-    const structure = buildMarionetterScene(gpu, sceneJson, generateActorHook);
+    const structure = buildMarionetterScene(gpu, sceneJson, fallbackGenerateActorHook, generatedActorHook);
 
     // sceneをreflesh
     const { actors } = structure;
@@ -292,7 +319,10 @@ function rebuildScene(
     // // orbit camera controller
     // orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
 
-    sceneViewCameraEntity = createSeneViewCamera(player, cameraPostProcess);
+    // if (!tmpSceneViewCamera) {
+    //     sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
+    // }
+    sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
 
     cachedPlayerCamera = camera;
 
@@ -301,6 +331,12 @@ function rebuildScene(
 
     // setPlayerCamera(player, isOrbitCameraEnabled ? orbitCameraEntity : cachedPlayerCamera);
     setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
+
+    console.log('hogehoge', player.scene);
+
+    if (!hotRebuild) {
+        hotRebuildRenderer(player.renderer);
+    }
 
     return structure;
 }
@@ -410,9 +446,9 @@ function stopMarionetter(player: Player) {
     player.isPlaying = false;
 }
 
-function createSeneViewCamera(player: Player, cameraPostProcess: PostProcess) {
+function createSceneViewCamera(player: Player, cameraPostProcess: PostProcess) {
     // orbit camera の切り替え
-    const entity = createPerspectiveCamera(70, 1, 0.1, 50, 'orbitCamera');
+    const entity = createPerspectiveCamera(70, 1, 0.1, 50, 'sceneViewCamera');
     addActorToScene(player.scene, entity);
     setCameraPostProcess(entity, cameraPostProcess);
     return entity;

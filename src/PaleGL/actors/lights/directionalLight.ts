@@ -1,12 +1,13 @@
-﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
+﻿import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { createOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
-import { addChildActor } from '@/PaleGL/actors/actor.ts';
-import { LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
-import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { setRotationY } from '@/PaleGL/core/transform.ts';
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
+import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import { LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { setRotationY } from '@/PaleGL/core/transform.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type DirectionalLight = Light;
 
@@ -44,8 +45,8 @@ export const createDirectionalLightShadow = (
     setRotationY(light.shadowCamera.transform, 180);
 
     addChildActor(light, light.shadowCamera);
-    
-    light.shadowCamera.visibleFrustum = visibleFrustum;
+
+    light.shadowCamera.visibleFrustum = isDevelopment() ? visibleFrustum : false;
     light.castShadow = true;
     light.shadowCamera.near = near;
     light.shadowCamera.far = far;

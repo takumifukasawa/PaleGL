@@ -121,7 +121,6 @@ export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componen
 //     );
 // }
 
-
 // ORIGINAL
 // function buildPostProcessVolumeActor({
 //     name,
@@ -160,7 +159,9 @@ export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componen
 //     return new PostProcessVolume({ name, parameters });
 // }
 
-export type BuildMarionetterSceneGenerateActorHook = (gpu: Gpu, obj: MarionetterObjectInfo) => Actor | null;
+export type BuildMarionetterSceneFallbackGenerateActorHook = (gpu: Gpu, obj: MarionetterObjectInfo) => Actor | null;
+
+export type BuildMarionetterSceneGeneratedActorHook = (gpu: Gpu, actor: Actor) => void;
 
 /**
  *
@@ -170,7 +171,8 @@ export type BuildMarionetterSceneGenerateActorHook = (gpu: Gpu, obj: Marionetter
 export function buildMarionetterScene(
     gpu: Gpu,
     marionetterScene: MarionetterScene,
-    generateActorHook?: BuildMarionetterSceneGenerateActorHook
+    fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook,
+    generatedActorHook?: BuildMarionetterSceneGeneratedActorHook
     // placedScene: Scene
 ): MarionetterSceneStructure {
     const actors: Actor[] = [];
@@ -315,15 +317,15 @@ export function buildMarionetterScene(
                     });
                     break;
                 case 'Spot':
-                    // TODO: デフォルト値を渡してるのはよくない
                     const spotLightInfo = light as MarionetterSpotLightComponentInfo;
+                    // angleは半分にする必要があることに注意
                     actor = createSpotLight({
                         name,
                         color: createColorFromHex(spotLightInfo[MarionetterLightComponentInfoProperty.color]),
                         intensity: spotLightInfo[MarionetterLightComponentInfoProperty.intensity],
                         distance: spotLightInfo[MarionetterSpotLightComponentInfoProperty.range],
-                        coneAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.spotAngle],
-                        penumbraAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.innerSpotAngle],
+                        coneAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.spotAngle] / 2,
+                        penumbraAngle: spotLightInfo[MarionetterSpotLightComponentInfoProperty.innerSpotAngle] / 2,
                     });
                     break;
                 default:
@@ -334,12 +336,12 @@ export function buildMarionetterScene(
             // ORIGINAL: volumeも一旦生のactorとみなす
             // } else if (volumeComponent) {
             //     actor = buildPostProcessVolumeActor({ name, volumeComponent });
-        // } else if (humanControllerComponent) {
-        //     actor = createHuman(gpu);
+            // } else if (humanControllerComponent) {
+            //     actor = createHuman(gpu);
         } else {
             // others
-            if (generateActorHook) {
-                actor = generateActorHook(gpu, obj);
+            if (fallbackGenerateActorHook) {
+                actor = fallbackGenerateActorHook(gpu, obj);
             }
             if (!actor) {
                 actor = createActor({ name });
@@ -435,6 +437,8 @@ export function buildMarionetterScene(
                 obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].y,
                 obj[MarionetterObjectInfoProperty.transform][MarionetterTransformInfoProperty.localPosition].z
             );
+
+            generatedActorHook?.(gpu, actor);
 
             // 親が存在する場合は親に追加、親がない場合はシーン直下に配置したいので配列に追加
             if (parentActor) {

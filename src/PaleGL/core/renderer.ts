@@ -271,7 +271,41 @@ export type Renderer = {
     //
     renderTarget: CameraRenderTargetType | null;
     clearColorDirtyFlag: boolean;
+    useDepthPrepass: boolean;
 };
+
+export function hotRebuildRenderer(renderer: Renderer) {
+    // const {gpu} = renderer;
+    // const depthPrePassRenderTarget = createRenderTarget({
+    //     gpu,
+    //     type: RenderTargetTypes.Depth,
+    //     width: 1,
+    //     height: 1,
+    //     name: 'depth pre-pass render target',
+    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+    // });
+    // const copyDepthSourceRenderTarget: RenderTarget = createRenderTarget({
+    //     gpu,
+    //     type: RenderTargetTypes.Empty,
+    //     width: 1,
+    //     height: 1,
+    //     name: 'copy depth source render target',
+    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+    // });
+    // const copyDepthDestRenderTarget = createRenderTarget({
+    //     gpu,
+    //     type: RenderTargetTypes.Depth,
+    //     width: 1,
+    //     height: 1,
+    //     name: 'copy depth dest render target',
+    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+    // });
+    //
+    // renderer.depthPrePassRenderTarget = depthPrePassRenderTarget;
+    // renderer.copyDepthSourceRenderTarget = copyDepthSourceRenderTarget;
+    // renderer.copyDepthDestRenderTarget = copyDepthDestRenderTarget;
+    // console.log("hogehoge")
+}
 
 /**
  * 描画パイプライン的な役割
@@ -299,6 +333,8 @@ export function createRenderer({
         data: UniformBufferObjectBlockData;
     }[] = [];
 
+    const useDepthPrepass = true;
+
     const realWidth: number = 1;
     const realHeight: number = 1;
     const stats: Stats | null = null;
@@ -318,6 +354,7 @@ export function createRenderer({
         width: 1,
         height: 1,
         name: 'g-buffer render target',
+        generateDepth: !useDepthPrepass,
     });
     const afterDeferredShadingRenderTarget = createRenderTarget({
         gpu,
@@ -737,6 +774,7 @@ export function createRenderer({
         //
         renderTarget,
         clearColorDirtyFlag,
+        useDepthPrepass,
     };
 }
 
@@ -1066,14 +1104,21 @@ export function renderRenderer(
     // depth pre-pass
     // ------------------------------------------------------------------------------
 
-    depthPrePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
+    if (renderer.useDepthPrepass) {
+        depthPrePass(renderer, currentCameraRenderMeshInfoEachPass.basePass, camera);
+    }
 
     // ------------------------------------------------------------------------------
     // skybox pass
     // g-buffer opaque pass
     // ------------------------------------------------------------------------------
 
-    setGBufferRenderTargetsDepthTexture(renderer.gBufferRenderTargets, renderer.depthPrePassRenderTarget.depthTexture!);
+    if (renderer.useDepthPrepass) {
+        setGBufferRenderTargetsDepthTexture(
+            renderer.gBufferRenderTargets,
+            renderer.depthPrePassRenderTarget.depthTexture!
+        );
+    }
     setRenderTargetToRendererAndClear(renderer, renderer.gBufferRenderTargets, true);
 
     // TODO: 本当はskyboxをshadingの後にしたい
@@ -1297,13 +1342,19 @@ export function renderRenderer(
 
     setRenderTargetTexture(renderer.afterDeferredShadingRenderTarget, sceneTexture);
 
-    // pattern1: g-buffer depth
-    // this._afterDeferredShadingRenderTarget.setDepthTexture(this._gBufferRenderTargets.depthTexture!);
-    // pattern2: depth prepass
-    setRenderTargetDepthTexture(
-        renderer.afterDeferredShadingRenderTarget,
-        renderer.depthPrePassRenderTarget.depthTexture!
-    );
+    if (renderer.useDepthPrepass) {
+        // pattern2: depth prepass
+        setRenderTargetDepthTexture(
+            renderer.afterDeferredShadingRenderTarget,
+            renderer.depthPrePassRenderTarget.depthTexture!
+        );
+    } else {
+        // pattern1: g-buffer depth
+        setRenderTargetDepthTexture(
+            renderer.afterDeferredShadingRenderTarget,
+            renderer.gBufferRenderTargets.depthTexture!
+        );
+    }
 
     copySceneTexture(renderer, sceneTexture);
     copyDepthTexture(renderer);

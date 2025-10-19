@@ -1,26 +1,26 @@
-﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { getDummyBlackTexture, setGPUViewport } from '@/PaleGL/core/gpu.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
-import {getDummyBlackTexture, setGPUViewport} from '@/PaleGL/core/gpu.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
-import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
-import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
-import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
-import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
 import {
-    PostProcessPassBase,
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
-    PostProcessPassRenderArgs,
+    PostProcessPassBase,
     PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
     getPostProcessPassRenderTarget,
     renderPostProcessPass,
     setPostProcessPassSize,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
+import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
+import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 // ------------------------------------------------------------------------------
 // constants
@@ -114,17 +114,17 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
             fragmentShader: bufferVisualizerRow0PassFragmentShader,
             uniforms: [
                 {
-                    name: 'uNearClip',
+                    name: UniformNames.CameraNear,
                     type: UniformTypes.Float,
                     value: 0.1,
                 },
                 {
-                    name: 'uFarClip',
+                    name: UniformNames.CameraFar,
                     type: UniformTypes.Float,
                     value: 1,
                 },
                 {
-                    name: 'uInverseViewProjectionMatrix',
+                    name: UniformNames.InverseViewProjectionMatrix,
                     type: UniformTypes.Matrix4,
                     value: createMat4Identity(),
                 },
@@ -512,7 +512,12 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                     createVector2(colOffset, 0)
                 );
                 // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
-                addMaterialUniformValue(pass.material, uniformNameTexture, UniformTypes.Texture, getDummyBlackTexture(gpu));
+                addMaterialUniformValue(
+                    pass.material,
+                    uniformNameTexture,
+                    UniformTypes.Texture,
+                    getDummyBlackTexture(gpu)
+                );
             }
 
             colIndex++;
@@ -970,7 +975,7 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
         //     ? renderer.depthOfFieldPass.preFilterPass.renderTarget.texture
         //     : renderer.depthOfFieldPass.circleOfConfusionPass.renderTarget.texture
     );
-    
+
     setMaterialUniformValue(
         bufferVisualizerPass.compositePass.material,
         'uFullViewTextureEnabled',

@@ -1,12 +1,4 @@
-﻿import { createTexture, setTextureSize, Texture } from '@/PaleGL/core/texture.ts';
-import {
-    bindFramebuffer,
-    createFramebuffer,
-    Framebuffer,
-    registerDrawBufferToFramebuffer,
-    unbindFramebuffer,
-} from '@/PaleGL/core/framebuffer.ts';
-import {
+﻿import {
     GL_DEPTH_ATTACHMENT,
     GL_FRAMEBUFFER,
     GL_TEXTURE_2D,
@@ -15,9 +7,17 @@ import {
     TextureFilterTypes,
     TextureTypes,
 } from '@/PaleGL/constants';
+import {
+    bindFramebuffer,
+    createFramebuffer,
+    Framebuffer,
+    registerDrawBufferToFramebuffer,
+    unbindFramebuffer,
+} from '@/PaleGL/core/framebuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTargetBase, RenderTargetBase } from '@/PaleGL/core/renderTarget.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
+import { createTexture, setTextureSize, Texture } from '@/PaleGL/core/texture.ts';
 
 // ---------------------------------------------------------------------
 // TODO: B,Cはまとめられる気がする
@@ -54,14 +54,16 @@ export function createGBufferRenderTargets({
     name,
     width = 1,
     height = 1,
+    generateDepth = false,
 }: {
     gpu: Gpu;
     name: string;
     width: number;
     height: number;
+    generateDepth: boolean;
 }): GBufferRenderTargets {
     const gBufferTextures: Texture[] = [];
-    const depthTexture: Texture | null = null;
+    let depthTexture: Texture | null = null;
 
     const minFilter = TextureFilterTypes.Linear;
     const magFilter = TextureFilterTypes.Linear;
@@ -139,19 +141,20 @@ export function createGBufferRenderTargets({
     registerDrawBufferToFramebuffer(framebuffer, gBufferDAttachment as GLColorAttachment);
     gBufferTextures.push(gBufferDTexture);
 
-    // 3: depth
-    // this._depthTexture = new Texture({
-    //     gpu,
-    //     width: this.width,
-    //     height: this.height,
-    //     mipmap: false,
-    //     type: TextureTypes.Depth,
-    //     // 一旦linear固定
-    //     minFilter,
-    //     magFilter,
-    // });
-    // // depth as texture
-    // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._depthTexture.glObject, 0);
+    if (generateDepth) {
+        depthTexture = createTexture({
+            gpu,
+            width,
+            height,
+            mipmap: false,
+            type: TextureTypes.Depth,
+            // 一旦linear固定
+            minFilter,
+            magFilter,
+        });
+        // depth as texture
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture.glObject, 0);
+    }
 
     // unbind
     gl.bindTexture(GL_TEXTURE_2D, null);

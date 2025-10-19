@@ -295,7 +295,7 @@ const updateStatsView = (stats: Stats) => {
             totalVertexCount += passInfo.vertexCount;
         }
         queue.unshift(
-            `[${stats.passes[i].groupLabel}]\ndraw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`
+            `[${stats.passes[i].groupLabel}] draw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`
         );
         passesStrings.push(...queue);
     }

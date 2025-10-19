@@ -220,5 +220,7 @@ export const disposeActor = (actor: Actor) => {
                 disposeRenderTarget(light.shadowMap);
             }
             break;
+        default:
+            break;
     }
 };

@@ -9,6 +9,7 @@ import { setRotationY } from '@/PaleGL/core/transform.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 type SpotLightParams = {
     distance: number;
@@ -93,7 +94,7 @@ export const createSpotLightShadow = (
 
     addChildActor(light, light.shadowCamera);
 
-    light.shadowCamera.visibleFrustum = visibleFrustum;
+    light.shadowCamera.visibleFrustum = isDevelopment() ? visibleFrustum : false;
     light.castShadow = true;
     light.shadowCamera.near = 1;
     light.shadowCamera.far = light.distance;
