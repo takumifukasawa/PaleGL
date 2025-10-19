@@ -5,6 +5,7 @@ export type StartupLayer = {
     menuContentElement: HTMLDivElement;
     loadingContentElement: HTMLDivElement;
     loadingGageElement: HTMLDivElement;
+    beginPlayer: () => void;
 };
 
 export function createStartupLayer(onClickPlayButton: () => void): StartupLayer {
@@ -115,19 +116,10 @@ canvas {
 
     document.body.appendChild(startupWrapperElement);
 
-    // const hideLoading = () => {
-    //     loadingContentElement.style.display = 'none';
-    // };
-    // const setLoadingPercentile = (percent: number) => {
-    //     loadingGageElement.style.width = `${percent}%`;
-    // };
-    // const showMenu = () => {
-    //     menuContentElement.style.display = 'flex';
-    // };
-
-    // const hideStartupWrapper = () => {
-    //     startupWrapperElement.style.display = 'none';
-    // };
+    const beginPlayer = () => {
+        hideStartupLayerWrapper(startupWrapperElement);
+        onClickPlayButton();
+    };
 
     fullscreenButtonElement.addEventListener('click', () => {
         if (!document.fullscreenElement) {
@@ -138,45 +130,31 @@ canvas {
         }
     });
 
-    const startupLayer = {
-        rootElement: startupWrapperElement,
-        menuContentElement,
-        loadingContentElement,
-        loadingGageElement,
-    };
-
-    const startPlayer = () => {
-        hideStartupLayerWrapper(startupLayer);
-        onClickPlayButton();
-    };
-
     playButtonElement.addEventListener('click', () => {
-        startPlayer();
+        beginPlayer();
     });
 
     if (isDevelopment()) {
         let isStarted = false;
         window.addEventListener('keydown', (e) => {
-            console.log(e.key)
+            console.log(e.key);
             if (e.key === 'Enter') {
                 if (isStarted) {
                     return;
                 }
                 isStarted = true;
-                startPlayer();
+                beginPlayer();
             }
         });
     }
 
-    // return {
-    //     rootElement: startupWrapperElement,
-    //     hideLoading,
-    //     setLoadingPercentile,
-    //     showMenu,
-    //     hideStartupWrapper,
-    // };
-
-    return startupLayer;
+    return {
+        rootElement: startupWrapperElement,
+        menuContentElement,
+        loadingContentElement,
+        loadingGageElement,
+        beginPlayer,
+    };
 }
 
 export function hideStartupLayerLoading(startupLayer: StartupLayer) {
@@ -191,6 +169,6 @@ export function showStartupLayerMenu(startupLayer: StartupLayer) {
     startupLayer.menuContentElement.style.display = 'flex';
 }
 
-export function hideStartupLayerWrapper(startupLayer: StartupLayer) {
-    startupLayer.rootElement.style.display = 'none';
+export function hideStartupLayerWrapper(rootElement: HTMLElement) {
+    rootElement.style.display = 'none';
 }

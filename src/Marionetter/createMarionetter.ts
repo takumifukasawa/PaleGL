@@ -23,6 +23,7 @@ export function createMarionetter({
     // onHotReload,
     onSetSceneViewData,
     onSceneViewEnabled,
+    onBeginPlayer,
 }: MarionetterArgs = {}): Marionetter {
     let currentTime: number = 0;
     let onHotReloadCallback: (() => void) | null = null;
@@ -103,7 +104,7 @@ export function createMarionetter({
                 case MarionetterReceiveDataType.ExportHotReloadScene:
                     if (showLog) {
                         console.log(`[marionetter] hotReloadScene`);
-                   }
+                    }
                     onHotReloadCallback?.();
                     break;
                 case MarionetterReceiveDataType.SetSceneViewData:
@@ -119,6 +120,12 @@ export function createMarionetter({
                         console.log(`[marionetter] setSceneViewEnabled: ${sceneViewEnabledData.enabled}`);
                     }
                     onSceneViewEnabled?.(sceneViewEnabledData);
+                    break;
+                case MarionetterReceiveDataType.BeginPlayer:
+                    // if (showLog) {
+                    console.log(`[marionetter] beginPlayer`);
+                    // }
+                    onBeginPlayer?.();
                     break;
                 default:
                     console.warn('invalid type', json.type);

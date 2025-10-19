@@ -30,6 +30,7 @@ export const MarionetterReceiveDataType = {
     ExportHotReloadScene: 'exportHotReloadScene',
     SetSceneViewData: 'setSceneViewData',
     SetSceneViewEnabled: 'setSceneViewEnabled',
+    BeginPlayer: 'beginPlayer',
 } as const;
 
 export type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
@@ -72,6 +73,7 @@ export type MarionetterArgs = {
     // onHotReload?: () => void;
     onSetSceneViewData?: (data: MarionetterReceiveSceneViewData) => void;
     onSceneViewEnabled?: (data: MarionetterReceiveSceneViewEnabledData) => void;
+    onBeginPlayer?: () => void;
 };
 
 //
@@ -194,8 +196,8 @@ export type MarionetterClipInfoKinds =
     | MarionetterLightControlClipInfo
     | MarionetterActivationControlClipInfo
     | MarionetterObjectMoveAndLookAtClipInfo;
-    // // custom
-    // | MarionetterHumanClipInfo;
+// // custom
+// | MarionetterHumanClipInfo;
 
 // NOTE: unity側に合わせる
 export const MarionetterClipInfoType = {

@@ -112,6 +112,7 @@ export function createPlayer(
         hotRebuildSceneEnabled?: boolean;
         glslSoundWrapper?: GLSLSoundWrapper;
         loop?: boolean;
+        onBeginPlayer?: () => void;
     } = {}
 ): Player {
     const {
@@ -121,6 +122,7 @@ export function createPlayer(
         fallbackGenerateActorHook,
         generatedActorHook,
         hotRebuildSceneEnabled = false,
+        onBeginPlayer,
     } = options;
 
     const renderer = createRenderer({
@@ -200,6 +202,11 @@ export function createPlayer(
                         )
                     )
                 );
+            }
+        },
+        onBeginPlayer: () => {
+            if (onBeginPlayer) {
+                onBeginPlayer();
             }
         },
     });

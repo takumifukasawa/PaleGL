@@ -18,6 +18,7 @@ const messageType = {
     exportHotReloadScene: 'exportHotReloadScene',
     setSceneViewData: 'setSceneViewData',
     setSceneViewEnabled: 'setSceneViewEnabled',
+    beginPlayer: 'beginPlayer',
 };
 
 const clientType = {
@@ -167,6 +168,19 @@ const setSceneViewEnabled = (json) => {
     wsBrowserClient.send(JSON.stringify(newData));
 };
 
+const beginPlayer = () => {
+    if (!wsBrowserClient) {
+        return;
+    }
+    const newData = {
+        type: messageType.beginPlayer,
+    };
+    if (logEnabled) {
+        console.log(`[beginPlayer] send to browser data: ${newData}`);
+    }
+    wsBrowserClient.send(JSON.stringify(newData));
+};
+
 wsServer.on('connection', (ws) => {
     console.log('server: connected');
 
@@ -218,6 +232,9 @@ wsServer.on('connection', (ws) => {
                 break;
             case messageType.setSceneViewEnabled:
                 setSceneViewEnabled(json);
+                break;
+            case messageType.beginPlayer:
+                beginPlayer();
                 break;
             default:
                 console.error(`invalid message type: ${json.type}`);
