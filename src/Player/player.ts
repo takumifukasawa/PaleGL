@@ -38,7 +38,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 // } from '@/PaleGL/core/orbitCameraController.ts';
 import {
     createRenderer,
-    hotRebuildRenderer,
+    // hotRebuildRenderer,
     Renderer,
     renderRenderer,
     updateTimelineUniforms,
@@ -362,9 +362,9 @@ function buildScene(
 
     // console.log('hogehoge', player.scene);
 
-    if (player.hotRebuildSceneEnabled || initialBuild) {
-        hotRebuildRenderer(player.renderer);
-    }
+    // if (player.hotRebuildSceneEnabled || initialBuild) {
+    //     hotRebuildRenderer(player.renderer);
+    // }
 
     return structure;
 }

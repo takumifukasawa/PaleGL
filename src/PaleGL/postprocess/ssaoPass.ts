@@ -1,26 +1,67 @@
 ﻿import {
-    UniformNames,
+    PostProcessPassType,
     TextureTypes,
     TextureWrapTypes,
-    UniformTypes,
     UniformBlockNames,
-    PostProcessPassType,
+    UniformNames,
+    UniformTypes,
 } from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
-import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
+import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
-import { randomRange } from '@/PaleGL/utilities/mathUtilities';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
-    PostProcessSinglePass,
     PostProcessPassParametersBaseArgs,
     PostProcessPassRenderArgs,
+    PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import { randomRange } from '@/PaleGL/utilities/mathUtilities';
+
+export type SSAOPassParameters = {
+    enabled: boolean;
+    occlusionSampleLength: number;
+    occlusionBias: number;
+    occlusionMinDistance: number;
+    occlusionMaxDistance: number;
+    occlusionColor: Color;
+    occlusionPower: number;
+    occlusionStrength: number;
+    blendRate: number;
+    samplingTexture: Texture;
+};
+
+// 短縮名表（唯一の真実源）
+export const SSAO_ShortNames = {
+    enabled: 'ao_on',
+    occlusionSampleLength: 'ao_sl',
+    occlusionBias: 'ao_b',
+    occlusionMinDistance: 'ao_mid',
+    occlusionMaxDistance: 'ao_mad',
+    occlusionColor: 'ao_c',
+    occlusionPower: 'ao_p',
+    occlusionStrength: 'ao_s',
+    blendRate: 'ao_br',
+    samplingTexture: 'ao_tex',
+} as const satisfies ShortNamesFor<SSAOPassParameters>;
+
+// 生成一式
+const SSAO = createShortenKit<SSAOPassParameters>()(SSAO_ShortNames);
+
+// NeedsShorten に応じたプロパティ名マップ
+export const SSAOPassParametersPropertyMap = SSAO.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const SSAOPassParametersKey = makeLongKeyMap(SSAO_ShortNames);
+
+// 型（キーのユニオン）
+export type SSAOPassParametersKey = keyof typeof SSAOPassParametersKey;
 
 /**
  *
@@ -96,17 +137,7 @@ const createSamplingTables: (gpu: Gpu) => {
     };
 };
 
-export type SSAOPassParameters = {
-    occlusionSampleLength: number;
-    occlusionBias: number;
-    occlusionMinDistance: number;
-    occlusionMaxDistance: number;
-    occlusionColor: Color;
-    occlusionPower: number;
-    occlusionStrength: number;
-    blendRate: number;
-    samplingTexture: Texture;
-};
+// pass ---
 
 export type SsaoPass = PostProcessSinglePass & SSAOPassParameters;
 
@@ -129,82 +160,80 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
     const { samplingRotations, samplingDistances, samplingTexture } = createSamplingTables(gpu);
 
     return {
-        ...createPostProcessSinglePass(
-            {
-                gpu,
-                enabled,
-                type: PostProcessPassType.SSAO,
-                fragmentShader,
-                uniforms: [
-                    {
-                        name: UniformNames.GBufferBTexture,
-                        type: UniformTypes.Texture,
-                        value: null,
-                    },
-                    {
-                        name: UniformNames.DepthTexture,
-                        type: UniformTypes.Texture,
-                        value: null,
-                    },
-                    {
-                        name: 'uSamplingRotations',
-                        type: UniformTypes.FloatArray,
-                        value: new Float32Array(samplingRotations),
-                    },
-                    {
-                        name: 'uSamplingDistances',
-                        type: UniformTypes.FloatArray,
-                        value: new Float32Array(samplingDistances),
-                    },
-                    {
-                        name: 'uSamplingTexture',
-                        type: UniformTypes.Texture,
-                        value: samplingTexture,
-                    },
-                    {
-                        name: 'uOcclusionSampleLength',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uOcclusionBias',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uOcclusionMinDistance',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uOcclusionMaxDistance',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uOcclusionColor',
-                        type: UniformTypes.Color,
-                        value: createColorBlack(),
-                    },
-                    {
-                        name: 'uOcclusionPower',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uOcclusionStrength',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                    {
-                        name: 'uBlendRate',
-                        type: UniformTypes.Float,
-                        value: 1,
-                    },
-                ],
-                uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
-            },
-        ),
+        ...createPostProcessSinglePass({
+            gpu,
+            enabled,
+            type: PostProcessPassType.SSAO,
+            fragmentShader,
+            uniforms: [
+                {
+                    name: UniformNames.GBufferBTexture,
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                {
+                    name: UniformNames.DepthTexture,
+                    type: UniformTypes.Texture,
+                    value: null,
+                },
+                {
+                    name: 'uSamplingRotations',
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(samplingRotations),
+                },
+                {
+                    name: 'uSamplingDistances',
+                    type: UniformTypes.FloatArray,
+                    value: new Float32Array(samplingDistances),
+                },
+                {
+                    name: 'uSamplingTexture',
+                    type: UniformTypes.Texture,
+                    value: samplingTexture,
+                },
+                {
+                    name: 'uOcclusionSampleLength',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uOcclusionBias',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uOcclusionMinDistance',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uOcclusionMaxDistance',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uOcclusionColor',
+                    type: UniformTypes.Color,
+                    value: createColorBlack(),
+                },
+                {
+                    name: 'uOcclusionPower',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uOcclusionStrength',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+                {
+                    name: 'uBlendRate',
+                    type: UniformTypes.Float,
+                    value: 1,
+                },
+            ],
+            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        }),
         // params
         occlusionSampleLength,
         occlusionBias,

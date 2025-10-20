@@ -399,11 +399,12 @@ function createMarionetterAnimationClip(
         setV3(localRotationEulerDegree, 0, 0, 0);
         setV3(localScale, 1, 1, 1);
 
-        const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
 
         // // for debug
+        // // for debug
+        // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip

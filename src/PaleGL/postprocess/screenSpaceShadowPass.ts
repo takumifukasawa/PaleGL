@@ -32,7 +32,6 @@ export type ScreenSpaceShadowPassParameters = {
     rayStepMultiplier: number;
 };
 
-// 短縮名表（唯一の真実源）。元型のキー網羅を compile 時に保証したいので satisfies を使う
 export const SSS_ShortNames = {
     enabled: 'sss_on',
     bias: 'sss_b',
@@ -49,6 +48,8 @@ export const ScreenSpaceShadowPassParametersPropertyMap = SSS.map(NeedsShorten);
 export const ScreenSpaceShadowPassParametersKey = makeLongKeyMap(SSS_ShortNames);
 
 export type ScreenSpaceShadowPassParametersKey = keyof typeof ScreenSpaceShadowPassParametersKey;
+
+// pass ---
 
 export type ScreenSpaceShadowPass = PostProcessSinglePass & ScreenSpaceShadowPassParameters;
 

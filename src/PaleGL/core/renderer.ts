@@ -274,39 +274,6 @@ export type Renderer = {
     useDepthPrepass: boolean;
 };
 
-export function hotRebuildRenderer(renderer: Renderer) {
-    // const {gpu} = renderer;
-    // const depthPrePassRenderTarget = createRenderTarget({
-    //     gpu,
-    //     type: RenderTargetTypes.Depth,
-    //     width: 1,
-    //     height: 1,
-    //     name: 'depth pre-pass render target',
-    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
-    // });
-    // const copyDepthSourceRenderTarget: RenderTarget = createRenderTarget({
-    //     gpu,
-    //     type: RenderTargetTypes.Empty,
-    //     width: 1,
-    //     height: 1,
-    //     name: 'copy depth source render target',
-    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
-    // });
-    // const copyDepthDestRenderTarget = createRenderTarget({
-    //     gpu,
-    //     type: RenderTargetTypes.Depth,
-    //     width: 1,
-    //     height: 1,
-    //     name: 'copy depth dest render target',
-    //     depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
-    // });
-    //
-    // renderer.depthPrePassRenderTarget = depthPrePassRenderTarget;
-    // renderer.copyDepthSourceRenderTarget = copyDepthSourceRenderTarget;
-    // renderer.copyDepthDestRenderTarget = copyDepthDestRenderTarget;
-    // console.log("hogehoge")
-}
-
 /**
  * 描画パイプライン的な役割
  * TODO: memo pass

@@ -55,21 +55,13 @@ export const Bloom_ShortNames = {
 } as const satisfies ShortNamesFor<BloomPassParameters>;
 
 const Bloom = createShortenKit<BloomPassParameters>()(Bloom_ShortNames);
-export type BloomParametersProperty = typeof Bloom.type;
 export const BloomPassParametersPropertyMap = Bloom.map(NeedsShorten);
 
 export const BloomPassParametersKey = makeLongKeyMap(Bloom_ShortNames);
 
 export type BloomPassParametersKey = keyof typeof BloomPassParametersKey;
 
-// type BloomPassParameters = {
-//     [BloomPassParameters.threshold]: number;
-//     [BloomPassParameters.tone]: number;
-//     [BloomPassParameters.bloomAmount]: number;
-//     // threshold: number;
-//     // tone: number;
-//     // bloomAmount: number;
-// };
+// pass ---
 
 export type BloomPass = PostProcessPassBase &
     BloomPassParameters & {

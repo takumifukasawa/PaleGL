@@ -1,27 +1,36 @@
 import { MarionetterPostProcessControllerComponentInfo } from '@/Marionetter/types';
 import { Component, createComponent } from '@/PaleGL/components/component.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
+import { Color, copyColor, createColorFromHex } from '@/PaleGL/math/color.ts';
 import { RawVector3, setV3, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { BloomPassParametersKey, BloomPassParametersPropertyMap } from '@/PaleGL/postprocess/bloomPass.ts';
 import {
     ScreenSpaceShadowPassParametersKey,
     ScreenSpaceShadowPassParametersPropertyMap,
 } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+import { SSAOPassParametersKey, SSAOPassParametersPropertyMap } from '@/PaleGL/postprocess/ssaoPass.ts';
 
 export type PostProcessController = Component;
 
 // type Bindings = Map<string, string>; // propertyName, uniformName
 
 type NumToBoolConverter = (n: number, prop: unknown) => void;
-const numToBool: NumToBoolConverter = (n: number, prop: unknown) => {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore-next-line
+const numToBoolConverter: NumToBoolConverter = (n: number, prop: unknown) => {
+    // eslint-disable-next-line
     prop = n > 0.5;
 };
 type AssignVector3Converter = (v: RawVector3, prop: Vector3) => void;
-const assignVector3: AssignVector3Converter = (v: RawVector3, prop: Vector3) => {
+const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: Vector3) => {
     setV3(prop, v.x, v.y, v.z);
 };
+type AssignColorConverter = (c: string, prop: Color) => void;
+const assignColorConverter: AssignColorConverter = (hex: string, prop: Color) => {
+    copyColor(prop, createColorFromHex(hex));
+};
 
-type ConversionFunction = NumToBoolConverter | AssignVector3Converter;
+type ConversionFunction = NumToBoolConverter | AssignVector3Converter | AssignColorConverter;
 
 const buildBindings = (renderer: Renderer) => {
     // prettier-ignore
@@ -32,7 +41,7 @@ const buildBindings = (renderer: Renderer) => {
             [
                 renderer.screenSpaceShadowPass,
                 ScreenSpaceShadowPassParametersKey.enabled,
-                numToBool
+                numToBoolConverter
             ]
         ],
         [
@@ -47,7 +56,7 @@ const buildBindings = (renderer: Renderer) => {
             [
                 renderer.screenSpaceShadowPass,
                 ScreenSpaceShadowPassParametersKey.jitterSize,
-                assignVector3
+                assignVector3Converter
             ]
         ],
         [
@@ -79,6 +88,49 @@ const buildBindings = (renderer: Renderer) => {
             ]
         ],
         
+        // ssao ---
+
+        [
+            SSAOPassParametersPropertyMap.enabled,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.enabled, numToBoolConverter]
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionSampleLength,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionSampleLength],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionBias,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionBias],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionMinDistance,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionMinDistance],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionMaxDistance,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionMaxDistance],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionColor,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionColor, assignColorConverter],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionPower,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionPower],
+        ],
+        [
+            SSAOPassParametersPropertyMap.occlusionStrength,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionStrength],
+        ],
+        [
+            SSAOPassParametersPropertyMap.blendRate,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.blendRate],
+        ],
+        [
+            SSAOPassParametersPropertyMap.samplingTexture,
+            [renderer.ambientOcclusionPass, SSAOPassParametersKey.samplingTexture],
+        ],
+        
         // bloom ---
         
         [
@@ -86,7 +138,7 @@ const buildBindings = (renderer: Renderer) => {
             [
                 renderer.bloomPass,
                 BloomPassParametersKey.enabled,
-                numToBool
+                numToBoolConverter
             ],
         ],
         [
@@ -132,7 +184,7 @@ const assignProperties = (
         console.log(target, targetPropertyKey, currentValue, converter);
         if (converter) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+            // @ts-ignore-next-line
             converter(currentValue, target[targetPropertyKey] as unknown);
         } else {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -174,10 +226,12 @@ export function createPostProcessController(
     return createComponent({
         onStartCallback: (_a, _b) => {
             console.log('hogehoge', _a, _b, postProcessControllerComponentInfo);
+            return;
             assignProperties(postProcessControllerComponentInfo, bindings);
-            console.log("hogehoge", renderer.bloomPass, postProcessControllerComponentInfo);
+            console.log('hogehoge', renderer.ambientOcclusionPass, postProcessControllerComponentInfo);
         },
-        onProcessPropertyBinder: (_a, _b, key, value) => {
+        // eslint-disable-next-line
+        onProcessPropertyBinder: (_a, _b, _c, _d) => {
             // assignProperties(renderer, key, value);
         },
     });
