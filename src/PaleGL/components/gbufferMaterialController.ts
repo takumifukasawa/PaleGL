@@ -5,6 +5,10 @@ import { UniformNames } from '@/PaleGL/constants.ts';
 const bindings = new Map([
     // prettier-ignore
     [
+        MarionetterGBufferMaterialControllerComponentInfoProperty.baseColor,
+        UniformNames.BaseColor
+    ],
+    [
         MarionetterGBufferMaterialControllerComponentInfoProperty.emissiveColor,
         UniformNames.EmissiveColor
     ],

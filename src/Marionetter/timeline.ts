@@ -179,31 +179,38 @@ export function buildMarionetterTimeline(
         } else {
             const targetName = (track as MarionetterDefaultTrackInfo)[MarionetterDefaultTrackInfoProperty.targetName];
             const clips = (track as MarionetterDefaultTrackInfo)[MarionetterDefaultTrackInfoProperty.clips];
-            const targetActors = [
-                findActorByName(marionetterActors, targetName),
-                // Scene.find(placedScene.children, targetName),
-            ];
+            // const targetActors = [
+            //     findActorByName(marionetterActors, targetName),
+            //     // Scene.find(placedScene.children, targetName),
+            // ];
+            let targetActor = findActorByName(marionetterActors, targetName);
             //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
             const marionetterClips = createMarionetterClips(clips);
-            if (targetActors.length < 1) {
+            // if (targetActors.length < 1) {
+            //     console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
+            // }
+            if (!targetActor) {
                 console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
             }
+            
+            targetActor = targetActor as Actor;
 
             // for debug
-            // console.log(
-            //     `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
-            //     targetActors,
-            //     marionetterClips
-            // );
+            console.log(
+                `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
+                targetActor,
+                marionetterClips
+            );
 
             const data = {
                 targetName,
-                targetActors,
+                // targetActors,
+                targetActor,
                 clips: marionetterClips,
                 // exec track
                 // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
                 execute: (args: MarionetterTimelineTrackExecuteArgs) => {
-                    targetActors.forEach((targetActor) => {
+                    // targetActors.forEach((targetActor) => {
                         const { time, scene } = args;
                         const clipAtTime = marionetterClips.find(
                             // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
@@ -249,10 +256,10 @@ export function buildMarionetterTimeline(
                         }
 
                         // clipの実行後にupdate
-                        if (targetActor) {
+                        // if (targetActor) {
                             postProcessActorTimeline(targetActor, time);
-                        }
-                    });
+                        // }
+                    // });
                 },
             } as MarionetterTimelineDefaultTrack;
             tracks.push(data);
@@ -283,10 +290,23 @@ export function buildMarionetterTimeline(
                 // TODO: ここなんかうまいことやりたい
                 if (Object.hasOwn(track, 'targetName')) {
                     const t = track as MarionetterTimelineDefaultTrack;
-                    if (t.targetName === targetName) {
-                        t.targetActors.push(actor);
+                    const targetActor = findActorByName(actors, targetName);
+                    if (targetActor) {
+                        t.targetActor = targetActor;
+                    } else {
+                        console.warn(
+                            `[buildMarionetterTimeline][bindActors] target actor is not found: ${targetName}`
+                        );
                     }
                 }
+                // // TODO: ここなんかうまいことやりたい
+                // if (Object.hasOwn(track, 'targetName')) {
+                //     const t = track as MarionetterTimelineDefaultTrack;
+                //     if (t.targetName === targetName) {
+                //         // t.targetActors.push(actor);
+                //         t.targetActor = actor;
+                //     }
+                // }
             });
         });
     };
@@ -370,12 +390,12 @@ function createMarionetterAnimationClip(
         const tmpVector4LengthMap = new Map<string, number>();
         const colorPropertyMap = new Map<string, Color>();
 
-        // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
+        const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
 
         // for debug
-        // console.log('bindings', bindings, animationClipType);
+        // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {

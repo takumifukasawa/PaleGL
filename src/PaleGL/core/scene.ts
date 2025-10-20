@@ -1,5 +1,5 @@
 ﻿import { Actor, getActorHasChild } from '@/PaleGL/actors/actor.ts';
-import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
+// import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { createOrthographicCamera, OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 

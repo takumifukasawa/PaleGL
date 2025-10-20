@@ -417,8 +417,11 @@ export type MarionetterComponentInfoKinds =
     | MarionetterCameraComponentInfo
     | MarionetterMeshRendererComponentInfo
     | MarionetterMeshFilterComponentInfo
-    | MarionetterVolumeComponentInfo
-    | MarionetterObjectMoveAndLookAtControllerComponentInfo;
+    // | MarionetterVolumeComponentInfo
+    | MarionetterPostProcessControllerComponentInfo
+    | MarionetterObjectMoveAndLookAtControllerComponentInfo
+    | MarionetterFbmNoiseTextureControllerComponentInfo
+    | MarionetterGBufferMaterialControllerComponentInfo;
 
 // unity側に合わせてcomponent情報を追加
 
@@ -489,73 +492,73 @@ export const MarionetterSpotLightComponentInfoProperty = {
     spotAngle: NeedsShorten ? 'sa' : 'spotAngle',
 } as const;
 
-// volume: postprocess
-
-export type MarionetterVolumeVolumeLayerBase = {
-    layerType: 'Bloom' | 'DepthOfField';
-    // shorten
-    l: 'Bloom' | 'DepthOfField';
-};
-
-export const MarionetterVolumeVolumeLayerBaseProperty = {
-    layerType: NeedsShorten ? 'l' : 'layerType',
-} as const;
-
-export type MarionetterVolumeLayerBloom = MarionetterVolumeVolumeLayerBase & {
-    intensity: number;
-    // shorten
-    bl_i: number;
-};
-
-export const MarionetterVolumeLayerBloomProperty = {
-    intensity: NeedsShorten ? 'bl_i' : 'intensity',
-} as const;
-
-export type MarionetterVolumeLayerDepthOfField = MarionetterVolumeVolumeLayerBase & {
-    focusDistance: number;
-    // shorten
-    dof_fd: number;
-};
-
-export const MarionetterVolumeLayerDepthOfFieldProperty = {
-    focusDistance: NeedsShorten ? 'dof_fd' : 'focusDistance',
-} as const;
-
-export type MarionetterVolumeLayerVignette = MarionetterVolumeVolumeLayerBase & {
-    intensity: number;
-    // shorten
-    vi_i: number;
-};
-
-export const MarionetterVolumeLayerVignetteProperty = {
-    intensity: NeedsShorten ? 'vi_i' : 'intensity',
-} as const;
-
-export type MarionetterVolumeLayerVolumetricLight = MarionetterVolumeVolumeLayerBase & {
-    volumetricLightRayStep: number;
-    // shorten
-    vl_rs: number;
-};
-
-export const MarionetterVolumeLayerVolumetricLightProperty = {
-    volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
-} as const;
-
-export type MarionetterVolumeLayerKinds =
-    | MarionetterVolumeLayerBloom
-    | MarionetterVolumeLayerDepthOfField
-    | MarionetterVolumeLayerVignette
-    | MarionetterVolumeLayerVolumetricLight;
-
-export type MarionetterVolumeComponentInfo = MarionetterComponentInfoBase & {
-    volumeLayers: MarionetterVolumeLayerKinds[];
-    // shorten
-    vl: MarionetterVolumeLayerKinds[];
-};
-
-export const MarionetterVolumeComponentInfoProperty = {
-    volumeLayers: NeedsShorten ? 'vl' : 'volumeLayers',
-} as const;
+// // volume: postprocess
+//
+// export type MarionetterVolumeVolumeLayerBase = {
+//     layerType: 'Bloom' | 'DepthOfField';
+//     // shorten
+//     l: 'Bloom' | 'DepthOfField';
+// };
+//
+// export const MarionetterVolumeVolumeLayerBaseProperty = {
+//     layerType: NeedsShorten ? 'l' : 'layerType',
+// } as const;
+//
+// export type MarionetterVolumeLayerBloom = MarionetterVolumeVolumeLayerBase & {
+//     intensity: number;
+//     // shorten
+//     bl_i: number;
+// };
+//
+// export const MarionetterVolumeLayerBloomProperty = {
+//     intensity: NeedsShorten ? 'bl_i' : 'intensity',
+// } as const;
+//
+// export type MarionetterVolumeLayerDepthOfField = MarionetterVolumeVolumeLayerBase & {
+//     focusDistance: number;
+//     // shorten
+//     dof_fd: number;
+// };
+//
+// export const MarionetterVolumeLayerDepthOfFieldProperty = {
+//     focusDistance: NeedsShorten ? 'dof_fd' : 'focusDistance',
+// } as const;
+//
+// export type MarionetterVolumeLayerVignette = MarionetterVolumeVolumeLayerBase & {
+//     intensity: number;
+//     // shorten
+//     vi_i: number;
+// };
+//
+// export const MarionetterVolumeLayerVignetteProperty = {
+//     intensity: NeedsShorten ? 'vi_i' : 'intensity',
+// } as const;
+//
+// export type MarionetterVolumeLayerVolumetricLight = MarionetterVolumeVolumeLayerBase & {
+//     volumetricLightRayStep: number;
+//     // shorten
+//     vl_rs: number;
+// };
+//
+// export const MarionetterVolumeLayerVolumetricLightProperty = {
+//     volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
+// } as const;
+//
+// export type MarionetterVolumeLayerKinds =
+//     | MarionetterVolumeLayerBloom
+//     | MarionetterVolumeLayerDepthOfField
+//     | MarionetterVolumeLayerVignette
+//     | MarionetterVolumeLayerVolumetricLight;
+//
+// export type MarionetterVolumeComponentInfo = MarionetterComponentInfoBase & {
+//     volumeLayers: MarionetterVolumeLayerKinds[];
+//     // shorten
+//     vl: MarionetterVolumeLayerKinds[];
+// };
+//
+// export const MarionetterVolumeComponentInfoProperty = {
+//     volumeLayers: NeedsShorten ? 'vl' : 'volumeLayers',
+// } as const;
 
 // camera
 
@@ -716,12 +719,20 @@ export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
     factor: NeedsShorten ? 'fa' : 'factor',
 } as const;
 
+// gbuffer material controller component
+
 export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterComponentInfoBase & {
+    baseColor: string;
     emissiveColor: string;
+    metallic: number;
+    roughness: number;
 };
 
 export const MarionetterGBufferMaterialControllerComponentInfoProperty = {
+    baseColor: NeedsShorten ? 'bc' : 'baseColor',
     emissiveColor: NeedsShorten ? 'ec' : 'emissiveColor',
+    metallic: NeedsShorten ? 'ec' : 'metallic',
+    roughness: NeedsShorten ? 'r' : 'roughness',
 } as const;
 
 // //
@@ -733,19 +744,19 @@ export const MarionetterGBufferMaterialControllerComponentInfoProperty = {
 // } as const;
 // export type MarionetterPostProcessBloomIntensity =
 //     (typeof MarionetterPostProcessBloom)[keyof typeof MarionetterPostProcessBloom];
-// 
+//
 // export const MarionetterPostProcessDepthOfField = {
 //     focusDistance: NeedsShorten ? 'dof_fd' : 'depthOfFieldFocusDistance',
 // } as const;
 // export type MarionetterPostProcessDepthOfFieldFocusDistance =
 //     (typeof MarionetterPostProcessDepthOfField)[keyof typeof MarionetterPostProcessDepthOfField];
-// 
+//
 // export const MarionetterPostProcessVignette = {
 //     vignetteIntensity: NeedsShorten ? 'vi_i' : 'vignetteIntensity',
 // } as const;
 // export type MarionetterPostProcessVignetteIntensity =
 //     (typeof MarionetterPostProcessVignette)[keyof typeof MarionetterPostProcessVignette];
-// 
+//
 // export const MarionetterPostProcessVolumetricLight = {
 //     volumetricLightRayStep: NeedsShorten ? 'vl_rs' : 'volumetricLightRayStep',
 // } as const;
@@ -782,7 +793,7 @@ export type MarionetterTimelineTrackBase = {
 
 export type MarionetterTimelineDefaultTrack = {
     targetName: string;
-    targetActors: Actor[];
+    targetActor: Actor;
     clips: MarionetterClipKinds[];
 } & MarionetterTimelineTrackBase;
 
