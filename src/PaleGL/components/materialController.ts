@@ -7,12 +7,14 @@ export type MaterialController = Component;
 type Bindings = Map<string, string>; // propertyName, uniformName
 
 // timeline から操作される
-export function createMaterialController(bindings: Bindings): MaterialController {
+export function createMaterialController(name: string, bindings: Bindings): MaterialController {
     return createComponent({
+        name,
+        onFilterPropertyBinder: (key: string) => bindings.has(key),
         onProcessPropertyBinder: (actor, _, key, value) => {
             // // for debug
             // console.log(
-            //     `[MaterialController] actor: ${actor.name}, key: ${key},`, uniformName, value
+            //     `[MaterialController] onProcessPropertyBinder: actor=${actor.name}, key=${key}, value=${value}`
             // );
             if (bindings.has(key)) {
                 const uniformName = bindings.get(key)!;

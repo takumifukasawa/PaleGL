@@ -105,6 +105,7 @@ import {
     createVector3One,
     createVector3Zero,
     negateVector3,
+    setV3,
     setV3x,
     setV3y,
     setV3z,
@@ -192,15 +193,15 @@ export function buildMarionetterTimeline(
             if (!targetActor) {
                 console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
             }
-            
+
             targetActor = targetActor as Actor;
 
-            // for debug
-            console.log(
-                `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
-                targetActor,
-                marionetterClips
-            );
+            // // for debug
+            // console.log(
+            //     `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
+            //     targetActor,
+            //     marionetterClips
+            // );
 
             const data = {
                 targetName,
@@ -211,54 +212,53 @@ export function buildMarionetterTimeline(
                 // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
                 execute: (args: MarionetterTimelineTrackExecuteArgs) => {
                     // targetActors.forEach((targetActor) => {
-                        const { time, scene } = args;
-                        const clipAtTime = marionetterClips.find(
-                            // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
-                            (clip) =>
-                                isTimeInClip(
-                                    time,
-                                    clip.clipInfo[MarionetterClipInfoBaseProperty.start],
-                                    clip.clipInfo[MarionetterClipInfoBaseProperty.start] +
-                                        clip.clipInfo[MarionetterClipInfoBaseProperty.duration]
-                                )
-                        );
+                    const { time, scene } = args;
+                    const clipAtTime = marionetterClips.find(
+                        // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
+                        (clip) =>
+                            isTimeInClip(
+                                time,
+                                clip.clipInfo[MarionetterClipInfoBaseProperty.start],
+                                clip.clipInfo[MarionetterClipInfoBaseProperty.start] +
+                                    clip.clipInfo[MarionetterClipInfoBaseProperty.duration]
+                            )
+                    );
 
-                        // NOTE: 渡されるtimeそのものがframeTimeになった
-                        // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
+                    // NOTE: 渡されるtimeそのものがframeTimeになった
+                    // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
 
-                        // まずactorのprocessTimelineを実行
-                        if (targetActor) {
-                            preProcessActorTimeline(targetActor, time);
-                        }
+                    // まずactorのprocessTimelineを実行
+                    if (targetActor) {
+                        preProcessActorTimeline(targetActor, time);
+                    }
 
-                        if (
-                            track[MarionetterTrackInfoBaseProperty.type] ===
-                            MarionetterTrackInfoType.ActivationControlTrack
-                        ) {
-                            if (targetActor != null) {
-                                // const clipAtTime = marionetterClips.find(
-                                //     (clip) => clip.clipInfo.s < time && time < clip.clipInfo.s + clip.clipInfo.d
-                                // );
-                                if (clipAtTime) {
-                                    targetActor.enabled = true;
-                                } else {
-                                    targetActor.enabled = false;
-                                }
-                            }
-                        } else {
-                            if (targetActor != null) {
-                                // // tmp
-                                // for (let j = 0; j < marionetterClips.length; j++) {
-                                //     marionetterClips[j].execute({ actor: targetActor, time, scene });
-                                // }
-                                clipAtTime?.execute({ actor: targetActor, time, scene });
+                    if (
+                        track[MarionetterTrackInfoBaseProperty.type] === MarionetterTrackInfoType.ActivationControlTrack
+                    ) {
+                        if (targetActor != null) {
+                            // const clipAtTime = marionetterClips.find(
+                            //     (clip) => clip.clipInfo.s < time && time < clip.clipInfo.s + clip.clipInfo.d
+                            // );
+                            if (clipAtTime) {
+                                targetActor.enabled = true;
+                            } else {
+                                targetActor.enabled = false;
                             }
                         }
+                    } else {
+                        if (targetActor != null) {
+                            // // tmp
+                            // for (let j = 0; j < marionetterClips.length; j++) {
+                            //     marionetterClips[j].execute({ actor: targetActor, time, scene });
+                            // }
+                            clipAtTime?.execute({ actor: targetActor, time, scene });
+                        }
+                    }
 
-                        // clipの実行後にupdate
-                        // if (targetActor) {
-                            postProcessActorTimeline(targetActor, time);
-                        // }
+                    // clipの実行後にupdate
+                    // if (targetActor) {
+                    postProcessActorTimeline(targetActor, time);
+                    // }
                     // });
                 },
             } as MarionetterTimelineDefaultTrack;
@@ -294,9 +294,7 @@ export function buildMarionetterTimeline(
                     if (targetActor) {
                         t.targetActor = targetActor;
                     } else {
-                        console.warn(
-                            `[buildMarionetterTimeline][bindActors] target actor is not found: ${targetName}`
-                        );
+                        console.warn(`[buildMarionetterTimeline][bindActors] target actor is not found: ${targetName}`);
                     }
                 }
                 // // TODO: ここなんかうまいことやりたい
@@ -371,30 +369,41 @@ function createMarionetterAnimationClip(
     animationClip: MarionetterAnimationClipInfo
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterAnimationClip {
+    // TODO: 負荷対策のためにキャッシュしたい
+    const numberPropertyMap = new Map<string, number>();
+    const vector2PropertyMap = new Map<string, Vector2>();
+    const vector3PropertyMap = new Map<string, Vector3>();
+    const vector4PropertyMap = new Map<string, Vector4>();
+    const tmpVector4PropertyMap = new Map<string, Vector4>();
+    const tmpVector4LengthMap = new Map<string, number>();
+    const colorPropertyMap = new Map<string, Color>();
+    const localPosition: Vector3 = createVector3Zero();
+    const localRotationEulerDegree: Vector3 = createVector3Zero();
+    const localScale: Vector3 = createVector3One();
+
     // actorに直接valueを割り当てる関数
     const execute = (args: MarionetterClipArgs) => {
         const { actor, time } = args;
         let hasLocalPosition: boolean = false;
         let hasLocalRotationEuler: boolean = false;
         let hasLocalScale: boolean = false;
-        const localPosition: Vector3 = createVector3Zero();
-        const localRotationEulerDegree: Vector3 = createVector3Zero();
-        const localScale: Vector3 = createVector3One();
 
-        // TODO: 負荷対策のためにキャッシュしたい
-        const numberPropertyMap = new Map<string, number>();
-        const vector2PropertyMap = new Map<string, Vector2>();
-        const vector3PropertyMap = new Map<string, Vector3>();
-        const vector4PropertyMap = new Map<string, Vector4>();
-        const tmpVector4PropertyMap = new Map<string, Vector4>();
-        const tmpVector4LengthMap = new Map<string, number>();
-        const colorPropertyMap = new Map<string, Color>();
+        numberPropertyMap.clear();
+        vector2PropertyMap.clear();
+        vector3PropertyMap.clear();
+        vector4PropertyMap.clear();
+        tmpVector4PropertyMap.clear();
+        tmpVector4LengthMap.clear();
+        colorPropertyMap.clear();
+        setV3(localPosition, 0, 0, 0);
+        setV3(localRotationEulerDegree, 0, 0, 0);
+        setV3(localScale, 1, 1, 1);
 
         const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         const start = animationClip[MarionetterClipInfoBaseProperty.start];
         const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
 
-        // for debug
+        // // for debug
         // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip

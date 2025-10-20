@@ -16,5 +16,5 @@ const bindings = new Map([
 
 // timeline から操作される
 export function createGBufferMaterialController(): MaterialController {
-    return createMaterialController(bindings);
+    return createMaterialController("GBufferMaterialController", bindings);
 }

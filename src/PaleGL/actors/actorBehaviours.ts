@@ -160,8 +160,11 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
 
 export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T) => {
     actor.onProcessPropertyBinder.forEach((cb) => cb(key, value));
+    // TODO: すべてのcomponentにすべてのpropertyが渡ってしまっているので不必要なプロパティは送らないようにしたい
     actor.components.forEach(([model, behaviour]) => {
-        behaviour.onProcessPropertyBinder?.(actor, model, key, value);
+        if (behaviour.onFilterPropertyBinder(key)) {
+            behaviour.onProcessPropertyBinder?.(actor, model, key, value);
+        }
     });
 };
 
