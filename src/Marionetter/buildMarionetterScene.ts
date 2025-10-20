@@ -38,8 +38,10 @@ import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
+import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
 import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
 import { createBoxGeometry } from '@/PaleGL/geometries/boxGeometry.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
@@ -52,8 +54,6 @@ import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quat
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
 import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
-import { Renderer } from '@/PaleGL/core/renderer.ts';
-import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
 // import { createHuman } from '../../../src/pages/scripts/createHuman.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
@@ -214,7 +214,7 @@ export function buildMarionetterScene(
         // );
         const postProcessControllerComponent = findMarionetterComponent<MarionetterPostProcessControllerComponentInfo>(
             obj,
-        MarionetterComponentType.PostProcessController
+            MarionetterComponentType.PostProcessController
         );
         const objectMoveAndLookAtControllerComponent =
             findMarionetterComponent<MarionetterObjectMoveAndLookAtControllerComponentInfo>(
@@ -368,10 +368,10 @@ export function buildMarionetterScene(
         //
 
         if (postProcessControllerComponent && actor) {
-            const postProcessController = createPostProcessController(renderer);
+            const postProcessController = createPostProcessController(renderer, postProcessControllerComponent);
             addActorComponent(actor, postProcessController);
         }
-        
+
         if (objectMoveAndLookAtControllerComponent) {
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
                 localPosition: createVector3FromRaw(

@@ -1,18 +1,20 @@
-﻿import { UniformNames, UniformTypes, UniformBlockNames, PostProcessPassType } from '@/PaleGL/constants';
-import screenSpaceShadowFragmentShader from '@/PaleGL/shaders/screen-space-shadow-fragment.glsl';
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import { PostProcessPassType, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
-    PostProcessSinglePass,
-    PostProcessPassRenderArgs,
     PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
+    PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     renderPostProcessSinglePassBehaviour,
     setPostProcessSinglePassSizeBehaviour,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import screenSpaceShadowFragmentShader from '@/PaleGL/shaders/screen-space-shadow-fragment.glsl';
 
 const UNIFORM_BIAS_NAME = 'uBias';
 const UNIFORM_JITTER_SIZE_NAME = 'uJitterSize';
@@ -21,6 +23,7 @@ const UNIFORM_STRENGTH_NAME = 'uStrength';
 const UNIFORM_RAY_STEP_MULTIPLIER_NAME = 'uRayStepMultiplier';
 
 export type ScreenSpaceShadowPassParameters = {
+    enabled: boolean;
     bias: number;
     jitterSize: Vector3;
     sharpness: number;
@@ -28,6 +31,24 @@ export type ScreenSpaceShadowPassParameters = {
     ratio: number;
     rayStepMultiplier: number;
 };
+
+// 短縮名表（唯一の真実源）。元型のキー網羅を compile 時に保証したいので satisfies を使う
+export const SSS_ShortNames = {
+    enabled: 'sss_on',
+    bias: 'sss_b',
+    jitterSize: 'sss_js',
+    sharpness: 'sss_sh',
+    strength: 'sss_s',
+    ratio: 'sss_r',
+    rayStepMultiplier: 'sss_rsm',
+} as const satisfies ShortNamesFor<ScreenSpaceShadowPassParameters>;
+
+const SSS = createShortenKit<ScreenSpaceShadowPassParameters>()(SSS_ShortNames);
+export const ScreenSpaceShadowPassParametersPropertyMap = SSS.map(NeedsShorten);
+
+export const ScreenSpaceShadowPassParametersKey = makeLongKeyMap(SSS_ShortNames);
+
+export type ScreenSpaceShadowPassParametersKey = keyof typeof ScreenSpaceShadowPassParametersKey;
 
 export type ScreenSpaceShadowPass = PostProcessSinglePass & ScreenSpaceShadowPassParameters;
 

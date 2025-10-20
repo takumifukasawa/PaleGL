@@ -675,9 +675,187 @@ export const MarionetterMeshFilterComponentInfoProperty = {
 // post process controller component
 
 export type MarionetterPostProcessControllerComponentInfo = MarionetterComponentInfoBase & {
+    screenSpaceShadowEnabled: number;
+    screenSpaceShadowBias: number;
+    screenSpaceShadowJitterSize: RawVector3;
+    screenSpaceShadowSharpness: number;
+    screenSpaceShadowStrength: number;
+    screenSpaceShadowRatio: number;
+    screenSpaceShadowRayStepMultiplier: number;
+
+    ambientOcclusionEnabled: number;
+    ambientOcclusionSampleLength: number;
+    ambientOcclusionBias: number;
+    ambientOcclusionMinDistance: number;
+    ambientOcclusionMaxDistance: number;
+    ambientOcclusionColor: string;
+    ambientOcclusionPower: number;
+    ambientOcclusionStrength: number;
+    ambientOcclusionBlendRate: number;
+
+    screenSpaceReflectionEnabled: number;
+    screenSpaceReflectionRayDepthBias: number;
+    screenSpaceReflectionRayNearestDistance: number;
+    screenSpaceReflectionRayMaxDistance: number;
+    screenSpaceReflectionRayThickness: number;
+    screenSpaceReflectionRayJitterSize: RawVector2;
+    screenSpaceReflectionFadeMinDistance: number;
+    screenSpaceReflectionFadeMaxDistance: number;
+    screenSpaceReflectionScreenEdgeFadeFactorMin: RawVector2;
+    screenSpaceReflectionScreenEdgeFadeFactorMax: RawVector2;
+    screenSpaceReflectionRoughnessPower: number;
+    screenSpaceReflectionAdditionalRate: number;
+    screenSpaceReflectionBlendRate: number;
+
+    lightShaftEnabled: number;
+    lightShaftRatio: number;
+    lightShaftBlendRate: number;
+    lightShaftPassScaleBase: number;
+    lightShaftRayStepStrength: number;
+
+    volumetricLightEnabled: number;
+    volumetricLightRayStep: number;
+    volumetricLightBlendRate: number;
+    volumetricLightDensityMultiplier: number;
+    volumetricLightRayJitterSize: RawVector3;
+    volumetricLightRatio: number;
+
+    fogEnabled: number;
+    fogColor: string;
+    fogStrength: number;
+    fogDensity: number;
+    fogDensityAttenuation: number;
+    fogEndHeight: number;
+    fogDistanceStart: number;
+    fogDistanceEnd: number;
+    fogDistancePower: number;
+    fogSSSRate: number;
+    fogSSSFogColor: string;
+    fogBlendRate: number;
+
+    depthOfFieldFocusEnabled: number;
+    depthOfFieldFocusDistance: number;
+    depthOfFieldFocusRange: number;
+    depthOfFieldBokehRadius: number;
+
+    bloomEnabled: number;
     bloomAmount: number;
-    // shorten
+    bloomTone: number;
+    bloomThreshold: number;
+
+    streakEnabled: number;
+    streakThreshold: number;
+    streakStretch: number;
+    streakColor: string;
+    streakIntensity: number;
+    streakVerticalScale: number;
+    streakHorizontalScale: number;
+
+    vignetteEnabled: number;
+    vignetteRadiusFrom: number;
+    vignetteRadiusTo: number;
+    vignettePower: number;
+    vignetteBlendRate: number;
+
+    chromaticAberrationEnabled: number;
+    chromaticAberrationScale: number;
+    chromaticAberrationPower: number;
+    chromaticAberrationBlendRate: number;
+
+    glitchEnabled: number;
+    glitchBlendRate: number;
+
+    // shorten ---
+
+    sss_on: number;
+    sss_b: number;
+    sss_js: RawVector3;
+    sss_sh: number;
+    sss_s: number;
+    sss_r: number;
+    sss_rsm: number;
+
+    ao_on: number;
+    ao_sl: number;
+    ao_b: number;
+    ao_mid: number;
+    ao_mad: number;
+    ao_c: string;
+    ao_p: number;
+    ao_s: number;
+    ao_br: number;
+
+    ssr_on: number;
+    ssr_rdb: number;
+    ssr_rnd: number;
+    ssr_rmd: number;
+    ssr_rt: number;
+    ssr_rj: RawVector2;
+    ssr_fmd: number;
+    ssr_fxd: number;
+    ssr_seffm: RawVector2;
+    ssr_seffM: RawVector2;
+    ssr_rp: number;
+    ssr_ar: number;
+    ssr_br: number;
+
+    ls_on: number;
+    ls_r: number;
+    ls_br: number;
+    ls_psb: number;
+    ls_rss: number;
+
+    vl_on: number;
+    vl_rs: number;
+    vl_br: number;
+    vl_dm: number;
+    vl_rjs: RawVector3;
+    vl_r: number;
+
+    fg_on: number;
+    fg_c: string;
+    fg_s: number;
+    fg_d: number;
+    fg_da: number;
+    fg_eh: number;
+    fg_ds: number;
+    fg_de: number;
+    fg_dp: number;
+    fg_sss_r: number;
+    fg_sss_fc: string;
+    fg_br: number;
+
+    dof_on: number;
+    dof_fd: number;
+    dof_fr: number;
+    dof_br: number;
+
+    bl_on: number;
     bl_a: number;
+    bl_to: number;
+    bl_th: number;
+
+    sk_on: number;
+    sk_th: number;
+    sk_st: number;
+    sk_c: string;
+    sk_i: number;
+    sk_vs: number;
+    sk_hs: number;
+
+    vg_on: number;
+    vg_rf: number;
+    vg_rt: number;
+    vg_p: number;
+    vg_br: number;
+
+    ca_on: number;
+    ca_s: number;
+    ca_p: number;
+    ca_br: number;
+
+    gl_on: number;
+    gl_br: number;
 };
 
 export const MarionetterPostProcessControllerComponentInfoProperty = {

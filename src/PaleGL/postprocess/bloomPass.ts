@@ -24,6 +24,7 @@ import {
     setPostProcessPassSize,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -40,23 +41,26 @@ const UNIFORM_NAME_THRESHOLD = 'uThreshold';
 const UNIFORM_NAME_EXTRACT_TEXTURE = 'uExtractTexture';
 
 export type BloomPassParameters = {
+    enabled: boolean;
     threshold: number;
     tone: number;
     bloomAmount: number;
 };
 
-export type BloomPassParametersProperty = BloomPassParameters & {
-    // shorten
-    bl_th: number;
-    bl_to: number;
-    bl_a: number;
-};
+export const Bloom_ShortNames = {
+    enabled: 'bl_on',
+    threshold: 'bl_th',
+    tone: 'bl_to',
+    bloomAmount: 'bl_a',
+} as const satisfies ShortNamesFor<BloomPassParameters>;
 
-export const BloomPassParametersProperty = {
-    threshold: NeedsShorten ? 'bl_th' : 'threshold',
-    tone: NeedsShorten ? 'bl_to' : 'tone',
-    bloomAmount: NeedsShorten ? 'bl_a' : 'bloomAmount',
-} as const;
+const Bloom = createShortenKit<BloomPassParameters>()(Bloom_ShortNames);
+export type BloomParametersProperty = typeof Bloom.type;
+export const BloomPassParametersPropertyMap = Bloom.map(NeedsShorten);
+
+export const BloomPassParametersKey = makeLongKeyMap(Bloom_ShortNames);
+
+export type BloomPassParametersKey = keyof typeof BloomPassParametersKey;
 
 // type BloomPassParameters = {
 //     [BloomPassParameters.threshold]: number;
