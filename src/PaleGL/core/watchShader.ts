@@ -17,7 +17,8 @@ if (hot) hot.data.__shaderStore = store;
 
 // 2) 全シェーダを vite-plugin-glsl で処理されたものとして eager import
 // glob pattern は literalを入れる必要がある
-const rawShaders = isNeededCompact() ? {} : import.meta.glob([
+// コンパクトモード時でも必要なシェーダーは読み込む
+const rawShaders = import.meta.glob([
     // prettier-ignore
     // '../../../pages/**/*.{glsl,vert,frag,wgsl,comp}', // pages
     '../../../../src/pages/**/*.{glsl,vert,frag,wgsl,comp}' // root
@@ -26,7 +27,8 @@ const rawShaders = isNeededCompact() ? {} : import.meta.glob([
 });
 
 // vite-plugin-glsl処理結果を文字列に変換
-export const shaders = isNeededCompact() ? {} : Object.fromEntries(
+// コンパクトモード時でも変換処理は実行してシェーダーを利用可能にする
+export const shaders = Object.fromEntries(
     Object.entries(rawShaders).map(([path, shader]) => {
         // vite-plugin-glslは通常default exportで文字列を返す
         let shaderString: string;
@@ -88,24 +90,22 @@ store.ready = true;
 
 // 4) API（get / getMany / subscribe）
 export const get = (path: string) => {
-    if (isNeededCompact()) return '';
     return store.CURRENT[path] ?? '';
 };
 
 export function getMany(paths: string[]) {
-    if (isNeededCompact()) return {};
     return Object.fromEntries(paths.map((p) => [p, store.CURRENT[p] ?? ''])) as Record<string, string>;
 }
 
 export function subscribeShaders(paths: string[], cb: Listener) {
-    if (isNeededCompact()) return () => {}; // 何もしない関数を返す
+    if (isNeededCompact()) return () => {}; // コンパクトモード時はHMRを無効化
     store.subs.set(cb, new Set(paths));
     // 解除したい時だけ呼ぶ。呼ばなければずっと呼ばれ続けます。
     return () => store.subs.delete(cb);
 }
 
 export function subscribeSomeChangedShaders(cb: Listener) {
-    if (isNeededCompact()) return () => {}; // 何もしない関数を返す
+    if (isNeededCompact()) return () => {}; // コンパクトモード時はHMRを無効化
     store.listeners.add(cb);
     // 解除したい時だけ呼ぶ。呼ばなければずっと呼ばれ続けます。
     return () => store.listeners.delete(cb);
