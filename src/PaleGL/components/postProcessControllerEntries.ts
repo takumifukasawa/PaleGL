@@ -34,7 +34,6 @@ const numToBoolConverter: NumToBoolConverter = (n: number, prop: unknown, key: s
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore-next-line
     (prop[key] as boolean) = n > 0.5;
-    console.log(prop,  key, n)
 };
 type AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => void;
 const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => {
@@ -53,6 +52,10 @@ export type PostProcessParametersConversionFunctions =
     | NumToBoolConverter
     | AssignVector3Converter
     | AssignColorConverter;
+
+export type PostProcessParameterBindingValue =
+    | [unknown, string]
+    | [unknown, string, PostProcessParametersConversionFunctions];
 
 export const buildPostProcessControllerEntries = (renderer: Renderer) => {
     const entries = [
@@ -343,9 +346,7 @@ export const buildPostProcessControllerEntries = (renderer: Renderer) => {
             [renderer.glitchPass, GlitchPassParametersKey.enabled, numToBoolConverter],
         ],
         [GlitchPassParametersPropertyMap.blendRate, [renderer.glitchPass, GlitchPassParametersKey.blendRate]],
-    ] satisfies ReadonlyArray<
-        readonly [string, [unknown, string] | [unknown, string, PostProcessParametersConversionFunctions]]
-    >;
+    ] satisfies ReadonlyArray<readonly [string, PostProcessParameterBindingValue]>;
 
-    return new Map<string, unknown>(entries);
+    return new Map<string, PostProcessParameterBindingValue>(entries);
 };

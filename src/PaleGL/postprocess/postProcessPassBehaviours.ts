@@ -217,7 +217,7 @@ const createRenderPostProcessPassBehaviour = (): Partial<
         [PostProcessPassType.Vignette]: renderVignettePass,
         [PostProcessPassType.VolumetricLight]: renderVolumetricLightPass,
     };
-
+    
     // 開発時のみBufferVisualizerを追加
     if (isDevelopment()) {
         behaviours[PostProcessPassType.BufferVisualizer] = renderBufferVisualizerPass;
