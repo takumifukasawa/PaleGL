@@ -1,20 +1,23 @@
-﻿import {
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import {
     PostProcessPassType,
     RenderTargetTypes,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
+    PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
     PostProcessSinglePass,
-    PostProcessPassRenderArgs, PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import ssrFragmentShader from '@/PaleGL/shaders/ssr-fragment.glsl';
 
 /*
 float eps = .001;
@@ -41,7 +44,9 @@ int maxIterationNum = 32;
 int binarySearchNum = 8;
 */
 
+// ---- Type ----
 export type SSRPassParameters = {
+    enabled: boolean;
     rayDepthBias: number;
     rayNearestDistance: number;
     rayMaxDistance: number;
@@ -58,6 +63,48 @@ export type SSRPassParameters = {
     reflectionAdditionalRate: number;
     blendRate: number;
 };
+
+// ---- Short names (唯一の真実源) ----
+// C# の定数と完全一致：
+//  ssr_on, ssr_rdb, ssr_rnd, ssr_rmd, ssr_rt,
+//  ssr_rjx, ssr_rjy, ssr_fmd, ssr_fxd,
+//  ssr_seffmx, ssr_seffMx, ssr_seffmy, ssr_seffMy,
+//  ssr_rp, ssr_ar, ssr_br
+export const SSR_ShortNames = {
+    enabled: 'ssr_on',
+    rayDepthBias: 'ssr_rdb',
+    rayNearestDistance: 'ssr_rnd',
+    rayMaxDistance: 'ssr_rmd',
+    reflectionRayThickness: 'ssr_rt',
+    reflectionRayJitterSizeX: 'ssr_rjx',
+    reflectionRayJitterSizeY: 'ssr_rjy',
+    reflectionFadeMinDistance: 'ssr_fmd',
+    reflectionFadeMaxDistance: 'ssr_fxd',
+    reflectionScreenEdgeFadeFactorMinX: 'ssr_seffmx',
+    reflectionScreenEdgeFadeFactorMaxX: 'ssr_seffMx',
+    reflectionScreenEdgeFadeFactorMinY: 'ssr_seffmy',
+    reflectionScreenEdgeFadeFactorMaxY: 'ssr_seffMy',
+    reflectionRoughnessPower: 'ssr_rp',
+    reflectionAdditionalRate: 'ssr_ar',
+    blendRate: 'ssr_br',
+} as const satisfies ShortNamesFor<SSRPassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const SSR = createShortenKit<SSRPassParameters>()(SSR_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const SSRPassParametersPropertyMap = SSR.map(NeedsShorten);
+
+// 常に long キーを返す論理キー
+export const SSRPassParametersKey = makeLongKeyMap(SSR_ShortNames);
+
+// long キーのユニオン（必要なら）
+export type SSRPassParametersKey = keyof typeof SSRPassParametersKey;
+
+// ※ 短縮キーも含む拡張型が必要なら（Bloom と同様）
+export type SSRPassParametersProperty = typeof SSR.type;
+
+// ---
 
 export type SsrPass = PostProcessSinglePass & SSRPassParameters;
 
@@ -190,24 +237,24 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
             uniforms: baseUniforms,
             renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
             uniformBlockNames: [UniformBlockNames.Common],
-            enabled
+            enabled,
         }),
         // parameters
-            rayDepthBias,
-            rayNearestDistance,
-            rayMaxDistance,
-            reflectionRayThickness,
-            reflectionRayJitterSizeX,
-            reflectionRayJitterSizeY,
-            reflectionFadeMinDistance,
-            reflectionFadeMaxDistance,
-            reflectionScreenEdgeFadeFactorMinX,
-            reflectionScreenEdgeFadeFactorMaxX,
-            reflectionScreenEdgeFadeFactorMinY,
-            reflectionScreenEdgeFadeFactorMaxY,
-            reflectionRoughnessPower,
-            reflectionAdditionalRate,
-            blendRate,
+        rayDepthBias,
+        rayNearestDistance,
+        rayMaxDistance,
+        reflectionRayThickness,
+        reflectionRayJitterSizeX,
+        reflectionRayJitterSizeY,
+        reflectionFadeMinDistance,
+        reflectionFadeMaxDistance,
+        reflectionScreenEdgeFadeFactorMinX,
+        reflectionScreenEdgeFadeFactorMaxX,
+        reflectionScreenEdgeFadeFactorMinY,
+        reflectionScreenEdgeFadeFactorMaxY,
+        reflectionRoughnessPower,
+        reflectionAdditionalRate,
+        blendRate,
     };
 }
 

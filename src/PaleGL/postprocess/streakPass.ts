@@ -1,21 +1,24 @@
-﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import streakPrefilterFragmentShader from '@/PaleGL/shaders/streak-prefilter-fragment.glsl';
-import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-fragment.glsl';
-import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
-import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
-import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import {
-    PostProcessPassBase,
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
-    PostProcessPassRenderArgs, PostProcessPassParametersBaseArgs,
+    PostProcessPassBase,
+    PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import streakCompositeFragmentShader from '@/PaleGL/shaders/streak-composite-fragment.glsl';
+import streakDownSampleFragmentShader from '@/PaleGL/shaders/streak-down-sample-fragment.glsl';
+import streakPrefilterFragmentShader from '@/PaleGL/shaders/streak-prefilter-fragment.glsl';
+import streakUpSampleFragmentShader from '@/PaleGL/shaders/streak-up-sample-fragment.glsl';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 const UNIFORM_NAME_PREV_TEXTURE = 'uPrevTexture';
 const UNIFORM_NAME_DOWN_SAMPLE_TEXTURE = 'uDownSampleTexture';
@@ -30,7 +33,11 @@ const UNIFORM_NAME_INTENSITY = 'uIntensity';
 // ref:
 // https://github.com/keijiro/KinoStreak/
 
-type StreakPassParameters = {
+// ---
+
+// ---- Type（提示の型を export 化）----
+export type StreakPassParameters = {
+    enabled: boolean;
     threshold: number;
     stretch: number;
     color: Color;
@@ -39,13 +46,40 @@ type StreakPassParameters = {
     horizontalScale: number;
 };
 
-export type StreakPass = PostProcessPassBase & StreakPassParameters & {
-    halfHeight: number;
-    prefilterPass: FragmentPass;
-    downSamplePasses: DownSamplePass[];
-    upSamplePasses: UpSamplePass[];
-    compositePass: FragmentPass;
-};
+// ---- Short names（C#定数に完全一致）----
+export const Streak_ShortNames = {
+    enabled: 'sk_on',
+    threshold: 'sk_th',
+    stretch: 'sk_st',
+    color: 'sk_c',
+    intensity: 'sk_i',
+    verticalScale: 'sk_vs',
+    horizontalScale: 'sk_hs',
+} as const satisfies ShortNamesFor<StreakPassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const Streak = createShortenKit<StreakPassParameters>()(Streak_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const StreakPassParametersPropertyMap = Streak.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const StreakPassParametersKey = makeLongKeyMap(Streak_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type StreakPassParametersKey = keyof typeof StreakPassParametersKey;
+export type StreakPassParametersProperty = typeof Streak.type;
+
+// ---
+
+export type StreakPass = PostProcessPassBase &
+    StreakPassParameters & {
+        halfHeight: number;
+        prefilterPass: FragmentPass;
+        downSamplePasses: DownSamplePass[];
+        upSamplePasses: UpSamplePass[];
+        compositePass: FragmentPass;
+    };
 
 type StreakPassArgs = PostProcessPassParametersBaseArgs & Partial<StreakPassParameters>;
 
@@ -56,11 +90,11 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
     const { gpu, enabled } = args;
 
     const threshold = args.threshold || 0.9;
-        const stretch = args.stretch || 0.5;
-        const color = args.color || createColorWhite();
-        const intensity = args.intensity || 0.6;
-        const verticalScale = args.verticalScale || 1.5;
-        const horizontalScale = args.horizontalScale || 1.25;
+    const stretch = args.stretch || 0.5;
+    const color = args.color || createColorWhite();
+    const intensity = args.intensity || 0.6;
+    const verticalScale = args.verticalScale || 1.5;
+    const horizontalScale = args.horizontalScale || 1.25;
     // parameters
     // threshold: number = 0.9;
     // stretch: number = 0.5;
@@ -211,7 +245,7 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             type: PostProcessPassType.Streak,
             geometry,
             materials,
-            enabled
+            enabled,
         }),
         halfHeight,
         prefilterPass,

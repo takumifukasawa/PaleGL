@@ -1,10 +1,5 @@
-﻿import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
-import {
-    createPostProcessSinglePass,
-    PostProcessPassBase,
-    PostProcessSinglePass,
-    PostProcessPassRenderArgs, PostProcessPassParametersBaseArgs,
-} from '@/PaleGL/postprocess/postProcessPassBase.ts';
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     PostProcessPassType,
     RenderTargetTypes,
@@ -12,10 +7,18 @@ import {
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
-import {Color, createColorWhite} from '@/PaleGL/math/color.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
+import {
+    createPostProcessSinglePass,
+    PostProcessPassBase,
+    PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
+    PostProcessSinglePass,
+} from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import fogFragmentShader from '@/PaleGL/shaders/fog-fragment.glsl';
 
 const UNIFORM_FOG_COLOR = 'uFogColor';
 const UNIFORM_FOG_STRENGTH = 'uFogStrength';
@@ -33,7 +36,11 @@ const lightShaftTextureUniformName = 'uLightShaftTexture';
 const volumetricLightTextureUniformName = 'uVolumetricLightTexture';
 const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 
+// ---
+
+// ---- Type ----
 export type FogPassParameters = {
+    enabled: boolean;
     fogColor: Color;
     fogStrength: number;
     fogDensity: number;
@@ -46,6 +53,37 @@ export type FogPassParameters = {
     sssFogColor: Color;
     blendRate: number;
 };
+
+// ---- Short names（C# に完全一致）----
+export const Fog_ShortNames = {
+    enabled: 'fg_on',
+    fogColor: 'fg_c',
+    fogStrength: 'fg_s',
+    fogDensity: 'fg_d',
+    fogDensityAttenuation: 'fg_da',
+    fogEndHeight: 'fg_eh',
+    distanceFogStart: 'fg_ds',
+    distanceFogPower: 'fg_dp',
+    distanceFogEnd: 'fg_de',
+    sssFogRate: 'fg_sss_r',
+    sssFogColor: 'fg_sss_fc',
+    blendRate: 'fg_br',
+} as const satisfies ShortNamesFor<FogPassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const Fog = createShortenKit<FogPassParameters>()(Fog_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ
+export const FogPassParametersPropertyMap = Fog.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const FogPassParametersKey = makeLongKeyMap(Fog_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type FogPassParametersKey = keyof typeof FogPassParametersKey;
+export type FogPassParametersProperty = typeof Fog.type;
+
+// ---
 
 export type FogPass = PostProcessSinglePass & FogPassParameters;
 
@@ -66,7 +104,7 @@ export function createFogPass(args: FogPassArgs) {
     const sssFogRate = args.sssFogRate ?? 1;
     const sssFogColor = args.sssFogColor ?? createColorWhite();
     const blendRate = args.blendRate ?? 1;
-        
+
     return {
         ...createPostProcessSinglePass({
             gpu,
@@ -159,7 +197,7 @@ export function createFogPass(args: FogPassArgs) {
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
             uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
-            enabled
+            enabled,
         }),
         // parameters
         fogColor,

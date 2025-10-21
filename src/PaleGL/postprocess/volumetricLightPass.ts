@@ -1,4 +1,7 @@
-﻿import {
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import {
     AttributeNames,
     BlendTypes,
     DepthFuncTypes,
@@ -12,42 +15,68 @@
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
-import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
+import { renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
+import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
+import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
-    PostProcessSinglePass,
-    PostProcessPassRenderArgs,
     PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
+    PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
-import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
-import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
-import {
-    createMaterial,
-    Material,
-    setMaterialUniformValue,
-} from '@/PaleGL/materials/material.ts';
-import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import {
     renderPostProcessSinglePassBehaviour,
     setPostProcessSinglePassSizeBehaviour,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import volumetricLightFragmentShader from '@/PaleGL/shaders/volumetric-light-fragment.glsl';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 const UNIFORM_VOLUME_DEPTH_TEXTURE = 'uVolumetricDepthTexture';
 const UNIFORM_NAME_RAY_STEP = 'uRayStep';
 const UNIFORM_NAME_DENSITY_MULTIPLIER = 'uDensityMultiplier';
 const UNIFORM_NAME_RAY_JITTER_SIZE = 'uRayJitterSize';
 
+// ---
+
+// ---- Type（既存）----
 export type VolumetricLightPassParameters = {
+    enabled: boolean;
     rayStep: number;
     blendRate: number;
     densityMultiplier: number;
     rayJitterSize: Vector3;
     ratio: number;
 };
+
+// ---- Short names（C#定数に完全一致）----
+export const VolumetricLight_ShortNames = {
+    enabled: 'vl_on',
+    rayStep: 'vl_rs',
+    blendRate: 'vl_br',
+    densityMultiplier: 'vl_dm',
+    rayJitterSize: 'vl_rjs',
+    ratio: 'vl_r',
+} as const satisfies ShortNamesFor<VolumetricLightPassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const VolumetricLight = createShortenKit<VolumetricLightPassParameters>()(VolumetricLight_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const VolumetricLightPassParametersPropertyMap = VolumetricLight.map(NeedsShorten);
+
+// 常に long キーを返す論理キー
+export const VolumetricLightPassParametersKey = makeLongKeyMap(VolumetricLight_ShortNames);
+
+// キーのユニオン（必要なら）
+export type VolumetricLightPassParametersKey = keyof typeof VolumetricLightPassParametersKey;
+
+// 短縮キーも含む拡張型（必要なら）
+export type VolumetricLightPassParametersProperty = typeof VolumetricLight.type;
+
+// ---
 
 export type VolumetricLightPass = PostProcessSinglePass &
     VolumetricLightPassParameters & {
@@ -229,13 +258,13 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
     const volumetricLightPass = postProcessPass as VolumetricLightPass;
 
     const { gpu, renderer } = options;
-    
-        tryStartMaterial(
-            gpu,
-            renderer,
-            volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry,
-            volumetricLightPass.spotLightFrustumMaterial
-        );
+
+    tryStartMaterial(
+        gpu,
+        renderer,
+        volumetricLightPass.spotLights[0].shadowCamera?.visibleFrustumMesh?.geometry as Geometry,
+        volumetricLightPass.spotLightFrustumMaterial
+    );
 
     setRenderTargetToRendererAndClear(renderer, volumetricLightPass.renderTargetSpotLightFrustum, false, true);
 

@@ -1,14 +1,16 @@
-﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
-import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
+﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
     PostProcessPassBase,
-    PostProcessSinglePass,
-    PostProcessPassRenderArgs,
     PostProcessPassParametersBaseArgs,
+    PostProcessPassRenderArgs,
+    PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
+import vignetteFragment from '@/PaleGL/shaders/vignette-fragment.glsl';
 
 // ref:
 
@@ -21,12 +23,40 @@ const UNIFORM_VALUE_VIGNETTE_POWER = 1.345;
 const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
 const UNIFORM_VALUE_BLEND_RATE = 0.73;
 
+// ---
+
+// ---- Type（既存）----
 export type VignettePassParameters = {
+    enabled: boolean;
     vignetteRadiusFrom: number;
     vignetteRadiusTo: number;
     vignettePower: number;
     blendRate: number;
 };
+
+// ---- Short names（C#定数に完全一致）----
+export const Vignette_ShortNames = {
+    enabled: 'vg_on',
+    vignetteRadiusFrom: 'vg_rf',
+    vignetteRadiusTo: 'vg_rt',
+    vignettePower: 'vg_p',
+    blendRate: 'vg_br',
+} as const satisfies ShortNamesFor<VignettePassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const Vignette = createShortenKit<VignettePassParameters>()(Vignette_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const VignettePassParametersPropertyMap = Vignette.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const VignettePassParametersKey = makeLongKeyMap(Vignette_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type VignettePassParametersKey = keyof typeof VignettePassParametersKey;
+export type VignettePassParametersProperty = typeof Vignette.type;
+
+// ---
 
 export type VignettePass = PostProcessSinglePass & VignettePassParameters;
 

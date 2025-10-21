@@ -1,11 +1,14 @@
 ﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
 
-import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
+import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
-import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
-import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
+import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
+import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/vector3.ts';
+import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import {
     createPostProcessPassBase,
     getPostProcessCommonUniforms,
@@ -13,32 +16,62 @@ import {
     PostProcessPassParametersBaseArgs,
     PostProcessPassRenderArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
-import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
-import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/vector3.ts';
+import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
+import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
+import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
 
 const radialBlurOriginUniformName = 'uRadialBlurOrigin';
 const radialBlurPassScaleBaseUniformName = 'uRadialBlurPassScaleBase';
 const radialBlurPassIndexUniformName = 'uRadialBlurPassIndex';
 const radialBlurRayStepStrengthUniformName = 'uRadialBlurRayStepStrength';
 
-type LightShaftPassParameters = {
+// ---
+
+// ---- Type ----
+export type LightShaftPassParameters = {
+    enabled: boolean;
     ratio: number;
     blendRate: number;
     passScaleBase: number;
     rayStepStrength: number;
 };
 
-export type LightShaftPass = PostProcessPassBase & LightShaftPassParameters & {
-    directionalLight: DirectionalLight | null;
-    lightShaftDownSamplePass: FragmentPass;
-    blur1Pass: FragmentPass;
-    blur2Pass: FragmentPass;
-    blur3Pass: FragmentPass;
-    compositePass: FragmentPass;
-};
+// ---- Short names (唯一の真実源 / C#に一致) ----
+export const LightShaft_ShortNames = {
+    enabled: 'ls_on',
+    ratio: 'ls_r',
+    blendRate: 'ls_br',
+    passScaleBase: 'ls_psb',
+    rayStepStrength: 'ls_rss',
+} as const satisfies ShortNamesFor<LightShaftPassParameters>;
+
+// ---- 派生（テンプレ同様）----
+const LightShaft = createShortenKit<LightShaftPassParameters>()(LightShaft_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const LightShaftPassParametersPropertyMap = LightShaft.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const LightShaftPassParametersKey = makeLongKeyMap(LightShaft_ShortNames);
+
+// long キーのユニオン（必要なら）
+export type LightShaftPassParametersKey = keyof typeof LightShaftPassParametersKey;
+
+// 短縮キーも含む拡張型（必要なら）
+export type LightShaftPassParametersProperty = typeof LightShaft.type;
+
+// ---
+
+export type LightShaftPass = PostProcessPassBase &
+    LightShaftPassParameters & {
+        directionalLight: DirectionalLight | null;
+        lightShaftDownSamplePass: FragmentPass;
+        blur1Pass: FragmentPass;
+        blur2Pass: FragmentPass;
+        blur3Pass: FragmentPass;
+        compositePass: FragmentPass;
+    };
 
 type LightShaftPassParametersArgs = PostProcessPassParametersBaseArgs & Partial<LightShaftPassParameters>;
 
@@ -48,7 +81,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const blendRate = args.blendRate ?? 0.65;
     const passScaleBase = args.passScaleBase ?? 0.2;
     const rayStepStrength = args.rayStepStrength ?? 0.012;
-    
+
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = createPlaneGeometry({ gpu });
 
@@ -204,7 +237,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
             type: PostProcessPassType.LightShaft,
             geometry,
             materials,
-            enabled
+            enabled,
         }),
         directionalLight: null,
         lightShaftDownSamplePass,

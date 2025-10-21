@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     PostProcessPassType,
     RenderTargetTypes,
@@ -33,24 +34,38 @@ const UNIFORM_NAME_DOF_TEXTURE = 'uDofTexture';
 // https://github.com/keijiro/KinoBokeh/tree/master
 //
 
+// ---
+
+// ---- Type（既存）----
 export type DepthOfFieldPassParameters = {
+    enabled: boolean;
     focusDistance: number;
     focusRange: number;
     bokehRadius: number;
 };
 
-export type DepthOfFieldPassParametersProperty = DepthOfFieldPassParameters & {
-    // shorten
-    dof_fd: number;
-    dof_fr: number;
-    dof_br: number;
-};
+// ---- Short names（C#定数に完全一致）----
+export const DepthOfField_ShortNames = {
+    enabled: 'dof_on',
+    focusDistance: 'dof_fd',
+    focusRange: 'dof_fr',
+    bokehRadius: 'dof_br',
+} as const satisfies ShortNamesFor<DepthOfFieldPassParameters>;
 
-export const DepthOfFieldPassParametersProperty = {
-    focusDistance: NeedsShorten ? 'dof_fd' : 'focusDistance',
-    focusRange: NeedsShorten ? 'dof_fr' : 'focusRange',
-    bokehRadius: NeedsShorten ? 'dof_br' : 'bokehRadius',
-} as const;
+// ---- 派生（テンプレ同様）----
+const DepthOfField = createShortenKit<DepthOfFieldPassParameters>()(DepthOfField_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const DepthOfFieldPassParametersPropertyMap = DepthOfField.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const DepthOfFieldPassParametersKey = makeLongKeyMap(DepthOfField_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type DepthOfFieldPassParametersKey = keyof typeof DepthOfFieldPassParametersKey;
+export type DepthOfFieldPassParametersProperty = typeof DepthOfField.type;
+
+// ---
 
 export type DepthOfFieldPassArgs = PostProcessPassParametersBaseArgs & Partial<DepthOfFieldPassParameters>;
 
