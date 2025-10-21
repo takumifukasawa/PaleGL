@@ -180,7 +180,6 @@ export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: Materi
     });
     // 差し替えたmaterialをコンパイル
     mesh.materials.forEach((material) => {
-        console.log(mesh,  !isCompiledMaterialShader(material), needsStart)
         if (!isCompiledMaterialShader(material) && needsStart) {
             startMaterial(material, {
                 gpu,
