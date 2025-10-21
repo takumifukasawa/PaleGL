@@ -29,20 +29,24 @@ import {
     VolumetricLightPassParametersPropertyMap,
 } from '@/PaleGL/postprocess/volumetricLightPass.ts';
 
-type NumToBoolConverter = (n: number, prop: unknown) => void;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore-next-line
-const numToBoolConverter: NumToBoolConverter = (n: number, prop: unknown) => {
-    // eslint-disable-next-line
-    prop = n > 0.5;
+type NumToBoolConverter = (n: number, prop: unknown, key: string) => void;
+const numToBoolConverter: NumToBoolConverter = (n: number, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    (prop[key] as boolean) = n > 0.5;
+    console.log(prop,  key, n)
 };
-type AssignVector3Converter = (v: RawVector3, prop: Vector3) => void;
-const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: Vector3) => {
-    setV3(prop, v.x, v.y, v.z);
+type AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => void;
+const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    setV3(prop[key] as Vector3, v.x, v.y, v.z);
 };
-type AssignColorConverter = (c: string, prop: Color) => void;
-const assignColorConverter: AssignColorConverter = (hex: string, prop: Color) => {
-    copyColor(prop, createColorFromHex(hex));
+type AssignColorConverter = (c: string, prop: unknown, key: string) => void;
+const assignColorConverter: AssignColorConverter = (hex: string, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    copyColor(prop[key] as Color, createColorFromHex(hex));
 };
 
 export type PostProcessParametersConversionFunctions =
