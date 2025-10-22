@@ -1,3 +1,5 @@
+import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
+import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import {
     Camera,
     FrustumDirection,
@@ -6,6 +8,17 @@ import {
     GetFrustumVectorsFunc,
     UpdateProjectionMatrixFunc,
 } from '@/PaleGL/actors/cameras/camera.ts';
+import {
+    getOrthographicFrustumLocalPositions,
+    setSizeOrthographicCamera,
+    updateOrthographicCameraProjectionMatrix,
+} from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import {
+    getPerspectiveFrustumLocalPositions,
+    setSizePerspectiveCamera,
+    updatePerspectiveCameraProjectionMatrix,
+} from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     AttributeNames,
     AttributeUsageType,
@@ -16,37 +29,37 @@ import {
     PrimitiveTypes,
     UniformNames,
 } from '@/PaleGL/constants.ts';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
+import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { getWriteRenderTarget, setRenderTargetSizeBehaviour } from '@/PaleGL/core/renderTargetBehaviours.ts';
+import { getWorldForward } from '@/PaleGL/core/transform.ts';
+import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
+import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { createMaterial } from '@/PaleGL/materials/material.ts';
 import {
-    getPerspectiveFrustumLocalPositions,
-    setSizePerspectiveCamera,
-    updatePerspectiveCameraProjectionMatrix,
-} from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
-import {
-    getOrthographicFrustumLocalPositions,
-    setSizeOrthographicCamera,
-    updateOrthographicCameraProjectionMatrix,
-} from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+    cloneMat4,
+    createTranslationMatrix,
+    getMat4Position,
+    invertMat4,
+    mat4m33,
+    multiplyMat4Array,
+} from '@/PaleGL/math/matrix4.ts';
+import { createRay, Ray } from '@/PaleGL/math/ray.ts';
+import { v2x, v2y, Vector2 } from '@/PaleGL/math/vector2.ts';
 import {
     cloneVector3,
     createVector3,
     createVector3Zero,
     multiplyVector3AndMatrix4,
-    negateVector3, normalizeVector3, subVector3AndVector3, v3x, v3y, v3z,
-    Vector3
+    negateVector3,
+    normalizeVector3,
+    subVector3AndVector3,
+    v3x,
+    v3y,
+    v3z,
+    Vector3,
 } from '@/PaleGL/math/vector3.ts';
-import { defaultUpdateActorTransform, UpdateActorTransformFunc } from '@/PaleGL/actors/actorBehaviours.ts';
-import {
-    cloneMat4,
-    createTranslationMatrix,
-    getMat4Position, invertMat4,
-    mat4m33,
-    multiplyMat4Array,
-} from '@/PaleGL/math/matrix4.ts';
-import { Actor, ActorUpdateArgs, addChildActor } from '@/PaleGL/actors/actor.ts';
-import { createMaterial } from '@/PaleGL/materials/material.ts';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import {
     createVector4,
     multiplyVector4AndMatrix4,
@@ -54,24 +67,18 @@ import {
     setV4y,
     setV4z,
     v4w,
-    v4x, v4y, v4z,
-    Vector4
+    v4x,
+    v4y,
+    v4z,
+    Vector4,
 } from '@/PaleGL/math/vector4.ts';
 import {
     hasPostProcessPassEnabled,
     isPostProcessEnabled,
     PostProcess,
-    setPostProcessSize
+    setPostProcessSize,
 } from '@/PaleGL/postprocess/postProcess.ts';
-import { getWorldForward } from '@/PaleGL/core/transform.ts';
-import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { v2x, v2y, Vector2 } from '@/PaleGL/math/vector2.ts';
-import { createRay, Ray } from '@/PaleGL/math/ray.ts';
-import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-import { getWriteRenderTarget, setRenderTargetSizeBehaviour } from '@/PaleGL/core/renderTargetBehaviours.ts';
-import { nullLiteralTypeAnnotation } from '@babel/types';
 
 // mainCamera: boolean = false;
 
@@ -246,7 +253,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         // console.log(flb);
         // console.log(frt);
         // console.log(frb);
-       
+
         updateGeometryAttribute(
             camera.visibleFrustumMesh.geometry,
             AttributeNames.Position,
@@ -327,18 +334,10 @@ export const isPerspectiveCamera = (camera: Camera) => {
 };
 
 export const transformScreenPoint = (camera: Camera, p: Vector3) => {
-    const matInProjection = multiplyMat4Array(
-        camera.projectionMatrix,
-        camera.viewMatrix,
-        createTranslationMatrix(p)
-    );
+    const matInProjection = multiplyMat4Array(camera.projectionMatrix, camera.viewMatrix, createTranslationMatrix(p));
     const clipPosition = getMat4Position(matInProjection);
     const w = mat4m33(matInProjection) === 0 ? 0.0001 : mat4m33(matInProjection); // TODO: cheap NaN fallback
-    return createVector3(
-        v3x(clipPosition) / w,
-        v3y(clipPosition) / w,
-        v3z(clipPosition) / w
-    );
+    return createVector3(v3x(clipPosition) / w, v3y(clipPosition) / w, v3z(clipPosition) / w);
 };
 
 export const setCameraRenderTarget = (camera: Camera, renderTarget: RenderTarget | GBufferRenderTargets | null) => {
