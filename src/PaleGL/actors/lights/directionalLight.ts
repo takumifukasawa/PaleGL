@@ -3,7 +3,7 @@ import { createOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCa
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
+import { LIGHT_TYPE_DIRECTIONAL, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { setRotationY } from '@/PaleGL/core/transform.ts';
@@ -12,7 +12,7 @@ import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 export type DirectionalLight = Light;
 
 export function createDirectionalLight(options: LightArgs): DirectionalLight {
-    const light = createLight({ ...options, lightType: LightTypes.Directional });
+    const light = createLight({ ...options, lightType: LIGHT_TYPE_DIRECTIONAL });
 
     // light.shadowCamera = createOrthographicCamera(-1, 1, -1, 1, 0.1, 1);
     // // ライトが向いている方向と逆を向かせたいので(projectionの過程でz軸が逆になるから)

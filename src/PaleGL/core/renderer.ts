@@ -26,16 +26,38 @@ import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import {
-    ActorTypes,
-    BlendTypes,
-    LightTypes,
+    // ActorType,
+    ACTOR_TYPE_MESH,
+    ACTOR_TYPE_LIGHT,
+    // ACTOR_TYPE_CAMERA,
+    ACTOR_TYPE_SKYBOX,
+    // BlendType,
+    BLEND_TYPE_OPAQUE,
+    BLEND_TYPE_TRANSPARENT,
+    BLEND_TYPE_ADDITIVE,
+    // LightType,
+    LIGHT_TYPE_DIRECTIONAL,
+    LIGHT_TYPE_SPOT,
+    LIGHT_TYPE_POINT,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
-    MeshTypes,
+    // MeshType,
+    // MESH_TYPE_SKINNED,
+    // MESH_TYPE_TEXT,
+    MESH_TYPE_SPRITE_ATLAS,
+    ACTOR_TYPE_POST_PROCESS_VOLUME,
     RenderQueueType,
+    RENDER_QUEUE_TYPE_OPAQUE,
+    RENDER_QUEUE_TYPE_ALPHA_TEST,
+    RENDER_QUEUE_TYPE_SKYBOX,
+    RENDER_QUEUE_TYPE_TRANSPARENT,
+    RENDER_QUEUE_TYPE_AFTER_TONE,
+    RENDER_QUEUE_TYPE_OVERLAY,
     RenderTargetTypes,
     TextureDepthPrecisionType,
-    UIQueueTypes,
+    // UIQueueType,
+    UI_QUEUE_TYPE_AFTER_TONE,
+    UI_QUEUE_TYPE_OVERLAY,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -921,12 +943,12 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
 
     const renderMeshInfoEachQueue: RenderMeshInfoEachQueue = {
-        [RenderQueueType.Opaque]: [],
-        [RenderQueueType.AlphaTest]: [],
-        [RenderQueueType.Skybox]: [],
-        [RenderQueueType.Transparent]: [],
-        [RenderQueueType.AfterTone]: [],
-        [RenderQueueType.Overlay]: [],
+        [RENDER_QUEUE_TYPE_OPAQUE]: [],
+        [RENDER_QUEUE_TYPE_ALPHA_TEST]: [],
+        [RENDER_QUEUE_TYPE_SKYBOX]: [],
+        [RENDER_QUEUE_TYPE_TRANSPARENT]: [],
+        [RENDER_QUEUE_TYPE_AFTER_TONE]: [],
+        [RENDER_QUEUE_TYPE_OVERLAY]: [],
     };
 
     const lightActors: LightActors = {
@@ -941,17 +963,17 @@ export function renderRenderer(
     // build render mesh info each queue
     traverseScene(scene, (actor) => {
         switch (actor.type) {
-            case ActorTypes.Skybox:
+            case ACTOR_TYPE_SKYBOX:
                 if (!actor.enabled) {
                     return;
                 }
-                renderMeshInfoEachQueue[RenderQueueType.Skybox].push(
-                    buildRenderMeshInfo(actor as Skybox, RenderQueueType.Skybox)
+                renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX].push(
+                    buildRenderMeshInfo(actor as Skybox, RENDER_QUEUE_TYPE_SKYBOX)
                 );
                 // TODO: skyboxの中で処理したい
                 // actor.transform.parent = cameras.transform;
                 return;
-            case ActorTypes.Mesh:
+            case ACTOR_TYPE_MESH:
                 // case ActorTypes.SkinnedMesh:
                 if (!actor.enabled) {
                     return;
@@ -963,48 +985,48 @@ export function renderRenderer(
                 }
                 mesh.materials.forEach((material, i) => {
                     // switch (uiMesh.uiQueueType) {
-                    //     case UIQueueTypes.AfterTone:
-                    //         renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
-                    //             buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                    //     case UI_QUEUE_TYPE_AFTER_TONE:
+                    //         renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_AFTER_TONE].push(
+                    //             buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_AFTER_TONE, i)
                     //         );
                     //         break;
-                    //     case UIQueueTypes.Overlay:
-                    //         renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
-                    //             buildRenderMeshInfo(mesh, RenderQueueType.Overlay, i)
+                    //     case UI_QUEUE_TYPE_OVERLAY:
+                    //         renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OVERLAY].push(
+                    //             buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_OVERLAY, i)
                     //         );
                     //         break;
                     //     default:
                     //         console.error('[renderRenderer] invalid ui queue type');
                     //         return;
                     // }
-                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.AfterTone) {
-                        renderMeshInfoEachQueue[RenderQueueType.AfterTone].push(
-                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                    if ((mesh as UIMesh).uiQueueType === UI_QUEUE_TYPE_AFTER_TONE) {
+                        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_AFTER_TONE].push(
+                            buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_AFTER_TONE, i)
                         );
                         return;
                     }
-                    if ((mesh as UIMesh).uiQueueType === UIQueueTypes.Overlay) {
-                        renderMeshInfoEachQueue[RenderQueueType.Overlay].push(
-                            buildRenderMeshInfo(mesh, RenderQueueType.AfterTone, i)
+                    if ((mesh as UIMesh).uiQueueType === UI_QUEUE_TYPE_OVERLAY) {
+                        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OVERLAY].push(
+                            buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_AFTER_TONE, i)
                         );
                         return;
                     }
                     if (material.alphaTest != null) {
-                        renderMeshInfoEachQueue[RenderQueueType.AlphaTest].push(
-                            buildRenderMeshInfo(mesh, RenderQueueType.AlphaTest, i)
+                        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_ALPHA_TEST].push(
+                            buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_ALPHA_TEST, i)
                         );
                         return;
                     }
                     switch (material.blendType) {
-                        case BlendTypes.Opaque:
-                            renderMeshInfoEachQueue[RenderQueueType.Opaque].push(
-                                buildRenderMeshInfo(mesh, RenderQueueType.Opaque, i)
+                        case BLEND_TYPE_OPAQUE:
+                            renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OPAQUE].push(
+                                buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_OPAQUE, i)
                             );
                             return;
-                        case BlendTypes.Transparent:
-                        case BlendTypes.Additive:
-                            renderMeshInfoEachQueue[RenderQueueType.Transparent].push(
-                                buildRenderMeshInfo(mesh, RenderQueueType.Transparent, i)
+                        case BLEND_TYPE_TRANSPARENT:
+                        case BLEND_TYPE_ADDITIVE:
+                            renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_TRANSPARENT].push(
+                                buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_TRANSPARENT, i)
                             );
                             return;
                         default:
@@ -1013,24 +1035,24 @@ export function renderRenderer(
                 });
                 break;
 
-            case ActorTypes.Light:
+            case ACTOR_TYPE_LIGHT:
                 if (actor.enabled) {
                     const light = actor as Light;
                     switch (light.lightType) {
-                        case LightTypes.Directional:
+                        case LIGHT_TYPE_DIRECTIONAL:
                             lightActors.directionalLight = light;
                             break;
-                        case LightTypes.Spot:
+                        case LIGHT_TYPE_SPOT:
                             lightActors.spotLights.push(light as SpotLight);
                             break;
-                        case LightTypes.Point:
+                        case LIGHT_TYPE_POINT:
                             lightActors.pointLights.push(light as PointLight);
                             break;
                     }
                 }
                 break;
 
-            case ActorTypes.PostProcessVolume:
+            case ACTOR_TYPE_POST_PROCESS_VOLUME:
                 postProcessVolumeActor = actor as PostProcessVolume;
                 break;
         }
@@ -1114,7 +1136,7 @@ export function renderRenderer(
 
     if (castShadowLightActors.length > 0) {
         // const castShadowRenderMeshInfos = sortedBasePassRenderMeshInfos.filter(({ actor }) => {
-        //     if (actor.type === ActorTypes.Skybox) {
+        //     if (actor.type === ACTOR_TYPE_SKYBOX) {
         //         return false;
         //     }
         //     return actor.castShadow;
@@ -1167,7 +1189,7 @@ export function renderRenderer(
 
     // update cubemap to deferred lighting pass
     // TODO: skyboxは一個だけ想定のいいはず
-    renderMeshInfoEachQueue[RenderQueueType.Skybox].forEach((skyboxRenderMeshInfo) => {
+    renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX].forEach((skyboxRenderMeshInfo) => {
         const skyboxActor = skyboxRenderMeshInfo.actor as Skybox;
         updateMaterialSkyboxUniforms(renderer.deferredShadingPass.material, skyboxActor);
     });
@@ -1327,7 +1349,7 @@ export function renderRenderer(
     copyDepthTexture(renderer);
 
     // TODO: set depth to transparent meshes
-    renderMeshInfoEachQueue[RenderQueueType.Transparent].forEach((renderMeshInfo) => {
+    renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_TRANSPARENT].forEach((renderMeshInfo) => {
         setMaterialUniformValue(
             getMeshMaterial(renderMeshInfo.actor),
             UniformNames.DepthTexture,
@@ -1340,8 +1362,8 @@ export function renderRenderer(
     renderTransparentPass(
         renderer,
         camera,
-        renderMeshInfoEachQueue[RenderQueueType.Transparent],
-        renderMeshInfoEachQueue[RenderQueueType.Skybox],
+        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_TRANSPARENT],
+        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX],
         lightActors,
         renderer.copySceneDestRenderTarget.texture!
     );
@@ -1380,8 +1402,8 @@ export function renderRenderer(
                     renderer,
                     // camera,
                     scene.uiCamera || camera, // ui camera があったらそっちを優先
-                    renderMeshInfoEachQueue[RenderQueueType.AfterTone],
-                    renderMeshInfoEachQueue[RenderQueueType.Skybox],
+                    renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_AFTER_TONE],
+                    renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX],
                     lightActors,
                     renderer.copySceneDestRenderTarget.texture!
                 );
@@ -1397,8 +1419,8 @@ export function renderRenderer(
             renderer,
             // camera,
             scene.uiCamera || camera, // ui camera があったらそっちを優先
-            renderMeshInfoEachQueue[RenderQueueType.Overlay],
-            renderMeshInfoEachQueue[RenderQueueType.Skybox],
+            renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OVERLAY],
+            renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX],
             lightActors,
             renderer.copySceneDestRenderTarget.texture!
         );
@@ -1432,8 +1454,8 @@ export function renderRenderer(
         renderer,
         // camera,
         scene.uiCamera || camera, // ui camera があったらそっちを優先
-        renderMeshInfoEachQueue[RenderQueueType.Overlay],
-        renderMeshInfoEachQueue[RenderQueueType.Skybox],
+        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OVERLAY],
+        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX],
         lightActors,
         renderer.copySceneDestRenderTarget.texture!
     );
@@ -1473,11 +1495,11 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
         depthWrite = material.depthWrite;
     } else {
         switch (material.blendType) {
-            case BlendTypes.Opaque:
+            case BLEND_TYPE_OPAQUE:
                 depthWrite = true;
                 break;
-            case BlendTypes.Transparent:
-            case BlendTypes.Additive:
+            case BLEND_TYPE_TRANSPARENT:
+            case BLEND_TYPE_ADDITIVE:
                 depthWrite = false;
                 break;
             default:
@@ -1515,7 +1537,7 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
 
 export function buildRenderMeshInfo(actor: Mesh, queue: RenderQueueType, materialIndex: number = 0): RenderMeshInfo {
     let cb: (() => void) | undefined;
-    if (actor.meshType === MeshTypes.SpriteAtlas) {
+    if (actor.meshType === MESH_TYPE_SPRITE_ATLAS) {
         const spriteAtlasMesh = actor as SpriteAtlasMesh;
         cb = () => {
             // NOTE: マテリアルは共通でuniformだけrender前に上書き
@@ -1752,7 +1774,7 @@ function renderBasePass(
 
     sortedBasePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         switch (actor.type) {
-            case ActorTypes.Skybox:
+            case ACTOR_TYPE_SKYBOX:
                 if (!(actor as Skybox).renderMesh) {
                     return;
                 }
@@ -2295,8 +2317,10 @@ function createRenderMeshInfosEachPass(
     renderMeshInfoEachQueue: RenderMeshInfoEachQueue,
     camera: Camera
 ): RenderMeshInfosEachPass {
-    const basePass = [RenderQueueType.Opaque, RenderQueueType.AlphaTest]
+    const basePass = [RENDER_QUEUE_TYPE_OPAQUE, RENDER_QUEUE_TYPE_ALPHA_TEST]
         .map((queue) => {
+            // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return [...renderMeshInfoEachQueue[queue]].sort((a, b) => {
                 // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
                 // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
@@ -2309,7 +2333,7 @@ function createRenderMeshInfosEachPass(
         })
         .flat();
 
-    const skyboxPass = [...renderMeshInfoEachQueue[RenderQueueType.Skybox]].sort((a, b) => {
+    const skyboxPass = [...renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX]].sort((a, b) => {
         // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
@@ -2319,7 +2343,7 @@ function createRenderMeshInfosEachPass(
         return al < bl ? -1 : 1;
     });
 
-    const afterTonePass = [...renderMeshInfoEachQueue[RenderQueueType.AfterTone]].sort((a, b) => {
+    const afterTonePass = [...renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_AFTER_TONE]].sort((a, b) => {
         // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         subVectorsV3Ref(tmpSortVA, camera.transform.position, a.actor.transform.position);
@@ -2329,7 +2353,7 @@ function createRenderMeshInfosEachPass(
         return al >= bl ? -1 : 1;
     });
 
-    const transparentPass = [...renderMeshInfoEachQueue[RenderQueueType.Transparent]].sort((a, b) => {
+    const transparentPass = [...renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_TRANSPARENT]].sort((a, b) => {
         // const al = getVector3Magnitude(subVectorsV3(camera.transform.position, a.actor.transform.position));
         // const bl = getVector3Magnitude(subVectorsV3(camera.transform.position, b.actor.transform.position));
         tmpSortVA = subVectorsV3(camera.transform.position, a.actor.transform.position);

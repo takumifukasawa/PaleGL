@@ -56,15 +56,15 @@ import { createTouchInputController } from '@/PaleGL/inputs/touchInputController
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController';
 import {
     UniformTypes,
-    BlendTypes,
+    BLEND_TYPE_TRANSPARENT,
     RenderTargetTypes,
     AttributeNames,
     AttributeUsageType,
     UniformNames,
-    FaceSide,
+    FACE_SIDE_DOUBLE,
     TextureDepthPrecisionType,
     UniformBlockNames,
-    ActorTypes,
+    ACTOR_TYPE_MESH,
     RAD_TO_DEG,
     FragmentShaderModifierPragmas,
 } from '@/PaleGL/constants';
@@ -865,7 +865,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             isInstancing: true,
             useInstanceLookDirection: true,
             useVertexColor: true,
-            faceSide: FaceSide.Double,
+            faceSide: FACE_SIDE_DOUBLE,
         })
     );
 
@@ -955,7 +955,7 @@ const main = async () => {
     streetFloorActor.name = 'streetFloor';
     addActorToScene(captureScene, streetFloorActor);
     streetFloorActor.children.forEach((child) => {
-        if (child.type === ActorTypes.Mesh) {
+        if (child.type === ACTOR_TYPE_MESH) {
             (child as Mesh).castShadow = true;
         }
     });
@@ -1253,7 +1253,7 @@ void main() {
                 value: null,
             },
         ],
-        blendType: BlendTypes.Transparent,
+        blendType: BLEND_TYPE_TRANSPARENT,
         depthWrite: false,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
     });

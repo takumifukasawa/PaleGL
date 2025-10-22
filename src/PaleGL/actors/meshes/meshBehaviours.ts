@@ -10,7 +10,7 @@ import {
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import { ActorType, DepthFuncTypes, MeshType, MeshTypes } from '@/PaleGL/constants.ts';
+import { ActorType, DEPTH_FUNC_TYPE_LEQUAL, MeshType, MESH_TYPE_SKINNED, MESH_TYPE_OBJECT_SPACE_RAYMARCH, MESH_TYPE_SCREEN_SPACE_RAYMARCH } from '@/PaleGL/constants.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { deleteProgram } from '@/PaleGL/core/shader.ts';
@@ -65,7 +65,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 faceSide: material.faceSide,
                 depthTest: true,
                 depthWrite: true,
-                depthFuncType: DepthFuncTypes.Lequal,
+                depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
                 alphaTest: material.alphaTest,
                 skipDepthPrePass: material.skipDepthPrePass,
 
@@ -98,7 +98,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
 }
 
 export const startMeshBehaviour: Partial<Record<MeshType, (mesh: Mesh, { gpu, scene }: ActorStartArgs) => void>> = {
-    [MeshTypes.Skinned]: startSkinnedMesh,
+    [MESH_TYPE_SKINNED]: startSkinnedMesh,
 };
 
 export function startMesh(actor: Actor, args: ActorStartArgs) {
@@ -210,7 +210,7 @@ export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: Materi
 // set size -------------------------------------------------------
 
 export const setSizeMeshBehaviour: Partial<Record<ActorType, (mesh: Mesh, width: number, height: number) => void>> = {
-    [MeshTypes.ScreenSpaceRaymarch]: setSizeScreenSpaceRaymarchMesh,
+    [MESH_TYPE_SCREEN_SPACE_RAYMARCH]: setSizeScreenSpaceRaymarchMesh,
 };
 
 export function setSizeMesh(actor: Actor, width: number, height: number) {
@@ -222,8 +222,8 @@ export function setSizeMesh(actor: Actor, width: number, height: number) {
 
 export const updateMeshBehaviour: Partial<Record<MeshType, UpdateActorFunc>> = {
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
-    [MeshTypes.Skinned]: updateSkinnedMesh,
-    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMesh,
+    [MESH_TYPE_SKINNED]: updateSkinnedMesh,
+    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchMesh,
 };
 
 export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
@@ -242,7 +242,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera; skybox?: Skybox | null }) => void;
 
 export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
-    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchMeshMaterial,
+    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchMeshMaterial,
 };
 
 // update materials
@@ -254,7 +254,7 @@ export const updateMeshMaterial: UpdateMeshMaterial = (mesh, args) => {
 };
 
 export const updateMeshDepthMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
-    [MeshTypes.ObjectSpaceRaymarch]: updateObjectSpaceRaymarchDepthMaterial,
+    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchDepthMaterial,
 };
 
 export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, args) => {

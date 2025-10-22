@@ -2,7 +2,7 @@
     Camera,
     createCamera,
 } from '@/PaleGL/actors/cameras/camera.ts';
-import { CameraTypes } from '@/PaleGL/constants.ts';
+import { CAMERA_TYPE_ORTHOGRAPHIC } from '@/PaleGL/constants.ts';
 import {setOrthoSize} from "@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts";
 
 export type OrthographicCamera = Camera & {
@@ -23,7 +23,7 @@ export function createOrthographicCamera(
 ) {
     const aspect: number = 1;
 
-    const camera = createCamera({ cameraType: CameraTypes.Orthographic });
+    const camera = createCamera({ cameraType: CAMERA_TYPE_ORTHOGRAPHIC });
 
     const orthographicCamera = {
         ...camera,

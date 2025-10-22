@@ -1,4 +1,4 @@
-import { MaterialTypes } from '@/PaleGL/constants.ts';
+import { MaterialType, MATERIAL_TYPE_G_BUFFER } from '@/PaleGL/constants.ts';
 import { replaceGBufferMaterial, updateGBufferMaterialUniforms } from '@/PaleGL/materials/gbufferMaterialBehaviours.ts';
 import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
 
@@ -6,8 +6,8 @@ type UpdateMaterial = (material: Material) => void;
 
 type ReplaceMaterial = (srcMaterial: Material, overrideArgs: MaterialArgs) => Material;
 
-const updateMaterialBehaviour: Partial<Record<MaterialTypes, UpdateMaterial>> = {
-    [MaterialTypes.GBuffer]: updateGBufferMaterialUniforms,
+const updateMaterialBehaviour: Partial<Record<MaterialType, UpdateMaterial>> = {
+    [MATERIAL_TYPE_G_BUFFER]: updateGBufferMaterialUniforms,
 };
 
 export const updateMaterial = (material: Material) => {
@@ -21,8 +21,8 @@ const replaceMaterial: ReplaceMaterial = (srcMaterial, overrideArgs) => {
     });
 };
 
-export const replaceMaterialBehaviour: Partial<Record<MaterialTypes, ReplaceMaterial>> = {
-    [MaterialTypes.GBuffer]: replaceGBufferMaterial,
+export const replaceMaterialBehaviour: Partial<Record<MaterialType, ReplaceMaterial>> = {
+    [MATERIAL_TYPE_G_BUFFER]: replaceGBufferMaterial,
 };
 
 export const cloneMaterial = (srcMaterial: Material, overrideArgs: MaterialArgs): Material => {

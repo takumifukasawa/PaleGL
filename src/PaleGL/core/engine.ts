@@ -8,7 +8,7 @@ import {
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { ActorTypes } from '@/PaleGL/constants';
+import { ACTOR_TYPE_CAMERA, ACTOR_TYPE_MESH, ACTOR_TYPE_SKYBOX } from '@/PaleGL/constants';
 import {
     createSharedTextures,
     renderSharedTextures,
@@ -232,8 +232,8 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
             deltaTime,
         });
         switch (actor.type) {
-            case ActorTypes.Skybox:
-            case ActorTypes.Mesh:
+            case ACTOR_TYPE_SKYBOX:
+            case ACTOR_TYPE_MESH:
                 // case ActorTypes.UiActor:
                 // case ActorTypes.SkinnedMesh:
                 beforeRenderActor(actor, { gpu: engine.renderer.gpu });
@@ -342,7 +342,7 @@ export function warmRender(engine: Engine) {
         const tmpP = cloneVector3(actor.transform.position);
         const tmpR = cloneRotator(actor.transform.rotation);
         // TODO: mainカメラだけ抽出したい
-        if (actor.type === ActorTypes.Camera) {
+        if (actor.type === ACTOR_TYPE_CAMERA) {
             setTranslation(actor.transform, createVector3(0, 0, 10));
             setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
         } else {

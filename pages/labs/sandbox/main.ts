@@ -91,12 +91,13 @@ import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail
 import {
     AttributeNames,
     AttributeUsageType,
-    BlendTypes,
-    FaceSide,
+    BLEND_TYPE_ADDITIVE,
+    FACE_SIDE_DOUBLE,
     RAD_TO_DEG,
     TextureFilterTypes,
     TextureWrapTypes,
-    UIQueueTypes,
+    UI_QUEUE_TYPE_AFTER_TONE,
+    UI_QUEUE_TYPE_OVERLAY,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -377,7 +378,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
                 metallic: 0,
                 roughness: 1,
                 baseColor: createColor(1, 0, 0, 1),
-                faceSide: FaceSide.Double,
+                faceSide: FACE_SIDE_DOUBLE,
             }),
         }),
         instanceCount: vatWidth,
@@ -448,7 +449,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
                 metallic: 0,
                 roughness: 1,
                 baseColor: createColor(0, 0, 1, 1),
-                faceSide: FaceSide.Double,
+                faceSide: FACE_SIDE_DOUBLE,
             }),
         }),
         instanceCount: vatWidth,
@@ -1529,7 +1530,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             isInstancing: true,
             useInstanceLookDirection: true,
             useVertexColor: true,
-            faceSide: FaceSide.Double,
+            faceSide: FACE_SIDE_DOUBLE,
         })
     );
 
@@ -1873,8 +1874,8 @@ const main = async () => {
         shapeFontService: shapeFontCircuitService,
         fontSize: 36,
         align: TextAlignType.Center,
-        blendType: BlendTypes.Additive,
-        uiQueueType: UIQueueTypes.AfterTone,
+        blendType: BLEND_TYPE_ADDITIVE,
+        uiQueueType: UI_QUEUE_TYPE_AFTER_TONE,
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeTextAfterTone);
@@ -1890,8 +1891,8 @@ const main = async () => {
         shapeFontService: shapeFontCircuitService,
         fontSize: 36,
         align: TextAlignType.Center,
-        blendType: BlendTypes.Additive,
-        uiQueueType: UIQueueTypes.Overlay,
+        blendType: BLEND_TYPE_ADDITIVE,
+        uiQueueType: UI_QUEUE_TYPE_OVERLAY,
         // ratio: 1,
     });
     addActorToScene(captureScene, uiShapeTextOverlay);

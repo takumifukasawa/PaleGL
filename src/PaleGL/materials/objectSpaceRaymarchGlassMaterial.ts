@@ -1,8 +1,9 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
-    DepthFuncTypes,
+    DEPTH_FUNC_TYPE_LEQUAL,
     FragmentShaderModifierPragmas,
-    MaterialTypes,
+    MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
+    SHADING_MODEL_ID_UNLIT,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -45,7 +46,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
         fragmentShaderContent,
         depthFragmentShaderTemplate,
         depthFragmentShaderContent,
-        shadingModelId = ShadingModelIds.Unlit,
+        shadingModelId = SHADING_MODEL_ID_UNLIT,
         uniforms = [],
         uniformBlockNames,
     } = args;
@@ -105,7 +106,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
         ...args,
         // ...options,
         name: 'ObjectSpaceRaymarchGlassMaterial',
-        type: MaterialTypes.ObjectSpaceRaymarch,
+        type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || glassObjectSpaceRaymarchFragmentLayout,
@@ -114,7 +115,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
         depthTest: args.depthTest ?? true,
         depthWrite: args.depthWrite ?? false,
-        depthFuncType: args.depthFuncType ?? DepthFuncTypes.Lequal,
+        depthFuncType: args.depthFuncType ?? DEPTH_FUNC_TYPE_LEQUAL,
 
         uniformBlockNames: [
             UniformBlockNames.Common,

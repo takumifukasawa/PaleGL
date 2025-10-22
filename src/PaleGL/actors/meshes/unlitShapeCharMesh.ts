@@ -1,6 +1,6 @@
 import {
-    MeshTypes,
-    UIQueueTypes,
+    MESH_TYPE_SPRITE_ATLAS,
+    UI_QUEUE_TYPE_NONE,
 } from '@/PaleGL/constants.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createShapeCharMeshBase, ShapeCharMesh, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
@@ -73,9 +73,9 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(
             y,
             castShadow,
             // uniforms: mergedUniforms,
-            meshType: MeshTypes.SpriteAtlas,
+            meshType: MESH_TYPE_SPRITE_ATLAS,
             planeWidth,
-            uiQueueType: UIQueueTypes.None,
+            uiQueueType: UI_QUEUE_TYPE_NONE,
         }),
     };
 };

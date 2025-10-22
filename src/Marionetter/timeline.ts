@@ -74,7 +74,7 @@ import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { ObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
-import { ActorTypes, DEG_TO_RAD, LightTypes } from '@/PaleGL/constants.ts';
+import { ACTOR_TYPE_LIGHT, DEG_TO_RAD, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
 import { findActorByName, Scene } from '@/PaleGL/core/scene.ts';
 import { setRotation } from '@/PaleGL/core/transform.ts';
 import {
@@ -547,10 +547,10 @@ function createMarionetterAnimationClip(
             setRotation(
                 actor.transform,
                 createRotator(
-                    // actor.type === ActorTypes.Light && (actor as Light).lightType === LightTypes.Spot ? q.invertAxis() : q
-                    actor.type === ActorTypes.Light &&
-                        ((actor as Light).lightType === LightTypes.Spot ||
-                            (actor as Light).lightType === LightTypes.Directional)
+                    // actor.type === ACTOR_TYPE_LIGHT && (actor as Light).lightType === LIGHT_TYPE_SPOT ? q.invertAxis() : q
+                    actor.type === ACTOR_TYPE_LIGHT &&
+                        ((actor as Light).lightType === LIGHT_TYPE_SPOT ||
+                            (actor as Light).lightType === LIGHT_TYPE_DIRECTIONAL)
                         ? createQuaternionInvertAxis(q)
                         : q
                 )

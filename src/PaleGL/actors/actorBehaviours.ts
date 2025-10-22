@@ -14,7 +14,7 @@ import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
-import { ActorType, ActorTypes } from '@/PaleGL/constants.ts';
+import { ActorType, ACTOR_TYPE_MESH, ACTOR_TYPE_SKYBOX, ACTOR_TYPE_CAMERA, ACTOR_TYPE_LIGHT } from '@/PaleGL/constants.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -47,8 +47,8 @@ export function startActorBehaviourBase(actor: Actor, args: ActorStartArgs) {
 }
 
 export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu, scene }: ActorStartArgs) => void>> = {
-    [ActorTypes.Mesh]: startMesh,
-    [ActorTypes.Skybox]: startMesh,
+    [ACTOR_TYPE_MESH]: startMesh,
+    [ACTOR_TYPE_SKYBOX]: startMesh,
 };
 
 const startActor = (actor: Actor, args: ActorStartArgs) => {
@@ -74,8 +74,8 @@ export type SetSizeActorFunc = (
 ) => void;
 
 const setSizeActorBehaviour: Partial<Record<ActorType, SetSizeActorFunc>> = {
-    [ActorTypes.Camera]: setSizeCamera,
-    [ActorTypes.Mesh]: setSizeMesh,
+    [ACTOR_TYPE_CAMERA]: setSizeCamera,
+    [ACTOR_TYPE_MESH]: setSizeMesh,
 };
 
 export const setSizeActor: SetSizeActorFunc = (
@@ -114,9 +114,9 @@ export type UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: Ac
 // export const defaultUpdateActorBehaviour: UpdateActorFunc = (actor: Actor, { gpu, scene, time, deltaTime }: ActorUpdateArgs) => {
 
 const updateActorBehaviour: Partial<Record<ActorType, UpdateActorFunc>> = {
-    [ActorTypes.Light]: updateLight,
-    [ActorTypes.Mesh]: updateMesh,
-    [ActorTypes.Camera]: updateCamera,
+    [ACTOR_TYPE_LIGHT]: updateLight,
+    [ACTOR_TYPE_MESH]: updateMesh,
+    [ACTOR_TYPE_CAMERA]: updateCamera,
 };
 
 // update({gpu, time, deltaTime}: { gpu: Gpu, time: number, deltaTime: number } = {}) {
@@ -196,8 +196,8 @@ export const defaultUpdateActorTransform: UpdateActorTransformFunc = (actor) => 
 };
 
 const updateActorTransformBehaviour: Partial<Record<ActorType, UpdateActorTransformFunc>> = {
-    [ActorTypes.Skybox]: updateSkyboxTransform,
-    [ActorTypes.Camera]: updateCameraTransform,
+    [ACTOR_TYPE_SKYBOX]: updateSkyboxTransform,
+    [ACTOR_TYPE_CAMERA]: updateCameraTransform,
 };
 
 export const updateActorTransform: UpdateActorTransformFunc = (actor: Actor, camera?: Camera) => {
@@ -209,7 +209,7 @@ export const updateActorTransform: UpdateActorTransformFunc = (actor: Actor, cam
 // TODO: disposeするものを適宜列挙していく
 export const disposeActor = (actor: Actor) => {
     switch (actor.type) {
-        case ActorTypes.Mesh:
+        case ACTOR_TYPE_MESH:
             const mesh = actor as Mesh;
             iterateAllMeshMaterials(mesh, (material) => {
                 disposeMaterial(material);
@@ -217,7 +217,7 @@ export const disposeActor = (actor: Actor) => {
             mesh.materials = [];
             mesh.depthMaterials = [];
             break;
-        case ActorTypes.Light:
+        case ACTOR_TYPE_LIGHT:
             const light = actor as Light;
             if (light.shadowMap) {
                 disposeRenderTarget(light.shadowMap);

@@ -1,7 +1,7 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     FragmentShaderModifierPragmas,
-    MeshTypes,
+    MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
     UniformBlockNames,
     UniformNames,
@@ -102,7 +102,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         ],
     });
 
-    const mesh = createMesh({ name, geometry, material, meshType: MeshTypes.ScreenSpaceRaymarch });
+    const mesh = createMesh({ name, geometry, material, meshType: MESH_TYPE_SCREEN_SPACE_RAYMARCH });
 
     return {
         ...mesh,

@@ -1,7 +1,8 @@
 import {
-    DepthFuncTypes,
-    MaterialTypes,
+    DEPTH_FUNC_TYPE_EQUAL,
+    MATERIAL_TYPE_G_BUFFER,
     ShadingModelIds,
+    SHADING_MODEL_ID_LIT,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -70,7 +71,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
     const heightScale: number = args.heightScale || 1.0;
     const heightMapTiling: Vector4 = args.heightMapTiling || createVector4(1, 1, 0, 0);
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
-    const shadingModelId: ShadingModelIds = args.shadingModelId || ShadingModelIds.Lit;
+    const shadingModelId: ShadingModelIds = args.shadingModelId || SHADING_MODEL_ID_LIT;
 
     const commonUniforms = [
         {
@@ -175,7 +176,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
 
     const material = createMaterial({
         name: 'GBufferMaterial',
-        type: MaterialTypes.GBuffer,
+        type: MATERIAL_TYPE_G_BUFFER,
         vertexShader: gBufferVert,
         fragmentShader: args.fragmentShader || litFrag,
         depthFragmentShader: args.depthFragmentShader || gBufferDepthFrag,
@@ -185,7 +186,7 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
         useNormalMap: !!normalMap,
         depthTest: true,
         depthWrite: false,
-        depthFuncType: DepthFuncTypes.Equal,
+        depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
         ...options, // override
         uniformBlockNames: [
             UniformBlockNames.Common,

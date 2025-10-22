@@ -31,15 +31,14 @@ import {
     RenderTargetTypes,
     UniformNames,
     TextureDepthPrecisionType,
-    ActorTypes,
-    RenderQueueType,
-    BlendTypes,
-    // FragmentShaderModifierPragmas,
+    ACTOR_TYPE_MESH,
     UniformTypes,
-    DepthFuncTypes,
-    FaceSide,
-    // RenderQueueType,
+    BLEND_TYPE_TRANSPARENT,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    FACE_SIDE_FRONT,
+    RENDER_QUEUE_TYPE_TRANSPARENT,
 } from '@/PaleGL/constants.ts';
+import type { RenderQueueType, FaceSide } from '@/PaleGL/constants.ts';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
 import { Actor, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import {
@@ -294,7 +293,7 @@ const main = async () => {
     addActorToScene(captureScene, streetFloorActor);
     streetFloorActor.children.forEach((child) => {
         child.enabled = false;
-        if (child.type === ActorTypes.Mesh) {
+        if (child.type === ACTOR_TYPE_MESH) {
             (child as Mesh).castShadow = true;
         }
     });
@@ -343,14 +342,14 @@ const main = async () => {
                 fragmentShaderContent: objectSpaceRaymarchFragContent,
                 depthFragmentShaderContent: objectSpaceRaymarchFragContent,
                 receiveShadow: false,
-                renderQueueType: RenderQueueType.Transparent,
-                blendType: BlendTypes.Transparent,
+                renderQueueType: RENDER_QUEUE_TYPE_TRANSPARENT,
+                blendType: BLEND_TYPE_TRANSPARENT,
                 // renderQueueType: RenderQueueType.AlphaTest,
                 // alphaTest: 0.5,
                 depthTest: true,
                 depthWrite: true,
-                depthFuncType: DepthFuncTypes.Lequal,
-                faceSide: FaceSide.Front,
+                depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
+                faceSide: FACE_SIDE_FRONT,
                 uniforms: [
                     {
                         name: UniformNames.SceneTexture,

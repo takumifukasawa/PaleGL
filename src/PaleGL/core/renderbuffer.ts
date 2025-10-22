@@ -53,7 +53,7 @@
 
 
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
-import { RenderbufferType, RenderbufferTypes } from '@/PaleGL/constants';
+import { RenderbufferType, RENDERBUFFER_TYPE_DEPTH } from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 export type Renderbuffer = GLObjectBase<WebGLRenderbuffer> & {
@@ -68,7 +68,7 @@ export function createRenderbuffer(gpu: Gpu, type: RenderbufferType, width: numb
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
 
     switch (type) {
-        case RenderbufferTypes.Depth:
+        case RENDERBUFFER_TYPE_DEPTH:
             gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
             break;
         default:
@@ -89,7 +89,7 @@ export function setRenderbufferSize(renderbuffer: Renderbuffer, width: number, h
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer.glObject);
 
     switch (renderbuffer.type) {
-        case RenderbufferTypes.Depth:
+        case RENDERBUFFER_TYPE_DEPTH:
             gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
             break;
     }

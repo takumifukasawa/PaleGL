@@ -1,7 +1,7 @@
 import {
-    DepthFuncTypes,
-    MaterialTypes,
-    ShadingModelIds,
+    DEPTH_FUNC_TYPE_EQUAL,
+    MATERIAL_TYPE_UNLIT,
+    SHADING_MODEL_ID_UNLIT,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -58,7 +58,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
         {
             name: UniformNames.ShadingModelId,
             type: UniformTypes.Int,
-            value: ShadingModelIds.Unlit,
+            value: SHADING_MODEL_ID_UNLIT,
         },
     ];
 
@@ -85,7 +85,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
 
     const material = createMaterial({
         name: 'UnlitMaterial',
-        type: MaterialTypes.Unlit,
+        type: MATERIAL_TYPE_UNLIT,
         vertexShaderModifiers,
         vertexShader: gBufferVert,
         fragmentShader: unlitFrag,
@@ -95,7 +95,7 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
         useNormalMap: false,
         depthTest: true,
         depthWrite: false, // TODO: これはGBufferの場合. unlitはtransparentの場合も対処すべき??
-        depthFuncType: DepthFuncTypes.Equal, // NOTE: これはGBufferの場合
+        depthFuncType: DEPTH_FUNC_TYPE_EQUAL, // NOTE: これはGBufferの場合
         ...options, // overrides
         uniformBlockNames: [
             UniformBlockNames.Common,

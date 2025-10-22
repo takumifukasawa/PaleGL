@@ -22,10 +22,11 @@ import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     AttributeNames,
     AttributeUsageType,
-    BlendTypes,
+    BLEND_TYPE_TRANSPARENT,
     CameraType,
-    CameraTypes,
-    FaceSide,
+    CAMERA_TYPE_PERSPECTIVE,
+    CAMERA_TYPE_ORTHOGRAPHIC,
+    FACE_SIDE_DOUBLE,
     PRIMITIVE_TYPE_LINES,
     UniformNames,
 } from '@/PaleGL/constants.ts';
@@ -220,8 +221,8 @@ void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewM
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                     `,
                 primitiveType: PRIMITIVE_TYPE_LINES,
-                blendType: BlendTypes.Transparent,
-                faceSide: FaceSide.Double,
+                blendType: BLEND_TYPE_TRANSPARENT,
+                faceSide: FACE_SIDE_DOUBLE,
                 depthWrite: false,
             }),
         });
@@ -330,7 +331,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
 };
 
 export const isPerspectiveCamera = (camera: Camera) => {
-    return camera.cameraType === CameraTypes.Perspective;
+    return camera.cameraType === CAMERA_TYPE_PERSPECTIVE;
 };
 
 export const transformScreenPoint = (camera: Camera, p: Vector3) => {
@@ -365,8 +366,8 @@ export const viewpointToRay = (camera: Camera, viewportPoint: Vector2): Ray => {
 // set size behaviour ---------------------------------------------------------
 
 const setSizeCameraBehaviour: Partial<Record<CameraType, (camera: Camera, width: number, height: number) => void>> = {
-    [CameraTypes.Perspective]: setSizePerspectiveCamera,
-    [CameraTypes.Orthographic]: setSizeOrthographicCamera,
+    [CAMERA_TYPE_PERSPECTIVE]: setSizePerspectiveCamera,
+    [CAMERA_TYPE_ORTHOGRAPHIC]: setSizeOrthographicCamera,
 };
 
 export function setSizeCamera(actor: Actor, width: number, height: number) {
@@ -398,8 +399,8 @@ export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
 // }
 
 const updateProjectionMatrixBehaviour: Partial<Record<CameraType, UpdateProjectionMatrixFunc>> = {
-    [CameraTypes.Orthographic]: updateOrthographicCameraProjectionMatrix,
-    [CameraTypes.Perspective]: updatePerspectiveCameraProjectionMatrix,
+    [CAMERA_TYPE_ORTHOGRAPHIC]: updateOrthographicCameraProjectionMatrix,
+    [CAMERA_TYPE_PERSPECTIVE]: updatePerspectiveCameraProjectionMatrix,
 };
 
 export const updateProjectionMatrix: UpdateProjectionMatrixFunc = (camera) => {
@@ -409,8 +410,8 @@ export const updateProjectionMatrix: UpdateProjectionMatrixFunc = (camera) => {
 // get frustum local ---------------------------------------------------------
 
 export const getFrustumLocalPositionBehaviour: Partial<Record<CameraType, GetFrustumVectorsFunc>> = {
-    [CameraTypes.Perspective]: getPerspectiveFrustumLocalPositions,
-    [CameraTypes.Orthographic]: getOrthographicFrustumLocalPositions,
+    [CAMERA_TYPE_PERSPECTIVE]: getPerspectiveFrustumLocalPositions,
+    [CAMERA_TYPE_ORTHOGRAPHIC]: getOrthographicFrustumLocalPositions,
 };
 
 export const getFrustumLocalPositions: GetFrustumVectorsFunc = (camera: Camera) => {

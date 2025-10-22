@@ -39,7 +39,7 @@ import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
-import { ActorTypes, LightTypes } from '@/PaleGL/constants.ts';
+import { ACTOR_TYPE_LIGHT, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
@@ -86,9 +86,9 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
     }
 
     // quaternionの反転が必要ならケースを列挙
-    if (actor.type == ActorTypes.Light) {
+    if (actor.type == ACTOR_TYPE_LIGHT) {
         const light = actor as Light;
-        if (light.lightType === LightTypes.Spot) {
+        if (light.lightType === LIGHT_TYPE_SPOT) {
             // NOTE: なぜか逆にしないといけない
             const x1 = qx(q);
             const y1 = qy(q);

@@ -1,4 +1,4 @@
-import { BlendType, MeshTypes, UIAnchorType, UIAnchorTypes, UIQueueType, UIQueueTypes } from '@/PaleGL/constants.ts';
+import { BlendType, MESH_TYPE_SPRITE_ATLAS, UIAnchorType, UI_ANCHOR_TYPE_CENTER, UIQueueType, UI_QUEUE_TYPE_NONE } from '@/PaleGL/constants.ts';
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createShapeCharMeshBase, ShapeCharMeshArgs } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
@@ -26,8 +26,8 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     x,
     y,
     planeWidth,
-    uiQueueType = UIQueueTypes.None,
-    anchor = UIAnchorTypes.Center,
+    uiQueueType = UI_QUEUE_TYPE_NONE,
+    anchor = UI_ANCHOR_TYPE_CENTER,
     material,
 }: UIShapeCharMeshArgs<T, U>): UIShapeCharMesh => {
     // const mergedUniforms: UniformsData = [
@@ -77,7 +77,7 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
             y,
             // uniforms: mergedUniforms,
             // meshType: MeshTypes.UI,
-            meshType: MeshTypes.SpriteAtlas,
+            meshType: MESH_TYPE_SPRITE_ATLAS,
             planeWidth,
             uiQueueType,
         }),

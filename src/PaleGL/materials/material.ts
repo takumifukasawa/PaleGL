@@ -1,16 +1,24 @@
 ﻿import {
     BlendType,
-    BlendTypes,
+    BLEND_TYPE_OPAQUE,
+    BLEND_TYPE_TRANSPARENT,
+    BLEND_TYPE_ADDITIVE,
     DepthFragmentShaderModifiers,
     DepthFuncType,
-    DepthFuncTypes,
+    DEPTH_FUNC_TYPE_LEQUAL,
     FaceSide,
+    FACE_SIDE_FRONT,
     FragmentShaderModifiers,
-    MaterialTypes,
+    MaterialType,
+    MATERIAL_TYPE_MISC,
     PrimitiveType,
     PRIMITIVE_TYPE_TRIANGLES,
     RenderQueue,
     RenderQueueType,
+    RENDER_QUEUE_TYPE_OPAQUE,
+    RENDER_QUEUE_TYPE_ALPHA_TEST,
+    RENDER_QUEUE_TYPE_TRANSPARENT,
+    RENDER_QUEUE_TYPE_SKYBOX,
     UniformBlockName,
     UniformNames,
     UniformTypes,
@@ -33,7 +41,7 @@ import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 import { uniqFunc } from '@/PaleGL/utilities/maton.ts';
 
 export type MaterialArgs = {
-    type?: MaterialTypes;
+    type?: MaterialType;
 
     // gpu: Gpu,
     // TODO: required じゃなくて大丈夫??
@@ -137,7 +145,7 @@ export function addMaterialUniformValue(material: Material, name: string, type: 
 export type Material = {
     name: string;
     canRender: boolean;
-    type: MaterialTypes;
+    type: MaterialType;
     shader: Shader | null;
     primitiveType: PrimitiveType;
     blendType: BlendType;
@@ -199,8 +207,8 @@ export function createMaterial(args: MaterialArgs): Material {
         depthFragmentShaderModifiers = [],
 
         skipDepthPrePass = false,
-        depthFuncType = DepthFuncTypes.Lequal,
-        faceSide = FaceSide.Front,
+        depthFuncType = DEPTH_FUNC_TYPE_LEQUAL,
+        faceSide = FACE_SIDE_FRONT,
         receiveShadow = false,
 
         useNormalMap = false,
@@ -232,34 +240,34 @@ export function createMaterial(args: MaterialArgs): Material {
 
     const canRender: boolean = true;
 
-    const type: MaterialTypes = args.type ?? MaterialTypes.Misc;
+    const type: MaterialType = args.type ?? MATERIAL_TYPE_MISC;
 
     const primitiveType: PrimitiveType = args.primitiveType ?? PRIMITIVE_TYPE_TRIANGLES;
-    const blendType: BlendType = args.blendType ?? BlendTypes.Opaque;
+    const blendType: BlendType = args.blendType ?? BLEND_TYPE_OPAQUE;
 
     alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
 
     // TODO: none type が欲しい？
-    let renderQueueType: RenderQueueType = args.renderQueueType ?? RenderQueueType.Opaque;
+    let renderQueueType: RenderQueueType = args.renderQueueType ?? RENDER_QUEUE_TYPE_OPAQUE;
 
     if (alphaTest !== null) {
-        renderQueueType = RenderQueueType.AlphaTest;
+        renderQueueType = RENDER_QUEUE_TYPE_ALPHA_TEST;
     }
 
     // skyboxじゃないかつrenderQueueの指定がなかったら自動で指定
-    if (renderQueueType !== RenderQueueType.Skybox && args.renderQueueType === undefined) {
+    if (renderQueueType !== RENDER_QUEUE_TYPE_SKYBOX && args.renderQueueType === undefined) {
         switch (blendType) {
-            case BlendTypes.Opaque:
-                renderQueueType = RenderQueueType.Opaque;
+            case BLEND_TYPE_OPAQUE:
+                renderQueueType = RENDER_QUEUE_TYPE_OPAQUE;
                 break;
-            case BlendTypes.Transparent:
-            case BlendTypes.Additive:
-                renderQueueType = RenderQueueType.Transparent;
+            case BLEND_TYPE_TRANSPARENT:
+            case BLEND_TYPE_ADDITIVE:
+                renderQueueType = RENDER_QUEUE_TYPE_TRANSPARENT;
                 break;
         }
     }
 
-    if (renderQueueType === RenderQueueType.AlphaTest && alphaTest === null) {
+    if (renderQueueType === RENDER_QUEUE_TYPE_ALPHA_TEST && alphaTest === null) {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 

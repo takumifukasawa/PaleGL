@@ -3,9 +3,9 @@ import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/t
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import {
     AttributeNames,
-    BlendTypes,
-    DepthFuncTypes,
-    FaceSide,
+    BLEND_TYPE_OPAQUE,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    FACE_SIDE_DOUBLE,
     MAX_SPOT_LIGHT_COUNT,
     PostProcessPassType,
     PRIMITIVE_TYPE_TRIANGLES,
@@ -131,12 +131,12 @@ void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position}
         fragmentShader: `
 out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        blendType: BlendTypes.Opaque,
-        // blendType: BlendTypes.Additive,
-        depthFuncType: DepthFuncTypes.Lequal,
+        blendType: BLEND_TYPE_OPAQUE,
+        // blendType: BLEND_TYPE_ADDITIVE,
+        depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
         depthWrite: true,
         depthTest: true,
-        faceSide: FaceSide.Double, // TODO: doubleである必要ない？
+        faceSide: FACE_SIDE_DOUBLE, // TODO: doubleである必要ない？
         uniforms: [
             {
                 name: UniformNames.WorldMatrix,

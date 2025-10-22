@@ -22,147 +22,117 @@ export const PRIMITIVE_TYPE_TRIANGLE_FAN = 6;
 
 export type PrimitiveType = typeof PRIMITIVE_TYPE_POINTS | typeof PRIMITIVE_TYPE_LINES | typeof PRIMITIVE_TYPE_LINE_LOOP | typeof PRIMITIVE_TYPE_LINE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLES | typeof PRIMITIVE_TYPE_TRIANGLE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLE_FAN;
 
-export const ShadingModelIds = {
-    Lit: 1,
-    Unlit: 2,
-    Skybox: 3,
-};
+export const SHADING_MODEL_ID_LIT = 1;
+export const SHADING_MODEL_ID_UNLIT = 2;
+export const SHADING_MODEL_ID_SKYBOX = 3;
 
-export type ShadingModelIds = (typeof ShadingModelIds)[keyof typeof ShadingModelIds];
+export type ShadingModelIds = typeof SHADING_MODEL_ID_LIT | typeof SHADING_MODEL_ID_UNLIT | typeof SHADING_MODEL_ID_SKYBOX;
 
-export const DepthFuncTypes = {
-    Never: 0,
-    Less: 1,
-    Equal: 2,
-    Lequal: 3,
-    Greater: 4,
-    NotEqual: 5,
-    Gequal: 6,
-    Always: 7,
-} as const;
+export const DEPTH_FUNC_TYPE_NEVER = 0;
+export const DEPTH_FUNC_TYPE_LESS = 1;
+export const DEPTH_FUNC_TYPE_EQUAL = 2;
+export const DEPTH_FUNC_TYPE_LEQUAL = 3;
+export const DEPTH_FUNC_TYPE_GREATER = 4;
+export const DEPTH_FUNC_TYPE_NOT_EQUAL = 5;
+export const DEPTH_FUNC_TYPE_GEQUAL = 6;
+export const DEPTH_FUNC_TYPE_ALWAYS = 7;
 
-export type DepthFuncType = (typeof DepthFuncTypes)[keyof typeof DepthFuncTypes];
+export type DepthFuncType = typeof DEPTH_FUNC_TYPE_NEVER | typeof DEPTH_FUNC_TYPE_LESS | typeof DEPTH_FUNC_TYPE_EQUAL | typeof DEPTH_FUNC_TYPE_LEQUAL | typeof DEPTH_FUNC_TYPE_GREATER | typeof DEPTH_FUNC_TYPE_NOT_EQUAL | typeof DEPTH_FUNC_TYPE_GEQUAL | typeof DEPTH_FUNC_TYPE_ALWAYS;
 
-export const BlendTypes = {
-    Opaque: 0,
-    Transparent: 1,
-    Additive: 2,
-} as const;
+export const BLEND_TYPE_OPAQUE = 0;
+export const BLEND_TYPE_TRANSPARENT = 1;
+export const BLEND_TYPE_ADDITIVE = 2;
 
-export type BlendType = (typeof BlendTypes)[keyof typeof BlendTypes];
+export type BlendType = typeof BLEND_TYPE_OPAQUE | typeof BLEND_TYPE_TRANSPARENT | typeof BLEND_TYPE_ADDITIVE;
 
-export const RenderQueueType = {
-    // TransformFeedback: 'TransformFeedback',
-    Opaque: 'o',
-    AlphaTest: 'a',
-    Skybox: 's',
-    Transparent: 't',
-    AfterTone: 'at',
-    Overlay: 'ol',
-} as const;
+// TransformFeedback: 'TransformFeedback',
+export const RENDER_QUEUE_TYPE_OPAQUE = 'o';
+export const RENDER_QUEUE_TYPE_ALPHA_TEST = 'a';
+export const RENDER_QUEUE_TYPE_SKYBOX = 's';
+export const RENDER_QUEUE_TYPE_TRANSPARENT = 't';
+export const RENDER_QUEUE_TYPE_AFTER_TONE = 'at';
+export const RENDER_QUEUE_TYPE_OVERLAY = 'ol';
 
-export type RenderQueueType = (typeof RenderQueueType)[keyof typeof RenderQueueType];
+export type RenderQueueType = typeof RENDER_QUEUE_TYPE_OPAQUE | typeof RENDER_QUEUE_TYPE_ALPHA_TEST | typeof RENDER_QUEUE_TYPE_SKYBOX | typeof RENDER_QUEUE_TYPE_TRANSPARENT | typeof RENDER_QUEUE_TYPE_AFTER_TONE | typeof RENDER_QUEUE_TYPE_OVERLAY;
 
-export const RenderQueues = {
-    [RenderQueueType.Opaque]: 0,
-    [RenderQueueType.AlphaTest]: 1,
-    [RenderQueueType.Skybox]: 2,
-    [RenderQueueType.Transparent]: 3,
-} as const;
+export const RENDER_QUEUE_OPAQUE = 0;
+export const RENDER_QUEUE_ALPHA_TEST = 1;
+export const RENDER_QUEUE_SKYBOX = 2;
+export const RENDER_QUEUE_TRANSPARENT = 3;
 
-export type RenderQueue = (typeof RenderQueues)[keyof typeof RenderQueues];
+export type RenderQueue = typeof RENDER_QUEUE_OPAQUE | typeof RENDER_QUEUE_ALPHA_TEST | typeof RENDER_QUEUE_SKYBOX | typeof RENDER_QUEUE_TRANSPARENT;
 
-export const RenderbufferTypes = {
-    Depth: 0,
-} as const;
+export const RENDERBUFFER_TYPE_DEPTH = 0;
 
-export type RenderbufferType = (typeof RenderbufferTypes)[keyof typeof RenderbufferTypes];
+export type RenderbufferType = typeof RENDERBUFFER_TYPE_DEPTH;
 
-export const LightTypes = {
-    Directional: 0,
-    Spot: 1,
-    Point: 2,
-} as const;
+export const LIGHT_TYPE_DIRECTIONAL = 0;
+export const LIGHT_TYPE_SPOT = 1;
+export const LIGHT_TYPE_POINT = 2;
 
-export type LightType = (typeof LightTypes)[keyof typeof LightTypes];
+export type LightType = typeof LIGHT_TYPE_DIRECTIONAL | typeof LIGHT_TYPE_SPOT | typeof LIGHT_TYPE_POINT;
 
-export const ActorTypes = {
-    Null: 0,
-    Mesh: 1,
-    // UiActor: 2,
-    // SkinnedMesh: 2,
-    Light: 2,
-    Skybox: 3,
-    Camera: 4,
-    // TextMesh: 5,
-    PostProcessVolume: 5,
-    // ObjectSpaceRaymarchMesh: 7,
-    // ScreenSpaceRaymarchMesh: 8,
-} as const;
+export const ACTOR_TYPE_NULL = 0;
+export const ACTOR_TYPE_MESH = 1;
+// UiActor: 2,
+// SkinnedMesh: 2,
+export const ACTOR_TYPE_LIGHT = 2;
+export const ACTOR_TYPE_SKYBOX = 3;
+export const ACTOR_TYPE_CAMERA = 4;
+// TextMesh: 5,
+export const ACTOR_TYPE_POST_PROCESS_VOLUME = 5;
+// ObjectSpaceRaymarchMesh: 7,
+// ScreenSpaceRaymarchMesh: 8,
 
-export type ActorType = (typeof ActorTypes)[keyof typeof ActorTypes];
+export type ActorType = typeof ACTOR_TYPE_NULL | typeof ACTOR_TYPE_MESH | typeof ACTOR_TYPE_LIGHT | typeof ACTOR_TYPE_SKYBOX | typeof ACTOR_TYPE_CAMERA | typeof ACTOR_TYPE_POST_PROCESS_VOLUME;
 
-export const MeshTypes = {
-    Default: 0,
-    Skinned: 1,
-    ObjectSpaceRaymarch: 2,
-    ScreenSpaceRaymarch: 3,
-    Text: 4,
-    // UI: 5,
-    SpriteAtlas: 6,
-} as const;
+export const MESH_TYPE_DEFAULT = 0;
+export const MESH_TYPE_SKINNED = 1;
+export const MESH_TYPE_OBJECT_SPACE_RAYMARCH = 2;
+export const MESH_TYPE_SCREEN_SPACE_RAYMARCH = 3;
+export const MESH_TYPE_TEXT = 4;
+// UI: 5,
+export const MESH_TYPE_SPRITE_ATLAS = 6;
 
-export type MeshType = (typeof MeshTypes)[keyof typeof MeshTypes];
+export type MeshType = typeof MESH_TYPE_DEFAULT | typeof MESH_TYPE_SKINNED | typeof MESH_TYPE_OBJECT_SPACE_RAYMARCH | typeof MESH_TYPE_SCREEN_SPACE_RAYMARCH | typeof MESH_TYPE_TEXT | typeof MESH_TYPE_SPRITE_ATLAS;
 
-export const MaterialTypes = {
-    Misc: 0,
-    GBuffer: 1,
-    Unlit: 2,
-    ObjectSpaceRaymarch: 3,
-    ScreenSpaceRaymarch: 4,
-} as const;
+export const MATERIAL_TYPE_MISC = 0;
+export const MATERIAL_TYPE_G_BUFFER = 1;
+export const MATERIAL_TYPE_UNLIT = 2;
+export const MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH = 3;
+export const MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH = 4;
 
-export type MaterialTypes = (typeof MaterialTypes)[keyof typeof MaterialTypes];
+export type MaterialType = typeof MATERIAL_TYPE_MISC | typeof MATERIAL_TYPE_G_BUFFER | typeof MATERIAL_TYPE_UNLIT | typeof MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH | typeof MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH;
 
-export const UIQueueTypes = {
-    None: 0,
-    AfterTone: 1,
-    Overlay: 2,
-} as const;
+export const UI_QUEUE_TYPE_NONE = 0;
+export const UI_QUEUE_TYPE_AFTER_TONE = 1;
+export const UI_QUEUE_TYPE_OVERLAY = 2;
 
-export type UIQueueType = (typeof UIQueueTypes)[keyof typeof UIQueueTypes];
+export type UIQueueType = typeof UI_QUEUE_TYPE_NONE | typeof UI_QUEUE_TYPE_AFTER_TONE | typeof UI_QUEUE_TYPE_OVERLAY;
 
-export const UIAnchorTypes = {
-    Center: 0,
-} as const;
+export const UI_ANCHOR_TYPE_CENTER = 0;
 
-export type UIAnchorType = (typeof UIAnchorTypes)[keyof typeof UIAnchorTypes];
+export type UIAnchorType = typeof UI_ANCHOR_TYPE_CENTER;
 
-export const CameraTypes = {
-    Perspective: 0,
-    Orthographic: 1,
-} as const;
+export const CAMERA_TYPE_PERSPECTIVE = 0;
+export const CAMERA_TYPE_ORTHOGRAPHIC = 1;
 
-export type CameraType = (typeof CameraTypes)[keyof typeof CameraTypes];
+export type CameraType = typeof CAMERA_TYPE_PERSPECTIVE | typeof CAMERA_TYPE_ORTHOGRAPHIC;
 
-export const CubeMapAxis = {
-    PositiveX: 0,
-    NegativeX: 1,
-    PositiveY: 2,
-    NegativeY: 3,
-    PositiveZ: 4,
-    NegativeZ: 5,
-} as const;
+export const CUBE_MAP_AXIS_POSITIVE_X = 0;
+export const CUBE_MAP_AXIS_NEGATIVE_X = 1;
+export const CUBE_MAP_AXIS_POSITIVE_Y = 2;
+export const CUBE_MAP_AXIS_NEGATIVE_Y = 3;
+export const CUBE_MAP_AXIS_POSITIVE_Z = 4;
+export const CUBE_MAP_AXIS_NEGATIVE_Z = 5;
 
-export type CubeMapAxis = (typeof CubeMapAxis)[keyof typeof CubeMapAxis];
+export type CubeMapAxis = typeof CUBE_MAP_AXIS_POSITIVE_X | typeof CUBE_MAP_AXIS_NEGATIVE_X | typeof CUBE_MAP_AXIS_POSITIVE_Y | typeof CUBE_MAP_AXIS_NEGATIVE_Y | typeof CUBE_MAP_AXIS_POSITIVE_Z | typeof CUBE_MAP_AXIS_NEGATIVE_Z;
 
-export const FaceSide = {
-    Front: 0,
-    Back: 1,
-    Double: 2,
-} as const;
+export const FACE_SIDE_FRONT = 0;
+export const FACE_SIDE_BACK = 1;
+export const FACE_SIDE_DOUBLE = 2;
 
-export type FaceSide = (typeof FaceSide)[keyof typeof FaceSide];
+export type FaceSide = typeof FACE_SIDE_FRONT | typeof FACE_SIDE_BACK | typeof FACE_SIDE_DOUBLE;
 
 // export type AttributeUsageType =
 // {

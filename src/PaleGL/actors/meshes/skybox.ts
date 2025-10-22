@@ -2,12 +2,12 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     UniformTypes,
     PRIMITIVE_TYPE_TRIANGLES,
-    ActorTypes,
+    ACTOR_TYPE_SKYBOX,
     UniformNames,
-    ShadingModelIds,
+    SHADING_MODEL_ID_SKYBOX,
     UniformBlockNames,
-    RenderQueueType,
-    FaceSide,
+    RENDER_QUEUE_TYPE_SKYBOX,
+    FACE_SIDE_BACK,
 } from '@/PaleGL/constants.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
@@ -131,11 +131,11 @@ export function createSkybox({
         vertexShader: skyboxVertexShader,
         fragmentShader: skyboxFragmentShader,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        renderQueueType: RenderQueueType.Skybox,
+        renderQueueType: RENDER_QUEUE_TYPE_SKYBOX,
         depthTest: true,
         depthWrite: false,
         useEnvMap: true,
-        faceSide: FaceSide.Back,
+        faceSide: FACE_SIDE_BACK,
         uniforms: [
             {
                 name: UniformNames.CubeTexture,
@@ -155,13 +155,13 @@ export function createSkybox({
             {
                 name: UniformNames.ShadingModelId,
                 type: UniformTypes.Int,
-                value: ShadingModelIds.Skybox,
+                value: SHADING_MODEL_ID_SKYBOX,
             },
         ],
         uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
-    const mesh = createMesh({ geometry, material, type: ActorTypes.Skybox });
+    const mesh = createMesh({ geometry, material, type: ACTOR_TYPE_SKYBOX });
 
     return {
         ...mesh,

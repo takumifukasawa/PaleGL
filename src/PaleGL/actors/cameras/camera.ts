@@ -1,5 +1,5 @@
 ﻿import { Actor, createActor } from '@/PaleGL/actors/actor.ts';
-import { ActorTypes, CameraType } from '@/PaleGL/constants.ts';
+import { ACTOR_TYPE_CAMERA, CameraType } from '@/PaleGL/constants.ts';
 import { createMat4Identity, Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 // import {Vector3} from "@/PaleGL/math/Vector3";
@@ -65,7 +65,7 @@ export function createCamera({
     clearColor?: Vector4;
     postProcess?: PostProcess | null;
 }): Camera {
-    const actor = createActor({ name, type: ActorTypes.Camera });
+    const actor = createActor({ name, type: ACTOR_TYPE_CAMERA });
 
     const viewMatrix = createMat4Identity();
     const projectionMatrix = createMat4Identity();

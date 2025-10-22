@@ -3,7 +3,7 @@ import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
     AttributeNames, BlendType,
-    BlendTypes,
+    BLEND_TYPE_TRANSPARENT,
     FragmentShaderModifiers,
     UniformBlockNames,
     UniformNames,
@@ -51,7 +51,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         maxSize,
         minColor,
         maxColor,
-        blendType = BlendTypes.Transparent,
+        blendType = BLEND_TYPE_TRANSPARENT,
         vertexShaderModifiers = [],
         fragmentShaderModifiers = [],
     } = args;

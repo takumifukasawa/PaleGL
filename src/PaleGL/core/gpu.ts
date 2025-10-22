@@ -1,10 +1,22 @@
 ﻿import {
     AttributeUsageType,
     BlendType,
-    BlendTypes,
+    BLEND_TYPE_OPAQUE,
+    BLEND_TYPE_TRANSPARENT,
+    BLEND_TYPE_ADDITIVE,
     DepthFuncType,
-    DepthFuncTypes,
+    DEPTH_FUNC_TYPE_NEVER,
+    DEPTH_FUNC_TYPE_LESS,
+    DEPTH_FUNC_TYPE_EQUAL,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    DEPTH_FUNC_TYPE_GREATER,
+    DEPTH_FUNC_TYPE_NOT_EQUAL,
+    DEPTH_FUNC_TYPE_GEQUAL,
+    DEPTH_FUNC_TYPE_ALWAYS,
     FaceSide,
+    FACE_SIDE_FRONT,
+    FACE_SIDE_BACK,
+    FACE_SIDE_DOUBLE,
     GL_ALWAYS,
     GL_BACK,
     GL_BLEND,
@@ -500,17 +512,17 @@ export function drawGPU(
 
     // culling
     switch (faceSide) {
-        case FaceSide.Front:
+        case FACE_SIDE_FRONT:
             gl.enable(GL_CULL_FACE);
             gl.cullFace(GL_BACK);
             gl.frontFace(GL_CCW);
             break;
-        case FaceSide.Back:
+        case FACE_SIDE_BACK:
             gl.enable(GL_CULL_FACE);
             gl.cullFace(GL_FRONT);
             gl.frontFace(GL_CCW);
             break;
-        case FaceSide.Double:
+        case FACE_SIDE_DOUBLE:
             gl.disable(GL_CULL_FACE);
             gl.frontFace(GL_CCW);
             break;
@@ -529,28 +541,28 @@ export function drawGPU(
     if (depthTest) {
         gl.enable(gl.DEPTH_TEST);
         switch (depthFuncType) {
-            case DepthFuncTypes.Never:
+            case DEPTH_FUNC_TYPE_NEVER:
                 gl.depthFunc(GL_NEVER);
                 break;
-            case DepthFuncTypes.Less:
+            case DEPTH_FUNC_TYPE_LESS:
                 gl.depthFunc(GL_LESS);
                 break;
-            case DepthFuncTypes.Equal:
+            case DEPTH_FUNC_TYPE_EQUAL:
                 gl.depthFunc(GL_EQUAL);
                 break;
-            case DepthFuncTypes.Lequal:
+            case DEPTH_FUNC_TYPE_LEQUAL:
                 gl.depthFunc(GL_LEQUAL);
                 break;
-            case DepthFuncTypes.Greater:
+            case DEPTH_FUNC_TYPE_GREATER:
                 gl.depthFunc(GL_GREATER);
                 break;
-            case DepthFuncTypes.NotEqual:
+            case DEPTH_FUNC_TYPE_NOT_EQUAL:
                 gl.depthFunc(GL_NOTEQUAL);
                 break;
-            case DepthFuncTypes.Gequal:
+            case DEPTH_FUNC_TYPE_GEQUAL:
                 gl.depthFunc(GL_GEQUAL);
                 break;
-            case DepthFuncTypes.Always:
+            case DEPTH_FUNC_TYPE_ALWAYS:
                 gl.depthFunc(GL_ALWAYS);
                 break;
             default:
@@ -566,17 +578,17 @@ export function drawGPU(
     // - src: current draw
     // - dest: drawn
     switch (blendType) {
-        case BlendTypes.Opaque:
+        case BLEND_TYPE_OPAQUE:
             gl.disable(GL_BLEND);
             // pattern_2: for enabled blend
             // gl.enable(gl.BLEND);
             // gl.blendFunc(gl.ONE, gl.ZERO);
             break;
-        case BlendTypes.Transparent:
+        case BLEND_TYPE_TRANSPARENT:
             gl.enable(GL_BLEND);
             gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             break;
-        case BlendTypes.Additive:
+        case BLEND_TYPE_ADDITIVE:
             gl.enable(GL_BLEND);
             gl.blendFunc(GL_SRC_ALPHA, GL_ONE);
             break;

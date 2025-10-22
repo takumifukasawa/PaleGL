@@ -33,7 +33,7 @@ import {
     multiplyTranslationMatrix,
     transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
-import { ActorTypes } from '@/PaleGL/constants.js';
+import { ACTOR_TYPE_CAMERA } from '@/PaleGL/constants.js';
 import {
     createRotatorZero,
     Rotator,
@@ -449,7 +449,7 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
         assignMat4Identity(actor.transform.localMatrix);
         const lookAtMatrix =
-            actor?.type === ActorTypes.Camera
+            actor?.type === ACTOR_TYPE_CAMERA
                 ? createLookAtMatrixRef(
                       actor.transform.localMatrix,
                       actor.transform.position,

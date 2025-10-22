@@ -1,5 +1,5 @@
 ﻿import { Actor, ActorArgs, createActor } from '@/PaleGL/actors/actor.ts';
-import { ActorTypes, LightType } from '@/PaleGL/constants.ts';
+import { ACTOR_TYPE_LIGHT, LightType } from '@/PaleGL/constants.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
@@ -26,7 +26,7 @@ export type Light = Actor & {
 
 // TODO: interfaceでいいかも
 export function createLight({ name, intensity, color, lightType }: LightArgs & { lightType: LightType }): Light {
-    const actor = createActor({ name, type: ActorTypes.Light });
+    const actor = createActor({ name, type: ACTOR_TYPE_LIGHT });
 
     const castShadow: boolean = false; // bool
     const shadowCamera: OrthographicCamera | PerspectiveCamera | null = null;

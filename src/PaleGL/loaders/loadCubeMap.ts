@@ -1,6 +1,13 @@
 ﻿import { loadImg } from '@/PaleGL/loaders/loadImg';
 import { createCubeMap, CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { CubeMapAxis } from '@/PaleGL/constants';
+import {
+    CUBE_MAP_AXIS_POSITIVE_X,
+    CUBE_MAP_AXIS_NEGATIVE_X,
+    CUBE_MAP_AXIS_POSITIVE_Y,
+    CUBE_MAP_AXIS_NEGATIVE_Y,
+    CUBE_MAP_AXIS_POSITIVE_Z,
+    CUBE_MAP_AXIS_NEGATIVE_Z
+} from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 
 // example
@@ -32,27 +39,27 @@ export async function loadCubeMap(
 ) {
     const paths = [
         {
-            axis: CubeMapAxis.PositiveX,
+            axis: CUBE_MAP_AXIS_POSITIVE_X,
             path: posXImage,
         },
         {
-            axis: CubeMapAxis.NegativeX,
+            axis: CUBE_MAP_AXIS_NEGATIVE_X,
             path: negXImage,
         },
         {
-            axis: CubeMapAxis.PositiveY,
+            axis: CUBE_MAP_AXIS_POSITIVE_Y,
             path: posYImage,
         },
         {
-            axis: CubeMapAxis.NegativeY,
+            axis: CUBE_MAP_AXIS_NEGATIVE_Y,
             path: negYImage,
         },
         {
-            axis: CubeMapAxis.PositiveZ,
+            axis: CUBE_MAP_AXIS_POSITIVE_Z,
             path: posZImage,
         },
         {
-            axis: CubeMapAxis.NegativeZ,
+            axis: CUBE_MAP_AXIS_NEGATIVE_Z,
             path: negZImage,
         },
     ];

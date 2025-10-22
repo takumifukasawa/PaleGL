@@ -6,12 +6,12 @@ import {
 } from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
 import {
     BlendType,
-    BlendTypes,
-    DepthFuncTypes,
-    MeshTypes,
+    BLEND_TYPE_TRANSPARENT,
+    DEPTH_FUNC_TYPE_ALWAYS,
+    MESH_TYPE_TEXT,
     PRIMITIVE_TYPE_TRIANGLES,
     UIAnchorType,
-    UIAnchorTypes,
+    UI_ANCHOR_TYPE_CENTER,
     UIQueueType,
     UniformBlockNames,
     UniformNames,
@@ -46,11 +46,11 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     options: UIShapeTextMeshArgs<T, U>
 ): UIShapeTextMesh<T, U> {
     const {
-        anchor = UIAnchorTypes.Center,
+        anchor = UI_ANCHOR_TYPE_CENTER,
         align,
         characterSpacing = 0,
         fontSize = 13,
-        blendType = BlendTypes.Transparent,
+        blendType = BLEND_TYPE_TRANSPARENT,
         shapeFontRenderer,
         uniforms,
         color = createColorWhite(),
@@ -114,7 +114,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         depthWrite: false,
         blendType,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        depthFuncType: DepthFuncTypes.Equal,
+        depthFuncType: DEPTH_FUNC_TYPE_ALWAYS,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
@@ -127,7 +127,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         // // uiQueueType: UIQueueTypes.AfterTone,
         // meshType: MeshTypes.UI,
         // meshType: MeshTypes.SpriteAtlas,
-        meshType: MeshTypes.Default,
+        meshType: MESH_TYPE_TEXT,
         planeWidth: fontSize,
         material,
     });

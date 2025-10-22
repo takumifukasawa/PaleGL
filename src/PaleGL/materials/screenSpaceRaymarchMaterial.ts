@@ -1,7 +1,8 @@
 import { MaterialArgs, createMaterial } from '@/PaleGL/materials/material.ts';
 import {
-    DepthFuncTypes,
-    MaterialTypes,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH,
+    SHADING_MODEL_ID_LIT,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -37,7 +38,7 @@ export function createScreenSpaceRaymarchMaterial({
     // TODO: 外部化
     fragmentShader,
     depthFragmentShader,
-    shadingModelId = ShadingModelIds.Lit,
+    shadingModelId = SHADING_MODEL_ID_LIT,
     uniforms = [],
     baseColor,
     baseMap,
@@ -147,7 +148,7 @@ export function createScreenSpaceRaymarchMaterial({
     const material = createMaterial({
         ...options,
         name: 'ScreenSpaceRaymarchMaterial',
-        type: MaterialTypes.ScreenSpaceRaymarch,
+        type: MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH,
         vertexShader: postprocessVert,
         fragmentShader,
         depthFragmentShader,
@@ -158,11 +159,11 @@ export function createScreenSpaceRaymarchMaterial({
         // useNormalMap: !!normalMap,
         // depthTest: true,
         // depthWrite: false,
-        // depthFuncType: DepthFuncTypes.Equal,
+        // depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
         // NOTE: GBufferMaterialと違う点
         depthTest: true,
         depthWrite: true,
-        depthFuncType: DepthFuncTypes.Lequal,
+        depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
         skipDepthPrePass: true,
         uniformBlockNames: [
             UniformBlockNames.Common,

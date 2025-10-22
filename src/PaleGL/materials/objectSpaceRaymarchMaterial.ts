@@ -1,11 +1,12 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
-    DepthFuncTypes,
-    FaceSide,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    FACE_SIDE_DOUBLE,
     FragmentShaderModifierPragmas,
-    MaterialTypes,
+    MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
-    RenderQueueType,
+    RENDER_QUEUE_TYPE_OPAQUE,
+    SHADING_MODEL_ID_LIT,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -74,7 +75,7 @@ export function createObjectSpaceRaymarchMaterial({
     depthFragmentShaderContent: string;
     materialArgs: ObjectSpaceRaymarchMaterialArgs;
 }) {
-    const { shadingModelId = ShadingModelIds.Lit, uniforms = [], uniformBlockNames } = materialArgs;
+    const { shadingModelId = SHADING_MODEL_ID_LIT, uniforms = [], uniformBlockNames } = materialArgs;
 
     const baseMap = materialArgs.baseMap ?? null;
     const baseColor = materialArgs.baseColor ?? createColorWhite();
@@ -169,13 +170,13 @@ export function createObjectSpaceRaymarchMaterial({
         ...materialArgs, // TODO: 上書きするためにできるだけ後ろに持っていきたい
         // ...options,
         name: 'ObjectSpaceRaymarchMaterial',
-        type: MaterialTypes.ObjectSpaceRaymarch,
+        type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        faceSide: FaceSide.Double,
+        faceSide: FACE_SIDE_DOUBLE,
 
         // rawFragmentShader,
         uniforms: mergedUniforms,
@@ -184,13 +185,13 @@ export function createObjectSpaceRaymarchMaterial({
         // useNormalMap: !!normalMap,
         // depthTest: true,
         // depthWrite: false,
-        // depthFuncType: DepthFuncTypes.Equal,
+        // depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
         // NOTE: GBufferMaterialと違う点
         depthTest: true,
         depthWrite: true,
-        depthFuncType: DepthFuncTypes.Lequal,
+        depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
         skipDepthPrePass: true,
-        renderQueueType: RenderQueueType.Opaque,
+        renderQueueType: RENDER_QUEUE_TYPE_OPAQUE,
         // renderQueueType: RenderQueueType.Transparent,
         // blendType: BlendTypes.Transparent,
 

@@ -8,18 +8,18 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
 import { createSkybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import {
-    ActorTypes,
-    BlendTypes,
-    DepthFuncTypes,
-    FaceSide,
+    ACTOR_TYPE_MESH,
+    BLEND_TYPE_TRANSPARENT,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    FACE_SIDE_FRONT,
     FragmentShaderModifierPragmas,
-    RenderQueueType,
+    RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderTargetTypes,
     TextureDepthPrecisionType,
     UniformNames,
-    // FragmentShaderModifierPragmas,
     UniformTypes,
 } from '@/PaleGL/constants';
+import type { RenderQueueType, FaceSide } from '@/PaleGL/constants';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import {
     createEngine,
@@ -447,7 +447,7 @@ const main = async () => {
     addActorToScene(captureScene, streetFloorActor);
     streetFloorActor.children.forEach((child) => {
         child.enabled = false;
-        if (child.type === ActorTypes.Mesh) {
+        if (child.type === ACTOR_TYPE_MESH) {
             (child as Mesh).castShadow = true;
         }
     });
@@ -499,14 +499,14 @@ const main = async () => {
                     fragmentShaderContent: objectSpaceRaymarchFragContent,
                     depthFragmentShaderContent: objectSpaceRaymarchFragContent,
                     receiveShadow: false,
-                    renderQueueType: RenderQueueType.Transparent,
-                    blendType: BlendTypes.Transparent,
+                    renderQueueType: RENDER_QUEUE_TYPE_TRANSPARENT,
+                    blendType: BLEND_TYPE_TRANSPARENT,
                     // renderQueueType: RenderQueueType.AlphaTest,
                     // alphaTest: 0.5,
                     depthTest: true,
                     depthWrite: true,
-                    depthFuncType: DepthFuncTypes.Lequal,
-                    faceSide: FaceSide.Front,
+                    depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
+                    faceSide: FACE_SIDE_FRONT,
                     uniforms: [
                         {
                             name: UniformNames.SceneTexture,

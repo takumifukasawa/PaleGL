@@ -2,11 +2,11 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { createShapeTextMeshBase, ShapeTextMeshArgs } from '@/PaleGL/actors/meshes/shapeTextMeshBase.ts';
 import { createUnlitShapeCharMesh } from '@/PaleGL/actors/meshes/unlitShapeCharMesh.ts';
 import {
-    DepthFuncTypes,
-    MeshTypes,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    MESH_TYPE_TEXT,
     PRIMITIVE_TYPE_TRIANGLES,
-    ShadingModelIds,
-    UIQueueTypes,
+    SHADING_MODEL_ID_UNLIT,
+    UI_QUEUE_TYPE_NONE,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -66,7 +66,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         {
             name: UniformNames.ShadingModelId,
             type: UniformTypes.Int,
-            value: ShadingModelIds.Unlit,
+            value: SHADING_MODEL_ID_UNLIT,
         },
         ...(uniforms || []),
     ];
@@ -85,7 +85,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         depthWrite: false,
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        depthFuncType: DepthFuncTypes.Equal,
+        depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });
 
@@ -93,8 +93,8 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         ...options,
         actor,
         createCharMeshFunc: createUnlitShapeCharMesh,
-        uiQueueType: UIQueueTypes.None,
-        meshType: MeshTypes.Default,
+        uiQueueType: UI_QUEUE_TYPE_NONE,
+        meshType: MESH_TYPE_TEXT,
         material,
     });
 

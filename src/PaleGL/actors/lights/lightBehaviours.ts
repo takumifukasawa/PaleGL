@@ -1,5 +1,5 @@
 ﻿import { ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
-import { LightType, LightTypes } from '@/PaleGL/constants.ts';
+import { LightType, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
 import { cloneMat4, createMatrix4, multiplyMat4Array } from '@/PaleGL/math/matrix4.ts';
 import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
@@ -9,8 +9,8 @@ import { Light } from '@/PaleGL/actors/lights/light.ts';
 export type UpdateLightFunc = (light: Light, args: ActorUpdateArgs) => void;
 
 export const updateLightBehaviour: Partial<Record<LightType, UpdateLightFunc>> = {
-    [LightTypes.Directional]: updateDirectionalLight,
-    [LightTypes.Spot]: updateSpotLight,
+    [LIGHT_TYPE_DIRECTIONAL]: updateDirectionalLight,
+    [LIGHT_TYPE_SPOT]: updateSpotLight,
 };
 
 export const updateLight: UpdateActorFunc = (actor, args) => {

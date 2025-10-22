@@ -8,7 +8,7 @@ import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 import { Color } from '@/PaleGL/math/color.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { CreateShapeCharMeshFunc } from '@/PaleGL/actors/meshes/shapeCharMeshBase.ts';
-import { MeshType, UIQueueType, UIQueueTypes } from '@/PaleGL/constants.ts';
+import { MeshType, UIQueueType, UI_QUEUE_TYPE_NONE } from '@/PaleGL/constants.ts';
 import {Material} from "@/PaleGL/materials/material.ts";
 import {UniformsData} from "@/PaleGL/core/uniforms.ts";
 
@@ -67,7 +67,7 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
         planeWidth,
         material,
         // for ui
-        uiQueueType = UIQueueTypes.None,
+        uiQueueType = UI_QUEUE_TYPE_NONE,
     } = args;
 
     // const actor = createActor({ name: name || `shape-text-${text}` });

@@ -1,8 +1,9 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
     FragmentShaderModifierPragmas,
-    MaterialTypes,
+    MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     ShadingModelIds,
+    SHADING_MODEL_ID_UNLIT,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -43,7 +44,7 @@ export function createObjectSpaceRaymarchUnlitMaterial(
         fragmentShaderContent,
         depthFragmentShaderTemplate,
         depthFragmentShaderContent,
-        shadingModelId = ShadingModelIds.Unlit,
+        shadingModelId = SHADING_MODEL_ID_UNLIT,
         uniforms = [],
         uniformBlockNames,
     } = args;
@@ -102,7 +103,7 @@ export function createObjectSpaceRaymarchUnlitMaterial(
         ...args,
         // ...options,
         name: 'ObjectSpaceRaymarchUnlitMaterial',
-        type: MaterialTypes.ObjectSpaceRaymarch,
+        type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || unlitObjectSpaceRaymarchFragmentLayout,

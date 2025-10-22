@@ -1,5 +1,5 @@
 ﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
-import { LightTypes } from '@/PaleGL/constants.ts';
+import { LIGHT_TYPE_POINT } from '@/PaleGL/constants.ts';
 
 type PointLightParams = {
     distance: number;
@@ -14,7 +14,7 @@ export type PointLight = Light & {
 };
 
 export function createPointLight(options: PointLightArgs) {
-    const light = createLight({ ...options, lightType: LightTypes.Point });
+    const light = createLight({ ...options, lightType: LIGHT_TYPE_POINT });
 
     const distance: number = options.distance;
     const attenuation: number = options.attenuation;

@@ -9,7 +9,7 @@ import {
 } from '@/PaleGL/core/framebuffer.ts';
 import { createRenderbuffer, Renderbuffer, setRenderbufferSize } from '@/PaleGL/core/renderbuffer.ts';
 import {
-    RenderbufferTypes,
+    RENDERBUFFER_TYPE_DEPTH,
     RenderTargetType,
     RenderTargetTypes,
     TextureFilterType,
@@ -112,7 +112,7 @@ export function createRenderTarget({
     // console.log(useDepthBuffer, writeDepthTexture, this.type, writeDepthTexture)
 
     if (useDepthBuffer) {
-        depthRenderbuffer = createRenderbuffer(gpu, RenderbufferTypes.Depth, width, height);
+        depthRenderbuffer = createRenderbuffer(gpu, RENDERBUFFER_TYPE_DEPTH, width, height);
     }
 
     // depth as render buffer

@@ -2,7 +2,7 @@
     Camera,
     createCamera,
 } from '@/PaleGL/actors/cameras/camera.ts';
-import { CameraTypes } from '@/PaleGL/constants.ts';
+import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 
 export type PerspectiveCamera = Camera & {
@@ -12,7 +12,7 @@ export type PerspectiveCamera = Camera & {
 };
 
 export function createPerspectiveCamera(fov: number, aspect: number, near: number, far: number, name?: string) {
-    const camera = createCamera({ name, cameraType: CameraTypes.Perspective });
+    const camera = createCamera({ name, cameraType: CAMERA_TYPE_PERSPECTIVE });
 
     const fixedAspect: boolean = false;
 

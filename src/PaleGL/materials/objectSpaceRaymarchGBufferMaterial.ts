@@ -1,7 +1,8 @@
 import {
-    DepthFuncTypes,
+    DEPTH_FUNC_TYPE_LEQUAL,
     FragmentShaderModifierPragmas,
-    MaterialTypes,
+    MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
+    SHADING_MODEL_ID_LIT,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -50,7 +51,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         fragmentShaderContent,
         depthFragmentShaderTemplate,
         depthFragmentShaderContent,
-        shadingModelId = ShadingModelIds.Lit,
+        shadingModelId = SHADING_MODEL_ID_LIT,
         uniforms = [],
         uniformBlockNames,
     } = args;
@@ -147,7 +148,7 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         ...args,
         // ...options,
         name: 'ObjectSpaceRaymarchGBufferMaterial',
-        type: MaterialTypes.ObjectSpaceRaymarch,
+        type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         // faceSide: FaceSide.Double,
 
@@ -159,9 +160,9 @@ export function createObjectSpaceRaymarchGBufferMaterial(
         // useNormalMap: !!normalMap,
         // depthTest: true,
         // depthWrite: false,
-        // depthFuncType: DepthFuncTypes.Equal,
+        // depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
 
-        depthFuncType: args.depthFuncType ?? DepthFuncTypes.Lequal,
+        depthFuncType: args.depthFuncType ?? DEPTH_FUNC_TYPE_LEQUAL,
         skipDepthPrePass: true,
 
         uniforms: mergedUniforms,

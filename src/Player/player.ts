@@ -63,7 +63,7 @@ import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
-import { CameraTypes } from '@/PaleGL/constants.ts';
+import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
 import { createVector3 } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 
@@ -180,7 +180,7 @@ export function createPlayer(
             if (sceneViewCameraEntity) {
                 sceneViewCameraEntity.near = data.cameraNear;
                 sceneViewCameraEntity.far = data.cameraFar;
-                if (sceneViewCameraEntity.type === CameraTypes.Perspective) {
+                if (sceneViewCameraEntity.type === CAMERA_TYPE_PERSPECTIVE) {
                     (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
                 }
                 setTranslation(

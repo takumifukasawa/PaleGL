@@ -2,7 +2,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import {AttributeNames, BlendTypes, UniformBlockNames, UniformNames} from '@/PaleGL/constants.ts';
+import {AttributeNames, BLEND_TYPE_TRANSPARENT, UniformBlockNames, UniformNames} from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {setScaling} from "@/PaleGL/core/transform.ts";
@@ -279,7 +279,7 @@ void main() {
         uniformBlockNames: [
             UniformBlockNames.Common,
         ],
-        blendType: BlendTypes.Transparent,
+        blendType: BLEND_TYPE_TRANSPARENT,
         depthTest: false,
         depthWrite: false
     });
