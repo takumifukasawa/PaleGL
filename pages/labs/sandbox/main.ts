@@ -1821,7 +1821,7 @@ const main = async () => {
     // unlit mesh
 
     const shapeFontCircuitTextureWidth = 4096;
-    const shapeFontCircuitTextureHeight = 1024;
+    const shapeFontCircuitTextureHeight = 2048;
 
     const shapeFontCircuitRenderer = createShapeFontRenderer(
         shapeFontCircuitService,

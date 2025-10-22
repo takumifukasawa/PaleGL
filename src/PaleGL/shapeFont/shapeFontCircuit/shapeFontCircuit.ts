@@ -1,3 +1,4 @@
+
 import { ShapeFontBase } from '@/PaleGL/shapeFont/shapeFont.ts';
 
 export type ShapeFontCircuitChar = [
@@ -21,7 +22,7 @@ const C = -1; // closePathIndex
 export const shapeFontCircuit: ShapeFontCircuit = {
     rawCellWidth: 91,
     rawCellHeight: 150,
-    colNum: 18,
+    colNum: 13,
     lineWidth: 6,
     dotLineWidth: 4,
     dotRadius: 5,
@@ -918,6 +919,25 @@ export const shapeFontCircuit: ShapeFontCircuit = {
                 ],
                 // dots
                 [10],
+                // stroke dots
+                [0],
+            ],
+        ],
+
+        [
+            '.',
+            [
+                // coords
+                // prettier-ignore
+                [
+                    24, B, // 0: 左下から反時計
+                ],
+                // lines
+                // prettier-ignore
+                [
+                ],
+                // dots
+                [],
                 // stroke dots
                 [0],
             ],
