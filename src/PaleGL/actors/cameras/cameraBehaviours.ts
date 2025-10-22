@@ -71,6 +71,7 @@ import { createRay, Ray } from '@/PaleGL/math/ray.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { getWriteRenderTarget, setRenderTargetSizeBehaviour } from '@/PaleGL/core/renderTargetBehaviours.ts';
+import { nullLiteralTypeAnnotation } from '@babel/types';
 
 // mainCamera: boolean = false;
 
@@ -220,7 +221,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         addChildActor(camera, camera.visibleFrustumMesh as Actor);
     }
 
-    if (camera.visibleFrustumMesh) {
+    if (camera.visibleFrustum && camera.visibleFrustumMesh) {
         const frustumPositions = getFrustumLocalPositions(camera);
         if (!frustumPositions) {
             return;
@@ -237,6 +238,15 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         const frt = frustumPositions.frt.e; // farRightTop: 6
         const frb = frustumPositions.frb.e; // farRightBottom: 7
 
+        // console.log(nlt);
+        // console.log(nrt);
+        // console.log(nlb);
+        // console.log(nrt);
+        // console.log(flt);
+        // console.log(flb);
+        // console.log(frt);
+        // console.log(frb);
+       
         updateGeometryAttribute(
             camera.visibleFrustumMesh.geometry,
             AttributeNames.Position,

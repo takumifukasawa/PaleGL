@@ -196,9 +196,10 @@ export function buildMarionetterTimeline(
 
             targetActor = targetActor as Actor;
 
-            // // for debug
+            // for debug
             // console.log(
             //     `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
+            //     targetActor.name,
             //     targetActor,
             //     marionetterClips
             // );
@@ -256,9 +257,9 @@ export function buildMarionetterTimeline(
                     }
 
                     // clipの実行後にupdate
-                    // if (targetActor) {
-                    postProcessActorTimeline(targetActor, time);
-                    // }
+                    if (targetActor) {
+                        postProcessActorTimeline(targetActor, time);
+                    }
                     // });
                 },
             } as MarionetterTimelineDefaultTrack;

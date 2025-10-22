@@ -1,15 +1,15 @@
-﻿import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
-import { addChildActor } from '@/PaleGL/actors/actor.ts';
-import { DEG_TO_RAD, LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
-import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
-import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
+﻿import { addChildActor } from '@/PaleGL/actors/actor.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
-import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { setRotationY } from '@/PaleGL/core/transform.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
+import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
+import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
+import { DEG_TO_RAD, LightTypes, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { setRotationY } from '@/PaleGL/core/transform.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 
 type SpotLightParams = {
     distance: number;
