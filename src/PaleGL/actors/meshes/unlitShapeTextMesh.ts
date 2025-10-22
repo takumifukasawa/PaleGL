@@ -4,7 +4,7 @@ import { createUnlitShapeCharMesh } from '@/PaleGL/actors/meshes/unlitShapeCharM
 import {
     DepthFuncTypes,
     MeshTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     ShadingModelIds,
     UIQueueTypes,
     UniformBlockNames,
@@ -84,7 +84,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         depthTest: true,
         depthWrite: false,
         // receiveShadow: !!receiveShadow,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });

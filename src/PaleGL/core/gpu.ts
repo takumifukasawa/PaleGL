@@ -42,7 +42,11 @@
     GL_UNIFORM_OFFSET,
     GL_UNSIGNED_SHORT,
     PrimitiveType,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_POINTS,
+    PRIMITIVE_TYPE_LINES,
+    PRIMITIVE_TYPE_LINE_LOOP,
+    PRIMITIVE_TYPE_LINE_STRIP,
+    PRIMITIVE_TYPE_TRIANGLES,
     TextureWrapTypes,
     // UniformNames,
     UniformTypes,
@@ -271,15 +275,15 @@ export function checkGPUExtension(gpu: Gpu, extensionName: string): boolean {
 
 export function getGLPrimitive(primitiveType: PrimitiveType) {
     switch (primitiveType) {
-        case PrimitiveTypes.Points:
+        case PRIMITIVE_TYPE_POINTS:
             return GL_POINTS;
-        case PrimitiveTypes.Lines:
+        case PRIMITIVE_TYPE_LINES:
             return GL_LINES;
-        case PrimitiveTypes.LineLoop:
+        case PRIMITIVE_TYPE_LINE_LOOP:
             return GL_LINE_LOOP;
-        case PrimitiveTypes.LineStrip:
+        case PRIMITIVE_TYPE_LINE_STRIP:
             return GL_LINE_STRIP;
-        case PrimitiveTypes.Triangles:
+        case PRIMITIVE_TYPE_TRIANGLES:
             return GL_TRIANGLES;
         default:
             console.error('invalid primitive type');

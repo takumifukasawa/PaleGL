@@ -4,7 +4,7 @@ import {
     FaceSide,
     FragmentShaderModifierPragmas,
     MaterialTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     RenderQueueType,
     ShadingModelIds,
     UniformBlockNames,
@@ -174,7 +174,7 @@ export function createObjectSpaceRaymarchMaterial({
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         faceSide: FaceSide.Double,
 
         // rawFragmentShader,

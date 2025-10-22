@@ -8,7 +8,7 @@ import {
     FaceSide,
     MAX_SPOT_LIGHT_COUNT,
     PostProcessPassType,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     RenderTargetTypes,
     TextureDepthPrecisionType,
     UniformBlockNames,
@@ -130,7 +130,7 @@ void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position}
 `,
         fragmentShader: `
 out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         blendType: BlendTypes.Opaque,
         // blendType: BlendTypes.Additive,
         depthFuncType: DepthFuncTypes.Lequal,

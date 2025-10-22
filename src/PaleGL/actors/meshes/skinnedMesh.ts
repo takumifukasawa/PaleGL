@@ -6,7 +6,8 @@ import {
     AttributeUsageType,
     BlendTypes,
     MeshTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_LINES,
+    PRIMITIVE_TYPE_POINTS,
     TextureTypes,
     UniformNames,
     UniformTypes,
@@ -520,7 +521,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
                     outColor = vec4(0, 1., 0, 1.);
                 }
                 `,
-            primitiveType: PrimitiveTypes.Lines,
+            primitiveType: PRIMITIVE_TYPE_LINES,
             blendType: BlendTypes.Transparent,
             depthWrite: false,
             depthTest: false,
@@ -564,7 +565,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
                     outColor = vec4(1, 0., 0, 1.);
                 }
                 `,
-            primitiveType: PrimitiveTypes.Points,
+            primitiveType: PRIMITIVE_TYPE_POINTS,
             blendType: BlendTypes.Transparent,
             depthWrite: false,
             depthTest: false,

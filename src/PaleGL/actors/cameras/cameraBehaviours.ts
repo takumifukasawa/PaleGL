@@ -26,7 +26,7 @@ import {
     CameraType,
     CameraTypes,
     FaceSide,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_LINES,
     UniformNames,
 } from '@/PaleGL/constants.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -219,7 +219,7 @@ void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewM
                 fragmentShader: `
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}
                     `,
-                primitiveType: PrimitiveTypes.Lines,
+                primitiveType: PRIMITIVE_TYPE_LINES,
                 blendType: BlendTypes.Transparent,
                 faceSide: FaceSide.Double,
                 depthWrite: false,

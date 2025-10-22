@@ -1,7 +1,7 @@
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     UniformTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     ActorTypes,
     UniformNames,
     ShadingModelIds,
@@ -130,7 +130,7 @@ export function createSkybox({
         name: 'Skybox',
         vertexShader: skyboxVertexShader,
         fragmentShader: skyboxFragmentShader,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         renderQueueType: RenderQueueType.Skybox,
         depthTest: true,
         depthWrite: false,

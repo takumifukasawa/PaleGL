@@ -1,4 +1,5 @@
 ﻿export const MAX_SPOT_LIGHT_COUNT = 2;
+
 export const MAX_POINT_LIGHT_COUNT = 1;
 
 export const DEG_TO_RAD = Math.PI / 180;
@@ -11,17 +12,15 @@ export const RAD_TO_DEG = 180 / Math.PI;
 // TODO: ビルド最適化のために一個一個exportする
 // -----------------------------------------------------------------------------
 
-export const PrimitiveTypes = {
-    Points: 0,
-    Lines: 1,
-    LineLoop: 2,
-    LineStrip: 3,
-    Triangles: 4,
-    TriangleStrip: 5,
-    TriangleFan: 6,
-} as const;
+export const PRIMITIVE_TYPE_POINTS = 0;
+export const PRIMITIVE_TYPE_LINES = 1;
+export const PRIMITIVE_TYPE_LINE_LOOP = 2;
+export const PRIMITIVE_TYPE_LINE_STRIP = 3;
+export const PRIMITIVE_TYPE_TRIANGLES = 4;
+export const PRIMITIVE_TYPE_TRIANGLE_STRIP = 5;
+export const PRIMITIVE_TYPE_TRIANGLE_FAN = 6;
 
-export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
+export type PrimitiveType = typeof PRIMITIVE_TYPE_POINTS | typeof PRIMITIVE_TYPE_LINES | typeof PRIMITIVE_TYPE_LINE_LOOP | typeof PRIMITIVE_TYPE_LINE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLES | typeof PRIMITIVE_TYPE_TRIANGLE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLE_FAN;
 
 export const ShadingModelIds = {
     Lit: 1,

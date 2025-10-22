@@ -8,7 +8,7 @@
     FragmentShaderModifiers,
     MaterialTypes,
     PrimitiveType,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     RenderQueue,
     RenderQueueType,
     UniformBlockName,
@@ -234,7 +234,7 @@ export function createMaterial(args: MaterialArgs): Material {
 
     const type: MaterialTypes = args.type ?? MaterialTypes.Misc;
 
-    const primitiveType: PrimitiveType = args.primitiveType ?? PrimitiveTypes.Triangles;
+    const primitiveType: PrimitiveType = args.primitiveType ?? PRIMITIVE_TYPE_TRIANGLES;
     const blendType: BlendType = args.blendType ?? BlendTypes.Opaque;
 
     alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;

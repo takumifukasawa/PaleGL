@@ -9,7 +9,7 @@ import {
     BlendTypes,
     DepthFuncTypes,
     MeshTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     UIAnchorType,
     UIAnchorTypes,
     UIQueueType,
@@ -113,7 +113,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         depthTest: false,
         depthWrite: false,
         blendType,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });

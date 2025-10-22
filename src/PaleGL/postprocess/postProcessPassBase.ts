@@ -1,6 +1,6 @@
 import {
     PostProcessPassType,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     RenderTargetType,
     RenderTargetTypes,
     TextureFilterType,
@@ -15,17 +15,17 @@ import {
 //     PostProcessPassParametersBase,
 //     PostProcessPassParametersBaseArgs
 // } from "@/PaleGL/postprocess/PostProcessPassBase.ts";
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { createMaterial, Material } from '@/PaleGL/materials/material.ts';
-import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
+import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
+import { createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import postProcessPassVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
-import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { LightActors, Renderer } from '@/PaleGL/core/renderer.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 
 export type PostProcessPassParametersBaseArgs = {
     gpu: Gpu;
@@ -45,7 +45,7 @@ export type PostProcessPassRenderArgs = {
 };
 
 export type PostProcessPassBase = {
-    gpu: Gpu,
+    gpu: Gpu;
     name: string;
     type: PostProcessPassType;
     width: number;
@@ -102,7 +102,7 @@ export function createPostProcessSinglePass(args: {
     wrapT?: TextureWrapType;
     renderTargetType?: RenderTargetType;
     srcTextureEnabled?: boolean;
-    
+
     enabled?: boolean;
 }): PostProcessSinglePass {
     const {
@@ -123,7 +123,7 @@ export function createPostProcessSinglePass(args: {
         wrapT = TextureWrapTypes.ClampToEdge,
         wrapS = TextureWrapTypes.ClampToEdge,
         srcTextureEnabled = true,
-        enabled
+        enabled,
     } = args;
 
     const width = 1;
@@ -132,7 +132,7 @@ export function createPostProcessSinglePass(args: {
 
     // const baseVertexShader = getPostProcessBaseVertexShader();
     // vertexShader = vertexShader || baseVertexShader;
-    
+
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = createPlaneGeometry({ gpu });
     const material = createMaterial({
@@ -165,7 +165,7 @@ export function createPostProcessSinglePass(args: {
         uniformBlockNames,
         useEnvMap: !!useEnvMap,
         receiveShadow: !!receiveShadow,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
     });
     materials.push(material);
 
@@ -185,7 +185,7 @@ export function createPostProcessSinglePass(args: {
         wrapS,
         wrapT,
     });
-    
+
     return {
         gpu,
         name,

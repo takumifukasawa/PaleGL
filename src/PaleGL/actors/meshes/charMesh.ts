@@ -6,7 +6,7 @@ import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.t
 import {
     DepthFuncTypes,
     MeshTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
@@ -129,7 +129,7 @@ export function createCharMesh({
         depthTest: true,
         depthWrite: false,
         // receiveShadow: !!receiveShadow,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DepthFuncTypes.Equal,
         uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
     });

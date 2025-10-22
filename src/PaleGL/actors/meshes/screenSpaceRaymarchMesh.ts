@@ -2,7 +2,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     FragmentShaderModifierPragmas,
     MeshTypes,
-    PrimitiveTypes,
+    PRIMITIVE_TYPE_TRIANGLES,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -86,7 +86,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         depthFragmentShader: gbufferScreenSpaceRaymarchDepthFragmentLayout,
         uniforms: mergedUniforms,
         // receiveShadow: !!receiveShadow,
-        primitiveType: PrimitiveTypes.Triangles,
+        primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         uniformBlockNames: [UniformBlockNames.Timeline],
         fragmentShaderModifiers: [
             {
