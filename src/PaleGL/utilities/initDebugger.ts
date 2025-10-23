@@ -16,7 +16,7 @@ import { setV3x, setV3y, v3x, v3y } from '@/PaleGL/math/vector3.ts';
 import { createColorFromHex, getColorHexCoord } from '@/PaleGL/math/color.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { getPostProcessPassByType, PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
-import { PostProcessPassType } from '@/PaleGL/constants.ts';
+import { POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER } from '@/PaleGL/constants.ts';
 
 export function initDebugger(
     wrapperElement: HTMLElement,
@@ -46,7 +46,7 @@ export function initDebugger(
 
     const bufferVisualizerPass = getPostProcessPassByType<BufferVisualizerPass>(
         cameraPostProcess,
-        PostProcessPassType.BufferVisualizer
+        POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER
     );
     if (bufferVisualizerPass) {
         addToggleDebugger(debuggerGUI, {

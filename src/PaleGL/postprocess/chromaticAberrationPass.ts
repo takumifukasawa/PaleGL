@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
+import { POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
@@ -67,7 +67,7 @@ export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs)
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.ChromaticAberration,
+            type: POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION,
             fragmentShader,
             uniforms: [
                 {

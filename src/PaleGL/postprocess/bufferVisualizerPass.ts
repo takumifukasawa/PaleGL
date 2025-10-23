@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_TYPE_MATRIX4 } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_TYPE_MATRIX4 } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getDummyBlackTexture, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -591,7 +591,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         ...createPostProcessPassBase({
             gpu,
             name: 'BufferVisualizerPass',
-            type: PostProcessPassType.BufferVisualizer,
+            type: POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER,
             geometry,
             materials,
             enabled: enabled || false,

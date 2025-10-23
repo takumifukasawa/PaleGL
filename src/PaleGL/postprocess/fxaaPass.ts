@@ -1,5 +1,5 @@
 ﻿import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_FXAA,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_TYPE_FLOAT,
 
@@ -28,7 +28,7 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.FXAA,
+            type: POST_PROCESS_PASS_TYPE_FXAA,
             fragmentShader,
             renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             uniforms: [

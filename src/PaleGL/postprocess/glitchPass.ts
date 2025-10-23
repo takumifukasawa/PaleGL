@@ -1,7 +1,7 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_GLITCH,
     UniformBlockNames,
     UniformNames,
     UNIFORM_TYPE_FLOAT,
@@ -63,7 +63,7 @@ export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.Glitch,
+            type: POST_PROCESS_PASS_TYPE_GLITCH,
             fragmentShader,
             uniforms: [
                 {

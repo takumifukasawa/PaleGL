@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2 } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2 } from '@/PaleGL/constants';
 
 import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
@@ -234,7 +234,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         ...createPostProcessPassBase({
             gpu,
             name: 'LightShaftPass',
-            type: PostProcessPassType.LightShaft,
+            type: POST_PROCESS_PASS_TYPE_LIGHT_SHAFT,
             geometry,
             materials,
             enabled,

@@ -1,7 +1,7 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_STREAK,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
@@ -251,7 +251,7 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         ...createPostProcessPassBase({
             gpu,
             name: 'StreakPass',
-            type: PostProcessPassType.Streak,
+            type: POST_PROCESS_PASS_TYPE_STREAK,
             geometry,
             materials,
             enabled,

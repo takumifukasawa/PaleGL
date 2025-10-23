@@ -1,5 +1,5 @@
 ﻿import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_SSAO,
     TEXTURE_TYPE_RGBA32F,
     TEXTURE_WRAP_TYPE_REPEAT,
     UniformBlockNames,
@@ -167,7 +167,7 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
         ...createPostProcessSinglePass({
             gpu,
             enabled,
-            type: PostProcessPassType.SSAO,
+            type: POST_PROCESS_PASS_TYPE_SSAO,
             fragmentShader,
             uniforms: [
                 {

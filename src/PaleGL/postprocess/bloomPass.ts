@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_BLOOM, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -90,7 +90,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
     const { gpu, enabled } = args;
 
     const name = 'BloomPass';
-    const type = PostProcessPassType.Bloom;
+    const type = POST_PROCESS_PASS_TYPE_BLOOM;
 
     const threshold = args.threshold ?? 1.534;
     const tone = args.tone ?? 0.46;

@@ -1,6 +1,6 @@
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
+import { POST_PROCESS_PASS_TYPE_BLOOM, POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD, POST_PROCESS_PASS_TYPE_FOG, POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, POST_PROCESS_PASS_TYPE_GLITCH, POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, POST_PROCESS_PASS_TYPE_SSAO, POST_PROCESS_PASS_TYPE_SSR, POST_PROCESS_PASS_TYPE_STREAK, POST_PROCESS_PASS_TYPE_VIGNETTE, POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT, PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -83,16 +83,16 @@ const createSetPostProcessPassSizeBehaviour = (): Partial<
     Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>
 > => {
     const behaviours: Partial<Record<PostProcessPassType, SetPostProcessPassSizeBehaviour>> = {
-        [PostProcessPassType.Bloom]: setBloomPassSize,
-        [PostProcessPassType.DepthOfField]: setDepthOfFieldPassSize,
-        [PostProcessPassType.LightShaft]: setLightShaftPassSize,
-        [PostProcessPassType.Streak]: setStreakPassSize,
-        [PostProcessPassType.ScreenSpaceShadow]: setScreenSpaceShadowPassSize,
-        [PostProcessPassType.VolumetricLight]: setVolumetricLightPassSize,
+        [POST_PROCESS_PASS_TYPE_BLOOM]: setBloomPassSize,
+        [POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD]: setDepthOfFieldPassSize,
+        [POST_PROCESS_PASS_TYPE_LIGHT_SHAFT]: setLightShaftPassSize,
+        [POST_PROCESS_PASS_TYPE_STREAK]: setStreakPassSize,
+        [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: setScreenSpaceShadowPassSize,
+        [POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT]: setVolumetricLightPassSize,
     };
 
     if (isDevelopment()) {
-        behaviours[PostProcessPassType.BufferVisualizer] = setBufferVisualizerPassSize;
+        behaviours[POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER] = setBufferVisualizerPassSize;
     }
 
     return behaviours;
@@ -131,7 +131,7 @@ const createUpdatePostProcessPassBehaviour = (): Partial<
 
     // 開発時のみBufferVisualizerを追加
     if (isDevelopment()) {
-        behaviours[PostProcessPassType.BufferVisualizer] = updateBufferVisualizerPass;
+        behaviours[POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER] = updateBufferVisualizerPass;
     }
 
     return behaviours;
@@ -203,24 +203,24 @@ const createRenderPostProcessPassBehaviour = (): Partial<
     const behaviours: Partial<
         Record<PostProcessPassType, (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs) => void>
     > = {
-        [PostProcessPassType.Bloom]: renderBloomPass,
-        [PostProcessPassType.ChromaticAberration]: renderChromaticAberrationPass,
-        [PostProcessPassType.Fog]: renderFogPass,
-        [PostProcessPassType.DepthOfField]: renderDepthOfFieldPass,
-        [PostProcessPassType.GaussianBlur]: renderGaussianBlurPass,
-        [PostProcessPassType.Glitch]: renderGlitchPass,
-        [PostProcessPassType.LightShaft]: renderLightShaftPass,
-        [PostProcessPassType.ScreenSpaceShadow]: renderScreenShadowPass,
-        [PostProcessPassType.SSAO]: renderSSAOPass,
-        [PostProcessPassType.SSR]: renderSSRPass,
-        [PostProcessPassType.Streak]: renderStreakPass,
-        [PostProcessPassType.Vignette]: renderVignettePass,
-        [PostProcessPassType.VolumetricLight]: renderVolumetricLightPass,
+        [POST_PROCESS_PASS_TYPE_BLOOM]: renderBloomPass,
+        [POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION]: renderChromaticAberrationPass,
+        [POST_PROCESS_PASS_TYPE_FOG]: renderFogPass,
+        [POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD]: renderDepthOfFieldPass,
+        [POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR]: renderGaussianBlurPass,
+        [POST_PROCESS_PASS_TYPE_GLITCH]: renderGlitchPass,
+        [POST_PROCESS_PASS_TYPE_LIGHT_SHAFT]: renderLightShaftPass,
+        [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: renderScreenShadowPass,
+        [POST_PROCESS_PASS_TYPE_SSAO]: renderSSAOPass,
+        [POST_PROCESS_PASS_TYPE_SSR]: renderSSRPass,
+        [POST_PROCESS_PASS_TYPE_STREAK]: renderStreakPass,
+        [POST_PROCESS_PASS_TYPE_VIGNETTE]: renderVignettePass,
+        [POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT]: renderVolumetricLightPass,
     };
-    
+
     // 開発時のみBufferVisualizerを追加
     if (isDevelopment()) {
-        behaviours[PostProcessPassType.BufferVisualizer] = renderBufferVisualizerPass;
+        behaviours[POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER] = renderBufferVisualizerPass;
     }
 
     return behaviours;
@@ -245,15 +245,15 @@ const createGetPostProcessPassRenderTargetBehaviour = (): Partial<
     Record<PostProcessPassType, GetPostProcessPassRenderTargetBehaviour>
 > => {
     const behaviours: Partial<Record<PostProcessPassType, GetPostProcessPassRenderTargetBehaviour>> = {
-        [PostProcessPassType.Bloom]: getBloomPassRenderTarget,
-        [PostProcessPassType.DepthOfField]: getDepthOfFieldPassRenderTarget,
-        [PostProcessPassType.LightShaft]: getLightShaftPassRenderTarget,
-        [PostProcessPassType.Streak]: getStreakPassRenderTarget,
+        [POST_PROCESS_PASS_TYPE_BLOOM]: getBloomPassRenderTarget,
+        [POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD]: getDepthOfFieldPassRenderTarget,
+        [POST_PROCESS_PASS_TYPE_LIGHT_SHAFT]: getLightShaftPassRenderTarget,
+        [POST_PROCESS_PASS_TYPE_STREAK]: getStreakPassRenderTarget,
     };
 
     // 開発時のみBufferVisualizerを追加
     if (isDevelopment()) {
-        behaviours[PostProcessPassType.BufferVisualizer] = getBufferVisualizerPassRenderTarget;
+        behaviours[POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER] = getBufferVisualizerPassRenderTarget;
     }
 
     return behaviours;
@@ -276,7 +276,7 @@ type GetPostProcessPassRenderTargetTextureBehaviour = (postProcessPass: PostProc
 const getPostProcessPassRenderTargetTextureBehaviour: Partial<
     Record<PostProcessPassType, GetPostProcessPassRenderTargetTextureBehaviour>
 > = {
-    [PostProcessPassType.ScreenSpaceShadow]: getScreenSpaceShadowRenderTargetTexture,
+    [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: getScreenSpaceShadowRenderTargetTexture,
 };
 
 export function getPostProcessPassRenderTargetTexture(postProcessPass: PostProcessPassBase): Texture | null {

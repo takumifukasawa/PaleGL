@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, UniformNames, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
+import { POST_PROCESS_PASS_TYPE_VIGNETTE, UniformNames, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
@@ -76,7 +76,7 @@ export function createVignettePass(args: VignettePassArgs): VignettePass {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.Vignette,
+            type: POST_PROCESS_PASS_TYPE_VIGNETTE,
             fragmentShader,
             uniforms: [
                 {

@@ -1,7 +1,7 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_SSR,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
@@ -234,7 +234,7 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.SSR,
+            type: POST_PROCESS_PASS_TYPE_SSR,
             fragmentShader,
             uniforms: baseUniforms,
             renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,

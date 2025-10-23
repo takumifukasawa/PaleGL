@@ -1,7 +1,7 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD,
     RENDER_TARGET_TYPE_R16F,
     RENDER_TARGET_TYPE_RGBA16F,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -274,7 +274,7 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         ...createPostProcessPassBase({
             gpu,
             name: 'DepthOfFieldPass',
-            type: PostProcessPassType.DepthOfField,
+            type: POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD,
             geometry,
             materials,
             enabled,

@@ -7,7 +7,7 @@ import {
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_DOUBLE,
     MAX_SPOT_LIGHT_COUNT,
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT,
     PRIMITIVE_TYPE_TRIANGLES,
     RENDER_TARGET_TYPE_DEPTH,
     RENDER_TARGET_TYPE_RGBA16F,
@@ -167,7 +167,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.VolumetricLight,
+            type: POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT,
             fragmentShader,
             uniforms: [
                 {

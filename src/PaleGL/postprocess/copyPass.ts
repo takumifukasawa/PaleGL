@@ -1,5 +1,5 @@
 ﻿import copyPassFragmentShader from '@/PaleGL/shaders/copy-pass-fragment.glsl';
-import { PostProcessPassType } from '@/PaleGL/constants.ts';
+import { POST_PROCESS_PASS_TYPE_COPY } from '@/PaleGL/constants.ts';
 import {
     createPostProcessSinglePass,
     PostProcessSinglePass,
@@ -17,7 +17,7 @@ export function createCopyPass(args: CopyPassArgs): CopyPass {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.Copy,
+            type: POST_PROCESS_PASS_TYPE_COPY,
             fragmentShader,
             enabled,
         }),

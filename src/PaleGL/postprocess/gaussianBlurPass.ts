@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -108,7 +108,7 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         ...createPostProcessPassBase({
             gpu,
             name: 'GaussianBlurPass',
-            type: PostProcessPassType.GaussianBlur,
+            type: POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR,
             geometry,
             materials,
             enabled,

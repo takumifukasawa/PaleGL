@@ -40,6 +40,16 @@
   - 型推論エラー: なし
   - 所要時間: 約15分
 
+**第7回（1個・20定数）**: PostProcessPassType (Bloom, DepthOfField, BufferVisualizer, ChromaticAberration, Glitch, GaussianBlur, Copy, FXAA, LightShaft, DeferredShading, ScreenSpaceShadow, SSAO, SSR, Streak, ToneMapping, Vignette, VolumetricLight, Fragment, Fog, FragmentPass)
+  - 修正ファイル数: 24ファイル（postprocess: 21ファイル、utilities: 1ファイル、pages/scripts: 1ファイル、Marionetter: コメントのみ）
+  - 使用箇所: 約57箇所（実コード51箇所、コメント6箇所）
+  - 主要パターン:
+    - 型アノテーション: 18箇所（各パスファイルの`type:`プロパティ）
+    - オブジェクトキー: 27箇所（postProcessPassBehaviours.tsの動的ビヘイビア定義）
+    - 条件判定: 2箇所（initDebugger.ts）
+  - 型推論エラー: なし
+  - 所要時間: 約30分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -182,12 +192,10 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 ### 完了済み
 1. ~~`AnimationKeyframeTypes`~~ (完了: 2定数)
 2. ~~`AttributeUsageType`~~ (完了: 3定数)
+3. ~~`PostProcessPassType`~~ (完了: 20定数)
 
 ### 優先度: 高（中規模・高頻度）
-3. **`PostProcessPassType`** - 20定数、24ファイル、54箇所
-   - 推定時間: 30-45分
-   - 難易度: ★★☆
-   - 理由: ポストプロセス関連で使用頻度が高い
+3. ~~**`PostProcessPassType`**~~ (完了: 20定数、24ファイル、57箇所、30分)
 
 4. **`AttributeNames`** - 18定数、16ファイル、93箇所
    - 推定時間: 30-40分

@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, UniformBlockNames, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants';
+import { POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, UniformBlockNames, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
@@ -70,7 +70,7 @@ export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.ScreenSpaceShadow,
+            type: POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW,
             fragmentShader,
             uniforms: [
                 {

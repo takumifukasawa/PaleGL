@@ -3,7 +3,7 @@
     createPostProcessSinglePass,
     PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { PostProcessPassType, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
+import { POST_PROCESS_PASS_TYPE_FRAGMENT, RenderTargetType, UniformBlockName } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 type FragmentPassParameters = {
@@ -36,7 +36,7 @@ export function createFragmentPass(args: FragmentPassParametersArgs): FragmentPa
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.Fragment,
+            type: POST_PROCESS_PASS_TYPE_FRAGMENT,
             fragmentShader,
             uniforms,
             uniformBlockNames,

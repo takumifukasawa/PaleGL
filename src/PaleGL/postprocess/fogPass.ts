@@ -1,7 +1,7 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_FOG,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
@@ -111,7 +111,7 @@ export function createFogPass(args: FogPassArgs) {
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.Fog,
+            type: POST_PROCESS_PASS_TYPE_FOG,
             fragmentShader,
             renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F,

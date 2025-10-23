@@ -6,7 +6,7 @@
 
 import {
     MAX_SPOT_LIGHT_COUNT,
-    PostProcessPassType,
+    POST_PROCESS_PASS_TYPE_DEFERRED_SHADING,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
@@ -92,7 +92,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
     return {
         ...createPostProcessSinglePass({
             gpu,
-            type: PostProcessPassType.DeferredShading,
+            type: POST_PROCESS_PASS_TYPE_DEFERRED_SHADING,
             name: 'DeferredShadingPass',
             fragmentShader: deferredShadingFragmentShader,
             uniforms,

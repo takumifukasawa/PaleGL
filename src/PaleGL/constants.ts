@@ -242,30 +242,28 @@ export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames]
 // post process
 // -----------------------------------------------------------------------------
 
-export const PostProcessPassType = {
-    Bloom: 0,
-    DepthOfField: 1,
-    BufferVisualizer: 2,
-    ChromaticAberration: 3,
-    Glitch: 4,
-    GaussianBlur: 5,
-    Copy: 6,
-    FXAA: 7,
-    LightShaft: 8,
-    DeferredShading: 9,
-    ScreenSpaceShadow: 10,
-    SSAO: 11,
-    SSR: 12,
-    Streak: 13,
-    ToneMapping: 14,
-    Vignette: 15,
-    VolumetricLight: 16,
-    Fragment: 17,
-    Fog: 18,
-    FragmentPass: 19,
-} as const;
+export const POST_PROCESS_PASS_TYPE_BLOOM = 0;
+export const POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD = 1;
+export const POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER = 2;
+export const POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION = 3;
+export const POST_PROCESS_PASS_TYPE_GLITCH = 4;
+export const POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR = 5;
+export const POST_PROCESS_PASS_TYPE_COPY = 6;
+export const POST_PROCESS_PASS_TYPE_FXAA = 7;
+export const POST_PROCESS_PASS_TYPE_LIGHT_SHAFT = 8;
+export const POST_PROCESS_PASS_TYPE_DEFERRED_SHADING = 9;
+export const POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW = 10;
+export const POST_PROCESS_PASS_TYPE_SSAO = 11;
+export const POST_PROCESS_PASS_TYPE_SSR = 12;
+export const POST_PROCESS_PASS_TYPE_STREAK = 13;
+export const POST_PROCESS_PASS_TYPE_TONE_MAPPING = 14;
+export const POST_PROCESS_PASS_TYPE_VIGNETTE = 15;
+export const POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT = 16;
+export const POST_PROCESS_PASS_TYPE_FRAGMENT = 17;
+export const POST_PROCESS_PASS_TYPE_FOG = 18;
+export const POST_PROCESS_PASS_TYPE_FRAGMENT_PASS = 19;
 
-export type PostProcessPassType = (typeof PostProcessPassType)[keyof typeof PostProcessPassType];
+export type PostProcessPassType = typeof POST_PROCESS_PASS_TYPE_BLOOM | typeof POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD | typeof POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER | typeof POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION | typeof POST_PROCESS_PASS_TYPE_GLITCH | typeof POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR | typeof POST_PROCESS_PASS_TYPE_COPY | typeof POST_PROCESS_PASS_TYPE_FXAA | typeof POST_PROCESS_PASS_TYPE_LIGHT_SHAFT | typeof POST_PROCESS_PASS_TYPE_DEFERRED_SHADING | typeof POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW | typeof POST_PROCESS_PASS_TYPE_SSAO | typeof POST_PROCESS_PASS_TYPE_SSR | typeof POST_PROCESS_PASS_TYPE_STREAK | typeof POST_PROCESS_PASS_TYPE_TONE_MAPPING | typeof POST_PROCESS_PASS_TYPE_VIGNETTE | typeof POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT | typeof POST_PROCESS_PASS_TYPE_FRAGMENT | typeof POST_PROCESS_PASS_TYPE_FOG | typeof POST_PROCESS_PASS_TYPE_FRAGMENT_PASS;
 
 // -----------------------------------------------------------------------------
 // uniforms
