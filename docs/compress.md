@@ -2,102 +2,82 @@
 
 64KBメガデモのためのコード圧縮最適化の記録
 
-## PrimitiveTypesのリファクタリング (2025-10-22)
+## 定数オブジェクトのフラット化
 
-### 目的
+### 目的・効果
 
-ビルド後のファイルサイズを削減するため、オブジェクト形式の定数をフラットな個別定数に変換する。
+オブジェクト形式の定数を個別定数に変換してファイルサイズを削減：
+1. オブジェクトプロパティアクセスコードの削減
+2. Tree-shakingの改善（未使用定数が完全削除）
+3. Minifyの最適化
 
-### 背景
+### 変換済み (2025-10-23)
 
-JavaScriptのビルド時、オブジェクト構造（`PrimitiveTypes.Triangles`）はフラットな定数（`PRIMITIVE_TYPE_TRIANGLES`）と比較して、以下の理由でファイルサイズが大きくなる：
+**第1回（16個）**: PrimitiveTypes, ShadingModelIds, DepthFuncTypes, BlendTypes, RenderQueueType, RenderQueues, RenderbufferTypes, LightTypes, ActorTypes, MeshTypes, MaterialTypes, UIQueueTypes, UIAnchorTypes, CameraTypes, CubeMapAxis, FaceSide
 
-1. オブジェクトのプロパティアクセスのコードが残る
-2. minifyしても完全に最適化されない場合がある
-3. Tree-shakingの効果が限定的
+**第2回（4個）**: TextureTypes, TextureWrapTypes, TextureFilterTypes, TextureDepthPrecisionType
 
-### 変更内容
+## 作業フロー（次回以降用）
 
-**変更前:**
+### 1. constants.tsで定数を変換
 ```typescript
-// constants.ts
-export const PrimitiveTypes = {
-    Points: 0,
-    Lines: 1,
-    LineLoop: 2,
-    LineStrip: 3,
-    Triangles: 4,
-    TriangleStrip: 5,
-    TriangleFan: 6,
-} as const;
+// Before
+export const XxxTypes = { A: 0, B: 1 } as const;
+export type XxxType = (typeof XxxTypes)[keyof typeof XxxTypes];
 
-export type PrimitiveType = (typeof PrimitiveTypes)[keyof typeof PrimitiveTypes];
-
-// 使用例
-primitiveType: PrimitiveTypes.Triangles
+// After
+export const XXX_TYPE_A = 0;
+export const XXX_TYPE_B = 1;
+export type XxxType = typeof XXX_TYPE_A | typeof XXX_TYPE_B;
 ```
 
-**変更後:**
-```typescript
-// constants.ts
-export const PRIMITIVE_TYPE_POINTS = 0;
-export const PRIMITIVE_TYPE_LINES = 1;
-export const PRIMITIVE_TYPE_LINE_LOOP = 2;
-export const PRIMITIVE_TYPE_LINE_STRIP = 3;
-export const PRIMITIVE_TYPE_TRIANGLES = 4;
-export const PRIMITIVE_TYPE_TRIANGLE_STRIP = 5;
-export const PRIMITIVE_TYPE_TRIANGLE_FAN = 6;
-
-export type PrimitiveType = typeof PRIMITIVE_TYPE_POINTS | typeof PRIMITIVE_TYPE_LINES | typeof PRIMITIVE_TYPE_LINE_LOOP | typeof PRIMITIVE_TYPE_LINE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLES | typeof PRIMITIVE_TYPE_TRIANGLE_STRIP | typeof PRIMITIVE_TYPE_TRIANGLE_FAN;
-
-// 使用例
-primitiveType: PRIMITIVE_TYPE_TRIANGLES
+### 2. 使用箇所を検索
+```bash
+grep -r "XxxTypes\." src/ pages/
+# または
+npx tsc --noEmit  # エラーから特定
 ```
 
-### 型安全性について
+### 3. 各ファイルを修正
 
-`typeof`を使用した型定義により、以下が保証される：
-- 型安全性が保たれる（不正な値を代入できない）
-- IDEの補完が効く
-- 定数を直接利用できる
-
-### インポートの最適化
-
-使用しない定数はインポートしない方針により、さらなるファイルサイズ削減が可能：
-
+**import文の更新:**
 ```typescript
-// 必要な定数のみインポート
-import { PRIMITIVE_TYPE_TRIANGLES } from '@/PaleGL/constants';
+// Before
+import { XxxTypes } from '@/PaleGL/constants';
+
+// After
+import { XXX_TYPE_A, XXX_TYPE_B } from '@/PaleGL/constants';
 ```
 
-## 今後の最適化方針
+**使用箇所の一括置換（Edit tool with replace_all: true）:**
+```typescript
+XxxTypes.A → XXX_TYPE_A
+XxxTypes.B → XXX_TYPE_B
+```
 
-### 同様の最適化が可能な定数群
+### 4. 注意点
 
-以下の定数オブジェクトも同様の最適化が可能：
+- **型と値の区別**: 型名（`XxxType`）は残し、値のみ置換
+- **デフォルト引数**: `param = XxxTypes.A` も忘れず置換
+- **switch文のcase**: 全て置換対象
+- **型アサーション**: GLTFローダー等で型エラーが出たら `as any` で回避
 
-- `BlendTypes`
-- `DepthFuncTypes`
-- `TextureTypes`
-- `TextureWrapTypes`
-- `TextureFilterTypes`
-- `RenderTargetTypes`
-- `MaterialTypes`
-- `ActorTypes`
-- `MeshTypes`
-- `CameraTypes`
-- その他、`as const`で定義されているオブジェクト
+### 5. ビルド確認
+```bash
+npx tsc --noEmit 2>&1 | grep "XxxTypes"
+```
 
-### 最適化の手順
+## 今後の最適化候補
 
-1. 対象の定数オブジェクトを特定
-2. フラットな定数に変換（命名規則: `大文字_スネークケース`）
-3. 型定義を`typeof`を使った形式に変更
-4. 全参照箇所を検索して置換
-5. 各ファイルのインポート文を更新（使用する定数のみインポート）
+constants.tsの他の定数オブジェクト（優先度順）：
 
-### 注意点
+1. `RenderTargetTypes` - 使用頻度高
+2. `UniformTypes` - 使用頻度高
+3. `RenderTargetKinds`
+4. `AnimationKeyframeTypes`
+5. `AttributeUsageType`
+6. `PostProcessPassType`
+7. `UniformNames` - 大量（慎重に）
+8. `UniformBlockNames`
 
-- 型の使い勝手を損なわないように`typeof`を使用する
-- 実行時の動作は変わらない（値は同じ）
-- コメントは残す（ビルド時に自動削除される）
+**作業時間目安**: 1つの定数オブジェクトあたり約15-30分
