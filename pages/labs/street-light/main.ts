@@ -83,7 +83,7 @@ import {
     UNIFORM_BLOCK_NAME_CAMERA,
     ACTOR_TYPE_MESH,
     RAD_TO_DEG,
-    FragmentShaderModifierPragmas,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
 } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial';
@@ -981,7 +981,7 @@ const main = async () => {
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
     streetFloorMaterial.fragmentShaderModifiers = [
         {
-            pragma: FragmentShaderModifierPragmas.BEFORE_OUT,
+            pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
             value: `
 float d = 1. - smoothstep(4., 7., length(uv));
 baseColor *= d;

@@ -7,9 +7,31 @@
 
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import {
-    VertexShaderModifierPragmas,
-    FragmentShaderModifierPragmas,
-    ShaderPragmas,
+    VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_OUT_CLIP_POSITION_PRE_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+    VERTEX_SHADER_MODIFIER_PRAGMA_END_MAIN,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_END_MAIN,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    SHADER_PRAGMA_DEFINES,
+    SHADER_PRAGMA_ATTRIBUTES,
     VertexShaderModifiers,
     FragmentShaderModifiers,
 } from '@/PaleGL/constants.ts';
@@ -282,7 +304,7 @@ const commonReplacementShader = (src: string, defineOptions: ShaderDefines) => {
     replacedShader = replaceShaderIncludes(replacedShader);
 
     // replace defines
-    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.DEFINES}`, 'g'), () => {
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${SHADER_PRAGMA_DEFINES}`, 'g'), () => {
         const defines = buildShaderDefines(defineOptions);
         return defines.join('\n');
     });
@@ -318,14 +340,27 @@ export const buildVertexShader = (
     let replacedShader: string = shader;
 
     // replace attributes
-    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${ShaderPragmas.ATTRIBUTES}`, 'g'), () => {
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${SHADER_PRAGMA_ATTRIBUTES}`, 'g'), () => {
         const attributes = buildVertexAttributeLayouts(attributeDescriptors);
         return attributes.join('\n');
     });
 
     // replace shader block
-    Object.values(VertexShaderModifierPragmas).forEach((value) => {
-        const pragma = value as VertexShaderModifierPragmas;
+    [
+        VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_OUT_CLIP_POSITION_PRE_PROCESS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+        VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+        VERTEX_SHADER_MODIFIER_PRAGMA_END_MAIN,
+        VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
+        VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+        VERTEX_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    ].forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             const modifierIndex = vertexShaderModifiers.findIndex((elem) => elem.pragma === pragma);
             if (modifierIndex < 0) {
@@ -360,8 +395,18 @@ export const buildFragmentShader = (
     let replacedShader: string = shader;
 
     // replace shader block
-    Object.values(FragmentShaderModifierPragmas).forEach((value) => {
-        const pragma = value as FragmentShaderModifierPragmas;
+    [
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_END_MAIN,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    ].forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             const modifierIndex = fragmentShaderModifiers.findIndex((elem) => elem.pragma === pragma);
             if (modifierIndex < 0) {

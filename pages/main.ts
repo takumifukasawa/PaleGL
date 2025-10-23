@@ -365,7 +365,7 @@ const main = async () => {
                 ],
                 //                 fragmentShaderModifiers: [
                 //                     {
-                //                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
+                //                         pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
                 //                         value: `
                 // vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
                 // vec2 screenUv = gl_FragCoord.xy / uViewport.xy;

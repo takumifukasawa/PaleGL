@@ -1,7 +1,7 @@
 import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/material.ts';
 import {
     DEPTH_FUNC_TYPE_LEQUAL,
-    FragmentShaderModifierPragmas,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     SHADING_MODEL_ID_UNLIT,
     ShadingModelIds,
@@ -133,14 +133,14 @@ export function createObjectSpaceRaymarchGlassMaterial(
 
         fragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: fragmentShaderContent,
             },
             ...(args.fragmentShaderModifiers ?? []),
         ],
         depthFragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
             },
             ...(args.depthFragmentShaderModifiers ?? []),

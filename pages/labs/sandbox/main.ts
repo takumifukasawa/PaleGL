@@ -110,6 +110,10 @@ import {
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
     UNIFORM_TYPE_VECTOR3,
+    VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+    VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
     VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
@@ -1233,13 +1237,13 @@ const createTransformFeedbackDrivenMesh = () => {
         isInstancing: true,
         useVertexColor: true,
         vertexShaderModifier: {
-            [VertexShaderModifierPragmas.INSTANCE_TRANSFORM_PRE_PROCESS]: `
+            [VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS]: `
                 instanceRotation = getLookAtMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
             `,
-            // [VertexShaderModifierPragmas.APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
-            // [VertexShaderModifierPragmas.APPEND_UNIFORMS]: `uniform float uTest;`,
-            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
-            // [VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
+            // [VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES]: 'layout(location = 3) in vec3 aVelocity;',
+            // [VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS]: `uniform float uTest;`,
+            // [VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aAccPosition;`,
+            // [VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS]: `localPosition.xyz += aVelocity;`,
         },
     });
     const mesh = new Mesh({
@@ -1990,27 +1994,27 @@ const main = async () => {
         vertexShaderModifiers: [
             ...(isMinifyShader()
                 ? []
-                : [
+                : ([
                       {
-                          pragma: VertexShaderModifierPragmas.BEGIN_MAIN,
+                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
                           value: `
 cycleSpeed = .33;
                 `,
                       },
                       {
-                          pragma: VertexShaderModifierPragmas.LOCAL_POSITION_POST_PROCESS,
+                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
                           value: `
 localPosition.x += mix(0., 4., r) * mix(.4, .8, cycleOffset);
 localPosition.z += mix(0., 4., r) * mix(-.4, -.8, cycleOffset);
                 `,
                       },
                       {
-                          pragma: VertexShaderModifierPragmas.VERTEX_COLOR_POST_PROCESS,
+                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
                           value: `
 vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
                 `,
                       },
-                  ]),
+                  ] as { pragma: VertexShaderModifierPragmas; value: string }[])),
         ],
     });
 

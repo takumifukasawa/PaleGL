@@ -77,6 +77,51 @@
   - 型推論エラー: なし
   - 所要時間: 約20分
 
+**第10回（1個・7定数）**: UniformBlockNames (Common, Transformations, Camera, DirectionalLight, SpotLight, PointLight, Timeline)
+  - 修正ファイル数: 30ファイル（src: 27ファイル、pages: 2ファイル、root/src: 1ファイル）
+  - 使用箇所: 約86箇所
+  - 主要修正箇所:
+    - postprocess: 10ファイル（volumetricLightPass, glitchPass, ssrPass, ssaoPass, depthOfFieldPass, screenSpaceShadowPass, deferredShadingPass, fogPass 他）
+    - materials: 7ファイル（unlitMaterial, screenSpaceRaymarchMaterial, objectSpaceRaymarch系, gBufferMaterial）
+    - core: 3ファイル（graphicsDoubleBuffer, effectTexture, renderer）
+    - actors/meshes: 7ファイル（unlitShapeTextMesh, uiShapeTextMesh, charMesh, arrowHelper, billboardParticle, screenSpaceRaymarchMesh, skybox）
+    - pages: 2ファイル（street-light/main, sandbox/main）
+    - root/src/pages/scripts: 1ファイル（testBackground）
+  - 型推論エラー: なし
+  - 所要時間: 約35-40分
+
+**第11回（1個・13定数）**: VertexShaderModifierPragmas (LOCAL_POSITION_POST_PROCESS, VERTEX_COLOR_POST_PROCESS, INSTANCE_TRANSFORM_PRE_PROCESS, WORLD_POSITION_POST_PROCESS, VIEW_POSITION_POST_PROCESS, OUT_CLIP_POSITION_PRE_PROCESS + ShaderModifierPragmas 7定数)
+  - 修正ファイル数: 2ファイル（sandbox/main.ts, buildShader.ts）
+  - 使用箇所: 8箇所（実質3箇所、コメントアウト5箇所含む）
+  - 主要修正箇所:
+    - pages/labs/sandbox/main.ts: import更新、オブジェクトキー1箇所、配列3箇所
+    - core/buildShader.ts: import更新、Object.values()を配列リテラルに置換
+  - 特記事項: Object.values()を13個の定数を列挙した配列リテラルに置換
+  - 型推論エラー: なし
+  - 所要時間: 約10分
+
+**第12回（1個・10定数）**: FragmentShaderModifierPragmas (BLOCK_BEFORE_RAYMARCH_CONTENT, BEFORE_OUT, AFTER_OUT + ShaderModifierPragmas 7定数)
+  - 修正ファイル数: 12ファイル（src: 8ファイル、pages: 3ファイル、buildShader: 1ファイル）
+  - 使用箇所: 18箇所（実質16箇所、コメントアウト2箇所含む）
+  - 主要修正箇所:
+    - src/pages/scripts: 3ファイル（testBackground 2箇所、sceneBuilder 1箇所、createHuman 1箇所）
+    - materials: 4ファイル（objectSpaceRaymarch系 各2箇所）
+    - actors/meshes: 1ファイル（screenSpaceRaymarchMesh 2箇所）
+    - pages: 3ファイル（main 1箇所コメント、street-light/main 1箇所、morph-glass/main 2箇所）
+    - core/buildShader.ts: Object.values()を配列リテラルに置換
+  - 特記事項: Object.values()を10個の定数を列挙した配列リテラルに置換
+  - 型推論エラー: なし
+  - 所要時間: 約30分
+
+**第13回（1個・9定数）**: ShaderPragmas (DEFINES, ATTRIBUTES + ShaderModifierPragmas 7定数)
+  - 修正ファイル数: 1ファイル（buildShader.ts）
+  - 使用箇所: 2箇所
+  - 主要修正箇所:
+    - core/buildShader.ts: DEFINES、ATTRIBUTES の2箇所を置換
+  - 特記事項: ShaderPartialPragmasは現在空（将来の拡張用）のためnever型に設定
+  - 型推論エラー: なし
+  - 所要時間: 約5分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -224,28 +269,19 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 5. ~~`GLTextureFilter`~~ (完了: 6定数)
 6. ~~`GLTextureWrap`~~ (完了: 3定数)
 7. ~~`GLColorAttachment`~~ (完了: 8定数)
+8. ~~`UniformBlockNames`~~ (完了: 7定数)
+9. ~~`VertexShaderModifierPragmas`~~ (完了: 13定数)
+10. ~~`FragmentShaderModifierPragmas`~~ (完了: 10定数)
+11. ~~`ShaderPragmas`~~ (完了: 9定数)
 
-### 優先度: 高（中規模・高頻度）
+### 優先度: 高（大規模・要注意）
 
-8. **`UniformBlockNames`** - 7定数、29ファイル、86箇所
-   - 推定時間: 30-40分
-   - 難易度: ★★☆
-   - 理由: Uniform Block関連、中規模で影響範囲が明確
-
-### 優先度: 中（大規模・要注意）
-9. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
+12. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
    - 推定時間: 2-3時間
    - 難易度: ★★★
    - 理由: 最大規模、慎重な作業が必要
 
-### 優先度: 保留（シェーダー関連・影響不明）
-10. **`VertexShaderModifierPragmas`** - 13定数、8箇所
-    - スプレッド構文使用、要調査
-11. **`FragmentShaderModifierPragmas`** - 10定数、14箇所
-    - スプレッド構文使用、要調査
-12. **`ShaderPragmas`** - スプレッド構文使用、要調査
-
-**推奨作業順序**: 8（UniformBlockNames） → 9（最後に大規模なUniformNames）
+**推奨作業順序**: 12（UniformNames）が最後の大きな作業
 
 **作業時間目安**:
 - 小規模（～10定数）: 約10-20分

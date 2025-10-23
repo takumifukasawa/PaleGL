@@ -1,6 +1,6 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
-    FragmentShaderModifierPragmas,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
     UNIFORM_BLOCK_NAME_TIMELINE,
@@ -90,13 +90,13 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         uniformBlockNames: [UNIFORM_BLOCK_NAME_TIMELINE],
         fragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: args.fragmentShaderContent,
             }
         ],
         depthFragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: args.depthFragmentShaderContent,
             }
         ],

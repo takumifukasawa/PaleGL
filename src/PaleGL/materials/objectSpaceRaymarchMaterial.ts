@@ -2,7 +2,7 @@ import { MaterialArgs, createMaterial, Material } from '@/PaleGL/materials/mater
 import {
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_DOUBLE,
-    FragmentShaderModifierPragmas,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
     RENDER_QUEUE_TYPE_OPAQUE,
@@ -212,14 +212,14 @@ export function createObjectSpaceRaymarchMaterial({
 
         fragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: fragmentShaderContent,
             },
             ...(materialArgs.fragmentShaderModifiers ?? []),
         ],
         depthFragmentShaderModifiers: [
             {
-                pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                 value: depthFragmentShaderContent,
             },
             ...(materialArgs.depthFragmentShaderModifiers ?? []),

@@ -12,7 +12,7 @@ import {
     BLEND_TYPE_TRANSPARENT,
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_FRONT,
-    FragmentShaderModifierPragmas,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RENDER_TARGET_TYPE_DEPTH,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
@@ -522,7 +522,7 @@ const main = async () => {
                     ],
                     //                 fragmentShaderModifiers: [
                     //                     {
-                    //                         pragma: FragmentShaderModifierPragmas.AFTER_OUT,
+                    //                         pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
                     //                         value: `
                     // vec3 eyeToSurface = normalize(vWorldPosition - uViewPosition);
                     // vec2 screenUv = gl_FragCoord.xy / uViewport.xy;
@@ -552,7 +552,7 @@ const main = async () => {
         replaceAllMeshMaterialsByArgs(objectSpaceRaymarchMesh, gpu, {
             fragmentShaderModifiers: [
                 {
-                    pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,
+                    pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
                     value: content,
                 },
             ],
