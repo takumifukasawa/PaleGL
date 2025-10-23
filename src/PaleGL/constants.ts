@@ -197,12 +197,10 @@ export type RenderTargetType = typeof RENDER_TARGET_TYPE_RGBA | typeof RENDER_TA
 // animation keyframes
 // -----------------------------------------------------------------------------
 
-export const AnimationKeyframeTypes = {
-    Vector3: 0,
-    Quaternion: 1,
-} as const;
+export const ANIMATION_KEYFRAME_TYPE_VECTOR3 = 0;
+export const ANIMATION_KEYFRAME_TYPE_QUATERNION = 1;
 
-export type AnimationKeyframeType = (typeof AnimationKeyframeTypes)[keyof typeof AnimationKeyframeTypes];
+export type AnimationKeyframeType = typeof ANIMATION_KEYFRAME_TYPE_VECTOR3 | typeof ANIMATION_KEYFRAME_TYPE_QUATERNION;
 
 // -----------------------------------------------------------------------------
 // geometry attributes

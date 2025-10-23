@@ -28,6 +28,12 @@
   - 修正ファイル数: 約60ファイル
   - 所要時間: 約2時間
 
+**第5回（1個・2定数）**: AnimationKeyframeTypes (Vector3, Quaternion)
+  - 修正ファイル数: 2ファイル（loadGLTF.ts, animationKeyframes.ts）
+  - 使用箇所: 実質9箇所（コメントアウト除く）
+  - 型推論エラー: なし
+  - 所要時間: 約10分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換

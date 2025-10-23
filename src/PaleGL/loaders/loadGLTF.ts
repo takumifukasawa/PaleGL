@@ -3,7 +3,7 @@ import { Bone, createBone } from '@/PaleGL/core/bone.ts';
 import { createBinormals, createGeometry, createTangentsAndBinormals } from '@/PaleGL/geometries/geometry.ts';
 import { createVector3, createVector3One, createVector3Zero } from '@/PaleGL/math/vector3.ts';
 import { createAnimationClip } from '@/PaleGL/core/animationClip.ts';
-import { AnimationKeyframeType, AnimationKeyframeTypes, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
+import { AnimationKeyframeType, ANIMATION_KEYFRAME_TYPE_VECTOR3, ANIMATION_KEYFRAME_TYPE_QUATERNION, GLTextureFilter, GLTextureWrap } from '@/PaleGL/constants';
 import { createAnimationKeyframes } from '@/PaleGL/core/animationKeyframes.ts';
 import { createMatrix4FromQuaternion, createQuaternion, createQuaternionIdentity } from '@/PaleGL/math/quaternion.ts';
 // import { Rotator } from '@/PaleGL/math/Rotator';
@@ -676,14 +676,14 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
                         console.error('invalid key type');
                 }
 
-                let animationKeyframeType: AnimationKeyframeType = AnimationKeyframeTypes.Vector3;
+                let animationKeyframeType: AnimationKeyframeType = ANIMATION_KEYFRAME_TYPE_VECTOR3;
                 switch (channel.target.path) {
                     case GLTFAnimationChannelTargetPath.rotation:
-                        animationKeyframeType = AnimationKeyframeTypes.Quaternion;
+                        animationKeyframeType = ANIMATION_KEYFRAME_TYPE_QUATERNION;
                         break;
                     case GLTFAnimationChannelTargetPath.translation:
                     case GLTFAnimationChannelTargetPath.scale:
-                        animationKeyframeType = AnimationKeyframeTypes.Vector3;
+                        animationKeyframeType = ANIMATION_KEYFRAME_TYPE_VECTOR3;
                         break;
                     default:
                         console.error('invalid channel target path');

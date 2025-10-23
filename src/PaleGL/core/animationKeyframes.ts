@@ -1,4 +1,4 @@
-﻿import { AnimationKeyframeType, AnimationKeyframeTypes } from '@/PaleGL/constants';
+﻿import { AnimationKeyframeType, ANIMATION_KEYFRAME_TYPE_VECTOR3, ANIMATION_KEYFRAME_TYPE_QUATERNION } from '@/PaleGL/constants';
 import { createVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
 import { createQuaternion, Quaternion } from '@/PaleGL/math/quaternion.ts';
 import {
@@ -148,10 +148,10 @@ export function createAnimationKeyframes({
     let elementSize: number = -1;
 
     switch (type) {
-        case AnimationKeyframeTypes.Vector3:
+        case ANIMATION_KEYFRAME_TYPE_VECTOR3:
             elementSize = 3;
             break;
-        case AnimationKeyframeTypes.Quaternion:
+        case ANIMATION_KEYFRAME_TYPE_QUATERNION:
             elementSize = 4;
             break;
         default:
@@ -197,10 +197,10 @@ export function getAnimationKeyframeValue(
     // console.log("data", frame, _interpolation, arr)
 
     switch (animationKeyframes.type) {
-        case AnimationKeyframeTypes.Vector3:
+        case ANIMATION_KEYFRAME_TYPE_VECTOR3:
             // return new Vector3(...arr);
             return createVector3(arr[0], arr[1], arr[2]);
-        case AnimationKeyframeTypes.Quaternion:
+        case ANIMATION_KEYFRAME_TYPE_QUATERNION:
             // return new Quaternion(...arr);
             return createQuaternion(arr[0], arr[1], arr[2], arr[3]);
         default:
