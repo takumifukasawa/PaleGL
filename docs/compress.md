@@ -81,3 +81,88 @@ constants.tsの他の定数オブジェクト（優先度順）：
 6. `UniformBlockNames`
 
 **作業時間目安**: 1つの定数オブジェクトあたり約15-30分
+
+---
+
+## [作業予定] 第4回：UniformTypes（19個）
+
+### 対象定数（constants.ts:278-298）
+Matrix4, Matrix4Array, Texture, CubeMap, Vector2, Vector2Array, Vector3, Vector3Array, Vector4, Vector4Array, Struct, StructArray, Float, FloatArray, Int, Color, ColorArray, TextureArray, Bool
+
+### 変換パターン
+```typescript
+// Before
+export const UniformTypes = {
+    Matrix4: 0,
+    // ... 19個
+} as const;
+
+// After
+export const UNIFORM_TYPE_MATRIX4 = 0;
+export const UNIFORM_TYPE_MATRIX4_ARRAY = 1;
+// ... 19個の個別定数
+export type UniformTypes = typeof UNIFORM_TYPE_MATRIX4 | typeof UNIFORM_TYPE_MATRIX4_ARRAY | ...;
+```
+
+### 使用箇所（約70ファイル、1000+箇所）
+**コアシステム:**
+- `core/gpu.ts` (~40箇所) - uniform設定処理
+- `core/renderer.ts` (~100箇所) - レンダラーのuniform定義
+- `core/uniformBufferObject.ts` (~20箇所)
+- `core/uniforms.ts` (~10箇所)
+
+**マテリアル系 (~10ファイル):**
+- `materials/material.ts`, `gBufferMaterial.ts`, `unlitMaterial.ts`, `objectSpaceRaymarchMaterial.ts` など
+
+**ポストプロセス系 (~15ファイル):**
+- `postprocess/*.ts` - 各種パス（bloom, dof, ssr, fog, lightShaft, streak等）
+
+**アクター系:**
+- `actors/meshes/*.ts` - skinnedMesh, skybox, charMesh等
+- `actors/particles/*.ts` - gpuParticle, gpuTrailParticle等
+
+**その他:**
+- `pages/*.ts`, `src/pages/scripts/*.ts`
+- `demos/`配下のビルド済みファイル（再ビルドで対応）
+
+### 置換パターン（19個すべて）
+- `UniformTypes.Matrix4` → `UNIFORM_TYPE_MATRIX4`
+- `UniformTypes.Matrix4Array` → `UNIFORM_TYPE_MATRIX4_ARRAY`
+- `UniformTypes.Texture` → `UNIFORM_TYPE_TEXTURE`
+- `UniformTypes.CubeMap` → `UNIFORM_TYPE_CUBE_MAP`
+- `UniformTypes.Vector2` → `UNIFORM_TYPE_VECTOR2`
+- `UniformTypes.Vector2Array` → `UNIFORM_TYPE_VECTOR2_ARRAY`
+- `UniformTypes.Vector3` → `UNIFORM_TYPE_VECTOR3`
+- `UniformTypes.Vector3Array` → `UNIFORM_TYPE_VECTOR3_ARRAY`
+- `UniformTypes.Vector4` → `UNIFORM_TYPE_VECTOR4`
+- `UniformTypes.Vector4Array` → `UNIFORM_TYPE_VECTOR4_ARRAY`
+- `UniformTypes.Struct` → `UNIFORM_TYPE_STRUCT`
+- `UniformTypes.StructArray` → `UNIFORM_TYPE_STRUCT_ARRAY`
+- `UniformTypes.Float` → `UNIFORM_TYPE_FLOAT`
+- `UniformTypes.FloatArray` → `UNIFORM_TYPE_FLOAT_ARRAY`
+- `UniformTypes.Int` → `UNIFORM_TYPE_INT`
+- `UniformTypes.Color` → `UNIFORM_TYPE_COLOR`
+- `UniformTypes.ColorArray` → `UNIFORM_TYPE_COLOR_ARRAY`
+- `UniformTypes.TextureArray` → `UNIFORM_TYPE_TEXTURE_ARRAY`
+- `UniformTypes.Bool` → `UNIFORM_TYPE_BOOL`
+
+### 作業ステップ
+1. constants.tsの定数を変換
+2. TypeScriptエラーで影響範囲を確認
+3. 優先度順に各ファイルを修正:
+   - import文更新
+   - replace_all: trueで一括置換（各定数ごと）
+4. 段階的にtsc --noEmitで確認
+5. 全修正後に最終ビルド確認
+
+### 注意事項
+- 型名 `UniformTypes` は残す（値のみ置換）
+- switch文のcase、デフォルト引数、型定義すべて対象
+- 使用頻度が最も高いため、他の作業より時間がかかる見込み
+
+### 推定作業時間
+60-90分（ファイル数・使用箇所が多いため）
+
+---
+
+※この作業予定セクションは作業完了後に削除予定
