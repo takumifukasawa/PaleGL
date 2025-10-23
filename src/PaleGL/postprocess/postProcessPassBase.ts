@@ -9,7 +9,9 @@ import {
     TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
     UniformBlockName,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+
 } from '@/PaleGL/constants.ts';
 // import {
 //     PostProcessPassParametersBase,
@@ -146,22 +148,22 @@ export function createPostProcessSinglePass(args: {
             ...[
                 {
                     name: UniformNames.BlendRate,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
-            ],
+            ] as UniformsData,
             ...uniforms,
             ...getPostProcessCommonUniforms(),
             ...(srcTextureEnabled
-                ? [
+                ? ([
                       {
                           name: UniformNames.SrcTexture,
-                          type: UniformTypes.Texture,
+                          type: UNIFORM_TYPE_TEXTURE,
                           value: null,
                       },
-                  ]
+                  ] as UniformsData)
                 : []),
-        ],
+        ] as UniformsData,
         uniformBlockNames,
         useEnvMap: !!useEnvMap,
         receiveShadow: !!receiveShadow,
@@ -209,22 +211,22 @@ export function getPostProcessCommonUniforms(): UniformsData {
     return [
         {
             name: UniformNames.TexelSize,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 1,
         },
         {
             name: UniformNames.TargetWidth,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 1,
         },
         {
             name: UniformNames.TargetHeight,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 1,
         },
         {
             name: UniformNames.Time,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
     ];

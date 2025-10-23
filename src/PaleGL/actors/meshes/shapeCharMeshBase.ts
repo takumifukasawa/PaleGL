@@ -80,22 +80,22 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     // const bUniforms: UniformsData = [
     //     {
     //         name: 'uColor',
-    //         type: UniformTypes.Color,
+    //         type: UNIFORM_TYPE_COLOR,
     //         value: color,
     //     },
     //     {
     //         name: UniformNames.FontMap,
-    //         type: UniformTypes.Texture,
+    //         type: UNIFORM_TYPE_TEXTURE,
     //         value: fontTexture,
     //     },
     //     {
     //         name: UniformNames.FontTiling,
-    //         type: UniformTypes.Vector4,
+    //         type: UNIFORM_TYPE_VECTOR4,
     //         value: tilingOffset,
     //     },
     //     {
     //         name: 'uFontAspect',
-    //         type: UniformTypes.Float,
+    //         type: UNIFORM_TYPE_FLOAT,
     //         value: shapeFontRenderer.shapeFontAtlas.aspect,
     //     },
     // ];

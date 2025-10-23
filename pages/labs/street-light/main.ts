@@ -55,7 +55,11 @@ import {
 import { createTouchInputController } from '@/PaleGL/inputs/touchInputController';
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController';
 import {
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_VECTOR2_ARRAY,
+    UNIFORM_TYPE_VECTOR3,
     BLEND_TYPE_TRANSPARENT,
     RENDER_TARGET_TYPE_DEPTH,
     AttributeNames,
@@ -491,7 +495,7 @@ const createGLTFSphereMesh = async (material: Material) => {
     const gltfActor = await loadGLTF({ gpu, dir: MODEL_ASSET_DIR, path: 'sphere-32x32.gltf' });
     const mesh: Mesh = gltfActor.children[0] as Mesh;
     mesh.castShadow = true;
-    setMeshMaterial(mesh, material);
+    setMeshMaterial(gpu, mesh, material);
     return mesh;
 };
 
@@ -635,22 +639,22 @@ layout (std140) uniform ubCommon {
         uniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: 'uNormalizedInputPosition',
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: 'uAttractTargetPosition',
-                type: UniformTypes.Vector3,
+                type: UNIFORM_TYPE_VECTOR3,
                 value: createVector3Zero(),
             },
             {
                 name: 'uAttractRate',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         ],
@@ -855,6 +859,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     );
 
     setMeshMaterial(
+        gpu,
         skinningMesh,
         createGBufferMaterial({
             metallic: 0,
@@ -1239,17 +1244,17 @@ void main() {
         uniforms: [
             {
                 name: 'uParticleMap',
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: particleMap,
             },
             {
                 name: 'uBillboardPositionConverters',
-                type: UniformTypes.Vector2Array,
+                type: UNIFORM_TYPE_VECTOR2_ARRAY,
                 value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
             },
             {
                 name: UniformNames.DepthTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
         ],

@@ -1,6 +1,9 @@
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
-    UniformTypes,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_CUBE_MAP,
+
     PRIMITIVE_TYPE_TRIANGLES,
     ACTOR_TYPE_SKYBOX,
     UniformNames,
@@ -139,22 +142,22 @@ export function createSkybox({
         uniforms: [
             {
                 name: UniformNames.CubeTexture,
-                type: UniformTypes.CubeMap,
+                type: UNIFORM_TYPE_CUBE_MAP,
                 value: cubeMap,
             },
             // {
             //     name: UniformNames.ViewDirectionProjectionInverse,
-            //     type: UniformTypes.Matrix4,
+            //     type: UNIFORM_TYPE_MATRIX4,
             //     value: Matrix4.identity,
             // },
             {
                 name: UniformNames.RotationOffset,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: rotationOffset,
             },
             {
                 name: UniformNames.ShadingModelId,
-                type: UniformTypes.Int,
+                type: UNIFORM_TYPE_INT,
                 value: SHADING_MODEL_ID_SKYBOX,
             },
         ],

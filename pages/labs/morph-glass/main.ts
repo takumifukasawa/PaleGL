@@ -17,7 +17,8 @@ import {
     RENDER_TARGET_TYPE_DEPTH,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
 } from '@/PaleGL/constants';
 import type { RenderQueueType, FaceSide } from '@/PaleGL/constants';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
@@ -510,12 +511,12 @@ const main = async () => {
                     uniforms: [
                         {
                             name: UniformNames.SceneTexture,
-                            type: UniformTypes.Texture,
+                            type: UNIFORM_TYPE_TEXTURE,
                             value: null,
                         },
                         {
                             name: 'uMorphRate',
-                            type: UniformTypes.Float,
+                            type: UNIFORM_TYPE_FLOAT,
                             value: 0,
                         },
                     ],

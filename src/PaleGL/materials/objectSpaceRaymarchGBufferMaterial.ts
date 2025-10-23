@@ -6,7 +6,13 @@ import {
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR3,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -70,73 +76,73 @@ export function createObjectSpaceRaymarchGBufferMaterial(
     const commonUniforms: UniformsData = [
         {
             name: UniformNames.ObjectSpaceRaymarchBoundsScale,
-            type: UniformTypes.Vector3,
+            type: UNIFORM_TYPE_VECTOR3,
             value: createVector3One(),
         },
         {
             name: UniformNames.DepthTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: baseMap,
         },
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: baseColor,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: Vector2.one,
             value: baseMapTiling,
         },
         {
             name: UniformNames.Metallic,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: metallic,
         },
         {
             name: UniformNames.MetallicMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
 
         {
             name: UniformNames.Roughness,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: roughness,
         },
         {
             name: UniformNames.RoughnessMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: roughnessMap,
         },
         {
             name: UniformNames.RoughnessMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: roughnessMapTiling,
         },
 
         {
             name: UniformNames.EmissiveColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
         ...createObjectSpaceRaymarchUniforms(),
-    ];
+    ] as UniformsData;
     const shadingUniforms: UniformsData = [
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int, // float,intどちらでもいい
+            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },
     ];

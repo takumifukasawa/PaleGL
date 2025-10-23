@@ -5,7 +5,9 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+
 } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -134,97 +136,97 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.GBufferATexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.GBufferBTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.GBufferCTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.DepthTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: 'uRayDepthBias',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uRayNearestDistance',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uRayMaxDistance',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionAdditionalRate',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionRayThickness',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionRayJitterSizeX',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionRayJitterSizeY',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionFadeMinDistance',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionFadeMaxDistance',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionScreenEdgeFadeFactorMinX',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionScreenEdgeFadeFactorMaxX',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionScreenEdgeFadeFactorMinY',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionScreenEdgeFadeFactorMaxY',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uReflectionRoughnessPower',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: 'uBlendRate',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 1,
         },
     ];

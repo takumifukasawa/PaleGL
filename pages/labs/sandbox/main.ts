@@ -100,7 +100,9 @@ import {
     UI_QUEUE_TYPE_OVERLAY,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_VECTOR3,
     VertexShaderModifierPragmas,
 } from '@/PaleGL/constants';
 
@@ -359,8 +361,7 @@ const createTestGPUParticle = (gpu: Gpu) => {
         setUniformValue(
             getMeshMaterial(testMesh).uniforms,
             UniformNames.BaseMap,
-            (vatGPUParticle.mrtGraphicsDoubleBuffer.doubleBuffer as MRTDoubleBuffer).multipleRenderTargets[0]
-                .textures[1]
+            vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
         );
     });
 };
@@ -517,12 +518,12 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         // effectUniforms: [
         //     // {
         //     //     name: UniformNames.Time,
-        //     //     type: UniformTypes.Float,
+        //     //     type: UNIFORM_TYPE_FLOAT,
         //     //     value: 0,
         //     // },
         //     {
         //         name: "uGridSize",
-        //         type: UniformTypes.Vector2,
+        //         type: UNIFORM_TYPE_VECTOR2,
         //         value: createVector2(4, 4),
         //     },
         // ],
@@ -533,32 +534,32 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: 'uGridSize',
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(4.4, 4.4),
             },
             {
                 name: 'uOctaves',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 8,
             },
             {
                 name: 'uAmplitude',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0.307,
             },
             {
                 name: 'uFrequency',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1.357,
             },
             {
                 name: 'uFactor',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0.597,
             },
         ],
@@ -1083,19 +1084,19 @@ const createTransformFeedbackDrivenMesh = () => {
         `,
         uniforms: {
             [UniformNames.Time]: {
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
             uNormalizedInputPosition: {
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: Vector2.zero,
             },
             uAttractTargetPosition: {
-                type: UniformTypes.Vector3,
+                type: UNIFORM_TYPE_VECTOR3,
                 value: Vector3.zero,
             },
             uAttractRate: {
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         },
@@ -1299,7 +1300,7 @@ const createTestLightingSphereMesh = (material: Material) => {
         material,
     });
     mesh.castShadow = true;
-    setMeshMaterial(mesh, material);
+    setMeshMaterial(gpu, mesh, material);
 
     return mesh;
 };
@@ -1443,22 +1444,22 @@ layout (std140) uniform ubCommon {
         uniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: 'uNormalizedInputPosition',
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: 'uAttractTargetPosition',
-                type: UniformTypes.Vector3,
+                type: UNIFORM_TYPE_VECTOR3,
                 value: createVector3Zero(),
             },
             {
                 name: 'uAttractRate',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         ],
@@ -1517,6 +1518,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setAnimationClips(skinningMesh, getAnimatorAnimationClips(gltfActor.animator));
 
     setMeshMaterial(
+        gpu,
         skinningMesh,
         createGBufferMaterial({
             // gpu,

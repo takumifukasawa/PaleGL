@@ -32,7 +32,8 @@ import {
     UniformNames,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     ACTOR_TYPE_MESH,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
     BLEND_TYPE_TRANSPARENT,
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_FRONT,
@@ -353,12 +354,12 @@ const main = async () => {
                 uniforms: [
                     {
                         name: UniformNames.SceneTexture,
-                        type: UniformTypes.Texture,
+                        type: UNIFORM_TYPE_TEXTURE,
                         value: null,
                     },
                     {
                         name: 'uMorphRate',
-                        type: UniformTypes.Float,
+                        type: UNIFORM_TYPE_FLOAT,
                         value: 0,
                     },
                 ],

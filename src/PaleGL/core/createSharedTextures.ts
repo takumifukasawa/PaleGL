@@ -1,4 +1,9 @@
-import { TEXTURE_FILTER_TYPE_NEAREST, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    TEXTURE_FILTER_TYPE_NEAREST,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+
+} from '@/PaleGL/constants.ts';
 import {
     createEffectTextureSystem,
     EffectTextureInfo,
@@ -41,32 +46,32 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: gridUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(4.4, 4.4),
             },
             {
                 name: 'uOctaves',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 8,
             },
             {
                 name: 'uAmplitude',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0.307,
             },
             {
                 name: 'uFrequency',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1.357,
             },
             {
                 name: 'uFactor',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0.597,
             },
         ],
@@ -83,12 +88,12 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: gridUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(TEXTURE_SIZE, TEXTURE_SIZE),
             },
         ],
@@ -107,17 +112,17 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: gridUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(4, 4),
             },
             {
                 name: 'uIsImproved',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         ],
@@ -134,17 +139,17 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: gridUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(4, 4),
             },
             {
                 name: 'uIsImproved',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
         ],
@@ -161,12 +166,12 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectUniforms: [
             // {
             //     name: UniformNames.Time,
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
             {
                 name: gridUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(4, 4),
             },
         ],

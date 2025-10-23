@@ -5,7 +5,7 @@ import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Color } from '@/PaleGL/math/color.ts';
-import { UniformTypes } from '@/PaleGL/constants.ts';
+import { UNIFORM_TYPE_STRUCT, UNIFORM_TYPE_STRUCT_ARRAY, UniformTypes } from '@/PaleGL/constants.ts';
 import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
 
 //
@@ -86,7 +86,8 @@ export type UniformBufferObjectValue =
     | UniformBufferObjectElementValueArray
     | Float32Array
     | UniformStructValue
-    | UniformStructArrayValue;
+    | UniformStructArrayValue
+    | UniformBufferObjectStructArrayValue;
 
 export type UniformBufferObjectBlockData = UniformBufferObjectData[];
 
@@ -164,14 +165,14 @@ export const setUniformValue = (uniforms: Uniforms, name: string, newValue: Unif
     // | UniformStructValue
     // | UniformStructArrayValue
     if (data) {
-        if (data.type === UniformTypes.Struct) {
+        if (data.type === UNIFORM_TYPE_STRUCT) {
             (newValue as UniformStructValue).forEach((elem) => {
                 const index = (data.value as UniformStructValue).findIndex((needle) => needle.name === elem.name);
                 if (index >= 0) {
                     (data.value as UniformStructValue)[index].value = elem.value;
                 }
             });
-        } else if (data.type === UniformTypes.StructArray) {
+        } else if (data.type === UNIFORM_TYPE_STRUCT_ARRAY) {
             (newValue as UniformStructArrayValue).forEach((newStructValue, structArrayIndex) => {
                 newStructValue.forEach((elem) => {
                     const index = (data.value as UniformStructArrayValue)[structArrayIndex].findIndex(

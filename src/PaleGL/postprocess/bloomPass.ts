@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -150,7 +150,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         uniforms: [
             {
                 name: UNIFORM_NAME_THRESHOLD,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: threshold,
             },
         ],
@@ -166,17 +166,17 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         uniforms: [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_WEIGHTS,
-                type: UniformTypes.FloatArray,
+                type: UNIFORM_TYPE_FLOAT_ARRAY,
                 value: new Float32Array(blurWeights),
             },
             {
                 name: UNIFORM_NAME_IS_HORIZONTAL,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             ...getPostProcessCommonUniforms(),
@@ -190,17 +190,17 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         uniforms: [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_WEIGHTS,
-                type: UniformTypes.FloatArray,
+                type: UNIFORM_TYPE_FLOAT_ARRAY,
                 value: new Float32Array(blurWeights),
             },
             {
                 name: UNIFORM_NAME_IS_HORIZONTAL,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
             ...getPostProcessCommonUniforms(),
@@ -214,47 +214,47 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         uniforms: [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_4_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_8_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_16_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_32_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_BLUR_64_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_TONE,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: tone,
             },
             {
                 name: UNIFORM_NAME_BLOOM_AMOUNT,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: bloomAmount,
             },
             {
                 name: UNIFORM_NAME_EXTRACT_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             ...getPostProcessCommonUniforms(),

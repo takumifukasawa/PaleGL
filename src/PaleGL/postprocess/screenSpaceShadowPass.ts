@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, UniformBlockNames, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { PostProcessPassType, UniformBlockNames, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
@@ -75,37 +75,37 @@ export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
             uniforms: [
                 {
                     name: UniformNames.GBufferBTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UniformNames.DepthTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_BIAS_NAME,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
                 {
                     name: UNIFORM_JITTER_SIZE_NAME,
-                    type: UniformTypes.Vector3,
+                    type: UNIFORM_TYPE_VECTOR3,
                     value: createVector3Zero(),
                 },
                 {
                     name: UNIFORM_SHARPNESS_NAME,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
                 {
                     name: UNIFORM_STRENGTH_NAME,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
                 {
                     name: UNIFORM_RAY_STEP_MULTIPLIER_NAME,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
             ],

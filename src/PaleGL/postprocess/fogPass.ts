@@ -5,7 +5,10 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -115,83 +118,83 @@ export function createFogPass(args: FogPassArgs) {
             uniforms: [
                 {
                     name: UNIFORM_FOG_COLOR,
-                    type: UniformTypes.Color,
+                    type: UNIFORM_TYPE_COLOR,
                     value: createColorWhite(),
                 },
                 {
                     // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
                     name: UniformNames.DepthTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: lightShaftTextureUniformName,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: volumetricLightTextureUniformName,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: screenSpaceShadowTextureUniformName,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_FOG_STRENGTH,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: fogStrength,
                 },
                 {
                     name: UNIFORM_FOG_DENSITY,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: fogDensity,
                 },
                 {
                     name: UNIFORM_FOG_DENSITY_ATTENUATION,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: fogDensityAttenuation,
                 },
                 {
                     name: UNIFORM_FOG_END_HEIGHT,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: fogEndHeight,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_START,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: distanceFogStart,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_END,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: distanceFogEnd,
                 },
                 {
                     name: UNIFORM_DISTANCE_FOG_POWER,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: distanceFogPower,
                 },
                 {
                     name: UNIFORM_SSS_FOG_RATE,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: sssFogRate,
                 },
                 {
                     name: UNIFORM_SSS_FOG_COLOR,
-                    type: UniformTypes.Color,
+                    type: UNIFORM_TYPE_COLOR,
                     value: createColorWhite(),
                 },
                 {
                     name: UNIFORM_NOISE_TEXTURE,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UniformNames.BlendRate,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,

@@ -1,4 +1,18 @@
-import { GL_DYNAMIC_DRAW, GL_UNIFORM_BUFFER, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    GL_DYNAMIC_DRAW,
+    GL_UNIFORM_BUFFER,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_BOOL,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_VECTOR3,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_MATRIX4,
+    UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_STRUCT,
+    UNIFORM_TYPE_STRUCT_ARRAY,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
@@ -17,34 +31,34 @@ import { Vector4 } from '@/PaleGL/math/vector4.ts';
 function getStructElementValue(type: UniformTypes, value: UniformBufferObjectValue) {
     const data: number[] = [];
     switch (type) {
-        case UniformTypes.Float:
-        case UniformTypes.Int:
+        case UNIFORM_TYPE_FLOAT:
+        case UNIFORM_TYPE_INT:
             data.push(value as number);
             data.push(0);
             data.push(0);
             data.push(0);
             break;
-        case UniformTypes.Bool:
+        case UNIFORM_TYPE_BOOL:
             data.push((value as boolean) ? 1 : 0);
             data.push(0);
             data.push(0);
             data.push(0);
             break;
-        case UniformTypes.Vector2:
+        case UNIFORM_TYPE_VECTOR2:
             data.push(...(value as Vector2).e);
             data.push(0);
             break;
-        case UniformTypes.Vector3:
+        case UNIFORM_TYPE_VECTOR3:
             data.push(...(value as Vector3).e);
             data.push(0);
             break;
-        case UniformTypes.Vector4:
+        case UNIFORM_TYPE_VECTOR4:
             data.push(...(value as Vector4).e);
             break;
-        case UniformTypes.Matrix4:
+        case UNIFORM_TYPE_MATRIX4:
             data.push(...(value as Matrix4).e);
             break;
-        case UniformTypes.Color:
+        case UNIFORM_TYPE_COLOR:
             data.push(...(value as Color).e);
             break;
         default:
@@ -148,14 +162,14 @@ export const updateUniformBufferValue = (
 ) => {
     switch (uniformType) {
         // TODO: update struct
-        case UniformTypes.Struct:
+        case UNIFORM_TYPE_STRUCT:
             (value as unknown as UniformBufferObjectStructValue).forEach((v) => {
                 const structElementName = `${uniformName}.${v.name}`;
                 const data: number[] = getStructElementValue(v.type, v.value);
                 updateUniformBufferData(ubo, structElementName, new Float32Array(data));
             });
             break;
-        case UniformTypes.StructArray:
+        case UNIFORM_TYPE_STRUCT_ARRAY:
             (value as UniformBufferObjectStructArrayValue).forEach((v, i) => {
                 v.forEach((vv) => {
                     const structElementName = `${uniformName}[${i}].${vv.name}`;

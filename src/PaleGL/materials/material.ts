@@ -21,6 +21,8 @@
     RENDER_QUEUE_TYPE_SKYBOX,
     UniformBlockName,
     UniformNames,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_MATRIX4,
     UniformTypes,
     // UniformType
     VertexShaderModifiers,
@@ -301,26 +303,26 @@ export function createMaterial(args: MaterialArgs): Material {
     const commonUniforms: UniformsData = [
         {
             name: UniformNames.InverseWorldMatrix,
-            type: UniformTypes.Matrix4,
+            type: UNIFORM_TYPE_MATRIX4,
             value: createMat4Identity(),
         },
 
         // TODO: commonを呼んでさえいればいらないはず
         {
             name: UniformNames.Time,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         ...(alphaTest !== null
-            ? [
+            ? ([
                   {
                       name: 'uAlphaTestThreshold',
-                      type: UniformTypes.Float,
+                      type: UNIFORM_TYPE_FLOAT,
                       value: alphaTest,
                   },
-              ]
+              ] as UniformsData)
             : []),
-    ];
+    ] as UniformsData;
 
     const uniforms = createUniforms(commonUniforms, args.uniforms || []);
     const depthUniforms = createUniforms(commonUniforms, args.depthUniforms || []);

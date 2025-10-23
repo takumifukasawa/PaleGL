@@ -1,4 +1,5 @@
-﻿import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_TYPE_MATRIX4 } from '@/PaleGL/constants';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getDummyBlackTexture, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -115,22 +116,22 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
             uniforms: [
                 {
                     name: UniformNames.CameraNear,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0.1,
                 },
                 {
                     name: UniformNames.CameraFar,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: UniformNames.InverseViewProjectionMatrix,
-                    type: UniformTypes.Matrix4,
+                    type: UNIFORM_TYPE_MATRIX4,
                     value: createMat4Identity(),
                 },
                 // {
                 //     name: 'uDepthTexture',
-                //     type: UniformTypes.Texture,
+                //     type: UNIFORM_TYPE_TEXTURE,
                 //     value: gpu.dummyTextureBlack,
                 // },
             ],
@@ -441,12 +442,12 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         uniforms: [
             {
                 name: 'uFullViewTexture',
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: getDummyBlackTexture(gpu),
             },
             {
                 name: 'uFullViewTextureEnabled',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
             ...maton
@@ -455,14 +456,14 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                     return [
                         {
                             name: `uRow${i}Texture`,
-                            type: UniformTypes.Texture,
+                            type: UNIFORM_TYPE_TEXTURE,
                             value: getDummyBlackTexture(gpu),
                         },
-                    ];
+                    ] as UniformsData;
                 })
                 .flat(),
             ...getPostProcessCommonUniforms(),
-        ],
+        ] as UniformsData,
     });
 
     // initialize materials
@@ -472,8 +473,8 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
     // this.rowPasses.forEach(({ pass, tiles }, rowIndex) => {
     rowPasses.forEach(({ pass, tiles }, i) => {
         let colIndex = 0;
-        // pass.material.uniforms.addValue('uTiling', UniformTypes.Vector2, new Vector2(COL_NUM, ROW_NUM));
-        addMaterialUniformValue(pass.material, 'uTiling', UniformTypes.Vector2, createVector2(COL_NUM, 1));
+        // pass.material.uniforms.addValue('uTiling', UNIFORM_TYPE_VECTOR2, new Vector2(COL_NUM, ROW_NUM));
+        addMaterialUniformValue(pass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(COL_NUM, 1));
         for (const [key, tile] of tiles) {
             const uniformNamePrefix = tile.uniformNamePrefix || 'uTextureCol';
             const uniformNameTexture = `${uniformNamePrefix}${colIndex}`;
@@ -493,14 +494,14 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                 addMaterialUniformValue(
                     pass.material,
                     uniformNameUvOffset,
-                    UniformTypes.Vector2,
+                    UNIFORM_TYPE_VECTOR2,
                     createVector2(colOffset, 0)
                 );
                 if (tile.type === 'Texture') {
                     addMaterialUniformValue(
                         pass.material,
                         uniformNameTexture,
-                        UniformTypes.Texture,
+                        UNIFORM_TYPE_TEXTURE,
                         getDummyBlackTexture(gpu)
                     );
                 }
@@ -508,14 +509,14 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
                 addMaterialUniformValue(
                     pass.material,
                     uniformNameUvOffset,
-                    UniformTypes.Vector2,
+                    UNIFORM_TYPE_VECTOR2,
                     createVector2(colOffset, 0)
                 );
-                // console.log('hogehoge', pass, key, uniformNameTexture, UniformTypes.Texture, gpu.dummyTextureBlack);
+                // console.log('hogehoge', pass, key, uniformNameTexture, UNIFORM_TYPE_TEXTURE, gpu.dummyTextureBlack);
                 addMaterialUniformValue(
                     pass.material,
                     uniformNameTexture,
-                    UniformTypes.Texture,
+                    UNIFORM_TYPE_TEXTURE,
                     getDummyBlackTexture(gpu)
                 );
             }
@@ -524,7 +525,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         }
     });
 
-    addMaterialUniformValue(compositePass.material, 'uTiling', UniformTypes.Vector2, createVector2(1, ROW_NUM));
+    addMaterialUniformValue(compositePass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(1, ROW_NUM));
 
     const styleHeader = document.createElement('style');
     styleHeader.textContent = `

@@ -1,6 +1,6 @@
 import {Gpu, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
-import { AttributeUsageType, UniformTypes } from '@/PaleGL/constants.ts';
+import { AttributeUsageType, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { buildVertexShader } from '@/PaleGL/core/buildShader.ts';
 
@@ -115,12 +115,12 @@ export function loadGLSLSound(
         uniforms: [
             {
                 name: UNIFORM_NAME_BLOCK_OFFSET,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
             {
                 name: UNIFORM_NAME_SAMPLE_RATE,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         ],

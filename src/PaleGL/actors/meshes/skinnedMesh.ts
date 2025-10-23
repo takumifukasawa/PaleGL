@@ -10,7 +10,8 @@ import {
     PRIMITIVE_TYPE_POINTS,
     TEXTURE_TYPE_RGBA32F,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_INT,
 } from '@/PaleGL/constants.ts';
 import { AnimationClip, getAllKeyframesValue } from '@/PaleGL/core/animationClip.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -18,7 +19,7 @@ import { Bone, calcBoneOffsetMatrix, calcJointMatrix, traverseBone } from '@/Pal
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { hasNodeChild } from '@/PaleGL/core/nodeBase.ts';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
-import { createUniforms } from '@/PaleGL/core/uniforms.ts';
+import { createUniforms, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { GLTFAnimationChannelTargetPath } from '@/PaleGL/loaders/loadGLTF.ts';
@@ -406,36 +407,36 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
     }
 }
 
-const generateSkinningUniforms = (skinnedMesh: SkinnedMesh) => {
+const generateSkinningUniforms = (skinnedMesh: SkinnedMesh): UniformsData => {
     return [
         // TODO: for cpu
         // material.uniforms.uJointMatrices = {
-        //     type: UniformTypes.Matrix4Array,
+        //     type: UNIFORM_TYPE_MATRIX4_ARRAY,
         //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
         // };
         {
             name: UniformNames.JointTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.JointTextureColNum,
-            type: UniformTypes.Int,
+            type: UNIFORM_TYPE_INT,
             value: skinnedMesh.jointTextureColNum,
         },
         ...(skinnedMesh.gpuSkinning
-            ? [
+            ? ([
                   {
                       name: UniformNames.BoneCount,
-                      type: UniformTypes.Int,
+                      type: UNIFORM_TYPE_INT,
                       value: skinnedMesh.boneCount,
                   },
                   {
                       name: UniformNames.TotalFrameCount,
-                      type: UniformTypes.Int,
+                      type: UNIFORM_TYPE_INT,
                       value: 0,
                   },
-              ]
+              ] as UniformsData)
             : []),
     ];
 };

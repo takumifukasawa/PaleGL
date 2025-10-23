@@ -14,7 +14,12 @@ import {
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR3,
+    UNIFORM_TYPE_MATRIX4,
+    UNIFORM_TYPE_TEXTURE_ARRAY,
+
 } from '@/PaleGL/constants';
 import { renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -141,17 +146,17 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         uniforms: [
             {
                 name: UniformNames.WorldMatrix,
-                type: UniformTypes.Matrix4,
+                type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
             {
                 name: UniformNames.ViewMatrix,
-                type: UniformTypes.Matrix4,
+                type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
             {
                 name: UniformNames.ProjectionMatrix,
-                type: UniformTypes.Matrix4,
+                type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
         ],
@@ -167,42 +172,42 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             uniforms: [
                 {
                     name: UniformNames.SpotLightShadowMap,
-                    type: UniformTypes.TextureArray,
+                    type: UNIFORM_TYPE_TEXTURE_ARRAY,
                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
                 },
                 {
                     name: UNIFORM_NAME_RAY_STEP,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
                 {
                     name: UNIFORM_NAME_DENSITY_MULTIPLIER,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0,
                 },
                 {
                     name: UNIFORM_NAME_RAY_JITTER_SIZE,
-                    type: UniformTypes.Vector3,
+                    type: UNIFORM_TYPE_VECTOR3,
                     value: createVector3Zero(),
                 },
                 {
                     name: UniformNames.GBufferATexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UniformNames.DepthTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_VOLUME_DEPTH_TEXTURE,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UniformNames.BlendRate,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
             ],

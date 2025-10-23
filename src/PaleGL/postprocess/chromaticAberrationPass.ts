@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
+import { PostProcessPassType, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
@@ -72,12 +72,12 @@ export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs)
             uniforms: [
                 {
                     name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
                 },
                 {
                     name: UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
                 },
             ],

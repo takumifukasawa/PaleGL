@@ -4,7 +4,11 @@ import {
     SHADING_MODEL_ID_UNLIT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_COLOR,
+
     VertexShaderModifiers,
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
@@ -42,22 +46,22 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
     const baseUniforms: UniformsData = [
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int,
+            type: UNIFORM_TYPE_INT,
             value: SHADING_MODEL_ID_UNLIT,
         },
     ];
@@ -67,17 +71,17 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
     const depthUniforms: UniformsData = [
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },
         ...uniforms,

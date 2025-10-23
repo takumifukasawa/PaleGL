@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -46,22 +46,22 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         uniforms: [
             {
                 name: 'uTargetWidth',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             {
                 name: 'uTargetHeight',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             {
                 name: 'uBlurWeights',
-                type: UniformTypes.FloatArray,
+                type: UNIFORM_TYPE_FLOAT_ARRAY,
                 value: new Float32Array(blurWeights),
             },
             {
                 name: 'uIsHorizontal',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
         ],
@@ -81,22 +81,22 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         uniforms: [
             {
                 name: 'uTargetWidth',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             {
                 name: 'uTargetHeight',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             {
                 name: 'uBlurWeights',
-                type: UniformTypes.FloatArray,
+                type: UNIFORM_TYPE_FLOAT_ARRAY,
                 value: new Float32Array(blurWeights),
             },
             {
                 name: 'uIsHorizontal',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
         ],

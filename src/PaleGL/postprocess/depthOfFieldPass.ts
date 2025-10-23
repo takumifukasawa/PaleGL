@@ -7,7 +7,10 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+
 } from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
@@ -102,32 +105,32 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         uniforms: [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UniformNames.DepthTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: 'uFocusDistance',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: focusDistance,
             },
             {
                 name: 'uFocusRange',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: focusRange,
             },
             {
                 name: 'uBokehRadius',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: bokehRadius,
             },
             // {
             //     name: 'uCocParams',
-            //     type: UniformTypes.Vector4,
+            //     type: UNIFORM_TYPE_VECTOR4,
             //     value: Vector4.zero,
             // },
             ...getPostProcessCommonUniforms(),
@@ -154,29 +157,29 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         fragmentShader: dofPreFilterFragmentShader,
         uniforms: [
             // [UniformNames.SrcTexture]: {
-            //     type: UniformTypes.Texture,
+            //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
             // [UniformNames.DepthTexture]: {
-            //     type: UniformTypes.Texture,
+            //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
             // uFocusDistance: {
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: this.focusDistance,
             // },
             // uFocusRange: {
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: this.focusRange,
             // }
             {
                 name: UNIFORM_NAME_COC_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UniformNames.TexelSize,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             ...getPostProcessCommonUniforms(),
@@ -198,21 +201,21 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         uniforms: [
             // uSrcTextureWidth: {
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 1,
             // },
             // uSrcTextureHeight: {
-            //     type: UniformTypes.Float,
+            //     type: UNIFORM_TYPE_FLOAT,
             //     value: 1,
             // },
             {
                 name: 'uTexelSize',
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: 'uBokehRadius',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: bokehRadius,
             },
         ],
@@ -231,12 +234,12 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         uniforms: [
             {
                 name: 'uTexelSize',
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: 'uBokehRadius',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: bokehRadius,
             },
         ],
@@ -254,12 +257,12 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         uniforms: [
             {
                 name: UNIFORM_NAME_COC_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_DOF_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
         ],

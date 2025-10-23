@@ -6,7 +6,9 @@ import {
     TEXTURE_WRAP_TYPE_REPEAT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+
 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
@@ -100,7 +102,7 @@ export const createEffectTextureSystem: (
             ...effectUniforms,
             {
                 name: 'uSpeed',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1.0, // Default speed, can be overridden
             },
         ],
@@ -125,27 +127,27 @@ export const createEffectTextureSystem: (
         const uniforms: UniformsData = [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: 'uTilingEnabled',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: tilingEnabled ? 1 : 0,
             },
             {
                 name: 'uEdgeMaskMix',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: edgeMaskMix,
             },
             {
                 name: 'uRemapMin',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: remapMin!,
             },
             {
                 name: 'uRemapMax',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: remapMax!,
             },
         ];

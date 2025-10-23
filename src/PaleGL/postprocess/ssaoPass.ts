@@ -4,7 +4,11 @@
     TEXTURE_WRAP_TYPE_REPEAT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_FLOAT_ARRAY,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
@@ -168,67 +172,67 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
             uniforms: [
                 {
                     name: UniformNames.GBufferBTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UniformNames.DepthTexture,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: 'uSamplingRotations',
-                    type: UniformTypes.FloatArray,
+                    type: UNIFORM_TYPE_FLOAT_ARRAY,
                     value: new Float32Array(samplingRotations),
                 },
                 {
                     name: 'uSamplingDistances',
-                    type: UniformTypes.FloatArray,
+                    type: UNIFORM_TYPE_FLOAT_ARRAY,
                     value: new Float32Array(samplingDistances),
                 },
                 {
                     name: 'uSamplingTexture',
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: samplingTexture,
                 },
                 {
                     name: 'uOcclusionSampleLength',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uOcclusionBias',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uOcclusionMinDistance',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uOcclusionMaxDistance',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uOcclusionColor',
-                    type: UniformTypes.Color,
+                    type: UNIFORM_TYPE_COLOR,
                     value: createColorBlack(),
                 },
                 {
                     name: 'uOcclusionPower',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uOcclusionStrength',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
                     name: 'uBlendRate',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
             ],

@@ -5,7 +5,12 @@ import {
     SHADING_MODEL_ID_LIT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
@@ -73,30 +78,30 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || SHADING_MODEL_ID_LIT;
 
-    const commonUniforms = [
+    const commonUniforms: UniformsData = [
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling,
         },
         {
             name: UniformNames.HeightMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: heightMap,
         },
         {
             name: UniformNames.HeightMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: heightMapTiling,
         },
         {
             name: UniformNames.HeightScale,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: heightScale,
         },
     ];
@@ -104,68 +109,68 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
     const gbufferUniforms: UniformsData = [
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },
 
         {
             name: UniformNames.Metallic,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: metallic,
         },
         {
             name: UniformNames.MetallicMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
         {
             name: UniformNames.Roughness,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: roughness,
         },
         {
             name: UniformNames.RoughnessMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: roughnessMap,
         },
         {
             name: UniformNames.RoughnessMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: roughnessMapTiling,
         },
         {
             name: UniformNames.MetallicMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
         {
             name: UniformNames.NormalMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: normalMap,
         },
         {
             name: UniformNames.NormalMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: normalMapTiling,
         },
         {
             name: UniformNames.EmissiveColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int, // float,intどちらでもいい
+            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },
     ];

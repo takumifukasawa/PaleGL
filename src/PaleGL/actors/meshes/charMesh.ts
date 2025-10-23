@@ -10,7 +10,10 @@ import {
     SHADING_MODEL_ID_UNLIT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
 } from '@/PaleGL/constants.ts';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -71,17 +74,17 @@ export function createCharMesh({
     const bUniforms: UniformsData = [
         {
             name: 'uColor',
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: color,
         },
         {
             name: UniformNames.FontMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: fontTexture,
         },
         {
             name: UniformNames.FontTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: Vector4.one
             value: createVector4(sw, sh, sx, sy), // TODO: dummy
         },
@@ -90,7 +93,7 @@ export function createCharMesh({
     const mergedUniforms: UniformsData = [
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int,
+            type: UNIFORM_TYPE_INT,
             value: SHADING_MODEL_ID_UNLIT,
         },
         ...bUniforms,

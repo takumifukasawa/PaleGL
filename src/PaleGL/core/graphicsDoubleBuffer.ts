@@ -1,4 +1,10 @@
-import { UniformBlockName, UniformBlockNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    UniformBlockName,
+    UniformBlockNames,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+
+} from '@/PaleGL/constants.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
@@ -22,25 +28,25 @@ export const createGraphicsDoubleBufferMaterial = (
             ...uniforms,
             // {
             //     name: prevMapUniformName,
-            //     type: UniformTypes.Texture,
+            //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
             {
                 name: targetWidthUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: width,
             },
             {
                 name: targetHeightUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: height,
             },
             {
                 name: texelSizeUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2(1 / width, 1 / height),
             },
-        ],
+        ] as UniformsData,
         uniformBlockNames: [...uniformBlockNames, UniformBlockNames.Common],
     });
 };

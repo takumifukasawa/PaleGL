@@ -1,6 +1,15 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import {
+    PostProcessPassType,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
+    UniformNames,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_COLOR,
+
+} from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
@@ -116,22 +125,22 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         uniforms: [
             {
                 name: UniformNames.SrcTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UniformNames.TexelSize,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: 'uThreshold',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: threshold,
             },
             {
                 name: 'uVerticalScale',
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: verticalScale,
             },
             ...getPostProcessCommonUniforms(),
@@ -148,17 +157,17 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             uniforms: [
                 {
                     name: UniformNames.TexelSize,
-                    type: UniformTypes.Vector2,
+                    type: UNIFORM_TYPE_VECTOR2,
                     value: createVector2Zero(),
                 },
                 {
                     name: UNIFORM_NAME_PREV_TEXTURE,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_NAME_HORIZONTAL_SCALE,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: horizontalScale,
                 },
                 ...getPostProcessCommonUniforms(),
@@ -183,17 +192,17 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             uniforms: [
                 {
                     name: UNIFORM_NAME_DOWN_SAMPLE_TEXTURE,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_NAME_PREV_TEXTURE,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: UNIFORM_NAME_STRETCH,
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: stretch,
                 },
                 ...getPostProcessCommonUniforms(),
@@ -219,17 +228,17 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         uniforms: [
             {
                 name: UNIFORM_NAME_STREAK_TEXTURE,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UNIFORM_NAME_COLOR,
-                type: UniformTypes.Color,
+                type: UNIFORM_TYPE_COLOR,
                 value: color,
             },
             {
                 name: UNIFORM_NAME_INTENSITY,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: intensity,
             },
             ...getPostProcessCommonUniforms(),

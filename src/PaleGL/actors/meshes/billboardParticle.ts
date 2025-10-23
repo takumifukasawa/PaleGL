@@ -7,7 +7,8 @@ import {
     FragmentShaderModifiers,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_VECTOR2_ARRAY,
     VertexShaderModifiers,
 } from '@/PaleGL/constants.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
@@ -186,12 +187,12 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         uniforms: [
             {
                 name: 'uParticleMap',
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: particleMap,
             },
             {
                 name: 'uBillboardPositionConverters',
-                type: UniformTypes.Vector2Array,
+                type: UNIFORM_TYPE_VECTOR2_ARRAY,
                 value: [
                     // prettier-ignore
                     createVector2(-1, 1),
@@ -202,7 +203,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
             },
             {
                 name: UniformNames.DepthTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
         ],

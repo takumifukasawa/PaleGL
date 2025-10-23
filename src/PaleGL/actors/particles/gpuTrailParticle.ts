@@ -2,7 +2,16 @@ import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/a
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import { AttributeNames, TEXTURE_FILTER_TYPE_NEAREST, TEXTURE_TYPE_RGBA16F, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    AttributeNames,
+    TEXTURE_FILTER_TYPE_NEAREST,
+    TEXTURE_TYPE_RGBA16F,
+    UniformNames,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_VECTOR2,
+
+} from '@/PaleGL/constants.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
     createMRTDoubleBuffer,
@@ -280,20 +289,20 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         textureTypes: [TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F], // 0: velocity, 1: position
     });
 
-    const createUniforms = () => [
+    const createUniforms = (): UniformsData => [
         {
             name: UniformNames.VelocityMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.PositionMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.UpMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
     ];
@@ -318,14 +327,14 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         mat.isTrail = true;
         // depthが作られる前なのでdepthUniformsにも設定する
         const vatResolution = createVector2(vatWidth, vatHeight);
-        addUniformValue(mat.uniforms, UniformNames.VelocityMap, UniformTypes.Texture, null);
-        addUniformValue(mat.uniforms, UniformNames.PositionMap, UniformTypes.Texture, null);
-        addUniformValue(mat.uniforms, UniformNames.UpMap, UniformTypes.Texture, null);
-        addUniformValue(mat.uniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
-        addUniformValue(mat.depthUniforms, UniformNames.VelocityMap, UniformTypes.Texture, null);
-        addUniformValue(mat.depthUniforms, UniformNames.PositionMap, UniformTypes.Texture, null);
-        addUniformValue(mat.depthUniforms, UniformNames.UpMap, UniformTypes.Texture, null);
-        addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UniformTypes.Vector2, vatResolution);
+        addUniformValue(mat.uniforms, UniformNames.VelocityMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UniformNames.PositionMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UniformNames.UpMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UniformNames.VATResolution, UNIFORM_TYPE_VECTOR2, vatResolution);
+        addUniformValue(mat.depthUniforms, UniformNames.VelocityMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UniformNames.PositionMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UniformNames.UpMap, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 
     const vatGPUParticle: GPUTrailParticle = { ...gpuParticle, mrtDoubleBuffer };

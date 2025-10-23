@@ -2,7 +2,15 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 import { blitRenderTarget, Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { RENDER_TARGET_TYPE_RGBA, TEXTURE_WRAP_TYPE_REPEAT, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    RENDER_TARGET_TYPE_RGBA,
+    TEXTURE_WRAP_TYPE_REPEAT,
+    UniformNames,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+
+} from '@/PaleGL/constants.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import vertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import fragmentShader from '@/PaleGL/shaders/normal-map-converter-fragment.glsl';
@@ -50,22 +58,22 @@ export const createNormalMapConverter: (
             uniforms: [
                 {
                     name: uniformNameSrcMap,
-                    type: UniformTypes.Texture,
+                    type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
                     name: 'uParallaxScale',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0.001,
                 },
                 {
                     name: 'uNormalScale',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 1.0,
                 },
                 {
                     name: UniformNames.TexelSize,
-                    type: UniformTypes.Vector2,
+                    type: UNIFORM_TYPE_VECTOR2,
                     value: createVector2(1, 1),
                 },
             ],

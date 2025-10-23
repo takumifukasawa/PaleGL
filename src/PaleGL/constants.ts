@@ -276,29 +276,46 @@ export type PostProcessPassType = (typeof PostProcessPassType)[keyof typeof Post
 // uniforms
 // -----------------------------------------------------------------------------
 
-export const UniformTypes = {
-    Matrix4: 0,
-    Matrix4Array: 1,
-    Texture: 2,
-    CubeMap: 3,
-    Vector2: 4,
-    Vector2Array: 5,
-    Vector3: 6,
-    Vector3Array: 7,
-    Vector4: 8,
-    Vector4Array: 9,
-    Struct: 10,
-    StructArray: 11,
-    Float: 12,
-    FloatArray: 13,
-    Int: 14,
-    Color: 15,
-    ColorArray: 16,
-    TextureArray: 17,
-    Bool: 18,
-} as const;
+export const UNIFORM_TYPE_MATRIX4 = 0;
+export const UNIFORM_TYPE_MATRIX4_ARRAY = 1;
+export const UNIFORM_TYPE_TEXTURE = 2;
+export const UNIFORM_TYPE_CUBE_MAP = 3;
+export const UNIFORM_TYPE_VECTOR2 = 4;
+export const UNIFORM_TYPE_VECTOR2_ARRAY = 5;
+export const UNIFORM_TYPE_VECTOR3 = 6;
+export const UNIFORM_TYPE_VECTOR3_ARRAY = 7;
+export const UNIFORM_TYPE_VECTOR4 = 8;
+export const UNIFORM_TYPE_VECTOR4_ARRAY = 9;
+export const UNIFORM_TYPE_STRUCT = 10;
+export const UNIFORM_TYPE_STRUCT_ARRAY = 11;
+export const UNIFORM_TYPE_FLOAT = 12;
+export const UNIFORM_TYPE_FLOAT_ARRAY = 13;
+export const UNIFORM_TYPE_INT = 14;
+export const UNIFORM_TYPE_COLOR = 15;
+export const UNIFORM_TYPE_COLOR_ARRAY = 16;
+export const UNIFORM_TYPE_TEXTURE_ARRAY = 17;
+export const UNIFORM_TYPE_BOOL = 18;
 
-export type UniformTypes = (typeof UniformTypes)[keyof typeof UniformTypes];
+export type UniformTypes =
+    | typeof UNIFORM_TYPE_MATRIX4
+    | typeof UNIFORM_TYPE_MATRIX4_ARRAY
+    | typeof UNIFORM_TYPE_TEXTURE
+    | typeof UNIFORM_TYPE_CUBE_MAP
+    | typeof UNIFORM_TYPE_VECTOR2
+    | typeof UNIFORM_TYPE_VECTOR2_ARRAY
+    | typeof UNIFORM_TYPE_VECTOR3
+    | typeof UNIFORM_TYPE_VECTOR3_ARRAY
+    | typeof UNIFORM_TYPE_VECTOR4
+    | typeof UNIFORM_TYPE_VECTOR4_ARRAY
+    | typeof UNIFORM_TYPE_STRUCT
+    | typeof UNIFORM_TYPE_STRUCT_ARRAY
+    | typeof UNIFORM_TYPE_FLOAT
+    | typeof UNIFORM_TYPE_FLOAT_ARRAY
+    | typeof UNIFORM_TYPE_INT
+    | typeof UNIFORM_TYPE_COLOR
+    | typeof UNIFORM_TYPE_COLOR_ARRAY
+    | typeof UNIFORM_TYPE_TEXTURE_ARRAY
+    | typeof UNIFORM_TYPE_BOOL;
 
 // TODO: Texture -> Map にしたい？
 // TODO: objectじゃなくて単体のconst_stringにするべき

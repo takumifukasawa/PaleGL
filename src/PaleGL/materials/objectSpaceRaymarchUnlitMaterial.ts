@@ -6,7 +6,12 @@ import {
     SHADING_MODEL_ID_UNLIT,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_VECTOR3,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -57,41 +62,41 @@ export function createObjectSpaceRaymarchUnlitMaterial(
     const commonUniforms: UniformsData = [
         {
             name: UniformNames.ObjectSpaceRaymarchBoundsScale,
-            type: UniformTypes.Vector3,
+            type: UNIFORM_TYPE_VECTOR3,
             value: createVector3One(),
         },
         {
             name: UniformNames.DepthTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: baseMap,
         },
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: baseColor,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: Vector2.one,
             value: baseMapTiling,
         },
         {
             name: UniformNames.EmissiveColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
         ...createObjectSpaceRaymarchUniforms()
-    ];
+    ] as UniformsData;
     const shadingUniforms: UniformsData = [
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int, // float,intどちらでもいい
+            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },
     ];

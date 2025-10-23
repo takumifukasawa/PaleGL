@@ -208,25 +208,25 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         //     addUniformValue(
         //         mat.uniforms,
         //         UniformNames.VATPositionMap,
-        //         UniformTypes.Texture,
+        //         UNIFORM_TYPE_TEXTURE,
         //         null
         //     );
         //     addUniformValue(
         //         mat.depthUniforms,
         //         UniformNames.VATPositionMap,
-        //         UniformTypes.Texture,
+        //         UNIFORM_TYPE_TEXTURE,
         //         null
         //     );
         //     addUniformValue(
         //         mat.uniforms,
         //         UniformNames.VATResolution,
-        //         UniformTypes.Vector2,
+        //         UNIFORM_TYPE_VECTOR2,
         //         vatResolution
         //     );
         //     addUniformValue(
         //         mat.depthUniforms,
         //         UniformNames.VATResolution,
-        //         UniformTypes.Vector2,
+        //         UNIFORM_TYPE_VECTOR2,
         //         vatResolution
         //     );
         // }

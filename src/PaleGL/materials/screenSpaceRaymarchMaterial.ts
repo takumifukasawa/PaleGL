@@ -6,7 +6,11 @@ import {
     ShadingModelIds,
     UniformBlockNames,
     UniformNames,
-    UniformTypes
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_INT
 } from '@/PaleGL/constants';
 import postprocessVert from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 // import postprocessVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
@@ -67,77 +71,77 @@ export function createScreenSpaceRaymarchMaterial({
     const commonUniforms: UniformsData = [
         {
             name: UniformNames.DepthTexture,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
             name: UniformNames.CameraFov,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
         {
             name: UniformNames.CameraAspect,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },
 
         {
             name: UniformNames.BaseMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: _baseMap,
         },
         {
             name: UniformNames.BaseColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: _baseColor,
         },
         {
             name: UniformNames.BaseMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: Vector2.one,
             value: _baseMapTiling,
         },
         {
             name: UniformNames.Metallic,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: _metallic,
         },
         {
             name: UniformNames.MetallicMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: _metallicMap,
         },
         {
             name: UniformNames.MetallicMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: _metallicMapTiling,
         },
 
         {
             name: UniformNames.Roughness,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: _roughness,
         },
         {
             name: UniformNames.RoughnessMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: _roughnessMap,
         },
         {
             name: UniformNames.RoughnessMapTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             value: _roughnessMapTiling,
         },
         {
             name: UniformNames.EmissiveColor,
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: _emissiveColor,
         },
     ];
     const shadingUniforms: UniformsData = [
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int, // float,intどちらでもいい
+            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },
     ];

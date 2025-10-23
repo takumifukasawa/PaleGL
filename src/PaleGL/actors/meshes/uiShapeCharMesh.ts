@@ -33,17 +33,17 @@ export const createUIShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     // const mergedUniforms: UniformsData = [
     //     {
     //         name: UniformNames.UICharRect,
-    //         type: UniformTypes.Vector2,
+    //         type: UNIFORM_TYPE_VECTOR2,
     //         value: createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect), // w: 1 を基準とする
     //     },
     //     {
     //         name: UniformNames.UIAnchor,
-    //         type: UniformTypes.Vector2,
+    //         type: UNIFORM_TYPE_VECTOR2,
     //         value: createVector2(0, 0),
     //     },
     //     {
     //         name: UniformNames.UIFontSize,
-    //         type: UniformTypes.Float,
+    //         type: UNIFORM_TYPE_FLOAT,
     //         value: planeWidth,
     //     },
     //     ...(uniforms || []),

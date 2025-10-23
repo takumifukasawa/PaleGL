@@ -15,7 +15,12 @@ import {
     UIQueueType,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants.ts';
 import { createUIShapeCharMesh } from '@/PaleGL/actors/meshes/uiShapeCharMesh.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
@@ -62,23 +67,23 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const baseUniforms: UniformsData = [
         {
             name: 'uColor',
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: color,
         },
         {
             name: UniformNames.FontMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: shapeFontTexture,
         },
         {
             name: UniformNames.FontTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: tilingOffset,
             value: createVector4(1, 1, 0, 0),
         },
         {
             name: 'uFontAspect',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: shapeFontRenderer.shapeFontAtlas.aspect,
         },
     ];
@@ -87,17 +92,17 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         ...baseUniforms,
         {
             name: UniformNames.UICharRect,
-            type: UniformTypes.Vector2,
+            type: UNIFORM_TYPE_VECTOR2,
             value: createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect), // w: 1 を基準とする
         },
         {
             name: UniformNames.UIAnchor,
-            type: UniformTypes.Vector2,
+            type: UNIFORM_TYPE_VECTOR2,
             value: createVector2(0, 0),
         },
         {
             name: UniformNames.UIFontSize,
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: fontSize,
         },
         ...(uniforms || []),

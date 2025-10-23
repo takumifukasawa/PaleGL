@@ -3,7 +3,7 @@
     PostProcessPassBase,
     PostProcessPassParametersBaseArgs,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import { PostProcessPassType, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { PostProcessPassType, UniformNames, UNIFORM_TYPE_TEXTURE } from '@/PaleGL/constants';
 import toneMappingFragmentShader from '@/PaleGL/shaders/tone-mapping-fragment.glsl';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 
@@ -18,7 +18,7 @@ export function createToneMappingPass(args: ToneMappingPassArgs): ToneMappingPas
         {
             name: UniformNames.SrcTexture,
             // uSrcTexture: {
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
     ];

@@ -5,7 +5,7 @@ import {
     PRIMITIVE_TYPE_TRIANGLES,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_VECTOR3,
 } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
@@ -45,7 +45,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
     const mergedUniforms: UniformsData = [
         {
             name: UniformNames.ViewDirection,
-            type: UniformTypes.Vector3,
+            type: UNIFORM_TYPE_VECTOR3,
             value: createVector3Zero(),
         },
         ...uniforms,

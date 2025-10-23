@@ -61,6 +61,24 @@
     PRIMITIVE_TYPE_TRIANGLES,
     TEXTURE_WRAP_TYPE_REPEAT,
     // UniformNames,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_FLOAT_ARRAY,
+    UNIFORM_TYPE_VECTOR2,
+    UNIFORM_TYPE_VECTOR2_ARRAY,
+    UNIFORM_TYPE_VECTOR3,
+    UNIFORM_TYPE_VECTOR3_ARRAY,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_VECTOR4_ARRAY,
+    UNIFORM_TYPE_MATRIX4,
+    UNIFORM_TYPE_MATRIX4_ARRAY,
+    UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_COLOR_ARRAY,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_TEXTURE_ARRAY,
+    UNIFORM_TYPE_CUBE_MAP,
+    UNIFORM_TYPE_STRUCT,
+    UNIFORM_TYPE_STRUCT_ARRAY,
     UniformTypes,
 } from '@/PaleGL/constants';
 import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
@@ -324,60 +342,60 @@ export function setGPUUniformValues(gpu: Gpu) {
         // TODO:
         // - nullなとき,値がおかしいときはセットしない方がよいけど、あえてエラーを出したいかもしれない
         switch (type) {
-            case UniformTypes.Int:
+            case UNIFORM_TYPE_INT:
                 gl.uniform1i(location, value as number);
                 break;
-            case UniformTypes.Float:
+            case UNIFORM_TYPE_FLOAT:
                 gl.uniform1f(location, value as number);
                 break;
-            case UniformTypes.FloatArray:
+            case UNIFORM_TYPE_FLOAT_ARRAY:
                 gl.uniform1fv(location, value as Float32Array);
                 break;
-            case UniformTypes.Vector2:
+            case UNIFORM_TYPE_VECTOR2:
                 gl.uniform2fv(location, (value as Vector2).e);
                 break;
-            case UniformTypes.Vector2Array:
+            case UNIFORM_TYPE_VECTOR2_ARRAY:
                 gl.uniform2fv(location, (value as Vector2[]).map((v) => [...v.e]).flat());
                 break;
-            case UniformTypes.Vector3:
+            case UNIFORM_TYPE_VECTOR3:
                 gl.uniform3fv(location, (value as Vector3).e);
                 break;
-            case UniformTypes.Vector3Array:
+            case UNIFORM_TYPE_VECTOR3_ARRAY:
                 gl.uniform3fv(location, (value as Vector3[]).map((v) => [...v.e]).flat());
                 break;
-            case UniformTypes.Vector4:
+            case UNIFORM_TYPE_VECTOR4:
                 gl.uniform4fv(location, (value as Vector4).e);
                 break;
-            case UniformTypes.Vector4Array:
+            case UNIFORM_TYPE_VECTOR4_ARRAY:
                 gl.uniform4fv(location, (value as Vector4[]).map((v) => [...v.e]).flat());
                 break;
-            case UniformTypes.Matrix4:
+            case UNIFORM_TYPE_MATRIX4:
                 // arg[1] ... use transpose.
                 gl.uniformMatrix4fv(location, false, (value as Matrix4).e);
                 break;
-            case UniformTypes.Matrix4Array:
+            case UNIFORM_TYPE_MATRIX4_ARRAY:
                 if (value) {
                     // arg[1] ... use transpose.
                     gl.uniformMatrix4fv(location, false, (value as Matrix4[]).map((v) => [...v.e]).flat());
                 }
                 break;
-            case UniformTypes.Color:
+            case UNIFORM_TYPE_COLOR:
                 gl.uniform4fv(location, (value as Color).e);
                 break;
-            case UniformTypes.ColorArray:
+            case UNIFORM_TYPE_COLOR_ARRAY:
                 if (value) {
                     // arg[1] ... use transpose.
                     gl.uniform4fv(location, (value as Color[]).map((v) => [...v.e]).flat());
                 }
                 break;
-            case UniformTypes.Texture:
+            case UNIFORM_TYPE_TEXTURE:
                 gl.activeTexture(GL_TEXTURE0 + activeTextureIndex);
                 gl.bindTexture(GL_TEXTURE_2D, value ? (value as Texture).glObject : getDummyWhiteTexture(gpu).glObject);
                 gl.uniform1i(location, activeTextureIndex);
                 // dummyTextureIndex++;
                 activeTextureIndex++;
                 break;
-            case UniformTypes.TextureArray:
+            case UNIFORM_TYPE_TEXTURE_ARRAY:
                 const textureArrayIndices: number[] = [];
                 (value as Texture[]).forEach((texture) => {
                     textureArrayIndices.push(activeTextureIndex);
@@ -392,7 +410,7 @@ export function setGPUUniformValues(gpu: Gpu) {
                 gl.uniform1iv(location, textureArrayIndices);
 
                 break;
-            case UniformTypes.CubeMap:
+            case UNIFORM_TYPE_CUBE_MAP:
                 // TODO: valueのguardなくて大丈夫なはず
                 gl.activeTexture(GL_TEXTURE0 + activeTextureIndex);
                 // if (value != null) {
@@ -415,13 +433,13 @@ export function setGPUUniformValues(gpu: Gpu) {
     // uniforms
     if (gpu.uniforms) {
         gpu.uniforms.data.forEach((uniformData) => {
-            if (uniformData.type === UniformTypes.Struct) {
+            if (uniformData.type === UNIFORM_TYPE_STRUCT) {
                 const uniformStructValue = uniformData.value as UniformStructValue;
                 uniformStructValue.forEach((structData) => {
                     const uniformName = `${uniformData.name}.${structData.name}`;
                     setUniformValueInternal(structData.type, uniformName, structData.value);
                 });
-            } else if (uniformData.type === UniformTypes.StructArray) {
+            } else if (uniformData.type === UNIFORM_TYPE_STRUCT_ARRAY) {
                 (uniformData.value as UniformStructArrayValue).forEach((uniformStructValue, i) => {
                     uniformStructValue.forEach((structData) => {
                         const uniformName = `${uniformData.name}[${i}].${structData.name}`;
@@ -642,12 +660,12 @@ export function createGPUUniformBufferObject(
     const variableNames: string[] = [];
     uniformBufferObjectBlockData.forEach((data) => {
         switch (data.type) {
-            case UniformTypes.Struct:
+            case UNIFORM_TYPE_STRUCT:
                 (data.value as UniformStructValue).forEach((structElement) => {
                     variableNames.push(`${data.name}.${structElement.name}`);
                 });
                 break;
-            case UniformTypes.StructArray:
+            case UNIFORM_TYPE_STRUCT_ARRAY:
                 (data.value as UniformStructArrayValue).forEach((structValue, i) => {
                     structValue.forEach((structElement) => {
                         variableNames.push(`${data.name}[${i}].${structElement.name}`);

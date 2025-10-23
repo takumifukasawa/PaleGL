@@ -1,4 +1,9 @@
-﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformTypes } from '@/PaleGL/constants';
+﻿import {
+    PostProcessPassType,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
+    UNIFORM_TYPE_FLOAT,
+
+} from '@/PaleGL/constants';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 import {
     createPostProcessSinglePass,
@@ -32,7 +37,7 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
                 // 1/12 = 0.0833 ... upper limit
                 {
                     name: 'uContrastThreshold',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0.0625,
                 },
                 // 1/3 = 0.333 ... too little
@@ -41,12 +46,12 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
                 // 1/16 = 0.0625 ... overkill
                 {
                     name: 'uRelativeThreshold',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0.125,
                 },
                 {
                     name: 'uSubpixelBlending',
-                    type: UniformTypes.Float,
+                    type: UNIFORM_TYPE_FLOAT,
                     value: 0.75,
                 },
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,

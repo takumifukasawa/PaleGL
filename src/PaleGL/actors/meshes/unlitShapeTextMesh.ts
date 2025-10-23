@@ -9,7 +9,12 @@ import {
     UI_QUEUE_TYPE_NONE,
     UniformBlockNames,
     UniformNames,
-    UniformTypes,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR4,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_COLOR,
+
 } from '@/PaleGL/constants.ts';
 import { TextAlignType } from '@/PaleGL/actors/meshes/textMesh.ts';
 import { setV3x, setV3y } from '@/PaleGL/math/vector3.ts';
@@ -40,23 +45,23 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const baseUniforms: UniformsData = [
         {
             name: 'uColor',
-            type: UniformTypes.Color,
+            type: UNIFORM_TYPE_COLOR,
             value: color,
         },
         {
             name: UniformNames.FontMap,
-            type: UniformTypes.Texture,
+            type: UNIFORM_TYPE_TEXTURE,
             value: shapeFontTexture,
         },
         {
             name: UniformNames.FontTiling,
-            type: UniformTypes.Vector4,
+            type: UNIFORM_TYPE_VECTOR4,
             // value: tilingOffset,
             value: createVector4(1, 1, 0, 0),
         },
         {
             name: 'uFontAspect',
-            type: UniformTypes.Float,
+            type: UNIFORM_TYPE_FLOAT,
             value: shapeFontRenderer.shapeFontAtlas.aspect,
         },
     ];
@@ -65,7 +70,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         ...baseUniforms,
         {
             name: UniformNames.ShadingModelId,
-            type: UniformTypes.Int,
+            type: UNIFORM_TYPE_INT,
             value: SHADING_MODEL_ID_UNLIT,
         },
         ...(uniforms || []),

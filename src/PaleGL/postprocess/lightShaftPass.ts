@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2 } from '@/PaleGL/constants';
 
 import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
@@ -95,7 +95,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         uniforms: [
             {
                 name: UniformNames.DepthTexture,
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             ...getPostProcessCommonUniforms(),
@@ -120,22 +120,22 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
             {
                 name: radialBlurOriginUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: passScaleBase,
             },
             {
                 name: radialBlurRayStepStrengthUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: rayStepStrength,
             },
         ],
@@ -151,22 +151,22 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 1,
             },
             {
                 name: radialBlurOriginUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: passScaleBase,
             },
             {
                 name: radialBlurRayStepStrengthUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: rayStepStrength,
             },
         ],
@@ -182,22 +182,22 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: 2,
             },
             {
                 name: radialBlurOriginUniformName,
-                type: UniformTypes.Vector2,
+                type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
             {
                 name: radialBlurPassScaleBaseUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: passScaleBase,
             },
             {
                 name: radialBlurRayStepStrengthUniformName,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: rayStepStrength,
             },
         ],
@@ -217,12 +217,12 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         uniforms: [
             {
                 name: 'uLightShaftTexture',
-                type: UniformTypes.Texture,
+                type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
                 name: UniformNames.BlendRate,
-                type: UniformTypes.Float,
+                type: UNIFORM_TYPE_FLOAT,
                 value: blendRate,
             },
         ],
