@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
 
 import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
@@ -90,8 +90,8 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const lightShaftDownSamplePass = createFragmentPass({
         gpu,
         fragmentShader: lightShaftDownSampleFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        // renderTargetType: RenderTargetTypes.R16F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
+        // renderTargetType: RENDER_TARGET_TYPE_R16F,
         uniforms: [
             {
                 name: UniformNames.DepthTexture,
@@ -116,7 +116,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const blur1Pass = createFragmentPass({
         gpu,
         fragmentShader: lightShaftRadialBlurFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
@@ -147,7 +147,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const blur2Pass = createFragmentPass({
         gpu,
         fragmentShader: lightShaftRadialBlurFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
@@ -178,7 +178,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const blur3Pass = createFragmentPass({
         gpu,
         fragmentShader: lightShaftRadialBlurFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
             {
                 name: radialBlurPassIndexUniformName,
@@ -213,7 +213,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
     const compositePass = createFragmentPass({
         gpu,
         fragmentShader: lightShaftCompositeFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
             {
                 name: 'uLightShaftTexture',

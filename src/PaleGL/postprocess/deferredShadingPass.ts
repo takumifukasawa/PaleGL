@@ -7,7 +7,7 @@
 import {
     MAX_SPOT_LIGHT_COUNT,
     PostProcessPassType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -93,7 +93,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
             uniforms,
             useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので
             receiveShadow: true, // TODO: これはいらないようにしたい. 確実にshadingするので
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             uniformBlockNames: [
                 UniformBlockNames.Camera,
                 UniformBlockNames.DirectionalLight,

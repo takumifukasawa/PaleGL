@@ -2,7 +2,7 @@
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     PostProcessPassType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -235,7 +235,7 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
             type: PostProcessPassType.SSR,
             fragmentShader,
             uniforms: baseUniforms,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             uniformBlockNames: [UniformBlockNames.Common],
             enabled,
         }),

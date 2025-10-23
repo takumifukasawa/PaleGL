@@ -53,7 +53,9 @@ import {
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RENDER_QUEUE_TYPE_AFTER_TONE,
     RENDER_QUEUE_TYPE_OVERLAY,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_DEPTH,
+    RENDER_TARGET_TYPE_EMPTY,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     // UIQueueType,
     UI_QUEUE_TYPE_AFTER_TONE,
@@ -332,7 +334,7 @@ export function createRenderer({
     const scenePostProcess = createPostProcess(screenQuadCamera);
     const depthPrePassRenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         width: 1,
         height: 1,
         name: 'depth pre-pass render target',
@@ -347,14 +349,14 @@ export function createRenderer({
     });
     const afterDeferredShadingRenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.Empty,
+        type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
         name: 'after g-buffer render target',
     });
     const copyDepthSourceRenderTarget: RenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.Empty,
+        type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
         name: 'copy depth source render target',
@@ -362,7 +364,7 @@ export function createRenderer({
     });
     const copyDepthDestRenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         width: 1,
         height: 1,
         name: 'copy depth dest render target',
@@ -370,14 +372,14 @@ export function createRenderer({
     });
     const copySceneSourceRenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.Empty,
+        type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
         name: 'copy scene source render target',
     });
     const copySceneDestRenderTarget = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         width: 1,
         height: 1,
         name: 'copy scene dest render target',

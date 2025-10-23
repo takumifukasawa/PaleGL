@@ -57,7 +57,7 @@ import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController
 import {
     UniformTypes,
     BLEND_TYPE_TRANSPARENT,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_DEPTH,
     AttributeNames,
     AttributeUsageType,
     UniformNames,
@@ -388,7 +388,7 @@ const directionalLight = createDirectionalLight({
 //         gpu,
 //         width: 1024,
 //         height: 1024,
-//         type: RenderTargetTypes.Depth,
+//         type: RENDER_TARGET_TYPE_DEPTH,
 //         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
 //     });
 // }
@@ -420,7 +420,7 @@ if (spotLight1.shadowCamera) {
         gpu,
         width: 1024,
         height: 1024,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }
@@ -451,7 +451,7 @@ if (spotLight2.shadowCamera) {
         name: 'spotLight2',
         width: 1024,
         height: 1024,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }

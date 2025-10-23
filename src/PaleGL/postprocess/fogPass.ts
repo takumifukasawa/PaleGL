@@ -2,7 +2,7 @@
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     PostProcessPassType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -110,7 +110,7 @@ export function createFogPass(args: FogPassArgs) {
             gpu,
             type: PostProcessPassType.Fog,
             fragmentShader,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             // renderTargetType: RenderTargetTypes.RGBA16F,
             uniforms: [
                 {

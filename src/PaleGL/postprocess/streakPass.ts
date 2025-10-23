@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Color, createColorWhite } from '@/PaleGL/math/color.ts';
@@ -136,7 +136,7 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             },
             ...getPostProcessCommonUniforms(),
         ],
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     materials.push(...prefilterPass.materials);
 
@@ -234,7 +234,7 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             },
             ...getPostProcessCommonUniforms(),
         ],
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     materials.push(...compositePass.materials);
 

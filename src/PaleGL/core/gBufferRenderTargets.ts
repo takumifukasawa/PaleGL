@@ -3,7 +3,7 @@
     GL_FRAMEBUFFER,
     GL_TEXTURE_2D,
     GLColorAttachment,
-    RenderTargetKinds,
+    RENDER_TARGET_KIND_G_BUFFER,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_TYPE_DEPTH,
     TEXTURE_TYPE_R11F_G11F_B10F,
@@ -163,7 +163,7 @@ export function createGBufferRenderTargets({
     unbindFramebuffer(framebuffer);
 
     return {
-        ...createRenderTargetBase(RenderTargetKinds.GBuffer, false),
+        ...createRenderTargetBase(RENDER_TARGET_KIND_G_BUFFER, false),
         gpu,
         name,
         width,

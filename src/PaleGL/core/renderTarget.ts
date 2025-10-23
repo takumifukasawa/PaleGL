@@ -11,7 +11,11 @@ import { createRenderbuffer, Renderbuffer, setRenderbufferSize } from '@/PaleGL/
 import {
     RENDERBUFFER_TYPE_DEPTH,
     RenderTargetType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_RGBA,
+    RENDER_TARGET_TYPE_DEPTH,
+    RENDER_TARGET_TYPE_RGBA16F,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
+    RENDER_TARGET_TYPE_R16F,
     TextureFilterType,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_TYPE_DEPTH,
@@ -34,7 +38,8 @@ import {
     GL_DEPTH_BUFFER_BIT,
     GLTextureFilter,
     RenderTargetKind,
-    RenderTargetKinds, GL_COLOR_BUFFER_BIT,
+    RENDER_TARGET_KIND_DEFAULT,
+    GL_COLOR_BUFFER_BIT,
 } from '@/PaleGL/constants';
 import { checkGPUExtension, Gpu } from '@/PaleGL/core/gpu.ts';
 import { SetRenderTargetSizeFunc } from '@/PaleGL/core/renderTargetBehaviours.ts';
@@ -91,8 +96,8 @@ export function createRenderTarget({
 }: RenderTargetOptions): RenderTarget {
     // default variables
     name = name ?? '';
-    renderTargetKind = renderTargetKind ?? RenderTargetKinds.Default;
-    type = type ?? RenderTargetTypes.RGBA;
+    renderTargetKind = renderTargetKind ?? RENDER_TARGET_KIND_DEFAULT;
+    type = type ?? RENDER_TARGET_TYPE_RGBA;
     width = width ?? 1;
     height = height ?? 1;
     useDepthBuffer = useDepthBuffer ?? false;
@@ -131,7 +136,7 @@ export function createRenderTarget({
     //
     switch (type) {
         // RGBA8整数バッファ
-        case RenderTargetTypes.RGBA:
+        case RENDER_TARGET_TYPE_RGBA:
             texture = createTexture({
                 gpu,
                 name: textureName,
@@ -154,7 +159,7 @@ export function createRenderTarget({
             break;
 
         // RGBA16F浮動小数点バッファ
-        case RenderTargetTypes.RGBA16F:
+        case RENDER_TARGET_TYPE_RGBA16F:
             if (!checkGPUExtension(gpu, GL_EXT_color_buffer_float)) {
                 console.error('EXT_color_buffer_float not supported');
                 // return;
@@ -181,7 +186,7 @@ export function createRenderTarget({
             break;
 
         // R11G11B10F浮動小数点バッファ
-        case RenderTargetTypes.R11F_G11F_B10F:
+        case RENDER_TARGET_TYPE_R11F_G11F_B10F:
             // TODO: r11g11b10 の場合はなくてもよい？
             if (!checkGPUExtension(gpu, GL_EXT_color_buffer_float)) {
                 console.error('EXT_color_buffer_float not supported');
@@ -209,7 +214,7 @@ export function createRenderTarget({
             );
             break;
 
-        case RenderTargetTypes.R16F:
+        case RENDER_TARGET_TYPE_R16F:
             texture = createTexture({
                 gpu,
                 name: textureName,
@@ -246,7 +251,7 @@ export function createRenderTarget({
     }
 
     // 深度バッファをテクスチャとして扱う場合
-    if (type === RenderTargetTypes.Depth || writeDepthTexture) {
+    if (type === RENDER_TARGET_TYPE_DEPTH || writeDepthTexture) {
         depthTexture = createTexture({
             gpu,
             name: textureName,

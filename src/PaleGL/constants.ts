@@ -177,25 +177,21 @@ export type TextureDepthPrecisionType = typeof TEXTURE_DEPTH_PRECISION_TYPE_MEDI
 // render target types
 // -----------------------------------------------------------------------------
 
-export const RenderTargetKinds = {
-    Default: 0,
-    GBuffer: 1,
-    MRT: 2,
-    DoubleBuffer: 3,
-};
+export const RENDER_TARGET_KIND_DEFAULT = 0;
+export const RENDER_TARGET_KIND_G_BUFFER = 1;
+export const RENDER_TARGET_KIND_MRT = 2;
+export const RENDER_TARGET_KIND_DOUBLE_BUFFER = 3;
 
-export type RenderTargetKind = (typeof RenderTargetKinds)[keyof typeof RenderTargetKinds];
+export type RenderTargetKind = typeof RENDER_TARGET_KIND_DEFAULT | typeof RENDER_TARGET_KIND_G_BUFFER | typeof RENDER_TARGET_KIND_MRT | typeof RENDER_TARGET_KIND_DOUBLE_BUFFER;
 
-export const RenderTargetTypes = {
-    RGBA: 0,
-    Depth: 1,
-    Empty: 2,
-    RGBA16F: 3,
-    R11F_G11F_B10F: 4,
-    R16F: 5,
-} as const;
+export const RENDER_TARGET_TYPE_RGBA = 0;
+export const RENDER_TARGET_TYPE_DEPTH = 1;
+export const RENDER_TARGET_TYPE_EMPTY = 2;
+export const RENDER_TARGET_TYPE_RGBA16F = 3;
+export const RENDER_TARGET_TYPE_R11F_G11F_B10F = 4;
+export const RENDER_TARGET_TYPE_R16F = 5;
 
-export type RenderTargetType = (typeof RenderTargetTypes)[keyof typeof RenderTargetTypes];
+export type RenderTargetType = typeof RENDER_TARGET_TYPE_RGBA | typeof RENDER_TARGET_TYPE_DEPTH | typeof RENDER_TARGET_TYPE_EMPTY | typeof RENDER_TARGET_TYPE_RGBA16F | typeof RENDER_TARGET_TYPE_R11F_G11F_B10F | typeof RENDER_TARGET_TYPE_R16F;
 
 // -----------------------------------------------------------------------------
 // animation keyframes

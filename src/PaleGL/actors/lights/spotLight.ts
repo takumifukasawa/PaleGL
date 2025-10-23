@@ -4,7 +4,7 @@ import { createPerspectiveCamera, PerspectiveCamera } from '@/PaleGL/actors/came
 import { setPerspectiveSize } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { DEG_TO_RAD, LIGHT_TYPE_SPOT, RenderTargetTypes, TEXTURE_DEPTH_PRECISION_TYPE_HIGH } from '@/PaleGL/constants.ts';
+import { DEG_TO_RAD, LIGHT_TYPE_SPOT, RENDER_TARGET_TYPE_DEPTH, TEXTURE_DEPTH_PRECISION_TYPE_HIGH } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { setRotationY } from '@/PaleGL/core/transform.ts';
@@ -103,7 +103,7 @@ export const createSpotLightShadow = (
         gpu,
         width: resolution,
         height: resolution,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 };

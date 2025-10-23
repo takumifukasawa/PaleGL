@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RenderTargetTypes, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformTypes } from '@/PaleGL/constants';
 import fxaaFragmentShader from '@/PaleGL/shaders/fxaa-fragment.glsl';
 import {
     createPostProcessSinglePass,
@@ -25,7 +25,7 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
             gpu,
             type: PostProcessPassType.FXAA,
             fragmentShader,
-            renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+            renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
             uniforms: [
                 // 1/32 = 0.03125 ... visible limit
                 // 1/16 = 0.0625 ... high quality

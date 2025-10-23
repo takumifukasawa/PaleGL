@@ -28,7 +28,7 @@ import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualize
 import { createTouchInputController } from '@/PaleGL/inputs/touchInputController.ts';
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController.ts';
 import {
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_DEPTH,
     UniformNames,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     ACTOR_TYPE_MESH,
@@ -233,7 +233,7 @@ if (directionalLight.shadowCamera) {
         gpu,
         width: 1024,
         height: 1024,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }

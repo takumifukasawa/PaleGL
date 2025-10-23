@@ -1,4 +1,4 @@
-﻿import { PostProcessPassType, RenderTargetTypes, UniformNames, UniformTypes } from '@/PaleGL/constants';
+﻿import { PostProcessPassType, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UniformTypes } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -105,43 +105,43 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
 
     const renderTargetBlurMip4_Horizontal = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip4_Vertical = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip8_Horizontal = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip8_Vertical = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip16_Horizontal = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip16_Vertical = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip32_Horizontal = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip32_Vertical = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip64_Horizontal = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     const renderTargetBlurMip64_Vertical = createRenderTarget({
         gpu,
-        type: RenderTargetTypes.R11F_G11F_B10F,
+        type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
 
     const extractBrightnessPass = createFragmentPass({
@@ -154,7 +154,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
                 value: threshold,
             },
         ],
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     materials.push(...extractBrightnessPass.materials);
 
@@ -259,7 +259,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
             },
             ...getPostProcessCommonUniforms(),
         ],
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
     materials.push(...compositePass.materials);
 

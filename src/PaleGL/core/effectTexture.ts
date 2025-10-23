@@ -1,6 +1,6 @@
 import {
     RenderTargetType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_RGBA,
     TextureFilterType,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_WRAP_TYPE_REPEAT,
@@ -21,7 +21,7 @@ const createEffectTextureTarget = ({
     gpu,
     width,
     height,
-    type = RenderTargetTypes.RGBA,
+    type = RENDER_TARGET_TYPE_RGBA,
     minFilter = TEXTURE_FILTER_TYPE_LINEAR,
     magFilter = TEXTURE_FILTER_TYPE_LINEAR,
 }: {

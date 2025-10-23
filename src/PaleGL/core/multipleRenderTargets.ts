@@ -3,7 +3,7 @@
     GL_TEXTURE_2D,
     GLColorAttachment,
     GLColorAttachments,
-    RenderTargetKinds,
+    RENDER_TARGET_KIND_MRT,
     TextureFilterType,
     TEXTURE_FILTER_TYPE_LINEAR,
     TextureType,
@@ -78,7 +78,7 @@ export function createMultipleRenderTargets({
     unbindFramebuffer(framebuffer);
 
     return {
-        ...createRenderTargetBase(RenderTargetKinds.MRT, false),
+        ...createRenderTargetBase(RENDER_TARGET_KIND_MRT, false),
         gpu,
         name,
         width,

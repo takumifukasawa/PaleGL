@@ -14,7 +14,7 @@ import {
     FACE_SIDE_FRONT,
     FragmentShaderModifierPragmas,
     RENDER_QUEUE_TYPE_TRANSPARENT,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_DEPTH,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformNames,
     UniformTypes,
@@ -385,7 +385,7 @@ if (directionalLight.shadowCamera) {
         gpu,
         width: 1024,
         height: 1024,
-        type: RenderTargetTypes.Depth,
+        type: RENDER_TARGET_TYPE_DEPTH,
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }

@@ -2,7 +2,9 @@
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     PostProcessPassType,
-    RenderTargetTypes,
+    RENDER_TARGET_TYPE_R16F,
+    RENDER_TARGET_TYPE_RGBA16F,
+    RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -135,9 +137,9 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             UniformBlockNames.Camera,
         ],
         // NOTE: r11f_g11f_b10fだとunsignedなのでr16fにする
-        // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        // renderTargetType: RenderTargetTypes.RGBA16F
-        renderTargetType: RenderTargetTypes.R16F,
+        // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
+        // renderTargetType: RENDER_TARGET_TYPE_RGBA16F
+        renderTargetType: RENDER_TARGET_TYPE_R16F,
         // renderTargetType: RenderTargetTypes.RGBA
     });
     materials.push(...circleOfConfusionPass.materials);
@@ -179,8 +181,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             },
             ...getPostProcessCommonUniforms(),
         ],
-        // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        renderTargetType: RenderTargetTypes.RGBA16F,
+        // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         // renderTargetType: RenderTargetTypes.RGBA
     });
     materials.push(...preFilterPass.materials);
@@ -192,8 +194,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
     const dofBokehPass = createFragmentPass({
         gpu,
         fragmentShader: dofBokehFragmentShader,
-        // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        renderTargetType: RenderTargetTypes.RGBA16F,
+        // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         uniforms: [
             // uSrcTextureWidth: {
             //     type: UniformTypes.Float,
@@ -224,8 +226,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
     const bokehBlurPass = createFragmentPass({
         gpu,
         fragmentShader: dofBokehBlurFragmentShader,
-        // renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
-        renderTargetType: RenderTargetTypes.RGBA16F,
+        // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         uniforms: [
             {
                 name: 'uTexelSize',
@@ -248,7 +250,7 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
     const compositePass = createFragmentPass({
         gpu,
         fragmentShader: dofCompositeFragmentShader,
-        renderTargetType: RenderTargetTypes.R11F_G11F_B10F,
+        renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
             {
                 name: UNIFORM_NAME_COC_TEXTURE,

@@ -1,4 +1,4 @@
-import { RenderTargetKinds } from '@/PaleGL/constants.ts';
+import { RENDER_TARGET_KIND_DOUBLE_BUFFER, RENDER_TARGET_KIND_MRT } from '@/PaleGL/constants.ts';
 import {
     createMultipleRenderTargets,
     MultipleRenderTarget,
@@ -37,7 +37,7 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
     }
 
     return {
-        ...createRenderTargetBase(RenderTargetKinds.DoubleBuffer, true),
+        ...createRenderTargetBase(RENDER_TARGET_KIND_DOUBLE_BUFFER, true),
         currentReadIndex: 0,
         renderTargets: renderTargets,
     };
@@ -52,7 +52,7 @@ export function createMRTDoubleBuffer(renderTargetOptions: MultipleRenderTargetO
     }
 
     return {
-        ...createRenderTargetBase(RenderTargetKinds.MRT, true),
+        ...createRenderTargetBase(RENDER_TARGET_KIND_MRT, true),
         currentReadIndex: 0,
         multipleRenderTargets,
     };
