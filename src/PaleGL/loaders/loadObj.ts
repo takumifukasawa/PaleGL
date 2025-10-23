@@ -1,7 +1,7 @@
 ﻿import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import {AttributeNames} from "@/PaleGL/constants.ts";
+import {ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_NORMAL} from "@/PaleGL/constants.ts";
 
 export async function loadAndCreateOBJGeometry(gpu: Gpu, path: string) {
     const modelData = await loadObj(path);
@@ -17,17 +17,17 @@ export async function loadAndCreateOBJGeometry(gpu: Gpu, path: string) {
         gpu,
         attributes: [
             createAttribute(
-                AttributeNames.Position,
+                ATTRIBUTE_NAME_POSITION,
                 positions,
                 3
             ),
             createAttribute(
-                AttributeNames.Uv,
+                ATTRIBUTE_NAME_UV,
                 uvs,
                 2
             ),
             createAttribute(
-                AttributeNames.Normal,
+                ATTRIBUTE_NAME_NORMAL,
                 normals,
                 3
             ),

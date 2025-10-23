@@ -50,6 +50,21 @@
   - 型推論エラー: なし
   - 所要時間: 約30分
 
+**第8回（1個・18定数）**: AttributeNames (Position, Color, Uv, Normal, Tangent, Binormal, BoneIndices, BoneWeights, InstancePosition, InstanceScale, InstanceRotation, InstanceAnimationOffset, InstanceVertexColor, InstanceEmissiveColor, InstanceVelocity, InstanceLookDirection, InstanceState, TrailIndex)
+  - 修正ファイル数: 16ファイル（src: 14ファイル、pages: 2ファイル）
+  - 使用箇所: 約93箇所
+  - 主要修正箇所:
+    - geometries: 3ファイル（boxGeometry, planeGeometry, createSphereGeometry）
+    - loaders: 1ファイル（loadObj）
+    - actors/meshes: 6ファイル（arrowHelper, axesHelper, billboardParticle, skinnedMesh, skybox※コメントのみ）
+    - actors/cameras: 1ファイル（cameraBehaviours）
+    - actors/particles: 2ファイル（instancingParticle, gpuTrailParticle）
+    - postprocess: 1ファイル（volumetricLightPass）
+    - utilities: 1ファイル（stats）
+    - pages: 2ファイル（street-light/main, sandbox/main）
+  - 型推論エラー: なし
+  - 所要時間: 約30-35分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -193,14 +208,9 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 1. ~~`AnimationKeyframeTypes`~~ (完了: 2定数)
 2. ~~`AttributeUsageType`~~ (完了: 3定数)
 3. ~~`PostProcessPassType`~~ (完了: 20定数)
+4. ~~`AttributeNames`~~ (完了: 18定数)
 
 ### 優先度: 高（中規模・高頻度）
-3. ~~**`PostProcessPassType`**~~ (完了: 20定数、24ファイル、57箇所、30分)
-
-4. **`AttributeNames`** - 18定数、16ファイル、93箇所
-   - 推定時間: 30-40分
-   - 難易度: ★★☆
-   - 理由: ジオメトリ属性で広く使用される
 
 5. **`UniformBlockNames`** - 7定数、29ファイル、86箇所
    - 推定時間: 30-40分

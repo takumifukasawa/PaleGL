@@ -20,7 +20,7 @@ import {
 } from '@/PaleGL/actors/cameras/perspectiveCameraBehaviour.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
-    AttributeNames,
+    ATTRIBUTE_NAME_POSITION,
     // @ts-ignore - type-only import
     type AttributeUsageType,
     ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
@@ -152,7 +152,7 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
                 gpu,
                 attributes: [
                     createAttribute(
-                        AttributeNames.Position,
+                        ATTRIBUTE_NAME_POSITION,
                         new Float32Array(maton.range(3 * 8 * 6).fill(0)),
                         3,
                         0,
@@ -214,10 +214,10 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
             material: createMaterial({
                 // gpu,
                 vertexShader: `
-layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
 #include <lighting>
 #include <ub>
-void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);}
+void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);}
 `,
                 fragmentShader: `
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}
@@ -259,7 +259,7 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
 
         updateGeometryAttribute(
             camera.visibleFrustumMesh.geometry,
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             new Float32Array([
                 // far
                 ...flt,

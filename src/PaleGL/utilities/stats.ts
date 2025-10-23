@@ -1,4 +1,4 @@
-// import { AttributeNames } from '@/PaleGL/constants';
+// import { ATTRIBUTE_NAME_POSITION } from '@/PaleGL/constants';
 // import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 // import { calculateFPSCounter, createFPSCounter, FpsCounter } from '@/PaleGL/utilities/fpsCounter.ts';
 // import { getGeometryAttributeByName } from '@/PaleGL/geometries/geometryBehaviours.ts';
@@ -71,7 +71,7 @@
 //
 //     const addPassInfo = (groupLabel: string, passLabel: string, geometry: Geometry) => {
 //         const passIndex = _passes.findIndex((elem) => elem.groupLabel === groupLabel);
-//         const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
+//         const positionAttribute = getGeometryAttributeByName(geometry, ATTRIBUTE_NAME_POSITION);
 //         if (!positionAttribute) {
 //             console.error('invalid position attribute');
 //         }
@@ -87,7 +87,7 @@
 //     };
 //
 //     const addDrawVertexCount = (geometry: Geometry) => {
-//         const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
+//         const positionAttribute = getGeometryAttributeByName(geometry, ATTRIBUTE_NAME_POSITION);
 //         if (!positionAttribute) {
 //             return;
 //         }
@@ -152,7 +152,7 @@
 //     };
 // }
 
-import { AttributeNames } from '@/PaleGL/constants';
+import { ATTRIBUTE_NAME_POSITION } from '@/PaleGL/constants';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { calculateFPSCounter, createFPSCounter, FpsCounter } from '@/PaleGL/utilities/fpsCounter.ts';
 import { getGeometryAttributeByName } from '@/PaleGL/geometries/geometryBehaviours.ts';
@@ -240,7 +240,7 @@ export const clearStats = (stats: Stats) => {
 
 export const addPassInfoStats = (stats: Stats, groupLabel: string, passLabel: string, geometry: Geometry) => {
     const passIndex = stats.passes.findIndex((elem) => elem.groupLabel === groupLabel);
-    const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
+    const positionAttribute = getGeometryAttributeByName(geometry, ATTRIBUTE_NAME_POSITION);
     if (!positionAttribute) {
         console.error('invalid position attribute');
     }
@@ -256,7 +256,7 @@ export const addPassInfoStats = (stats: Stats, groupLabel: string, passLabel: st
 };
 
 export const addDrawVertexCountStats = (stats: Stats, geometry: Geometry) => {
-    const positionAttribute = getGeometryAttributeByName(geometry, AttributeNames.Position);
+    const positionAttribute = getGeometryAttributeByName(geometry, ATTRIBUTE_NAME_POSITION);
     if (!positionAttribute) {
         return;
     }

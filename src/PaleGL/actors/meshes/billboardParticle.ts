@@ -2,7 +2,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
-    AttributeNames, BlendType,
+    ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_COLOR, BlendType,
     BLEND_TYPE_TRANSPARENT,
     FragmentShaderModifiers,
     UniformBlockNames,
@@ -60,7 +60,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         gpu,
         attributes: [
             createAttribute(
-                AttributeNames.Position.toString(),
+                ATTRIBUTE_NAME_POSITION,
                 // dummy data
                 new Float32Array(
                     maton
@@ -82,7 +82,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                 3
             ),
             createAttribute(
-                AttributeNames.Uv.toString(),
+                ATTRIBUTE_NAME_UV,
                 new Float32Array(
                     maton
                         .range(particleNum)
@@ -100,7 +100,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                 2
             ),
             createAttribute(
-                AttributeNames.Color.toString(),
+                ATTRIBUTE_NAME_COLOR,
                 new Float32Array(
                     maton
                         .range(particleNum)

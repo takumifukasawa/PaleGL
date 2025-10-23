@@ -89,7 +89,11 @@ import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail
 
 // others
 import {
-    AttributeNames,
+    ATTRIBUTE_NAME_INSTANCE_POSITION,
+    ATTRIBUTE_NAME_INSTANCE_SCALE,
+    ATTRIBUTE_NAME_INSTANCE_ROTATION,
+    ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
+    ATTRIBUTE_NAME_INSTANCE_VELOCITY,
     // @ts-ignore - type-only import
     type AttributeUsageType,
     ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
@@ -1191,31 +1195,31 @@ const createTransformFeedbackDrivenMesh = () => {
             //     divisor: 1,
             // }),
             new Attribute({
-                name: AttributeNames.InstancePosition,
+                name: ATTRIBUTE_NAME_INSTANCE_POSITION,
                 data: new Float32Array(instancePosition),
                 size: 3,
                 divisor: 1,
             }),
             new Attribute({
-                name: AttributeNames.InstanceScale,
+                name: ATTRIBUTE_NAME_INSTANCE_SCALE,
                 data: new Float32Array(instanceScale),
                 size: 3,
                 divisor: 1,
             }),
             new Attribute({
-                name: AttributeNames.InstanceRotation,
+                name: ATTRIBUTE_NAME_INSTANCE_ROTATION,
                 data: new Float32Array(instanceRotation),
                 size: 3,
                 divisor: 1,
             }),
             new Attribute({
-                name: AttributeNames.InstanceVertexColor,
+                name: ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
                 data: new Float32Array(instanceColor),
                 size: 4,
                 divisor: 1,
             }),
             new Attribute({
-                name: AttributeNames.InstanceVelocity,
+                name: ATTRIBUTE_NAME_INSTANCE_VELOCITY,
                 data: new Float32Array(instanceVelocity),
                 size: 3,
                 divisor: 1,
@@ -1267,11 +1271,11 @@ const createTransformFeedbackDrivenMesh = () => {
         // };
         // mesh.onUpdate = () => {
         geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstancePosition,
+            ATTRIBUTE_NAME_INSTANCE_POSITION,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aPosition')
         );
         geometry.vertexArrayObject.replaceBuffer(
-            AttributeNames.InstanceVelocity,
+            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
             transformFeedbackDoubleBuffer.read.vertexArrayObject.findBuffer('aVelocity')
         );
         // geometry.vertexArrayObject.replaceBuffer(
@@ -1600,7 +1604,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         // mesh.onUpdate = () => {
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
-            AttributeNames.InstancePosition,
+            ATTRIBUTE_NAME_INSTANCE_POSITION,
             findVertexArrayObjectVertexBufferObjectBuffer(
                 getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aPosition'
@@ -1608,7 +1612,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         );
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
-            AttributeNames.InstanceVelocity,
+            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
             findVertexArrayObjectVertexBufferObjectBuffer(
                 getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aVelocity'

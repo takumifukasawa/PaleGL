@@ -212,31 +212,29 @@ export const ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY = 2;
 
 export type AttributeUsageType = typeof ATTRIBUTE_USAGE_TYPE_STATIC_DRAW | typeof ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW | typeof ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY;
 
-export const AttributeNames = {
-    Position: 'aPosition',
-    Color: 'aColor',
-    Uv: 'aUv',
-    Normal: 'aNormal',
-    Tangent: 'aTangent',
-    Binormal: 'aBinormal',
-    // skinning
-    BoneIndices: 'aBoneIndices',
-    BoneWeights: 'aBoneWeighs',
-    // instancing
-    InstancePosition: 'aInstancePosition',
-    InstanceScale: 'aInstanceScale',
-    InstanceRotation: 'aInstanceRotation',
-    InstanceAnimationOffset: 'aInstanceAnimationOffset',
-    InstanceVertexColor: 'aInstanceVertexColor',
-    InstanceEmissiveColor: 'aInstanceEmissiveColor',
-    InstanceVelocity: 'aInstanceVelocity',
-    InstanceLookDirection: 'aLookDirection',
-    InstanceState: 'aInstanceState',
-    // trail
-    TrailIndex: 'aTrailIndex',
-} as const;
+export const ATTRIBUTE_NAME_POSITION = 'aPosition';
+export const ATTRIBUTE_NAME_COLOR = 'aColor';
+export const ATTRIBUTE_NAME_UV = 'aUv';
+export const ATTRIBUTE_NAME_NORMAL = 'aNormal';
+export const ATTRIBUTE_NAME_TANGENT = 'aTangent';
+export const ATTRIBUTE_NAME_BINORMAL = 'aBinormal';
+// skinning
+export const ATTRIBUTE_NAME_BONE_INDICES = 'aBoneIndices';
+export const ATTRIBUTE_NAME_BONE_WEIGHTS = 'aBoneWeighs';
+// instancing
+export const ATTRIBUTE_NAME_INSTANCE_POSITION = 'aInstancePosition';
+export const ATTRIBUTE_NAME_INSTANCE_SCALE = 'aInstanceScale';
+export const ATTRIBUTE_NAME_INSTANCE_ROTATION = 'aInstanceRotation';
+export const ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET = 'aInstanceAnimationOffset';
+export const ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR = 'aInstanceVertexColor';
+export const ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR = 'aInstanceEmissiveColor';
+export const ATTRIBUTE_NAME_INSTANCE_VELOCITY = 'aInstanceVelocity';
+export const ATTRIBUTE_NAME_INSTANCE_LOOK_DIRECTION = 'aLookDirection';
+export const ATTRIBUTE_NAME_INSTANCE_STATE = 'aInstanceState';
+// trail
+export const ATTRIBUTE_NAME_TRAIL_INDEX = 'aTrailIndex';
 
-export type AttributeName = (typeof AttributeNames)[keyof typeof AttributeNames];
+export type AttributeName = typeof ATTRIBUTE_NAME_POSITION | typeof ATTRIBUTE_NAME_COLOR | typeof ATTRIBUTE_NAME_UV | typeof ATTRIBUTE_NAME_NORMAL | typeof ATTRIBUTE_NAME_TANGENT | typeof ATTRIBUTE_NAME_BINORMAL | typeof ATTRIBUTE_NAME_BONE_INDICES | typeof ATTRIBUTE_NAME_BONE_WEIGHTS | typeof ATTRIBUTE_NAME_INSTANCE_POSITION | typeof ATTRIBUTE_NAME_INSTANCE_SCALE | typeof ATTRIBUTE_NAME_INSTANCE_ROTATION | typeof ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET | typeof ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR | typeof ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR | typeof ATTRIBUTE_NAME_INSTANCE_VELOCITY | typeof ATTRIBUTE_NAME_INSTANCE_LOOK_DIRECTION | typeof ATTRIBUTE_NAME_INSTANCE_STATE | typeof ATTRIBUTE_NAME_TRAIL_INDEX;
 
 // -----------------------------------------------------------------------------
 // post process

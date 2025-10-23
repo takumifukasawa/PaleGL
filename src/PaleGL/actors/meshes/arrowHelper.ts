@@ -2,7 +2,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import {AttributeNames, BLEND_TYPE_TRANSPARENT, UniformBlockNames, UniformNames} from '@/PaleGL/constants.ts';
+import {ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, BLEND_TYPE_TRANSPARENT, UniformBlockNames, UniformNames} from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {setScaling} from "@/PaleGL/core/transform.ts";
@@ -189,15 +189,15 @@ f 23/56/18 22/55/18 20/53/18
 //         const material = createMaterial({
 //             // gpu,
 //             vertexShader: `
-//             layout (location = 0) in vec3 ${AttributeNames.Position};
-//             layout (location = 1) in vec2 ${AttributeNames.Uv};
+//             layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
+//             layout (location = 1) in vec2 ${ATTRIBUTE_NAME_UV};
 //             uniform mat4 ${UniformNames.WorldMatrix};
 //             uniform mat4 ${UniformNames.ViewMatrix};
 //             uniform mat4 ${UniformNames.ProjectionMatrix};
 //             out vec2 vUv;
 //             void main() {
 //                 vUv = aUv;
-//                 gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
+//                 gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
 //             }
 //             `,
 //             fragmentShader: `
@@ -232,12 +232,12 @@ export function createArrowHelper({ gpu }: { gpu: Gpu }): Mesh {
         gpu,
         attributes: [
             createAttribute(
-                AttributeNames.Position,
+                ATTRIBUTE_NAME_POSITION,
                 new Float32Array(objData.positions),
                 3
             ),
             createAttribute(
-                AttributeNames.Uv,
+                ATTRIBUTE_NAME_UV,
                 new Float32Array(objData.uvs),
                 2
             ),
@@ -257,7 +257,7 @@ precision highp float;
 out vec2 vUv;
 void main() {
     vUv = aUv;
-    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
+    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
 }
             `,
         fragmentShader: `

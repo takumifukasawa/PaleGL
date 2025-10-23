@@ -1,5 +1,5 @@
 ﻿import { createGeometry, createTangentsAndBinormals, Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { AttributeNames } from '@/PaleGL/constants';
+import { ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_NORMAL, ATTRIBUTE_NAME_TANGENT, ATTRIBUTE_NAME_BINORMAL } from '@/PaleGL/constants';
 import {Attribute, createAttribute} from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createVector3Zero, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
@@ -98,17 +98,17 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
 
     const attributes: Attribute[] = [
         createAttribute(
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             rawData.positions,
             3
         ),
         createAttribute(
-            AttributeNames.Uv,
+            ATTRIBUTE_NAME_UV,
             rawData.uvs,
             2
         ),
         createAttribute(
-            AttributeNames.Normal,
+            ATTRIBUTE_NAME_NORMAL,
             rawData.normals,
             3
         ),
@@ -117,7 +117,7 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
     if (args.calculateTangent) {
         attributes.push(
             createAttribute(
-                AttributeNames.Tangent,
+                ATTRIBUTE_NAME_TANGENT,
                 rawData.tangents,
                 3
             )
@@ -126,7 +126,7 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
     if (args.calculateBinormal) {
         attributes.push(
             createAttribute(
-                AttributeNames.Binormal,
+                ATTRIBUTE_NAME_BINORMAL,
                 rawData.binormals,
                 3
             )

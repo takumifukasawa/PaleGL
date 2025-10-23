@@ -2,7 +2,7 @@
 import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
-    AttributeNames,
+    ATTRIBUTE_NAME_POSITION,
     // @ts-ignore - type-only import
     type AttributeUsageType,
     ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
@@ -346,16 +346,16 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
             // console.log(bone.jointMatrix.position.e)
             return [...getMat4Position(bone.jointMatrix).e];
         });
-        // this.boneLines.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
-        // this.bonePoints.geometry.updateAttribute(AttributeNames.Position, boneLinePositions.flat())
+        // this.boneLines.geometry.updateAttribute(ATTRIBUTE_NAME_POSITION, boneLinePositions.flat())
+        // this.bonePoints.geometry.updateAttribute(ATTRIBUTE_NAME_POSITION, boneLinePositions.flat())
         updateGeometryAttribute(
             skinnedMesh.boneLines.geometry,
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             new Float32Array(boneLinePositions.flat())
         );
         updateGeometryAttribute(
             skinnedMesh.bonePoints.geometry,
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             new Float32Array(boneLinePositions.flat())
         );
     }
@@ -493,7 +493,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
             gpu,
             attributes: [
                 createAttribute(
-                    AttributeNames.Position,
+                    ATTRIBUTE_NAME_POSITION,
                     new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
                     3,
                     0,
@@ -507,14 +507,14 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
         material: createMaterial({
             // gpu,
             vertexShader: `
-                layout (location = 0) in vec3 ${AttributeNames.Position};
+                layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
                 
                 uniform mat4 ${UniformNames.WorldMatrix};
                 uniform mat4 ${UniformNames.ViewMatrix};
                 uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
                 }
                 `,
             fragmentShader: `
@@ -537,7 +537,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
             gpu,
             attributes: [
                 createAttribute(
-                    AttributeNames.Position.toString(),
+                    ATTRIBUTE_NAME_POSITION.toString(),
                     new Float32Array(new Array(skinnedMesh.boneOrderedIndex.length * 3).fill(0)),
                     3,
                     0,
@@ -550,14 +550,14 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
         material: createMaterial({
             // gpu,
             vertexShader: `
-                layout (location = 0) in vec3 ${AttributeNames.Position};
+                layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
                 
                 uniform mat4 ${UniformNames.WorldMatrix};
                 uniform mat4 ${UniformNames.ViewMatrix};
                 uniform mat4 ${UniformNames.ProjectionMatrix};
                 
                 void main() {
-                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${AttributeNames.Position}, 1.);
+                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
                     gl_PointSize = 6.;
                 }
                 `,

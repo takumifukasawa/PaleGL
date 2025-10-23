@@ -3,7 +3,10 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
-    AttributeNames,
+    ATTRIBUTE_NAME_POSITION,
+    ATTRIBUTE_NAME_UV,
+    ATTRIBUTE_NAME_NORMAL,
+    ATTRIBUTE_NAME_TRAIL_INDEX,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
     UniformNames,
@@ -113,22 +116,22 @@ export const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVert
 
     const attributes: Attribute[] = [
         createAttribute(
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             positions,
             3
         ),
         createAttribute(
-            AttributeNames.Uv,
+            ATTRIBUTE_NAME_UV,
             uvs,
             2
         ),
         createAttribute(
-            AttributeNames.Normal,
+            ATTRIBUTE_NAME_NORMAL,
             normals,
             3
         ),
         createAttribute(
-            AttributeNames.TrailIndex,
+            ATTRIBUTE_NAME_TRAIL_INDEX,
             trailVertices,
             1
         ),
@@ -216,22 +219,22 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
 
     const attributes: Attribute[] = [
         createAttribute(
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             positions,
             3
         ),
         createAttribute(
-            AttributeNames.Uv,
+            ATTRIBUTE_NAME_UV,
             uvs,
             2
         ),
         createAttribute(
-            AttributeNames.Normal,
+            ATTRIBUTE_NAME_NORMAL,
             normals,
             3
         ),
         createAttribute(
-            AttributeNames.TrailIndex,
+            ATTRIBUTE_NAME_TRAIL_INDEX,
             trailVertices,
             1
         ),

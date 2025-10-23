@@ -3,7 +3,7 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 // @ts-ignore - type-only import
-import { AttributeNames, type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants.ts';
+import { ATTRIBUTE_NAME_INSTANCE_POSITION, ATTRIBUTE_NAME_INSTANCE_SCALE, ATTRIBUTE_NAME_INSTANCE_ROTATION, ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET, ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR, ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR, ATTRIBUTE_NAME_INSTANCE_VELOCITY, type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -115,7 +115,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstancePosition,
+            ATTRIBUTE_NAME_INSTANCE_POSITION,
             new Float32Array(instanceInfo.position.flat()),
             3,
             0,
@@ -127,7 +127,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceScale,
+            ATTRIBUTE_NAME_INSTANCE_SCALE,
             new Float32Array(instanceInfo.scale.flat()),
             3,
             0,
@@ -139,7 +139,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceRotation,
+            ATTRIBUTE_NAME_INSTANCE_ROTATION,
             new Float32Array(instanceInfo.rotation.flat()),
             3,
             0,
@@ -152,7 +152,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceAnimationOffset,
+            ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
             new Float32Array(instanceInfo.animationOffset.flat()),
             1,
             0,
@@ -164,7 +164,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceVertexColor,
+            ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
             new Float32Array(instanceInfo.color.flat()),
             4,
             0,
@@ -176,7 +176,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceEmissiveColor,
+            ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
             new Float32Array(instanceInfo.emissiveColor.flat()),
             4,
             0,
@@ -188,7 +188,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     setGeometryAttribute(
         mesh.geometry,
         createAttribute(
-            AttributeNames.InstanceVelocity,
+            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
             new Float32Array(instanceInfo.velocity.flat()),
             3,
             0,

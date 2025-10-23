@@ -62,7 +62,16 @@ import {
     UNIFORM_TYPE_VECTOR3,
     BLEND_TYPE_TRANSPARENT,
     RENDER_TARGET_TYPE_DEPTH,
-    AttributeNames,
+    ATTRIBUTE_NAME_POSITION,
+    ATTRIBUTE_NAME_UV,
+    ATTRIBUTE_NAME_COLOR,
+    ATTRIBUTE_NAME_INSTANCE_POSITION,
+    ATTRIBUTE_NAME_INSTANCE_SCALE,
+    ATTRIBUTE_NAME_INSTANCE_ROTATION,
+    ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
+    ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
+    ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
+    ATTRIBUTE_NAME_INSTANCE_VELOCITY,
     // @ts-ignore - type-only import
     type AttributeUsageType,
     ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
@@ -778,7 +787,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstancePosition,
+            ATTRIBUTE_NAME_INSTANCE_POSITION,
             new Float32Array(instanceInfo.position.flat()),
             3,
             0,
@@ -790,7 +799,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceScale,
+            ATTRIBUTE_NAME_INSTANCE_SCALE,
             new Float32Array(instanceInfo.scale.flat()),
             3,
             0,
@@ -802,7 +811,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceRotation,
+            ATTRIBUTE_NAME_INSTANCE_ROTATION,
             new Float32Array(instanceInfo.rotation.flat()),
             3,
             0,
@@ -815,7 +824,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceAnimationOffset,
+            ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
             new Float32Array(animationOffsetInfo),
             1,
             0,
@@ -827,7 +836,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceVertexColor,
+            ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
             new Float32Array(instanceInfo.color.flat()),
             4,
             0,
@@ -839,7 +848,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceEmissiveColor,
+            ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
             new Float32Array(instanceInfo.emissiveColor.flat()),
             4,
             0,
@@ -851,7 +860,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     setGeometryAttribute(
         skinningMesh.geometry,
         createAttribute(
-            AttributeNames.InstanceVelocity,
+            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
             new Float32Array(instanceInfo.velocity.flat()),
             3,
             0,
@@ -909,7 +918,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
 
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
-            AttributeNames.InstancePosition,
+            ATTRIBUTE_NAME_INSTANCE_POSITION,
             findVertexArrayObjectVertexBufferObjectBuffer(
                 getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aPosition'
@@ -917,7 +926,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
         );
         replaceVertexArrayObjectBuffer(
             skinnedMesh.geometry.vertexArrayObject,
-            AttributeNames.InstanceVelocity,
+            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
             findVertexArrayObjectVertexBufferObjectBuffer(
                 getReadTransformFeedbackDoubleBuffer(transformFeedbackDoubleBuffer).vertexArrayObject,
                 'aVelocity'
@@ -1049,7 +1058,7 @@ emissiveColor *= d;
         gpu,
         attributes: [
             createAttribute(
-                AttributeNames.Position.toString(),
+                ATTRIBUTE_NAME_POSITION,
                 // dummy data
                 new Float32Array(
                     maton
@@ -1065,7 +1074,7 @@ emissiveColor *= d;
                 3
             ),
             createAttribute(
-                AttributeNames.Uv.toString(),
+                ATTRIBUTE_NAME_UV,
                 new Float32Array(
                     maton
                         .range(particleNum)
@@ -1075,7 +1084,7 @@ emissiveColor *= d;
                 2
             ),
             createAttribute(
-                AttributeNames.Color.toString(),
+                ATTRIBUTE_NAME_COLOR,
                 new Float32Array(
                     maton
                         .range(particleNum)

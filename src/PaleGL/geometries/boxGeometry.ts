@@ -1,5 +1,5 @@
 ﻿import { createGeometry, Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { AttributeNames } from '@/PaleGL/constants';
+import { ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_NORMAL } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createVector3One, scaleVector3ByScalar, Vector3 } from '@/PaleGL/math/vector3.ts';
@@ -124,17 +124,17 @@ export function createBoxGeometryData(size: Vector3) {
     // TODO: uniqでfilter
     const attributes = [
         createAttribute(
-            AttributeNames.Position,
+            ATTRIBUTE_NAME_POSITION,
             new Float32Array(rawData.positions),
             3
         ),
         createAttribute(
-            AttributeNames.Uv,
+            ATTRIBUTE_NAME_UV,
             new Float32Array(rawData.uvs),
             2
         ),
         createAttribute(
-            AttributeNames.Normal,
+            ATTRIBUTE_NAME_NORMAL,
             new Float32Array(rawData.normals),
             3
         ),
@@ -219,12 +219,12 @@ export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
             // 1 ---- 3
             // -----------------------------
             createAttribute(
-                AttributeNames.Position,
+                ATTRIBUTE_NAME_POSITION,
                 new Float32Array(localPositions),
                 3
             ),
             createAttribute(
-                AttributeNames.Uv,
+                ATTRIBUTE_NAME_UV,
                 new Float32Array(
                     new Array(6)
                         .fill(0)
@@ -234,7 +234,7 @@ export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
                 2
             ),
             createAttribute(
-                AttributeNames.Normal,
+                ATTRIBUTE_NAME_NORMAL,
                 new Float32Array(normals.map((normal) => new Array(4).fill(0).map(() => normal)).flat(2)),
                 3
             ),

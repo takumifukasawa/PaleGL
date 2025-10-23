@@ -2,7 +2,7 @@
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import {
-    AttributeNames,
+    ATTRIBUTE_NAME_POSITION,
     BLEND_TYPE_OPAQUE,
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_DOUBLE,
@@ -128,11 +128,11 @@ export function createVolumetricLightPass(args: VolumetricLightPassArgs): Volume
 
     const spotLightFrustumMaterial = createMaterial({
         vertexShader: `
-layout (location = 0) in vec3 ${AttributeNames.Position};
+layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
 uniform mat4 ${UniformNames.WorldMatrix};
 uniform mat4 ${UniformNames.ViewMatrix};
 uniform mat4 ${UniformNames.ProjectionMatrix};
-void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${AttributeNames.Position},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
+void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${ATTRIBUTE_NAME_POSITION},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
 `,
         fragmentShader: `
 out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
