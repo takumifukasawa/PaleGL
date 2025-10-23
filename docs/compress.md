@@ -17,6 +17,8 @@
 
 **第2回（4個）**: TextureTypes, TextureWrapTypes, TextureFilterTypes, TextureDepthPrecisionType
 
+**第3回（2個）**: RenderTargetTypes, RenderTargetKinds
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -71,13 +73,11 @@ npx tsc --noEmit 2>&1 | grep "XxxTypes"
 
 constants.tsの他の定数オブジェクト（優先度順）：
 
-1. `RenderTargetTypes` - 使用頻度高
-2. `UniformTypes` - 使用頻度高
-3. `RenderTargetKinds`
-4. `AnimationKeyframeTypes`
-5. `AttributeUsageType`
-6. `PostProcessPassType`
-7. `UniformNames` - 大量（慎重に）
-8. `UniformBlockNames`
+1. `UniformTypes` - 使用頻度高
+2. `AnimationKeyframeTypes`
+3. `AttributeUsageType`
+4. `PostProcessPassType`
+5. `UniformNames` - 大量（慎重に）
+6. `UniformBlockNames`
 
 **作業時間目安**: 1つの定数オブジェクトあたり約15-30分
