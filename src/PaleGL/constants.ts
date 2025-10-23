@@ -709,15 +709,14 @@ export const GL_TEXTURE_MAG_FILTER = 10240;
 // export const GL_LINEAR_MIPMAP_NEAREST = 9985;
 // export const GL_LINEAR_MIPMAP_LINEAR = 9987;
 
-export const GLTextureFilter = {
-    NEAREST: 9728,
-    LINEAR: 9729,
-    NEAREST_MIPMAP_NEAREST: 9984,
-    NEAREST_MIPMAP_LINEAR: 9986,
-    LINEAR_MIPMAP_NEAREST: 9985,
-    LINEAR_MIPMAP_LINEAR: 9987,
-} as const;
-export type GLTextureFilter = (typeof GLTextureFilter)[keyof typeof GLTextureFilter];
+export const GL_TEXTURE_FILTER_NEAREST = 9728;
+export const GL_TEXTURE_FILTER_LINEAR = 9729;
+export const GL_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST = 9984;
+export const GL_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR = 9986;
+export const GL_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST = 9985;
+export const GL_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR = 9987;
+
+export type GLTextureFilter = typeof GL_TEXTURE_FILTER_NEAREST | typeof GL_TEXTURE_FILTER_LINEAR | typeof GL_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST | typeof GL_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR | typeof GL_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST | typeof GL_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR;
 
 // wrap -----------------------------------
 
@@ -727,12 +726,11 @@ export const GL_TEXTURE_WRAP_T = 10243;
 // export const GL_CLAMP_TO_EDGE = 33071;
 // export const GL_MIRRORED_REPEAT = 33648;
 
-export const GLTextureWrap = {
-    REPEAT: 10497,
-    CLAMP_TO_EDGE: 33071,
-    MIRRORED_REPEAT: 33648,
-} as const;
-export type GLTextureWrap = (typeof GLTextureWrap)[keyof typeof GLTextureWrap];
+export const GL_TEXTURE_WRAP_REPEAT = 10497;
+export const GL_TEXTURE_WRAP_CLAMP_TO_EDGE = 33071;
+export const GL_TEXTURE_WRAP_MIRRORED_REPEAT = 33648;
+
+export type GLTextureWrap = typeof GL_TEXTURE_WRAP_REPEAT | typeof GL_TEXTURE_WRAP_CLAMP_TO_EDGE | typeof GL_TEXTURE_WRAP_MIRRORED_REPEAT;
 
 // framebuffer -----------------------------------
 
@@ -751,27 +749,26 @@ export const GL_FRAMEBUFFER_UNSUPPORTED = 36061;
 // export const GL_COLOR_ATTACHMENT6 = 36070;
 // export const GL_COLOR_ATTACHMENT7 = 36071;
 
-export const GLColorAttachment = {
-    COLOR_ATTACHMENT0: 36064,
-    COLOR_ATTACHMENT1: 36065,
-    COLOR_ATTACHMENT2: 36066,
-    COLOR_ATTACHMENT3: 36067,
-    COLOR_ATTACHMENT4: 36068,
-    COLOR_ATTACHMENT5: 36069,
-    COLOR_ATTACHMENT6: 36070,
-    COLOR_ATTACHMENT7: 36071,
-} as const;
-export type GLColorAttachment = (typeof GLColorAttachment)[keyof typeof GLColorAttachment];
+export const GL_COLOR_ATTACHMENT0 = 36064;
+export const GL_COLOR_ATTACHMENT1 = 36065;
+export const GL_COLOR_ATTACHMENT2 = 36066;
+export const GL_COLOR_ATTACHMENT3 = 36067;
+export const GL_COLOR_ATTACHMENT4 = 36068;
+export const GL_COLOR_ATTACHMENT5 = 36069;
+export const GL_COLOR_ATTACHMENT6 = 36070;
+export const GL_COLOR_ATTACHMENT7 = 36071;
+
+export type GLColorAttachment = typeof GL_COLOR_ATTACHMENT0 | typeof GL_COLOR_ATTACHMENT1 | typeof GL_COLOR_ATTACHMENT2 | typeof GL_COLOR_ATTACHMENT3 | typeof GL_COLOR_ATTACHMENT4 | typeof GL_COLOR_ATTACHMENT5 | typeof GL_COLOR_ATTACHMENT6 | typeof GL_COLOR_ATTACHMENT7;
 
 export const GLColorAttachments = [
-    GLColorAttachment.COLOR_ATTACHMENT0,
-    GLColorAttachment.COLOR_ATTACHMENT1,
-    GLColorAttachment.COLOR_ATTACHMENT2,
-    GLColorAttachment.COLOR_ATTACHMENT3,
-    GLColorAttachment.COLOR_ATTACHMENT4,
-    GLColorAttachment.COLOR_ATTACHMENT5,
-    GLColorAttachment.COLOR_ATTACHMENT6,
-    GLColorAttachment.COLOR_ATTACHMENT7,
+    GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3,
+    GL_COLOR_ATTACHMENT4,
+    GL_COLOR_ATTACHMENT5,
+    GL_COLOR_ATTACHMENT6,
+    GL_COLOR_ATTACHMENT7,
 ];
 
 // --

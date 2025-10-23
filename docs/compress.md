@@ -65,6 +65,18 @@
   - 型推論エラー: なし
   - 所要時間: 約30-35分
 
+**第9回（3個・17定数）**: GLTextureFilter (6定数), GLTextureWrap (3定数), GLColorAttachment (8定数)
+  - 修正ファイル数: 4ファイル（constants.ts, texture.ts, cubeMap.ts, renderTarget.ts, gBufferRenderTargets.ts）
+  - 使用箇所: 44箇所（GLTextureFilter: 18箇所、GLTextureWrap: 8箇所、GLColorAttachment: 18箇所）
+  - 主要修正箇所:
+    - core/texture.ts: GLTextureFilter 15箇所、GLTextureWrap 6箇所
+    - core/cubeMap.ts: GLTextureFilter 2箇所、GLTextureWrap 2箇所
+    - core/renderTarget.ts: GLTextureFilter 2箇所、GLColorAttachment 6箇所
+    - core/gBufferRenderTargets.ts: GLColorAttachment 4箇所
+    - constants.ts: GLColorAttachments配列 8箇所
+  - 型推論エラー: なし
+  - 所要時間: 約20分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -209,35 +221,22 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 2. ~~`AttributeUsageType`~~ (完了: 3定数)
 3. ~~`PostProcessPassType`~~ (完了: 20定数)
 4. ~~`AttributeNames`~~ (完了: 18定数)
+5. ~~`GLTextureFilter`~~ (完了: 6定数)
+6. ~~`GLTextureWrap`~~ (完了: 3定数)
+7. ~~`GLColorAttachment`~~ (完了: 8定数)
 
 ### 優先度: 高（中規模・高頻度）
 
-5. **`UniformBlockNames`** - 7定数、29ファイル、86箇所
+8. **`UniformBlockNames`** - 7定数、29ファイル、86箇所
    - 推定時間: 30-40分
    - 難易度: ★★☆
    - 理由: Uniform Block関連、中規模で影響範囲が明確
 
 ### 優先度: 中（大規模・要注意）
-6. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
+9. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
    - 推定時間: 2-3時間
    - 難易度: ★★★
    - 理由: 最大規模、慎重な作業が必要
-
-### 優先度: 低（小規模・低頻度）
-7. **`GLTextureFilter`** - 6定数、3ファイル、18箇所
-   - 推定時間: 15-20分
-   - 難易度: ★☆☆
-   - 理由: WebGL定数ラッパー、影響範囲が限定的
-
-8. **`GLTextureWrap`** - 3定数、2ファイル、8箇所
-   - 推定時間: 10-15分
-   - 難易度: ★☆☆
-   - 理由: WebGL定数ラッパー、影響範囲が限定的
-
-9. **`GLColorAttachment`** - 8定数、3ファイル、18箇所
-   - 推定時間: 15-20分
-   - 難易度: ★☆☆
-   - 理由: WebGL定数ラッパー、影響範囲が限定的
 
 ### 優先度: 保留（シェーダー関連・影響不明）
 10. **`VertexShaderModifierPragmas`** - 13定数、8箇所
@@ -246,7 +245,7 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
     - スプレッド構文使用、要調査
 12. **`ShaderPragmas`** - スプレッド構文使用、要調査
 
-**推奨作業順序**: 3 → 4 → 5 → 7 → 8 → 9 → 6（最後に大規模なUniformNames）
+**推奨作業順序**: 8（UniformBlockNames） → 9（最後に大規模なUniformNames）
 
 **作業時間目安**:
 - 小規模（～10定数）: 約10-20分

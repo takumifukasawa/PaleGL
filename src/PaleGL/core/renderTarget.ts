@@ -24,7 +24,7 @@ import {
     TEXTURE_TYPE_RGBA,
     TEXTURE_TYPE_RGBA16F,
     TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
-    GLColorAttachment,
+    GL_COLOR_ATTACHMENT0,
     TextureDepthPrecisionType,
     TextureWrapType,
     GL_FRAMEBUFFER_COMPLETE,
@@ -36,7 +36,7 @@ import {
     GL_READ_FRAMEBUFFER,
     GL_DRAW_FRAMEBUFFER,
     GL_DEPTH_BUFFER_BIT,
-    GLTextureFilter,
+    GL_TEXTURE_FILTER_NEAREST,
     RenderTargetKind,
     RENDER_TARGET_KIND_DEFAULT,
     GL_COLOR_BUFFER_BIT,
@@ -151,7 +151,7 @@ export function createRenderTarget({
             });
             gl.framebufferTexture2D(
                 GL_FRAMEBUFFER,
-                GLColorAttachment.COLOR_ATTACHMENT0,
+                GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D,
                 texture.glObject,
                 0
@@ -178,7 +178,7 @@ export function createRenderTarget({
             });
             gl.framebufferTexture2D(
                 GL_FRAMEBUFFER,
-                GLColorAttachment.COLOR_ATTACHMENT0,
+                GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D,
                 texture.glObject,
                 0
@@ -207,7 +207,7 @@ export function createRenderTarget({
 
             gl.framebufferTexture2D(
                 GL_FRAMEBUFFER,
-                GLColorAttachment.COLOR_ATTACHMENT0,
+                GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D,
                 texture.glObject,
                 0
@@ -230,7 +230,7 @@ export function createRenderTarget({
 
             gl.framebufferTexture2D(
                 GL_FRAMEBUFFER,
-                GLColorAttachment.COLOR_ATTACHMENT0,
+                GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D,
                 texture.glObject,
                 0
@@ -247,7 +247,7 @@ export function createRenderTarget({
         if (checkFramebufferStatus !== GL_FRAMEBUFFER_COMPLETE) {
             console.error('framebuffer not completed');
         }
-        registerDrawBufferToFramebuffer(framebuffer, GLColorAttachment.COLOR_ATTACHMENT0);
+        registerDrawBufferToFramebuffer(framebuffer, GL_COLOR_ATTACHMENT0);
     }
 
     // 深度バッファをテクスチャとして扱う場合
@@ -360,7 +360,7 @@ export function setRenderTargetTexture(renderTarget: RenderTarget, texture: Text
     gl.bindFramebuffer(GL_FRAMEBUFFER, renderTarget.framebuffer.glObject);
     gl.framebufferTexture2D(
         GL_FRAMEBUFFER,
-        GLColorAttachment.COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT0,
         GL_TEXTURE_2D,
         renderTarget.texture.glObject,
         0
@@ -390,7 +390,7 @@ export function copyRenderTargetColor(
 
     gl.clear(GL_COLOR_BUFFER_BIT);
 
-    gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GLTextureFilter.NEAREST);
+    gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_TEXTURE_FILTER_NEAREST);
     gl.bindFramebuffer(GL_READ_FRAMEBUFFER, null);
     gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
 }
@@ -414,7 +414,7 @@ export function copyRenderTargetDepth(
     //     return;
     // }
 
-    gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GLTextureFilter.NEAREST);
+    gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_TEXTURE_FILTER_NEAREST);
     gl.bindFramebuffer(GL_READ_FRAMEBUFFER, null);
     gl.bindFramebuffer(GL_DRAW_FRAMEBUFFER, null);
 }

@@ -2,6 +2,10 @@
     GL_DEPTH_ATTACHMENT,
     GL_FRAMEBUFFER,
     GL_TEXTURE_2D,
+    GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3,
     GLColorAttachment,
     RENDER_TARGET_KIND_G_BUFFER,
     TEXTURE_FILTER_TYPE_LINEAR,
@@ -78,7 +82,7 @@ export function createGBufferRenderTargets({
     //
     // 1: GBufferA
     //
-    const gBufferAAttachment = GLColorAttachment.COLOR_ATTACHMENT0;
+    const gBufferAAttachment = GL_COLOR_ATTACHMENT0;
     const gBufferATexture = createTexture({
         gpu,
         width,
@@ -95,7 +99,7 @@ export function createGBufferRenderTargets({
     //
     // 2: GBufferB
     //
-    const gBufferBAttachment = GLColorAttachment.COLOR_ATTACHMENT1;
+    const gBufferBAttachment = GL_COLOR_ATTACHMENT1;
     const gBufferBTexture = createTexture({
         gpu,
         width,
@@ -112,7 +116,7 @@ export function createGBufferRenderTargets({
     //
     // 3: GBufferC
     //
-    const gBufferCAttachment = GLColorAttachment.COLOR_ATTACHMENT2;
+    const gBufferCAttachment = GL_COLOR_ATTACHMENT2;
     const gBufferCTexture = createTexture({
         gpu,
         width,
@@ -129,7 +133,7 @@ export function createGBufferRenderTargets({
     //
     // 4: GBufferD
     //
-    const gBufferDAttachment = GLColorAttachment.COLOR_ATTACHMENT3;
+    const gBufferDAttachment = GL_COLOR_ATTACHMENT3;
     const gBufferDTexture = createTexture({
         gpu,
         width,

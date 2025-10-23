@@ -19,8 +19,15 @@ import {
     GL_UNPACK_FLIP_Y_WEBGL,
     GL_UNSIGNED_BYTE,
     GL_UNSIGNED_SHORT,
+    GL_TEXTURE_FILTER_NEAREST,
+    GL_TEXTURE_FILTER_LINEAR,
+    GL_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST,
+    GL_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST,
+    GL_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR,
+    GL_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR,
+    GL_TEXTURE_WRAP_REPEAT,
+    GL_TEXTURE_WRAP_CLAMP_TO_EDGE,
     GLTextureFilter,
-    GLTextureWrap,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR,
@@ -73,17 +80,17 @@ export type TextureArgs = {
  */
 export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter) {
     switch (glTextureFilter) {
-        case GLTextureFilter.NEAREST:
+        case GL_TEXTURE_FILTER_NEAREST:
             return TEXTURE_FILTER_TYPE_NEAREST;
-        case GLTextureFilter.LINEAR:
+        case GL_TEXTURE_FILTER_LINEAR:
             return TEXTURE_FILTER_TYPE_LINEAR;
-        case GLTextureFilter.NEAREST_MIPMAP_NEAREST:
+        case GL_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
             return TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_NEAREST;
-        case GLTextureFilter.LINEAR_MIPMAP_NEAREST:
+        case GL_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
             return TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_NEAREST;
-        case GLTextureFilter.NEAREST_MIPMAP_LINEAR:
+        case GL_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
             return TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_LINEAR;
-        case GLTextureFilter.LINEAR_MIPMAP_LINEAR:
+        case GL_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
             return TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR;
         default:
             console.error('[resolveGLEnumTextureFilterType] invalid glTextureFilter');
@@ -255,35 +262,35 @@ export function createTexture({
             // min filter settings
             switch (minFilter) {
                 case TEXTURE_FILTER_TYPE_NEAREST:
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.NEAREST);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_FILTER_NEAREST);
                     break;
                 case TEXTURE_FILTER_TYPE_LINEAR:
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.LINEAR);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_FILTER_LINEAR);
                     break;
                 default:
                     console.warn('[Texture.constructor] invalid min filter type and fallback to LINEAR');
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.LINEAR);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_FILTER_LINEAR);
                     break;
             }
             // mag filter settings
             switch (magFilter) {
                 case TEXTURE_FILTER_TYPE_NEAREST:
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.NEAREST);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_FILTER_NEAREST);
                     break;
                 case TEXTURE_FILTER_TYPE_LINEAR:
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.LINEAR);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_FILTER_LINEAR);
                     break;
                 default:
                     console.warn('[Texture.constructor] invalid mag filter type and fallback to LINEAR');
-                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.LINEAR);
+                    gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_FILTER_LINEAR);
                     break;
             }
             break;
 
         // TODO: depthの場合nearest必須？
         case TEXTURE_TYPE_DEPTH:
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.NEAREST);
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.NEAREST);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_FILTER_NEAREST);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_FILTER_NEAREST);
             break;
 
         // // 「filterできない」で合っているはず？
@@ -302,26 +309,26 @@ export function createTexture({
 
     switch (wrapS) {
         case TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE:
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLTextureWrap.CLAMP_TO_EDGE);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_CLAMP_TO_EDGE);
             break;
         case TEXTURE_WRAP_TYPE_REPEAT:
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLTextureWrap.REPEAT);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_REPEAT);
             break;
         default:
             console.warn('[Texture.constructor] invalid wrapS type and fallback to REPEAT');
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLTextureWrap.REPEAT);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_REPEAT);
             break;
     }
     switch (wrapT) {
         case TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE:
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLTextureWrap.CLAMP_TO_EDGE);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_CLAMP_TO_EDGE);
             break;
         case TEXTURE_WRAP_TYPE_REPEAT:
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLTextureWrap.REPEAT);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_REPEAT);
             break;
         default:
             console.warn('[Texture.constructor] invalid wrapT type and fallback to REPEAT');
-            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLTextureWrap.REPEAT);
+            gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_REPEAT);
             break;
     }
 
