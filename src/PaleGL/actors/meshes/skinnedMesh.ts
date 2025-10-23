@@ -8,7 +8,7 @@ import {
     MESH_TYPE_SKINNED,
     PRIMITIVE_TYPE_LINES,
     PRIMITIVE_TYPE_POINTS,
-    TextureTypes,
+    TEXTURE_TYPE_RGBA32F,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
@@ -175,7 +175,7 @@ export function startSkinnedMesh(actor: Actor, args: ActorStartArgs) {
         gpu,
         width: 1,
         height: 1,
-        type: TextureTypes.RGBA32F,
+        type: TEXTURE_TYPE_RGBA32F,
     });
 
     skinnedMesh.materials.forEach((material) => {

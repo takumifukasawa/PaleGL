@@ -10,7 +10,7 @@ import {
     PostProcessPassType,
     PRIMITIVE_TYPE_TRIANGLES,
     RenderTargetTypes,
-    TextureDepthPrecisionType,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -117,7 +117,7 @@ export function createVolumetricLightPass(args: VolumetricLightPassArgs): Volume
         type: RenderTargetTypes.Depth,
         width: 1,
         height: 1,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 
     const spotLightFrustumMaterial = createMaterial({

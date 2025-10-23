@@ -4,8 +4,10 @@
     GL_TEXTURE_2D,
     GLColorAttachment,
     RenderTargetKinds,
-    TextureFilterTypes,
-    TextureTypes,
+    TEXTURE_FILTER_TYPE_LINEAR,
+    TEXTURE_TYPE_DEPTH,
+    TEXTURE_TYPE_R11F_G11F_B10F,
+    TEXTURE_TYPE_RGBA,
 } from '@/PaleGL/constants';
 import {
     bindFramebuffer,
@@ -65,8 +67,8 @@ export function createGBufferRenderTargets({
     const gBufferTextures: Texture[] = [];
     let depthTexture: Texture | null = null;
 
-    const minFilter = TextureFilterTypes.Linear;
-    const magFilter = TextureFilterTypes.Linear;
+    const minFilter = TEXTURE_FILTER_TYPE_LINEAR;
+    const magFilter = TEXTURE_FILTER_TYPE_LINEAR;
 
     const gl = gpu.gl;
 
@@ -82,7 +84,7 @@ export function createGBufferRenderTargets({
         width,
         height,
         mipmap: false,
-        type: TextureTypes.RGBA,
+        type: TEXTURE_TYPE_RGBA,
         minFilter,
         magFilter,
     });
@@ -99,7 +101,7 @@ export function createGBufferRenderTargets({
         width,
         height,
         mipmap: false,
-        type: TextureTypes.RGBA,
+        type: TEXTURE_TYPE_RGBA,
         minFilter,
         magFilter,
     });
@@ -116,7 +118,7 @@ export function createGBufferRenderTargets({
         width,
         height,
         mipmap: false,
-        type: TextureTypes.RGBA,
+        type: TEXTURE_TYPE_RGBA,
         minFilter,
         magFilter,
     });
@@ -133,7 +135,7 @@ export function createGBufferRenderTargets({
         width,
         height,
         mipmap: false,
-        type: TextureTypes.R11F_G11F_B10F,
+        type: TEXTURE_TYPE_R11F_G11F_B10F,
         minFilter,
         magFilter,
     });
@@ -147,7 +149,7 @@ export function createGBufferRenderTargets({
             width,
             height,
             mipmap: false,
-            type: TextureTypes.Depth,
+            type: TEXTURE_TYPE_DEPTH,
             // 一旦linear固定
             minFilter,
             magFilter,

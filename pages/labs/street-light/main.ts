@@ -62,7 +62,7 @@ import {
     AttributeUsageType,
     UniformNames,
     FACE_SIDE_DOUBLE,
-    TextureDepthPrecisionType,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformBlockNames,
     ACTOR_TYPE_MESH,
     RAD_TO_DEG,
@@ -389,7 +389,7 @@ const directionalLight = createDirectionalLight({
 //         width: 1024,
 //         height: 1024,
 //         type: RenderTargetTypes.Depth,
-//         depthPrecision: TextureDepthPrecisionType.High,
+//         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
 //     });
 // }
 
@@ -421,7 +421,7 @@ if (spotLight1.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }
 subscribeActorOnStart(spotLight1, () => {
@@ -452,7 +452,7 @@ if (spotLight2.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }
 subscribeActorOnStart(spotLight2, () => {

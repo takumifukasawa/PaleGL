@@ -3,7 +3,7 @@ import { createOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCa
 import { setOrthoSize } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
 import { createLight, Light, LightArgs } from '@/PaleGL/actors/lights/light.ts';
 import { UpdateLightFunc, updateShadowCamera } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { LIGHT_TYPE_DIRECTIONAL, RenderTargetTypes, TextureDepthPrecisionType } from '@/PaleGL/constants.ts';
+import { LIGHT_TYPE_DIRECTIONAL, RenderTargetTypes, TEXTURE_DEPTH_PRECISION_TYPE_HIGH } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { setRotationY } from '@/PaleGL/core/transform.ts';
@@ -58,6 +58,6 @@ export const createDirectionalLightShadow = (
         width: resolution,
         height: resolution,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 };

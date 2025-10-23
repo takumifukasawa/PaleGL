@@ -279,7 +279,14 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
             })
         ).then((images) => {
             images.forEach(({ img, minFilter, magFilter, wrapS, wrapT }) => {
-                const texture = createTexture({ gpu, img, minFilter, magFilter, wrapS, wrapT });
+                const texture = createTexture({
+                    gpu,
+                    img,
+                    minFilter: minFilter as any,
+                    magFilter: magFilter as any,
+                    wrapS: wrapS as any,
+                    wrapT: wrapT as any
+                });
                 preloadTextures.push(texture);
             });
         });

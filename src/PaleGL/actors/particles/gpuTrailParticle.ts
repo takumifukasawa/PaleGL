@@ -2,7 +2,7 @@ import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/a
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import { AttributeNames, TextureFilterTypes, TextureTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { AttributeNames, TEXTURE_FILTER_TYPE_NEAREST, TEXTURE_TYPE_RGBA16F, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
     createMRTDoubleBuffer,
@@ -275,9 +275,9 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         name: 'mrt',
         width: vatWidth,
         height: vatHeight,
-        minFilter: TextureFilterTypes.Nearest,
-        magFilter: TextureFilterTypes.Nearest,
-        textureTypes: [TextureTypes.RGBA16F, TextureTypes.RGBA16F, TextureTypes.RGBA16F], // 0: velocity, 1: position
+        minFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        magFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        textureTypes: [TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F], // 0: velocity, 1: position
     });
 
     const createUniforms = () => [

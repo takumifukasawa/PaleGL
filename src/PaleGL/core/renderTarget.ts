@@ -13,11 +13,15 @@ import {
     RenderTargetType,
     RenderTargetTypes,
     TextureFilterType,
-    TextureFilterTypes,
-    TextureTypes,
+    TEXTURE_FILTER_TYPE_LINEAR,
+    TEXTURE_TYPE_DEPTH,
+    TEXTURE_TYPE_R11F_G11F_B10F,
+    TEXTURE_TYPE_R16F,
+    TEXTURE_TYPE_RGBA,
+    TEXTURE_TYPE_RGBA16F,
+    TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
     GLColorAttachment,
     TextureDepthPrecisionType,
-    TextureWrapTypes,
     TextureWrapType,
     GL_FRAMEBUFFER_COMPLETE,
     GL_EXT_color_buffer_float,
@@ -93,10 +97,10 @@ export function createRenderTarget({
     height = height ?? 1;
     useDepthBuffer = useDepthBuffer ?? false;
     writeDepthTexture = writeDepthTexture ?? false;
-    minFilter = minFilter ?? TextureFilterTypes.Linear;
-    magFilter = magFilter ?? TextureFilterTypes.Linear;
-    wrapT = wrapT ?? TextureWrapTypes.ClampToEdge;
-    wrapS = wrapS ?? TextureWrapTypes.ClampToEdge;
+    minFilter = minFilter ?? TEXTURE_FILTER_TYPE_LINEAR;
+    magFilter = magFilter ?? TEXTURE_FILTER_TYPE_LINEAR;
+    wrapT = wrapT ?? TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE;
+    wrapS = wrapS ?? TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE;
     mipmap = mipmap ?? false;
 
     const gl = gpu.gl;
@@ -134,7 +138,7 @@ export function createRenderTarget({
                 width,
                 height,
                 mipmap,
-                type: TextureTypes.RGBA,
+                type: TEXTURE_TYPE_RGBA,
                 minFilter,
                 magFilter,
                 wrapS,
@@ -161,7 +165,7 @@ export function createRenderTarget({
                 width,
                 height,
                 mipmap,
-                type: TextureTypes.RGBA16F,
+                type: TEXTURE_TYPE_RGBA16F,
                 minFilter,
                 magFilter,
                 wrapS,
@@ -189,7 +193,7 @@ export function createRenderTarget({
                 width,
                 height,
                 mipmap,
-                type: TextureTypes.R11F_G11F_B10F,
+                type: TEXTURE_TYPE_R11F_G11F_B10F,
                 minFilter,
                 magFilter,
                 wrapS,
@@ -212,7 +216,7 @@ export function createRenderTarget({
                 width,
                 height,
                 mipmap,
-                type: TextureTypes.R16F,
+                type: TEXTURE_TYPE_R16F,
                 minFilter,
                 magFilter,
                 wrapS,
@@ -249,10 +253,10 @@ export function createRenderTarget({
             width,
             height,
             mipmap: false,
-            type: TextureTypes.Depth,
+            type: TEXTURE_TYPE_DEPTH,
             // 一旦linear固定
-            // minFilter: TextureFilterTypes.Linear,
-            // magFilter: TextureFilterTypes.Linear
+            // minFilter: TEXTURE_FILTER_TYPE_LINEAR,
+            // magFilter: TEXTURE_FILTER_TYPE_LINEAR
             minFilter,
             magFilter,
             wrapS,

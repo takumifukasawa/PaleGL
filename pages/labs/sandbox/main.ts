@@ -94,8 +94,8 @@ import {
     BLEND_TYPE_ADDITIVE,
     FACE_SIDE_DOUBLE,
     RAD_TO_DEG,
-    TextureFilterTypes,
-    TextureWrapTypes,
+    TEXTURE_FILTER_TYPE_LINEAR,
+    TEXTURE_WRAP_TYPE_REPEAT,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
     UniformBlockNames,
@@ -1637,10 +1637,10 @@ const main = async () => {
         gpu,
         img: floorBaseImg,
         // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
+        minFilter: TEXTURE_FILTER_TYPE_LINEAR,
+        magFilter: TEXTURE_FILTER_TYPE_LINEAR,
     });
 
     const floorNormalImg = await loadImg(leaveNormalImgUrl);
@@ -1648,10 +1648,10 @@ const main = async () => {
         gpu,
         img: floorNormalImg,
         // mipmap: true,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
+        minFilter: TEXTURE_FILTER_TYPE_LINEAR,
+        magFilter: TEXTURE_FILTER_TYPE_LINEAR,
     });
 
     cubeMap = await loadCubeMap(
@@ -1770,8 +1770,8 @@ const main = async () => {
         gpu,
         img: fontAtlasImg,
         flipY: false,
-        minFilter: TextureFilterTypes.Linear,
-        magFilter: TextureFilterTypes.Linear,
+        minFilter: TEXTURE_FILTER_TYPE_LINEAR,
+        magFilter: TEXTURE_FILTER_TYPE_LINEAR,
     });
     const textMesh1 = createTextMesh({
         gpu,

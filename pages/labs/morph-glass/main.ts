@@ -15,7 +15,7 @@ import {
     FragmentShaderModifierPragmas,
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderTargetTypes,
-    TextureDepthPrecisionType,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
@@ -386,7 +386,7 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }
 

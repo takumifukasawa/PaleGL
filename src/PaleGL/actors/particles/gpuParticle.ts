@@ -1,5 +1,5 @@
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { TextureFilterTypes, TextureTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { TEXTURE_FILTER_TYPE_NEAREST, TEXTURE_TYPE_RGBA16F, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
@@ -80,9 +80,9 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         name: 'mrt',
         width: vatWidth,
         height: vatHeight,
-        minFilter: TextureFilterTypes.Nearest,
-        magFilter: TextureFilterTypes.Nearest,
-        textureTypes: [TextureTypes.RGBA16F, TextureTypes.RGBA16F], // 0: velocity, 1: position
+        minFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        magFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        textureTypes: [TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F], // 0: velocity, 1: position
     });
 
     const createUniforms = () => [

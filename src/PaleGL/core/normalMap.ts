@@ -2,7 +2,7 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 import { blitRenderTarget, Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { RenderTargetTypes, TextureWrapTypes, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
+import { RenderTargetTypes, TEXTURE_WRAP_TYPE_REPEAT, UniformNames, UniformTypes } from '@/PaleGL/constants.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import vertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 import fragmentShader from '@/PaleGL/shaders/normal-map-converter-fragment.glsl';
@@ -39,8 +39,8 @@ export const createNormalMapConverter: (
         type: RenderTargetTypes.RGBA,
         width,
         height,
-        wrapT: TextureWrapTypes.Repeat,
-        wrapS: TextureWrapTypes.Repeat,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
     });
 
     if (!convertNormalMapFromHeightMapMaterial) {

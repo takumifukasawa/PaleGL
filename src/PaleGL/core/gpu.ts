@@ -59,7 +59,7 @@
     PRIMITIVE_TYPE_LINE_LOOP,
     PRIMITIVE_TYPE_LINE_STRIP,
     PRIMITIVE_TYPE_TRIANGLES,
-    TextureWrapTypes,
+    TEXTURE_WRAP_TYPE_REPEAT,
     // UniformNames,
     UniformTypes,
 } from '@/PaleGL/constants';
@@ -166,8 +166,8 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     dummyWhiteTextures.push(createTexture({
         gpu: gpu as Gpu,
         img: create1x1('white'),
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
     }));
     }
     gpu.dummyWhiteTextures = dummyWhiteTextures;
@@ -176,8 +176,8 @@ export function createGPU(gl: WebGL2RenderingContext): Gpu {
     dummyBlackTextures.push(createTexture({
         gpu: gpu as Gpu,
         img: create1x1('black'),
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
     }));
     }
     gpu.dummyBlackTextures = dummyBlackTextures;

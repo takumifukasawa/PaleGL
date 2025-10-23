@@ -2,8 +2,8 @@ import {
     RenderTargetType,
     RenderTargetTypes,
     TextureFilterType,
-    TextureFilterTypes,
-    TextureWrapTypes,
+    TEXTURE_FILTER_TYPE_LINEAR,
+    TEXTURE_WRAP_TYPE_REPEAT,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -22,8 +22,8 @@ const createEffectTextureTarget = ({
     width,
     height,
     type = RenderTargetTypes.RGBA,
-    minFilter = TextureFilterTypes.Linear,
-    magFilter = TextureFilterTypes.Linear,
+    minFilter = TEXTURE_FILTER_TYPE_LINEAR,
+    magFilter = TEXTURE_FILTER_TYPE_LINEAR,
 }: {
     gpu: Gpu;
     width: number;
@@ -39,8 +39,8 @@ const createEffectTextureTarget = ({
         type,
         minFilter,
         magFilter,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
     });
 };
 

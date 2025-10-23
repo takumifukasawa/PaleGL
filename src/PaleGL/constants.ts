@@ -144,42 +144,34 @@ export type FaceSide = typeof FACE_SIDE_FRONT | typeof FACE_SIDE_BACK | typeof F
 // texture
 // -----------------------------------------------------------------------------
 
-export const TextureTypes = {
-    RGBA: 0,
-    Depth: 1,
-    RGBA16F: 2,
-    RGBA32F: 3,
-    R11F_G11F_B10F: 4,
-    R16F: 5,
-} as const;
+export const TEXTURE_TYPE_RGBA = 0;
+export const TEXTURE_TYPE_DEPTH = 1;
+export const TEXTURE_TYPE_RGBA16F = 2;
+export const TEXTURE_TYPE_RGBA32F = 3;
+export const TEXTURE_TYPE_R11F_G11F_B10F = 4;
+export const TEXTURE_TYPE_R16F = 5;
 
-export type TextureType = (typeof TextureTypes)[keyof typeof TextureTypes];
+export type TextureType = typeof TEXTURE_TYPE_RGBA | typeof TEXTURE_TYPE_DEPTH | typeof TEXTURE_TYPE_RGBA16F | typeof TEXTURE_TYPE_RGBA32F | typeof TEXTURE_TYPE_R11F_G11F_B10F | typeof TEXTURE_TYPE_R16F;
 
-export const TextureWrapTypes = {
-    Repeat: 0,
-    ClampToEdge: 1,
-    MirroredRepeat: 2,
-} as const;
+export const TEXTURE_WRAP_TYPE_REPEAT = 0;
+export const TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE = 1;
+export const TEXTURE_WRAP_TYPE_MIRRORED_REPEAT = 2;
 
-export type TextureWrapType = (typeof TextureWrapTypes)[keyof typeof TextureWrapTypes];
+export type TextureWrapType = typeof TEXTURE_WRAP_TYPE_REPEAT | typeof TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE | typeof TEXTURE_WRAP_TYPE_MIRRORED_REPEAT;
 
-export const TextureFilterTypes = {
-    Nearest: 0, // min, mag
-    Linear: 1, // min, mag
-    NearestMipmapNearest: 2, // only min filter
-    NearestMipmapLinear: 3, // only min filter,
-    LinearMipmapNearest: 4, // only min filter
-    LinearMipmapLinear: 5, // only min filter
-} as const;
+export const TEXTURE_FILTER_TYPE_NEAREST = 0; // min, mag
+export const TEXTURE_FILTER_TYPE_LINEAR = 1; // min, mag
+export const TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_NEAREST = 2; // only min filter
+export const TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_LINEAR = 3; // only min filter,
+export const TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_NEAREST = 4; // only min filter
+export const TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR = 5; // only min filter
 
-export type TextureFilterType = (typeof TextureFilterTypes)[keyof typeof TextureFilterTypes];
+export type TextureFilterType = typeof TEXTURE_FILTER_TYPE_NEAREST | typeof TEXTURE_FILTER_TYPE_LINEAR | typeof TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_NEAREST | typeof TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_LINEAR | typeof TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_NEAREST | typeof TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR;
 
-export const TextureDepthPrecisionType = {
-    Medium: 0,
-    High: 1,
-} as const;
+export const TEXTURE_DEPTH_PRECISION_TYPE_MEDIUM = 0;
+export const TEXTURE_DEPTH_PRECISION_TYPE_HIGH = 1;
 
-export type TextureDepthPrecisionType = (typeof TextureDepthPrecisionType)[keyof typeof TextureDepthPrecisionType];
+export type TextureDepthPrecisionType = typeof TEXTURE_DEPTH_PRECISION_TYPE_MEDIUM | typeof TEXTURE_DEPTH_PRECISION_TYPE_HIGH;
 
 // -----------------------------------------------------------------------------
 // render target types

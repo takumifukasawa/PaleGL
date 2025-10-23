@@ -5,7 +5,7 @@
     GLColorAttachments,
     RenderTargetKinds,
     TextureFilterType,
-    TextureFilterTypes,
+    TEXTURE_FILTER_TYPE_LINEAR,
     TextureType,
 } from '@/PaleGL/constants';
 import {
@@ -45,8 +45,8 @@ export function createMultipleRenderTargets({
     width = 1,
     height = 1,
     textureTypes,
-    minFilter = TextureFilterTypes.Linear,
-    magFilter = TextureFilterTypes.Linear,
+    minFilter = TEXTURE_FILTER_TYPE_LINEAR,
+    magFilter = TEXTURE_FILTER_TYPE_LINEAR,
 }: MultipleRenderTargetOptions): MultipleRenderTarget {
     const textures: Texture[] = [];
 

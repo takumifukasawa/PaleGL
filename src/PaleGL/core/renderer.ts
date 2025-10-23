@@ -54,7 +54,7 @@ import {
     RENDER_QUEUE_TYPE_AFTER_TONE,
     RENDER_QUEUE_TYPE_OVERLAY,
     RenderTargetTypes,
-    TextureDepthPrecisionType,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     // UIQueueType,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
@@ -336,7 +336,7 @@ export function createRenderer({
         width: 1,
         height: 1,
         name: 'depth pre-pass render target',
-        depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const gBufferRenderTargets = createGBufferRenderTargets({
         gpu,
@@ -358,7 +358,7 @@ export function createRenderer({
         width: 1,
         height: 1,
         name: 'copy depth source render target',
-        depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const copyDepthDestRenderTarget = createRenderTarget({
         gpu,
@@ -366,7 +366,7 @@ export function createRenderer({
         width: 1,
         height: 1,
         name: 'copy depth dest render target',
-        depthPrecision: TextureDepthPrecisionType.High, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const copySceneSourceRenderTarget = createRenderTarget({
         gpu,

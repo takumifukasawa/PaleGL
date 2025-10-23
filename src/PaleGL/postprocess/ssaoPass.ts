@@ -1,7 +1,7 @@
 ﻿import {
     PostProcessPassType,
-    TextureTypes,
-    TextureWrapTypes,
+    TEXTURE_TYPE_RGBA32F,
+    TEXTURE_WRAP_TYPE_REPEAT,
     UniformBlockNames,
     UniformNames,
     UniformTypes,
@@ -119,9 +119,9 @@ const createSamplingTables: (gpu: Gpu) => {
         gpu,
         width: 4,
         height: 4,
-        type: TextureTypes.RGBA32F,
-        wrapS: TextureWrapTypes.Repeat,
-        wrapT: TextureWrapTypes.Repeat,
+        type: TEXTURE_TYPE_RGBA32F,
+        wrapS: TEXTURE_WRAP_TYPE_REPEAT,
+        wrapT: TEXTURE_WRAP_TYPE_REPEAT,
     });
 
     updateTexture(samplingTexture, {

@@ -21,13 +21,26 @@ import {
     GL_UNSIGNED_SHORT,
     GLTextureFilter,
     GLTextureWrap,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
+    TEXTURE_FILTER_TYPE_LINEAR,
+    TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR,
+    TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_NEAREST,
+    TEXTURE_FILTER_TYPE_NEAREST,
+    TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_LINEAR,
+    TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_NEAREST,
+    TEXTURE_TYPE_DEPTH,
+    TEXTURE_TYPE_R11F_G11F_B10F,
+    TEXTURE_TYPE_R16F,
+    TEXTURE_TYPE_RGBA,
+    TEXTURE_TYPE_RGBA16F,
+    TEXTURE_TYPE_RGBA32F,
+    TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
+    TEXTURE_WRAP_TYPE_MIRRORED_REPEAT,
+    TEXTURE_WRAP_TYPE_REPEAT,
     TextureDepthPrecisionType,
     TextureFilterType,
-    TextureFilterTypes,
     TextureType,
-    TextureTypes,
     TextureWrapType,
-    TextureWrapTypes,
 } from '@/PaleGL/constants';
 import { Gpu } from './gpu.ts';
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
@@ -61,17 +74,17 @@ export type TextureArgs = {
 export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter) {
     switch (glTextureFilter) {
         case GLTextureFilter.NEAREST:
-            return TextureFilterTypes.Nearest;
+            return TEXTURE_FILTER_TYPE_NEAREST;
         case GLTextureFilter.LINEAR:
-            return TextureFilterTypes.Linear;
+            return TEXTURE_FILTER_TYPE_LINEAR;
         case GLTextureFilter.NEAREST_MIPMAP_NEAREST:
-            return TextureFilterTypes.NearestMipmapNearest;
+            return TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_NEAREST;
         case GLTextureFilter.LINEAR_MIPMAP_NEAREST:
-            return TextureFilterTypes.LinearMipmapNearest;
+            return TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_NEAREST;
         case GLTextureFilter.NEAREST_MIPMAP_LINEAR:
-            return TextureFilterTypes.NearestMipmapLinear;
+            return TEXTURE_FILTER_TYPE_NEAREST_MIPMAP_LINEAR;
         case GLTextureFilter.LINEAR_MIPMAP_LINEAR:
-            return TextureFilterTypes.LinearMipmapLinear;
+            return TEXTURE_FILTER_TYPE_LINEAR_MIPMAP_LINEAR;
         default:
             console.error('[resolveGLEnumTextureFilterType] invalid glTextureFilter');
     }
@@ -84,11 +97,11 @@ export function resolveGLEnumTextureFilterType(glTextureFilter: GLTextureFilter)
 export function resolveGLEnumTextureWrapType(glTextureWrap: number) {
     switch (glTextureWrap) {
         case WebGLRenderingContext.CLAMP_TO_EDGE:
-            return TextureWrapTypes.ClampToEdge;
+            return TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE;
         case WebGLRenderingContext.REPEAT:
-            return TextureWrapTypes.Repeat;
+            return TEXTURE_WRAP_TYPE_REPEAT;
         case WebGLRenderingContext.MIRRORED_REPEAT:
-            return TextureWrapTypes.MirroredRepeat;
+            return TEXTURE_WRAP_TYPE_MIRRORED_REPEAT;
         default:
             console.error('[resolveGLEnumTextureWrapType] invalid glTextureWrap');
     }
@@ -117,14 +130,14 @@ export function createTexture({
     name,
     img = null,
     arraybuffer,
-    type = TextureTypes.RGBA,
+    type = TEXTURE_TYPE_RGBA,
     width,
     height,
     mipmap = false,
-    minFilter = TextureFilterTypes.Nearest,
-    magFilter = TextureFilterTypes.Nearest,
-    wrapS = TextureWrapTypes.Repeat,
-    wrapT = TextureWrapTypes.Repeat,
+    minFilter = TEXTURE_FILTER_TYPE_NEAREST,
+    magFilter = TEXTURE_FILTER_TYPE_NEAREST,
+    wrapS = TEXTURE_WRAP_TYPE_REPEAT,
+    wrapT = TEXTURE_WRAP_TYPE_REPEAT,
     flipY,
     depthPrecision,
     dxt1 = false,
@@ -152,7 +165,7 @@ export function createTexture({
     // imgを持つが特に指定がない場合はflipする
     flipY = img && flipY === undefined ? true : !!flipY;
 
-    depthPrecision = type === TextureTypes.Depth && depthPrecision !== undefined ? depthPrecision : undefined;
+    depthPrecision = type === TEXTURE_TYPE_DEPTH && depthPrecision !== undefined ? depthPrecision : undefined;
 
     if (img === null) {
         // this._img = createWhite1x1();
@@ -234,17 +247,17 @@ export function createTexture({
 
     // filterable ref: https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
     switch (type) {
-        case TextureTypes.RGBA:
-        case TextureTypes.RGBA16F:
-        case TextureTypes.RGBA32F:
-        case TextureTypes.R11F_G11F_B10F:
-        case TextureTypes.R16F:
+        case TEXTURE_TYPE_RGBA:
+        case TEXTURE_TYPE_RGBA16F:
+        case TEXTURE_TYPE_RGBA32F:
+        case TEXTURE_TYPE_R11F_G11F_B10F:
+        case TEXTURE_TYPE_R16F:
             // min filter settings
             switch (minFilter) {
-                case TextureFilterTypes.Nearest:
+                case TEXTURE_FILTER_TYPE_NEAREST:
                     gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.NEAREST);
                     break;
-                case TextureFilterTypes.Linear:
+                case TEXTURE_FILTER_TYPE_LINEAR:
                     gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.LINEAR);
                     break;
                 default:
@@ -254,10 +267,10 @@ export function createTexture({
             }
             // mag filter settings
             switch (magFilter) {
-                case TextureFilterTypes.Nearest:
+                case TEXTURE_FILTER_TYPE_NEAREST:
                     gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.NEAREST);
                     break;
-                case TextureFilterTypes.Linear:
+                case TEXTURE_FILTER_TYPE_LINEAR:
                     gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.LINEAR);
                     break;
                 default:
@@ -268,13 +281,13 @@ export function createTexture({
             break;
 
         // TODO: depthの場合nearest必須？
-        case TextureTypes.Depth:
+        case TEXTURE_TYPE_DEPTH:
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLTextureFilter.NEAREST);
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLTextureFilter.NEAREST);
             break;
 
         // // 「filterできない」で合っているはず？
-        // case TextureTypes.RGBA32F:
+        // case TEXTURE_TYPE_RGBA32F:
         //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         //     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         //     break;
@@ -288,10 +301,10 @@ export function createTexture({
     //
 
     switch (wrapS) {
-        case TextureWrapTypes.ClampToEdge:
+        case TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE:
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLTextureWrap.CLAMP_TO_EDGE);
             break;
-        case TextureWrapTypes.Repeat:
+        case TEXTURE_WRAP_TYPE_REPEAT:
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLTextureWrap.REPEAT);
             break;
         default:
@@ -300,10 +313,10 @@ export function createTexture({
             break;
     }
     switch (wrapT) {
-        case TextureWrapTypes.ClampToEdge:
+        case TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE:
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLTextureWrap.CLAMP_TO_EDGE);
             break;
-        case TextureWrapTypes.Repeat:
+        case TEXTURE_WRAP_TYPE_REPEAT:
             gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLTextureWrap.REPEAT);
             break;
         default:
@@ -334,7 +347,7 @@ export function createTexture({
     //
 
     switch (type) {
-        case TextureTypes.RGBA:
+        case TEXTURE_TYPE_RGBA:
             if (width && height) {
                 // for render target
                 if (img) {
@@ -353,7 +366,7 @@ export function createTexture({
             }
             break;
 
-        case TextureTypes.Depth:
+        case TEXTURE_TYPE_DEPTH:
             if (width && height) {
                 // for render target
                 // 1: use 16bit
@@ -361,28 +374,28 @@ export function createTexture({
                     gl.texImage2D(
                         GL_TEXTURE_2D,
                         0,
-                        depthPrecision === TextureDepthPrecisionType.High
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH
                             ? GL_DEPTH_COMPONENT32F
                             : GL_DEPTH_COMPONENT16,
                         width,
                         height,
                         0,
                         GL_DEPTH_COMPONENT,
-                        depthPrecision === TextureDepthPrecisionType.High ? GL_FLOAT : GL_UNSIGNED_SHORT,
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH ? GL_FLOAT : GL_UNSIGNED_SHORT,
                         img
                     );
                 } else {
                     gl.texImage2D(
                         GL_TEXTURE_2D,
                         0,
-                        depthPrecision === TextureDepthPrecisionType.High
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH
                             ? GL_DEPTH_COMPONENT32F
                             : GL_DEPTH_COMPONENT16,
                         width,
                         height,
                         0,
                         GL_DEPTH_COMPONENT,
-                        depthPrecision === TextureDepthPrecisionType.High ? GL_FLOAT : GL_UNSIGNED_SHORT,
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH ? GL_FLOAT : GL_UNSIGNED_SHORT,
                         null
                     );
                 }
@@ -396,11 +409,11 @@ export function createTexture({
                     gl.texImage2D(
                         GL_TEXTURE_2D,
                         0,
-                        depthPrecision === TextureDepthPrecisionType.High
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH
                             ? GL_DEPTH_COMPONENT32F
                             : GL_DEPTH_COMPONENT16,
                         GL_DEPTH_COMPONENT,
-                        depthPrecision === TextureDepthPrecisionType.High ? GL_FLOAT : GL_UNSIGNED_SHORT,
+                        depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH ? GL_FLOAT : GL_UNSIGNED_SHORT,
                         img
                     );
                     // } else {
@@ -411,7 +424,7 @@ export function createTexture({
             }
             break;
 
-        case TextureTypes.RGBA16F:
+        case TEXTURE_TYPE_RGBA16F:
             if (width && height) {
                 if (img) {
                     gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, img);
@@ -428,7 +441,7 @@ export function createTexture({
             }
             break;
 
-        case TextureTypes.RGBA32F:
+        case TEXTURE_TYPE_RGBA32F:
             if (width && height) {
                 if (img) {
                     gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, img);
@@ -445,7 +458,7 @@ export function createTexture({
             }
             break;
 
-        case TextureTypes.R11F_G11F_B10F:
+        case TEXTURE_TYPE_R11F_G11F_B10F:
             if (width && height) {
                 if (img) {
                     gl.texImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, width, height, 0, GL_RGB, GL_FLOAT, img);
@@ -462,7 +475,7 @@ export function createTexture({
             }
             break;
 
-        case TextureTypes.R16F:
+        case TEXTURE_TYPE_R16F:
             if (width && height) {
                 if (img) {
                     gl.texImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, img);
@@ -519,7 +532,7 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
 
     // bind texture data
     switch (texture.type) {
-        case TextureTypes.RGBA:
+        case TEXTURE_TYPE_RGBA:
             if (texture.img) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.img);
             } else {
@@ -527,34 +540,34 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
             }
             break;
 
-        case TextureTypes.Depth:
+        case TEXTURE_TYPE_DEPTH:
             // 1: use 16bit
             if (texture.img) {
                 gl.texImage2D(
                     GL_TEXTURE_2D,
                     0,
-                    texture.depthPrecision === TextureDepthPrecisionType.High
+                    texture.depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH
                         ? GL_DEPTH_COMPONENT32F
                         : GL_DEPTH_COMPONENT16,
                     width,
                     height,
                     0,
                     GL_DEPTH_COMPONENT,
-                    texture.depthPrecision === TextureDepthPrecisionType.High ? GL_FLOAT : GL_UNSIGNED_SHORT,
+                    texture.depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH ? GL_FLOAT : GL_UNSIGNED_SHORT,
                     texture.img
                 );
             } else {
                 gl.texImage2D(
                     GL_TEXTURE_2D,
                     0,
-                    texture.depthPrecision === TextureDepthPrecisionType.High
+                    texture.depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH
                         ? GL_DEPTH_COMPONENT32F
                         : GL_DEPTH_COMPONENT16,
                     width,
                     height,
                     0,
                     GL_DEPTH_COMPONENT,
-                    texture.depthPrecision === TextureDepthPrecisionType.High ? GL_FLOAT : GL_UNSIGNED_SHORT,
+                    texture.depthPrecision === TEXTURE_DEPTH_PRECISION_TYPE_HIGH ? GL_FLOAT : GL_UNSIGNED_SHORT,
                     null
                 );
             }
@@ -562,7 +575,7 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
             // gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, width, height, 0, gl.DEPTH_COMPONENT, gl.FLOAT, this._img);
             break;
 
-        case TextureTypes.RGBA16F:
+        case TEXTURE_TYPE_RGBA16F:
             if (texture.img) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, texture.img);
             } else {
@@ -570,7 +583,7 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
             }
             break;
 
-        case TextureTypes.RGBA32F:
+        case TEXTURE_TYPE_RGBA32F:
             if (texture.img) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, texture.img);
             } else {
@@ -578,7 +591,7 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
             }
             break;
 
-        case TextureTypes.R11F_G11F_B10F:
+        case TEXTURE_TYPE_R11F_G11F_B10F:
             if (texture.img) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, width, height, 0, GL_RGB, GL_FLOAT, texture.img);
             } else {
@@ -586,7 +599,7 @@ export function setTextureSize(texture: Texture, width: number, height: number) 
             }
             break;
 
-        case TextureTypes.R16F:
+        case TEXTURE_TYPE_R16F:
             if (texture.img) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, texture.img);
             } else {
@@ -637,7 +650,7 @@ export function updateTexture(
     // TODO: execute all type
     switch (texture.type) {
         // data: Uint8Array | null
-        case TextureTypes.RGBA:
+        case TEXTURE_TYPE_RGBA:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             }
@@ -647,7 +660,7 @@ export function updateTexture(
             break;
 
         // data: Float32Array | null
-        case TextureTypes.RGBA16F:
+        case TEXTURE_TYPE_RGBA16F:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, data);
             } else {
@@ -656,7 +669,7 @@ export function updateTexture(
             break;
             
         // data: Float32Array | null
-        case TextureTypes.RGBA32F:
+        case TEXTURE_TYPE_RGBA32F:
             if (data) {
                 gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data);
             }

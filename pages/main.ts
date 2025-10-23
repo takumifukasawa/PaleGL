@@ -30,7 +30,7 @@ import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController
 import {
     RenderTargetTypes,
     UniformNames,
-    TextureDepthPrecisionType,
+    TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     ACTOR_TYPE_MESH,
     UniformTypes,
     BLEND_TYPE_TRANSPARENT,
@@ -234,7 +234,7 @@ if (directionalLight.shadowCamera) {
         width: 1024,
         height: 1024,
         type: RenderTargetTypes.Depth,
-        depthPrecision: TextureDepthPrecisionType.High,
+        depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     });
 }
 
