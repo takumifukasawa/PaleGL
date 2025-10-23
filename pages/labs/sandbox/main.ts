@@ -90,7 +90,10 @@ import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail
 // others
 import {
     AttributeNames,
-    AttributeUsageType,
+    // @ts-ignore - type-only import
+    type AttributeUsageType,
+    ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
     BLEND_TYPE_ADDITIVE,
     FACE_SIDE_DOUBLE,
     RAD_TO_DEG,
@@ -876,13 +879,13 @@ const debugTransformFeedback = () => {
                 name: 'aArg1',
                 data: new Float32Array([1, 2, 3, 4, 5, 6]),
                 size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
+                usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
             }),
             new Attribute({
                 name: 'aArg2',
                 data: new Float32Array([7, 8, 9, 10, 11, 12]),
                 size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
+                usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
             }),
         ],
         varyings: [
@@ -1001,19 +1004,19 @@ const createTransformFeedbackDrivenMesh = () => {
                 name: 'aPosition',
                 data: initialPosition,
                 size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
+                usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
             }),
             new Attribute({
                 name: 'aVelocity',
                 data: initialVelocity,
                 size: 3,
-                usageType: AttributeUsageType.DynamicDraw,
+                usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
             }),
             // new Attribute({
             //     name: 'aTransform',
             //     data: initialTransform,
             //     size: 16,
-            //     usageType: AttributeUsageType.DynamicDraw,
+            //     usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
             // }),
         ],
         varyings: [
@@ -1359,7 +1362,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 3,
                 0,
                 0,
-                AttributeUsageType.DynamicDraw
+                ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
             ),
             createAttribute(
                 'aVelocity',
@@ -1367,7 +1370,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 3,
                 0,
                 0,
-                AttributeUsageType.DynamicDraw
+                ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
             ),
             createAttribute(
                 'aSeed',
@@ -1375,7 +1378,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 2,
                 0,
                 0,
-                AttributeUsageType.StaticDraw
+                ATTRIBUTE_USAGE_TYPE_STATIC_DRAW
             ),
         ],
         varyings: [

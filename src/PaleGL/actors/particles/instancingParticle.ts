@@ -2,7 +2,8 @@ import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.t
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { AttributeNames, AttributeUsageType } from '@/PaleGL/constants.ts';
+// @ts-ignore - type-only import
+import { AttributeNames, type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -119,7 +120,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -131,7 +132,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -143,7 +144,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -156,7 +157,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             1,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -168,7 +169,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             4,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -180,7 +181,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             4,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -192,7 +193,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );

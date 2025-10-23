@@ -3,7 +3,9 @@ import { createMesh, Mesh, MeshArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, startMeshBehaviourBase } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     AttributeNames,
-    AttributeUsageType,
+    // @ts-ignore - type-only import
+    type AttributeUsageType,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
     BLEND_TYPE_TRANSPARENT,
     MESH_TYPE_SKINNED,
     PRIMITIVE_TYPE_LINES,
@@ -496,7 +498,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
                     3,
                     0,
                     0,
-                    AttributeUsageType.DynamicDraw
+                    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
                 ),
             ],
             indices: skinnedMesh.boneIndicesForLines,
@@ -540,7 +542,7 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
                     3,
                     0,
                     0,
-                    AttributeUsageType.DynamicDraw
+                    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
                 ),
             ],
             drawCount: skinnedMesh.boneOrderedIndex.length,

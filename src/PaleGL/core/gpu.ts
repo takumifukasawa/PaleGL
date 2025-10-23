@@ -1,5 +1,9 @@
 ﻿import {
-    AttributeUsageType,
+    // @ts-ignore - type-only import
+    type AttributeUsageType,
+    ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY,
     BlendType,
     BLEND_TYPE_OPAQUE,
     BLEND_TYPE_TRANSPARENT,
@@ -116,11 +120,11 @@ export const create1x1 = (color: string = 'black'): HTMLCanvasElement => {
 
 export const getAttributeUsage = (usageType: AttributeUsageType) => {
     switch (usageType) {
-        case AttributeUsageType.StaticDraw:
+        case ATTRIBUTE_USAGE_TYPE_STATIC_DRAW:
             return GL_STATIC_DRAW;
-        case AttributeUsageType.DynamicDraw:
+        case ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW:
             return GL_DYNAMIC_DRAW;
-        case AttributeUsageType.DynamicCopy:
+        case ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY:
             return GL_DYNAMIC_COPY;
         default:
             console.error('[getAttributeUsage] invalid usage');

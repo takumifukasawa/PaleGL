@@ -5,7 +5,8 @@ import { getAttributeUsage, Gpu } from '@/PaleGL/core/gpu.ts';
 import { createShader, Shader } from '@/PaleGL/core/shader.ts';
 import { createTransformFeedback, TransformFeedback } from '@/PaleGL/core/transformFeedback.ts';
 import transformFeedbackFragmentShader from '@/PaleGL/shaders/transform-feedback-fragment.glsl';
-import { AttributeUsageType, GL_ARRAY_BUFFER } from '@/PaleGL/constants.ts';
+// @ts-ignore - type-only import
+import { type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW, GL_ARRAY_BUFFER } from '@/PaleGL/constants.ts';
 import { createUniforms, Uniforms, UniformsData } from '@/PaleGL/core/uniforms.ts';
 
 // TODO: location, divisorをいい感じに指定したい
@@ -99,7 +100,7 @@ export function createTransformFeedbackBuffer(args: TransformFeedbackBufferArgs)
     const outputBuffers = varyings.map(({ data, usageType }) => {
         const buffer = gl.createBuffer();
         gl.bindBuffer(GL_ARRAY_BUFFER, buffer);
-        gl.bufferData(GL_ARRAY_BUFFER, data, getAttributeUsage(usageType || AttributeUsageType.DynamicDraw));
+        gl.bufferData(GL_ARRAY_BUFFER, data, getAttributeUsage(usageType || ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW));
         gl.bindBuffer(GL_ARRAY_BUFFER, null);
         outputs.push({
             // name,

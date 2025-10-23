@@ -1,6 +1,7 @@
 import {Gpu, updateGPUTransformFeedback} from '@/PaleGL/core/gpu.ts';
 import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBuffer.ts';
-import { AttributeUsageType, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
+// @ts-ignore - type-only import
+import { type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { buildVertexShader } from '@/PaleGL/core/buildShader.ts';
 
@@ -108,7 +109,7 @@ export function loadGLSLSound(
             {
                 name: varyingName,
                 data,
-                usageType: AttributeUsageType.DynamicCopy,
+                usageType: ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY,
             },
         ],
         vertexShader: glslSound.vertexShader,

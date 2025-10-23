@@ -206,14 +206,11 @@ export type AnimationKeyframeType = typeof ANIMATION_KEYFRAME_TYPE_VECTOR3 | typ
 // geometry attributes
 // -----------------------------------------------------------------------------
 
-// TODO: rename Type"s"
-export const AttributeUsageType = {
-    StaticDraw: 0,
-    DynamicDraw: 1,
-    DynamicCopy: 2,
-} as const;
+export const ATTRIBUTE_USAGE_TYPE_STATIC_DRAW = 0;
+export const ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW = 1;
+export const ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY = 2;
 
-export type AttributeUsageType = (typeof AttributeUsageType)[keyof typeof AttributeUsageType];
+export type AttributeUsageType = typeof ATTRIBUTE_USAGE_TYPE_STATIC_DRAW | typeof ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW | typeof ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY;
 
 export const AttributeNames = {
     Position: 'aPosition',

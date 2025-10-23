@@ -1,6 +1,7 @@
 import { Attribute, createAttribute, getAttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
-import { AttributeUsageType } from '@/PaleGL/constants.ts';
+// @ts-ignore - type-only import
+import { type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants.ts';
 import {
     setVertexArrayObjectAttribute, updateVertexArrayObjectBufferData,
 } from '@/PaleGL/core/vertexArrayObject.ts';
@@ -16,7 +17,7 @@ export function setGeometryAttribute(geometry: Geometry, attribute: Attribute) {
         attribute.size,
         location,
         attribute.offset || 0,
-        attribute.usageType || AttributeUsageType.StaticDraw,
+        attribute.usageType || ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
         divisor
     );
     geometry.attributes.push(attr);

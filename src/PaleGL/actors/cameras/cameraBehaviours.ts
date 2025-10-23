@@ -21,7 +21,9 @@ import {
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     AttributeNames,
-    AttributeUsageType,
+    // @ts-ignore - type-only import
+    type AttributeUsageType,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
     BLEND_TYPE_TRANSPARENT,
     CameraType,
     CAMERA_TYPE_PERSPECTIVE,
@@ -155,7 +157,7 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
                         3,
                         0,
                         0,
-                        AttributeUsageType.DynamicDraw
+                        ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
                     ),
                 ],
                 // index list

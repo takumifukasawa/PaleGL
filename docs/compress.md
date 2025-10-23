@@ -34,6 +34,12 @@
   - 型推論エラー: なし
   - 所要時間: 約10分
 
+**第6回（1個・3定数）**: AttributeUsageType (StaticDraw, DynamicDraw, DynamicCopy)
+  - 修正ファイル数: 11ファイル（src: 9ファイル、pages: 2ファイル）
+  - 使用箇所: 36箇所（src: 18箇所、pages: 18箇所）
+  - 型推論エラー: なし
+  - 所要時間: 約15分
+
 ## 作業フロー（次回以降用）
 
 ### 1. constants.tsで定数を変換
@@ -173,8 +179,8 @@ Property 'mrtGraphicsDoubleBuffer' does not exist on type 'GpuParticle'
 
 constants.tsの他の定数オブジェクト（優先度順）：
 
-1. `AnimationKeyframeTypes`
-2. `AttributeUsageType`
+1. ~~`AnimationKeyframeTypes`~~ (完了)
+2. ~~`AttributeUsageType`~~ (完了)
 3. `PostProcessPassType`
 4. `UniformNames` - 大量（慎重に）
 5. `UniformBlockNames`

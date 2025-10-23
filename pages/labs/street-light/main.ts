@@ -63,7 +63,10 @@ import {
     BLEND_TYPE_TRANSPARENT,
     RENDER_TARGET_TYPE_DEPTH,
     AttributeNames,
-    AttributeUsageType,
+    // @ts-ignore - type-only import
+    type AttributeUsageType,
+    ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
     UniformNames,
     FACE_SIDE_DOUBLE,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
@@ -551,7 +554,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 3,
                 0,
                 0,
-                AttributeUsageType.DynamicDraw
+                ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
             ),
             createAttribute(
                 'aVelocity',
@@ -559,7 +562,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 3,
                 0,
                 0,
-                AttributeUsageType.DynamicDraw
+                ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW
             ),
             createAttribute(
                 'aSeed',
@@ -567,7 +570,7 @@ const createInstanceUpdater = (instanceNum: number) => {
                 2,
                 0,
                 0,
-                AttributeUsageType.StaticDraw
+                ATTRIBUTE_USAGE_TYPE_STATIC_DRAW
             ),
         ],
         varyings: [
@@ -780,7 +783,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -792,7 +795,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -804,7 +807,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -817,7 +820,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             1,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -829,7 +832,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             4,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -841,7 +844,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             4,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );
@@ -853,7 +856,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
             3,
             0,
             0,
-            AttributeUsageType.StaticDraw,
+            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
             1
         )
     );

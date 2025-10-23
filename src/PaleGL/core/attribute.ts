@@ -1,4 +1,5 @@
-﻿import { AttributeUsageType } from '@/PaleGL/constants';
+﻿// @ts-ignore - type-only import
+import { type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants';
 
 type AttributeDataConstructor = Float32ArrayConstructor | Uint16ArrayConstructor;
 
@@ -29,7 +30,7 @@ export function createAttribute(
     size: number,
     location: number = 0,
     offset: number = 0,
-    usageType: AttributeUsageType = AttributeUsageType.StaticDraw,
+    usageType: AttributeUsageType = ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
     divisor: number = 0
 ) {
 
