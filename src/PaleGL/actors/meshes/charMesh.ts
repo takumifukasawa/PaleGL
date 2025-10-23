@@ -8,7 +8,9 @@ import {
     MESH_TYPE_TEXT,
     PRIMITIVE_TYPE_TRIANGLES,
     SHADING_MODEL_ID_UNLIT,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_TEXTURE,
@@ -134,7 +136,7 @@ export function createCharMesh({
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     });
 
     const mesh = createMesh({ name, geometry, material, meshType: MESH_TYPE_TEXT, castShadow });

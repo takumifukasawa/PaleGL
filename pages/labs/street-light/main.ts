@@ -79,7 +79,8 @@ import {
     UniformNames,
     FACE_SIDE_DOUBLE,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_CAMERA,
     ACTOR_TYPE_MESH,
     RAD_TO_DEG,
     FragmentShaderModifierPragmas,
@@ -670,7 +671,7 @@ layout (std140) uniform ubCommon {
                 value: 0,
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Common],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
         drawCount: instanceNum,
     });
 
@@ -1272,7 +1273,7 @@ void main() {
         ],
         blendType: BLEND_TYPE_TRANSPARENT,
         depthWrite: false,
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
     });
     const particleMesh = createMesh({
         geometry: particleGeometry,

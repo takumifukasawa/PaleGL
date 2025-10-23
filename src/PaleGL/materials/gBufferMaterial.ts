@@ -3,7 +3,9 @@ import {
     MATERIAL_TYPE_G_BUFFER,
     ShadingModelIds,
     SHADING_MODEL_ID_LIT,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -194,9 +196,9 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
         depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
         ...options, // override
         uniformBlockNames: [
-            UniformBlockNames.Common,
-            UniformBlockNames.Transformations,
-            UniformBlockNames.Camera,
+            UNIFORM_BLOCK_NAME_COMMON,
+            UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+            UNIFORM_BLOCK_NAME_CAMERA,
             ...(uniformBlockNames || []), // merge
         ],
     });

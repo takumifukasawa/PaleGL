@@ -57,7 +57,7 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(
     //     // receiveShadow: !!receiveShadow,
     //     primitiveType: PrimitiveTypes.Triangles,
     //     depthFuncType: DepthFuncTypes.Equal,
-    //     uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+    //     uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     // });
 
     return {

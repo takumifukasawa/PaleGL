@@ -441,17 +441,22 @@ export const UniformNames = {
 
 export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
 
-export const UniformBlockNames = {
-    Common: 'ubCommon',
-    Transformations: 'ubTransformations',
-    Camera: 'ubCamera',
-    DirectionalLight: 'ubDirectionalLight',
-    SpotLight: 'ubSpotLight',
-    PointLight: 'ubPointLight',
-    Timeline: 'ubTimeline',
-} as const;
+export const UNIFORM_BLOCK_NAME_COMMON = 'ubCommon';
+export const UNIFORM_BLOCK_NAME_TRANSFORMATIONS = 'ubTransformations';
+export const UNIFORM_BLOCK_NAME_CAMERA = 'ubCamera';
+export const UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT = 'ubDirectionalLight';
+export const UNIFORM_BLOCK_NAME_SPOT_LIGHT = 'ubSpotLight';
+export const UNIFORM_BLOCK_NAME_POINT_LIGHT = 'ubPointLight';
+export const UNIFORM_BLOCK_NAME_TIMELINE = 'ubTimeline';
 
-export type UniformBlockName = (typeof UniformBlockNames)[keyof typeof UniformBlockNames];
+export type UniformBlockName =
+    | typeof UNIFORM_BLOCK_NAME_COMMON
+    | typeof UNIFORM_BLOCK_NAME_TRANSFORMATIONS
+    | typeof UNIFORM_BLOCK_NAME_CAMERA
+    | typeof UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT
+    | typeof UNIFORM_BLOCK_NAME_SPOT_LIGHT
+    | typeof UNIFORM_BLOCK_NAME_POINT_LIGHT
+    | typeof UNIFORM_BLOCK_NAME_TIMELINE;
 
 // export const PostProcessUniformNames = {
 //     TargetWidth: 'uTargetWidth',

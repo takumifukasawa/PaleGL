@@ -3,7 +3,7 @@ import {
     FragmentShaderModifierPragmas,
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_TIMELINE,
     UniformNames,
     UNIFORM_TYPE_VECTOR3,
 } from '@/PaleGL/constants.ts';
@@ -87,7 +87,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         uniforms: mergedUniforms,
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        uniformBlockNames: [UniformBlockNames.Timeline],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_TIMELINE],
         fragmentShaderModifiers: [
             {
                 pragma: FragmentShaderModifierPragmas.RAYMARCH_SCENE,

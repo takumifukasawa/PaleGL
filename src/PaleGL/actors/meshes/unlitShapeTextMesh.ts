@@ -7,7 +7,9 @@ import {
     PRIMITIVE_TYPE_TRIANGLES,
     SHADING_MODEL_ID_UNLIT,
     UI_QUEUE_TYPE_NONE,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -91,7 +93,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     });
 
     const shapeText = createShapeTextMeshBase({

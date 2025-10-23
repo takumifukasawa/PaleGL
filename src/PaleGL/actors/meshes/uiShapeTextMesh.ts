@@ -13,7 +13,9 @@ import {
     UIAnchorType,
     UI_ANCHOR_TYPE_CENTER,
     UIQueueType,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -120,7 +122,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         blendType,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DEPTH_FUNC_TYPE_ALWAYS,
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     });
 
     const shapeText = createShapeTextMeshBase({

@@ -4,7 +4,7 @@ import {
     TextureFilterType,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_WRAP_TYPE_REPEAT,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -106,7 +106,7 @@ export const createEffectTextureSystem: (
                 value: 1.0, // Default speed, can be overridden
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Common],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
     });
 
     let compositeMaterial: Material | null = null;
@@ -156,7 +156,7 @@ export const createEffectTextureSystem: (
             vertexShader: getPostProcessBaseVertexShader(),
             fragmentShader: effectTexturePostProcessFragment,
             uniforms,
-            uniformBlockNames: [UniformBlockNames.Common],
+            uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
         });
 
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, compositeMaterial);

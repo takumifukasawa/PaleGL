@@ -1,6 +1,6 @@
 import {
     UniformBlockName,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
 
@@ -47,6 +47,6 @@ export const createGraphicsDoubleBufferMaterial = (
                 value: createVector2(1 / width, 1 / height),
             },
         ] as UniformsData,
-        uniformBlockNames: [...uniformBlockNames, UniformBlockNames.Common],
+        uniformBlockNames: [...uniformBlockNames, UNIFORM_BLOCK_NAME_COMMON],
     });
 };

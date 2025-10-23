@@ -5,7 +5,9 @@ import {
     MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     SHADING_MODEL_ID_UNLIT,
     ShadingModelIds,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR3,
@@ -123,9 +125,9 @@ export function createObjectSpaceRaymarchGlassMaterial(
         depthFuncType: args.depthFuncType ?? DEPTH_FUNC_TYPE_LEQUAL,
 
         uniformBlockNames: [
-            UniformBlockNames.Common,
-            UniformBlockNames.Transformations,
-            UniformBlockNames.Camera,
+            UNIFORM_BLOCK_NAME_COMMON,
+            UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+            UNIFORM_BLOCK_NAME_CAMERA,
             ...(uniformBlockNames ? uniformBlockNames : []),
         ],
 

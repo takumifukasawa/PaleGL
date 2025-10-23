@@ -2,7 +2,8 @@
     POST_PROCESS_PASS_TYPE_SSAO,
     TEXTURE_TYPE_RGBA32F,
     TEXTURE_WRAP_TYPE_REPEAT,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -236,7 +237,7 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
                     value: 1,
                 },
             ],
-            uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
+            uniformBlockNames: [UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
         }),
         // params
         occlusionSampleLength,

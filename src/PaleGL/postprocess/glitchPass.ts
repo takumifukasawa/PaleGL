@@ -2,7 +2,7 @@
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_GLITCH,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
     UniformNames,
     UNIFORM_TYPE_FLOAT,
 
@@ -77,7 +77,7 @@ export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
                     value: 1,
                 },
             ],
-            uniformBlockNames: [UniformBlockNames.Common],
+            uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
             enabled,
         }),
         // parameters

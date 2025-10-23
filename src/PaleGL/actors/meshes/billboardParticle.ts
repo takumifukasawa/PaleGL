@@ -5,7 +5,8 @@ import {
     ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_COLOR, BlendType,
     BLEND_TYPE_TRANSPARENT,
     FragmentShaderModifiers,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2_ARRAY,
@@ -207,7 +208,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                 value: null,
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
         // blendType: BlendTypes.Additive
         vertexShaderModifiers,
         fragmentShaderModifiers,

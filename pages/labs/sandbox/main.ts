@@ -105,7 +105,7 @@ import {
     TEXTURE_WRAP_TYPE_REPEAT,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
     UniformNames,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
@@ -1470,7 +1470,7 @@ layout (std140) uniform ubCommon {
                 value: 0,
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Common],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
         drawCount: instanceNum,
     });
 

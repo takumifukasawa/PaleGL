@@ -8,7 +8,8 @@ import {
     ACTOR_TYPE_SKYBOX,
     UniformNames,
     SHADING_MODEL_ID_SKYBOX,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     RENDER_QUEUE_TYPE_SKYBOX,
     FACE_SIDE_BACK,
 } from '@/PaleGL/constants.ts';
@@ -161,7 +162,7 @@ export function createSkybox({
                 value: SHADING_MODEL_ID_SKYBOX,
             },
         ],
-        uniformBlockNames: [UniformBlockNames.Transformations, UniformBlockNames.Camera],
+        uniformBlockNames: [UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     });
 
     const mesh = createMesh({ geometry, material, type: ACTOR_TYPE_SKYBOX });

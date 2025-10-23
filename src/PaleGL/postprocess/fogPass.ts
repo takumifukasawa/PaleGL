@@ -3,7 +3,8 @@ import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/t
 import {
     POST_PROCESS_PASS_TYPE_FOG,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -199,7 +200,7 @@ export function createFogPass(args: FogPassArgs) {
                 },
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
-            uniformBlockNames: [UniformBlockNames.Common, UniformBlockNames.Camera],
+            uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
             enabled,
         }),
         // parameters

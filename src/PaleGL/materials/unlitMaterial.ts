@@ -2,7 +2,9 @@ import {
     DEPTH_FUNC_TYPE_EQUAL,
     MATERIAL_TYPE_UNLIT,
     SHADING_MODEL_ID_UNLIT,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
@@ -102,9 +104,9 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
         depthFuncType: DEPTH_FUNC_TYPE_EQUAL, // NOTE: これはGBufferの場合
         ...options, // overrides
         uniformBlockNames: [
-            UniformBlockNames.Common,
-            UniformBlockNames.Transformations,
-            UniformBlockNames.Camera,
+            UNIFORM_BLOCK_NAME_COMMON,
+            UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+            UNIFORM_BLOCK_NAME_CAMERA,
             ...(uniformBlockNames ?? []), // merge
         ],
     });

@@ -4,7 +4,9 @@ import {
     MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH,
     SHADING_MODEL_ID_LIT,
     ShadingModelIds,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -170,9 +172,9 @@ export function createScreenSpaceRaymarchMaterial({
         depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
         skipDepthPrePass: true,
         uniformBlockNames: [
-            UniformBlockNames.Common,
-            UniformBlockNames.Transformations,
-            UniformBlockNames.Camera,
+            UNIFORM_BLOCK_NAME_COMMON,
+            UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+            UNIFORM_BLOCK_NAME_CAMERA,
             ...(uniformBlockNames ? uniformBlockNames : []),
         ],
     });

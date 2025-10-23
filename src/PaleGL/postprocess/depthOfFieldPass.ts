@@ -5,7 +5,7 @@ import {
     RENDER_TARGET_TYPE_R16F,
     RENDER_TARGET_TYPE_RGBA16F,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -136,8 +136,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             ...getPostProcessCommonUniforms(),
         ],
         uniformBlockNames: [
-            // UniformBlockNames.Transformations,
-            UniformBlockNames.Camera,
+            // UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+            UNIFORM_BLOCK_NAME_CAMERA,
         ],
         // NOTE: r11f_g11f_b10fだとunsignedなのでr16fにする
         // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,

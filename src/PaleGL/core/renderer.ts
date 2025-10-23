@@ -60,7 +60,13 @@ import {
     // UIQueueType,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
-    UniformBlockNames,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
+    UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
+    UNIFORM_BLOCK_NAME_SPOT_LIGHT,
+    UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    UNIFORM_BLOCK_NAME_TIMELINE,
     UniformNames,
 
     UNIFORM_TYPE_INT,
@@ -492,7 +498,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.Transformations,
+            UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
             transformationsUniformBlockData
         ),
         data: transformationsUniformBlockData,
@@ -534,7 +540,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.Camera,
+            UNIFORM_BLOCK_NAME_CAMERA,
             cameraUniformBufferData
         ),
         data: cameraUniformBufferData,
@@ -572,7 +578,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.DirectionalLight,
+            UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
             directionalLightUniformBufferData
         ),
         data: directionalLightUniformBufferData,
@@ -635,7 +641,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.SpotLight,
+            UNIFORM_BLOCK_NAME_SPOT_LIGHT,
             spotLightUniformBufferData
         ),
         data: spotLightUniformBufferData,
@@ -678,7 +684,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.PointLight,
+            UNIFORM_BLOCK_NAME_POINT_LIGHT,
             pointLightUniformBufferData
         ),
         data: pointLightUniformBufferData,
@@ -700,7 +706,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.Timeline,
+            UNIFORM_BLOCK_NAME_TIMELINE,
             timelineUniformBufferData
         ),
         data: timelineUniformBufferData,
@@ -728,7 +734,7 @@ export function createRenderer({
         uniformBufferObject: createGPUUniformBufferObject(
             gpu,
             uniformBufferObjectShader,
-            UniformBlockNames.Common,
+            UNIFORM_BLOCK_NAME_COMMON,
             commonUniformBlockData
         ),
         data: commonUniformBlockData,
@@ -1973,87 +1979,87 @@ function renderUIPass(
 function updateActorTransformUniforms(renderer: Renderer, actor: Actor, camera: Camera) {
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.WorldMatrix,
         actor.transform.worldMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.InverseWorldMatrix,
         actor.transform.worldMatrix
         // invertMat4(actor.transform.worldMatrix) // TODO: こっちの方が正しいが・・・
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.WVPMatrix,
         multiplyMat4Array(camera.viewProjectionMatrix, actor.transform.worldMatrix)
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.NormalMatrix,
         actor.transform.normalMatrix
     );
 }
 
 export function updateRendererCameraUniforms(renderer: Renderer, camera: Camera) {
-    setUniformBlockValue(renderer, UniformBlockNames.Transformations, UniformNames.ViewMatrix, camera.viewMatrix);
+    setUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UniformNames.ViewMatrix, camera.viewMatrix);
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.ProjectionMatrix,
         camera.projectionMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Camera,
+        UNIFORM_BLOCK_NAME_CAMERA,
         UniformNames.ViewPosition,
         getMat4Position(camera.transform.worldMatrix)
     );
-    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.ViewDirection, getCameraForward(camera));
-    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.CameraNear, camera.near);
-    setUniformBlockValue(renderer, UniformBlockNames.Camera, UniformNames.CameraFar, camera.far);
+    setUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_CAMERA, UniformNames.ViewDirection, getCameraForward(camera));
+    setUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_CAMERA, UniformNames.CameraNear, camera.near);
+    setUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_CAMERA, UniformNames.CameraFar, camera.far);
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Camera,
+        UNIFORM_BLOCK_NAME_CAMERA,
         UniformNames.CameraAspect,
         isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).aspect : (camera as OrthographicCamera).aspect
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Camera,
+        UNIFORM_BLOCK_NAME_CAMERA,
         UniformNames.CameraFov,
         isPerspectiveCamera(camera) ? (camera as PerspectiveCamera).fov : 0
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.ViewProjectionMatrix,
         camera.viewProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.InverseViewMatrix,
         camera.inverseViewMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.InverseProjectionMatrix,
         camera.inverseProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.InverseViewProjectionMatrix,
         camera.inverseViewProjectionMatrix
     );
     setUniformBlockValue(
         renderer,
-        UniformBlockNames.Transformations,
+        UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
         UniformNames.TransposeInverseViewMatrix,
         transposeMat4(invertMat4(cloneMat4(camera.viewMatrix)))
     );
@@ -2179,11 +2185,11 @@ function updateUniformBlockValue(
 
 function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: number; deltaTime: number }) {
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
-    updateUniformBlockValue(renderer, UniformBlockNames.Common, UniformNames.Time, time);
-    updateUniformBlockValue(renderer, UniformBlockNames.Common, UniformNames.DeltaTime, deltaTime);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_COMMON, UniformNames.Time, time);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_COMMON, UniformNames.DeltaTime, deltaTime);
     updateUniformBlockValue(
         renderer,
-        UniformBlockNames.Common,
+        UNIFORM_BLOCK_NAME_COMMON,
         UniformNames.Viewport,
         createVector4(renderer.realWidth, renderer.realHeight, renderer.realWidth / renderer.realHeight, 0)
     );
@@ -2191,14 +2197,14 @@ function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: n
 
 export function updateTimelineUniforms(renderer: Renderer, timelineTime: number, timelineDeltaTime: number) {
     // passMaterial.uniforms.setValue(UniformNames.Time, time);
-    updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineTime, timelineTime);
-    updateUniformBlockValue(renderer, UniformBlockNames.Timeline, UniformNames.TimelineDeltaTime, timelineDeltaTime);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_TIMELINE, UniformNames.TimelineTime, timelineTime);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_TIMELINE, UniformNames.TimelineDeltaTime, timelineDeltaTime);
     // for debug
     // console.log(timelineTime, timelineDeltaTime);
 }
 
 function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: DirectionalLight) {
-    updateUniformBlockValue(renderer, UniformBlockNames.DirectionalLight, UniformNames.DirectionalLight, [
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT, UniformNames.DirectionalLight, [
         {
             name: UniformNames.LightDirection,
             type: UNIFORM_TYPE_VECTOR3,
@@ -2230,7 +2236,7 @@ function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: Di
 function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
     updateUniformBlockValue(
         renderer,
-        UniformBlockNames.SpotLight,
+        UNIFORM_BLOCK_NAME_SPOT_LIGHT,
         UniformNames.SpotLight,
         spotLights.map((spotLight): UniformBufferObjectStructValue => {
             return [
@@ -2287,7 +2293,7 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
 function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]) {
     updateUniformBlockValue(
         renderer,
-        UniformBlockNames.PointLight,
+        UNIFORM_BLOCK_NAME_POINT_LIGHT,
         UniformNames.PointLight,
         pointLights.map((pointLight): UniformBufferObjectStructValue => {
             return [

@@ -1,6 +1,16 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, UniformBlockNames, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants';
+import {
+    POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW,
+    UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_BLOCK_NAME_CAMERA,
+    UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    UniformNames,
+    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_VECTOR3,
+} from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
@@ -110,10 +120,10 @@ export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
                 },
             ],
             uniformBlockNames: [
-                UniformBlockNames.Common,
-                UniformBlockNames.Transformations,
-                UniformBlockNames.Camera,
-                UniformBlockNames.PointLight,
+                UNIFORM_BLOCK_NAME_COMMON,
+                UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+                UNIFORM_BLOCK_NAME_CAMERA,
+                UNIFORM_BLOCK_NAME_POINT_LIGHT,
             ],
             // renderTargetType: RenderTargetTypes.R16F,
             enabled,
