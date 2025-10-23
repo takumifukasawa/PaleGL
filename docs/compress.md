@@ -177,12 +177,60 @@ Property 'mrtGraphicsDoubleBuffer' does not exist on type 'GpuParticle'
 
 ## 今後の最適化候補
 
-constants.tsの他の定数オブジェクト（優先度順）：
+constants.tsの他の定数オブジェクト（優先度・規模順）：
 
-1. ~~`AnimationKeyframeTypes`~~ (完了)
-2. ~~`AttributeUsageType`~~ (完了)
-3. `PostProcessPassType`
-4. `UniformNames` - 大量（慎重に）
-5. `UniformBlockNames`
+### 完了済み
+1. ~~`AnimationKeyframeTypes`~~ (完了: 2定数)
+2. ~~`AttributeUsageType`~~ (完了: 3定数)
 
-**作業時間目安**: 1つの定数オブジェクトあたり約15-30分
+### 優先度: 高（中規模・高頻度）
+3. **`PostProcessPassType`** - 20定数、24ファイル、54箇所
+   - 推定時間: 30-45分
+   - 難易度: ★★☆
+   - 理由: ポストプロセス関連で使用頻度が高い
+
+4. **`AttributeNames`** - 18定数、16ファイル、93箇所
+   - 推定時間: 30-40分
+   - 難易度: ★★☆
+   - 理由: ジオメトリ属性で広く使用される
+
+5. **`UniformBlockNames`** - 7定数、29ファイル、86箇所
+   - 推定時間: 30-40分
+   - 難易度: ★★☆
+   - 理由: Uniform Block関連、中規模で影響範囲が明確
+
+### 優先度: 中（大規模・要注意）
+6. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
+   - 推定時間: 2-3時間
+   - 難易度: ★★★
+   - 理由: 最大規模、慎重な作業が必要
+
+### 優先度: 低（小規模・低頻度）
+7. **`GLTextureFilter`** - 6定数、3ファイル、18箇所
+   - 推定時間: 15-20分
+   - 難易度: ★☆☆
+   - 理由: WebGL定数ラッパー、影響範囲が限定的
+
+8. **`GLTextureWrap`** - 3定数、2ファイル、8箇所
+   - 推定時間: 10-15分
+   - 難易度: ★☆☆
+   - 理由: WebGL定数ラッパー、影響範囲が限定的
+
+9. **`GLColorAttachment`** - 8定数、3ファイル、18箇所
+   - 推定時間: 15-20分
+   - 難易度: ★☆☆
+   - 理由: WebGL定数ラッパー、影響範囲が限定的
+
+### 優先度: 保留（シェーダー関連・影響不明）
+10. **`VertexShaderModifierPragmas`** - 13定数、8箇所
+    - スプレッド構文使用、要調査
+11. **`FragmentShaderModifierPragmas`** - 10定数、14箇所
+    - スプレッド構文使用、要調査
+12. **`ShaderPragmas`** - スプレッド構文使用、要調査
+
+**推奨作業順序**: 3 → 4 → 5 → 7 → 8 → 9 → 6（最後に大規模なUniformNames）
+
+**作業時間目安**:
+- 小規模（～10定数）: 約10-20分
+- 中規模（10-20定数）: 約30-45分
+- 大規模（100+定数）: 約2-3時間
