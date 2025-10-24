@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_GLITCH,
     UNIFORM_BLOCK_NAME_COMMON,
@@ -19,18 +20,30 @@ import glitchFragment from '@/PaleGL/shaders/glitch-fragment.glsl';
 
 // ---
 
+// ---- Type（既存）----
 export type GlitchPassParameters = {
     enabled: boolean;
     blendRate: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const GLITCH_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'gl_on' : 'enabled';
-export const GLITCH_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'gl_br' : 'blendRate';
+// ---- Short names（C#定数に完全一致）----
+export const Glitch_ShortNames = {
+    enabled: 'gl_on',
+    blendRate: 'gl_br',
+} as const satisfies ShortNamesFor<GlitchPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const GLITCH_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const GLITCH_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+// ---- 派生（テンプレ同様）----
+const Glitch = createShortenKit<GlitchPassParameters>()(Glitch_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const GlitchPassParametersPropertyMap = Glitch.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const GlitchPassParametersKey = makeLongKeyMap(Glitch_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type GlitchPassParametersKey = keyof typeof GlitchPassParametersKey;
+export type GlitchPassParametersProperty = typeof Glitch.type;
 
 // ---
 

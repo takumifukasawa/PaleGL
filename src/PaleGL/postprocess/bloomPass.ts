@@ -24,6 +24,7 @@ import {
     setPostProcessPassSize,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 
 const BLUR_PIXEL_NUM = 7;
 
@@ -46,17 +47,19 @@ export type BloomPassParameters = {
     bloomAmount: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const BLOOM_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'bl_on' : 'enabled';
-export const BLOOM_PASS_PARAMETERS_PROPERTY_THRESHOLD = NeedsShorten ? 'bl_th' : 'threshold';
-export const BLOOM_PASS_PARAMETERS_PROPERTY_TONE = NeedsShorten ? 'bl_to' : 'tone';
-export const BLOOM_PASS_PARAMETERS_PROPERTY_BLOOM_AMOUNT = NeedsShorten ? 'bl_a' : 'bloomAmount';
+export const Bloom_ShortNames = {
+    enabled: 'bl_on',
+    threshold: 'bl_th',
+    tone: 'bl_to',
+    bloomAmount: 'bl_a',
+} as const satisfies ShortNamesFor<BloomPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const BLOOM_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const BLOOM_PASS_PARAMETERS_KEY_THRESHOLD = 'threshold' as const;
-export const BLOOM_PASS_PARAMETERS_KEY_TONE = 'tone' as const;
-export const BLOOM_PASS_PARAMETERS_KEY_BLOOM_AMOUNT = 'bloomAmount' as const;
+const Bloom = createShortenKit<BloomPassParameters>()(Bloom_ShortNames);
+export const BloomPassParametersPropertyMap = Bloom.map(NeedsShorten);
+
+export const BloomPassParametersKey = makeLongKeyMap(Bloom_ShortNames);
+
+export type BloomPassParametersKey = keyof typeof BloomPassParametersKey;
 
 // pass ---
 

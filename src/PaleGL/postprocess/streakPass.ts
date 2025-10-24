@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_STREAK,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -54,23 +55,29 @@ export type StreakPassParameters = {
     horizontalScale: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const STREAK_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'sk_on' : 'enabled';
-export const STREAK_PASS_PARAMETERS_PROPERTY_THRESHOLD = NeedsShorten ? 'sk_th' : 'threshold';
-export const STREAK_PASS_PARAMETERS_PROPERTY_STRETCH = NeedsShorten ? 'sk_st' : 'stretch';
-export const STREAK_PASS_PARAMETERS_PROPERTY_COLOR = NeedsShorten ? 'sk_c' : 'color';
-export const STREAK_PASS_PARAMETERS_PROPERTY_INTENSITY = NeedsShorten ? 'sk_i' : 'intensity';
-export const STREAK_PASS_PARAMETERS_PROPERTY_VERTICAL_SCALE = NeedsShorten ? 'sk_vs' : 'verticalScale';
-export const STREAK_PASS_PARAMETERS_PROPERTY_HORIZONTAL_SCALE = NeedsShorten ? 'sk_hs' : 'horizontalScale';
+// ---- Short names（C#定数に完全一致）----
+export const Streak_ShortNames = {
+    enabled: 'sk_on',
+    threshold: 'sk_th',
+    stretch: 'sk_st',
+    color: 'sk_c',
+    intensity: 'sk_i',
+    verticalScale: 'sk_vs',
+    horizontalScale: 'sk_hs',
+} as const satisfies ShortNamesFor<StreakPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const STREAK_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const STREAK_PASS_PARAMETERS_KEY_THRESHOLD = 'threshold' as const;
-export const STREAK_PASS_PARAMETERS_KEY_STRETCH = 'stretch' as const;
-export const STREAK_PASS_PARAMETERS_KEY_COLOR = 'color' as const;
-export const STREAK_PASS_PARAMETERS_KEY_INTENSITY = 'intensity' as const;
-export const STREAK_PASS_PARAMETERS_KEY_VERTICAL_SCALE = 'verticalScale' as const;
-export const STREAK_PASS_PARAMETERS_KEY_HORIZONTAL_SCALE = 'horizontalScale' as const;
+// ---- 派生（テンプレ同様）----
+const Streak = createShortenKit<StreakPassParameters>()(Streak_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const StreakPassParametersPropertyMap = Streak.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const StreakPassParametersKey = makeLongKeyMap(Streak_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type StreakPassParametersKey = keyof typeof StreakPassParametersKey;
+export type StreakPassParametersProperty = typeof Streak.type;
 
 // ---
 

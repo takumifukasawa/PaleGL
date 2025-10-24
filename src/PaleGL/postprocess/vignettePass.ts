@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { POST_PROCESS_PASS_TYPE_VIGNETTE, UNIFORM_TYPE_FLOAT, UNIFORM_NAME_ASPECT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
@@ -33,19 +34,27 @@ export type VignettePassParameters = {
     blendRate: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const VIGNETTE_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'vg_on' : 'enabled';
-export const VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_FROM = NeedsShorten ? 'vg_rf' : 'vignetteRadiusFrom';
-export const VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_TO = NeedsShorten ? 'vg_rt' : 'vignetteRadiusTo';
-export const VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_POWER = NeedsShorten ? 'vg_p' : 'vignettePower';
-export const VIGNETTE_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'vg_br' : 'blendRate';
+// ---- Short names（C#定数に完全一致）----
+export const Vignette_ShortNames = {
+    enabled: 'vg_on',
+    vignetteRadiusFrom: 'vg_rf',
+    vignetteRadiusTo: 'vg_rt',
+    vignettePower: 'vg_p',
+    blendRate: 'vg_br',
+} as const satisfies ShortNamesFor<VignettePassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const VIGNETTE_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_FROM = 'vignetteRadiusFrom' as const;
-export const VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_TO = 'vignetteRadiusTo' as const;
-export const VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_POWER = 'vignettePower' as const;
-export const VIGNETTE_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+// ---- 派生（テンプレ同様）----
+const Vignette = createShortenKit<VignettePassParameters>()(Vignette_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const VignettePassParametersPropertyMap = Vignette.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const VignettePassParametersKey = makeLongKeyMap(Vignette_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type VignettePassParametersKey = keyof typeof VignettePassParametersKey;
+export type VignettePassParametersProperty = typeof Vignette.type;
 
 // ---
 

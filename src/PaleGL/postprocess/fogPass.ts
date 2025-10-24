@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_FOG,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -41,6 +42,7 @@ const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 
 // ---
 
+// ---- Type ----
 export type FogPassParameters = {
     enabled: boolean;
     fogColor: Color;
@@ -56,33 +58,34 @@ export type FogPassParameters = {
     blendRate: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const FOG_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'fg_on' : 'enabled';
-export const FOG_PASS_PARAMETERS_PROPERTY_FOG_COLOR = NeedsShorten ? 'fg_c' : 'fogColor';
-export const FOG_PASS_PARAMETERS_PROPERTY_FOG_STRENGTH = NeedsShorten ? 'fg_s' : 'fogStrength';
-export const FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY = NeedsShorten ? 'fg_d' : 'fogDensity';
-export const FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY_ATTENUATION = NeedsShorten ? 'fg_da' : 'fogDensityAttenuation';
-export const FOG_PASS_PARAMETERS_PROPERTY_FOG_END_HEIGHT = NeedsShorten ? 'fg_eh' : 'fogEndHeight';
-export const FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_START = NeedsShorten ? 'fg_ds' : 'distanceFogStart';
-export const FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_POWER = NeedsShorten ? 'fg_dp' : 'distanceFogPower';
-export const FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_END = NeedsShorten ? 'fg_de' : 'distanceFogEnd';
-export const FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_RATE = NeedsShorten ? 'fg_sss_r' : 'sssFogRate';
-export const FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_COLOR = NeedsShorten ? 'fg_sss_fc' : 'sssFogColor';
-export const FOG_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'fg_br' : 'blendRate';
+// ---- Short names（C# に完全一致）----
+export const Fog_ShortNames = {
+    enabled: 'fg_on',
+    fogColor: 'fg_c',
+    fogStrength: 'fg_s',
+    fogDensity: 'fg_d',
+    fogDensityAttenuation: 'fg_da',
+    fogEndHeight: 'fg_eh',
+    distanceFogStart: 'fg_ds',
+    distanceFogPower: 'fg_dp',
+    distanceFogEnd: 'fg_de',
+    sssFogRate: 'fg_sss_r',
+    sssFogColor: 'fg_sss_fc',
+    blendRate: 'fg_br',
+} as const satisfies ShortNamesFor<FogPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const FOG_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const FOG_PASS_PARAMETERS_KEY_FOG_COLOR = 'fogColor' as const;
-export const FOG_PASS_PARAMETERS_KEY_FOG_STRENGTH = 'fogStrength' as const;
-export const FOG_PASS_PARAMETERS_KEY_FOG_DENSITY = 'fogDensity' as const;
-export const FOG_PASS_PARAMETERS_KEY_FOG_DENSITY_ATTENUATION = 'fogDensityAttenuation' as const;
-export const FOG_PASS_PARAMETERS_KEY_FOG_END_HEIGHT = 'fogEndHeight' as const;
-export const FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_START = 'distanceFogStart' as const;
-export const FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_POWER = 'distanceFogPower' as const;
-export const FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_END = 'distanceFogEnd' as const;
-export const FOG_PASS_PARAMETERS_KEY_SSS_FOG_RATE = 'sssFogRate' as const;
-export const FOG_PASS_PARAMETERS_KEY_SSS_FOG_COLOR = 'sssFogColor' as const;
-export const FOG_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+// ---- 派生（テンプレ同様）----
+const Fog = createShortenKit<FogPassParameters>()(Fog_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ
+export const FogPassParametersPropertyMap = Fog.map(NeedsShorten);
+
+// 常に long キー（論理キー）
+export const FogPassParametersKey = makeLongKeyMap(Fog_ShortNames);
+
+// 任意：キーのユニオン／拡張型
+export type FogPassParametersKey = keyof typeof FogPassParametersKey;
+export type FogPassParametersProperty = typeof Fog.type;
 
 // ---
 

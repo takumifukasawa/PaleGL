@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import {
     ATTRIBUTE_NAME_POSITION,
@@ -66,21 +67,30 @@ export type VolumetricLightPassParameters = {
     ratio: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'vl_on' : 'enabled';
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_STEP = NeedsShorten ? 'vl_rs' : 'rayStep';
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'vl_br' : 'blendRate';
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_DENSITY_MULTIPLIER = NeedsShorten ? 'vl_dm' : 'densityMultiplier';
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_JITTER_SIZE = NeedsShorten ? 'vl_rjs' : 'rayJitterSize';
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RATIO = NeedsShorten ? 'vl_r' : 'ratio';
+// ---- Short names（C#定数に完全一致）----
+export const VolumetricLight_ShortNames = {
+    enabled: 'vl_on',
+    rayStep: 'vl_rs',
+    blendRate: 'vl_br',
+    densityMultiplier: 'vl_dm',
+    rayJitterSize: 'vl_rjs',
+    ratio: 'vl_r',
+} as const satisfies ShortNamesFor<VolumetricLightPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_STEP = 'rayStep' as const;
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_DENSITY_MULTIPLIER = 'densityMultiplier' as const;
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_JITTER_SIZE = 'rayJitterSize' as const;
-export const VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RATIO = 'ratio' as const;
+// ---- 派生（テンプレ同様）----
+const VolumetricLight = createShortenKit<VolumetricLightPassParameters>()(VolumetricLight_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const VolumetricLightPassParametersPropertyMap = VolumetricLight.map(NeedsShorten);
+
+// 常に long キーを返す論理キー
+export const VolumetricLightPassParametersKey = makeLongKeyMap(VolumetricLight_ShortNames);
+
+// キーのユニオン（必要なら）
+export type VolumetricLightPassParametersKey = keyof typeof VolumetricLightPassParametersKey;
+
+// 短縮キーも含む拡張型（必要なら）
+export type VolumetricLightPassParametersProperty = typeof VolumetricLight.type;
 
 // ---
 

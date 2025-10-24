@@ -1,4 +1,5 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
+import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_SSR,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -67,41 +68,45 @@ export type SSRPassParameters = {
     blendRate: number;
 };
 
-// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
-export const SSR_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'ssr_on' : 'enabled';
-export const SSR_PASS_PARAMETERS_PROPERTY_RAY_DEPTH_BIAS = NeedsShorten ? 'ssr_rdb' : 'rayDepthBias';
-export const SSR_PASS_PARAMETERS_PROPERTY_RAY_NEAREST_DISTANCE = NeedsShorten ? 'ssr_rnd' : 'rayNearestDistance';
-export const SSR_PASS_PARAMETERS_PROPERTY_RAY_MAX_DISTANCE = NeedsShorten ? 'ssr_rmd' : 'rayMaxDistance';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_THICKNESS = NeedsShorten ? 'ssr_rt' : 'reflectionRayThickness';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_X = NeedsShorten ? 'ssr_rjx' : 'reflectionRayJitterSizeX';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_Y = NeedsShorten ? 'ssr_rjy' : 'reflectionRayJitterSizeY';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MIN_DISTANCE = NeedsShorten ? 'ssr_fmd' : 'reflectionFadeMinDistance';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MAX_DISTANCE = NeedsShorten ? 'ssr_fxd' : 'reflectionFadeMaxDistance';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X = NeedsShorten ? 'ssr_seffmx' : 'reflectionScreenEdgeFadeFactorMinX';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X = NeedsShorten ? 'ssr_seffMx' : 'reflectionScreenEdgeFadeFactorMaxX';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y = NeedsShorten ? 'ssr_seffmy' : 'reflectionScreenEdgeFadeFactorMinY';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y = NeedsShorten ? 'ssr_seffMy' : 'reflectionScreenEdgeFadeFactorMaxY';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ROUGHNESS_POWER = NeedsShorten ? 'ssr_rp' : 'reflectionRoughnessPower';
-export const SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ADDITIONAL_RATE = NeedsShorten ? 'ssr_ar' : 'reflectionAdditionalRate';
-export const SSR_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'ssr_br' : 'blendRate';
+// ---- Short names (唯一の真実源) ----
+// C# の定数と完全一致：
+//  ssr_on, ssr_rdb, ssr_rnd, ssr_rmd, ssr_rt,
+//  ssr_rjx, ssr_rjy, ssr_fmd, ssr_fxd,
+//  ssr_seffmx, ssr_seffMx, ssr_seffmy, ssr_seffMy,
+//  ssr_rp, ssr_ar, ssr_br
+export const SSR_ShortNames = {
+    enabled: 'ssr_on',
+    rayDepthBias: 'ssr_rdb',
+    rayNearestDistance: 'ssr_rnd',
+    rayMaxDistance: 'ssr_rmd',
+    reflectionRayThickness: 'ssr_rt',
+    reflectionRayJitterSizeX: 'ssr_rjx',
+    reflectionRayJitterSizeY: 'ssr_rjy',
+    reflectionFadeMinDistance: 'ssr_fmd',
+    reflectionFadeMaxDistance: 'ssr_fxd',
+    reflectionScreenEdgeFadeFactorMinX: 'ssr_seffmx',
+    reflectionScreenEdgeFadeFactorMaxX: 'ssr_seffMx',
+    reflectionScreenEdgeFadeFactorMinY: 'ssr_seffmy',
+    reflectionScreenEdgeFadeFactorMaxY: 'ssr_seffMy',
+    reflectionRoughnessPower: 'ssr_rp',
+    reflectionAdditionalRate: 'ssr_ar',
+    blendRate: 'ssr_br',
+} as const satisfies ShortNamesFor<SSRPassParameters>;
 
-// KEY定数: 常に元の名前（プロパティアクセス用）
-export const SSR_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
-export const SSR_PASS_PARAMETERS_KEY_RAY_DEPTH_BIAS = 'rayDepthBias' as const;
-export const SSR_PASS_PARAMETERS_KEY_RAY_NEAREST_DISTANCE = 'rayNearestDistance' as const;
-export const SSR_PASS_PARAMETERS_KEY_RAY_MAX_DISTANCE = 'rayMaxDistance' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_THICKNESS = 'reflectionRayThickness' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_X = 'reflectionRayJitterSizeX' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_Y = 'reflectionRayJitterSizeY' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MIN_DISTANCE = 'reflectionFadeMinDistance' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MAX_DISTANCE = 'reflectionFadeMaxDistance' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X = 'reflectionScreenEdgeFadeFactorMinX' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X = 'reflectionScreenEdgeFadeFactorMaxX' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y = 'reflectionScreenEdgeFadeFactorMinY' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y = 'reflectionScreenEdgeFadeFactorMaxY' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_ROUGHNESS_POWER = 'reflectionRoughnessPower' as const;
-export const SSR_PASS_PARAMETERS_KEY_REFLECTION_ADDITIONAL_RATE = 'reflectionAdditionalRate' as const;
-export const SSR_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+// ---- 派生（テンプレ同様）----
+const SSR = createShortenKit<SSRPassParameters>()(SSR_ShortNames);
+
+// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
+export const SSRPassParametersPropertyMap = SSR.map(NeedsShorten);
+
+// 常に long キーを返す論理キー
+export const SSRPassParametersKey = makeLongKeyMap(SSR_ShortNames);
+
+// long キーのユニオン（必要なら）
+export type SSRPassParametersKey = keyof typeof SSRPassParametersKey;
+
+// ※ 短縮キーも含む拡張型が必要なら（Bloom と同様）
+export type SSRPassParametersProperty = typeof SSR.type;
 
 // ---
 
