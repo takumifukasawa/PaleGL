@@ -3,7 +3,6 @@ import {
     MarionetterCameraComponentInfo,
     MarionetterCameraComponentInfoProperty,
     MarionetterComponentInfoBaseProperty,
-    MarionetterComponentType,
     MarionetterDirectionalLightComponentInfo,
     MarionetterFbmNoiseTextureControllerComponentInfo,
     MarionetterGBufferMaterialControllerComponentInfo,
@@ -11,7 +10,6 @@ import {
     MarionetterLightComponentInfoProperty,
     MarionetterLitMaterialInfoProperty,
     MarionetterMaterialInfoProperty,
-    MarionetterMaterialType,
     MarionetterMeshFilterComponentInfo,
     MarionetterMeshFilterComponentInfoProperty,
     MarionetterMeshRendererComponentInfo,
@@ -29,6 +27,17 @@ import {
     MarionetterSpotLightComponentInfoProperty,
     MarionetterTimeline,
     MarionetterTransformInfoProperty,
+    MARIONETTER_COMPONENT_TYPE_MESH_FILTER,
+    MARIONETTER_COMPONENT_TYPE_MESH_RENDERER,
+    MARIONETTER_COMPONENT_TYPE_CAMERA,
+    MARIONETTER_COMPONENT_TYPE_LIGHT,
+    MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
+    MARIONETTER_MATERIAL_TYPE_LIT,
+    MARIONETTER_MATERIAL_TYPE_UNLIT,
 } from '@/Marionetter/types';
 import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -193,19 +202,19 @@ export function buildMarionetterScene(
         const name = obj[MarionetterObjectInfoProperty.name];
         const mfComponent = findMarionetterComponent<MarionetterMeshFilterComponentInfo>(
             obj,
-            MarionetterComponentType.MeshFilter
+            MARIONETTER_COMPONENT_TYPE_MESH_FILTER
         );
         const mrComponent = findMarionetterComponent<MarionetterMeshRendererComponentInfo>(
             obj,
-            MarionetterComponentType.MeshRenderer
+            MARIONETTER_COMPONENT_TYPE_MESH_RENDERER
         );
         const cameraComponent = findMarionetterComponent<MarionetterCameraComponentInfo>(
             obj,
-            MarionetterComponentType.Camera
+            MARIONETTER_COMPONENT_TYPE_CAMERA
         );
         const lightComponent = findMarionetterComponent<MarionetterLightComponentInfo>(
             obj,
-            MarionetterComponentType.Light
+            MARIONETTER_COMPONENT_TYPE_LIGHT
         );
         // ORIGINAL
         // const volumeComponent = findMarionetterComponent<MarionetterVolumeComponentInfo>(
@@ -214,17 +223,17 @@ export function buildMarionetterScene(
         // );
         const postProcessControllerComponent = findMarionetterComponent<MarionetterPostProcessControllerComponentInfo>(
             obj,
-            MarionetterComponentType.PostProcessController
+            MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER
         );
         const objectMoveAndLookAtControllerComponent =
             findMarionetterComponent<MarionetterObjectMoveAndLookAtControllerComponentInfo>(
                 obj,
-                MarionetterComponentType.ObjectMoveAndLookAtController
+                MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER
             );
         const fbmNoiseTextureControllerComponent =
             findMarionetterComponent<MarionetterFbmNoiseTextureControllerComponentInfo>(
                 obj,
-                MarionetterComponentType.FbmNoiseTextureController
+                MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER
             );
         // const humanControllerComponent = findMarionetterComponent<MarionetterHumanControllerComponentInfo>(
         //     obj,
@@ -233,7 +242,7 @@ export function buildMarionetterScene(
         const gBufferMaterialControllerComponent =
             findMarionetterComponent<MarionetterGBufferMaterialControllerComponentInfo>(
                 obj,
-                MarionetterComponentType.GBufferMaterialController
+                MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER
             );
 
         let actor: Actor | null = null;
@@ -272,7 +281,7 @@ export function buildMarionetterScene(
                     MarionetterMaterialInfoProperty.type
                 ]
             ) {
-                case MarionetterMaterialType.Lit:
+                case MARIONETTER_MATERIAL_TYPE_LIT:
                     const litMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     const tiling = createVector4FromRawVector4(litMaterial[MarionetterLitMaterialInfoProperty.tiling]);
                     material = createGBufferMaterial({
@@ -288,7 +297,7 @@ export function buildMarionetterScene(
                         receiveShadow: !!litMaterial[MarionetterLitMaterialInfoProperty.receiveShadow],
                     });
                     break;
-                case MarionetterMaterialType.Unlit:
+                case MARIONETTER_MATERIAL_TYPE_UNLIT:
                     const unlitMaterial = meshRenderer[MarionetterMeshRendererComponentInfoProperty.material];
                     material = createUnlitMaterial({
                         baseColor: createColorFromHex(unlitMaterial[MarionetterLitMaterialInfoProperty.color]),
@@ -519,7 +528,7 @@ export function buildMarionetterTimelineFromScene(
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MarionetterSceneProperty.objects].forEach((obj) => {
         const timelineComponent = obj[MarionetterObjectInfoProperty.components].find(
-            (c) => c[MarionetterComponentInfoBaseProperty.type] === MarionetterComponentType.PlayableDirector
+            (c) => c[MarionetterComponentInfoBaseProperty.type] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
         );
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(

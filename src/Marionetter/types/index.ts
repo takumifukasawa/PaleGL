@@ -22,19 +22,26 @@ export type MarionetterSceneStructure = {
     marionetterTimeline: MarionetterTimeline | null;
 };
 
-export const MarionetterReceiveDataType = {
-    SeekTimeline: 'seekTimeline',
-    PlayTimeline: 'playTimeline',
-    StopTimeline: 'stopTimeline',
-    ExportScene: 'exportScene',
-    ExportHotReloadScene: 'exportHotReloadScene',
-    SetSceneViewData: 'setSceneViewData',
-    SetSceneViewEnabled: 'setSceneViewEnabled',
-    BeginPlayer: 'beginPlayer',
-    Reload: 'reload',
-} as const;
+export const MARIONETTER_RECEIVE_DATA_TYPE_SEEK_TIMELINE = 'seekTimeline';
+export const MARIONETTER_RECEIVE_DATA_TYPE_PLAY_TIMELINE = 'playTimeline';
+export const MARIONETTER_RECEIVE_DATA_TYPE_STOP_TIMELINE = 'stopTimeline';
+export const MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_SCENE = 'exportScene';
+export const MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_HOT_RELOAD_SCENE = 'exportHotReloadScene';
+export const MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_DATA = 'setSceneViewData';
+export const MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_ENABLED = 'setSceneViewEnabled';
+export const MARIONETTER_RECEIVE_DATA_TYPE_BEGIN_PLAYER = 'beginPlayer';
+export const MARIONETTER_RECEIVE_DATA_TYPE_RELOAD = 'reload';
 
-export type MarionetterReceiveDataType = (typeof MarionetterReceiveDataType)[keyof typeof MarionetterReceiveDataType];
+export type MarionetterReceiveDataType =
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_SEEK_TIMELINE
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_PLAY_TIMELINE
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_STOP_TIMELINE
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_SCENE
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_HOT_RELOAD_SCENE
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_DATA
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_ENABLED
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_BEGIN_PLAYER
+    | typeof MARIONETTER_RECEIVE_DATA_TYPE_RELOAD;
 
 export type MarionetterReceiveData = {
     type: MarionetterReceiveDataType;
@@ -131,18 +138,22 @@ export const MarionetterTransformInfoProperty = {
 //
 
 // unityに合わせる
-export const MarionetterTrackInfoType = {
-    None: 0,
-    AnimationTrack: 1,
-    LightControlTrack: 2,
-    ActivationControlTrack: 3,
-    MarkerTrack: 4,
-    ObjectMoveAndLookAtTrack: 5,
-    // TODO: custom track は外から注入したい
-    // HumanTrack: 6,
-} as const;
+export const MARIONETTER_TRACK_INFO_TYPE_NONE = 0;
+export const MARIONETTER_TRACK_INFO_TYPE_ANIMATION_TRACK = 1;
+export const MARIONETTER_TRACK_INFO_TYPE_LIGHT_CONTROL_TRACK = 2;
+export const MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK = 3;
+export const MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK = 4;
+export const MARIONETTER_TRACK_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_TRACK = 5;
+// TODO: custom track は外から注入したい
+// HumanTrack: 6,
 
-export type MarionetterTrackInfoType = (typeof MarionetterTrackInfoType)[keyof typeof MarionetterTrackInfoType];
+export type MarionetterTrackInfoType =
+    | typeof MARIONETTER_TRACK_INFO_TYPE_NONE
+    | typeof MARIONETTER_TRACK_INFO_TYPE_ANIMATION_TRACK
+    | typeof MARIONETTER_TRACK_INFO_TYPE_LIGHT_CONTROL_TRACK
+    | typeof MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+    | typeof MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK
+    | typeof MARIONETTER_TRACK_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_TRACK;
 
 export type MarionetterTrackInfoBase = {
     type: MarionetterTrackInfoType;
@@ -201,18 +212,22 @@ export type MarionetterClipInfoKinds =
 // | MarionetterHumanClipInfo;
 
 // NOTE: unity側に合わせる
-export const MarionetterClipInfoType = {
-    None: 0,
-    AnimationClip: 1,
-    LightControlClip: 2,
-    ActivationControlClip: 3,
-    SignalEmitter: 4,
-    ObjectMoveAndLookAtClip: 5,
-    // custom
-    // HumanClip: 6,
-} as const;
+export const MARIONETTER_CLIP_INFO_TYPE_NONE = 0;
+export const MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP = 1;
+export const MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP = 2;
+export const MARIONETTER_CLIP_INFO_TYPE_ACTIVATION_CONTROL_CLIP = 3;
+export const MARIONETTER_CLIP_INFO_TYPE_SIGNAL_EMITTER = 4;
+export const MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP = 5;
+// custom
+// HumanClip: 6,
 
-export type MarionetterClipInfoType = (typeof MarionetterClipInfoType)[keyof typeof MarionetterClipInfoType];
+export type MarionetterClipInfoType =
+    | typeof MARIONETTER_CLIP_INFO_TYPE_NONE
+    | typeof MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP
+    | typeof MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP
+    | typeof MARIONETTER_CLIP_INFO_TYPE_ACTIVATION_CONTROL_CLIP
+    | typeof MARIONETTER_CLIP_INFO_TYPE_SIGNAL_EMITTER
+    | typeof MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP;
 
 export type MarionetterClipInfoBase = {
     type: MarionetterClipInfoType;
@@ -393,21 +408,29 @@ export const MarionetterComponentInfoBaseProperty = {
 } as const;
 
 // unity側に合わせる
-export const MarionetterComponentType = {
-    None: 0,
-    PlayableDirector: 1,
-    Light: 2,
-    Camera: 3,
-    MeshRenderer: 4,
-    MeshFilter: 5,
-    PostProcessController: 6,
-    ObjectMoveAndLookAtController: 7,
-    FbmNoiseTextureController: 8,
-    GBufferMaterialController: 9,
-    // CUSTOM
-} as const;
+export const MARIONETTER_COMPONENT_TYPE_NONE = 0;
+export const MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR = 1;
+export const MARIONETTER_COMPONENT_TYPE_LIGHT = 2;
+export const MARIONETTER_COMPONENT_TYPE_CAMERA = 3;
+export const MARIONETTER_COMPONENT_TYPE_MESH_RENDERER = 4;
+export const MARIONETTER_COMPONENT_TYPE_MESH_FILTER = 5;
+export const MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER = 6;
+export const MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER = 7;
+export const MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER = 8;
+export const MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER = 9;
+// CUSTOM
 
-export type MarionetterComponentType = (typeof MarionetterComponentType)[keyof typeof MarionetterComponentType];
+export type MarionetterComponentType =
+    | typeof MARIONETTER_COMPONENT_TYPE_NONE
+    | typeof MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
+    | typeof MARIONETTER_COMPONENT_TYPE_LIGHT
+    | typeof MARIONETTER_COMPONENT_TYPE_CAMERA
+    | typeof MARIONETTER_COMPONENT_TYPE_MESH_RENDERER
+    | typeof MARIONETTER_COMPONENT_TYPE_MESH_FILTER
+    | typeof MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER
+    | typeof MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER
+    | typeof MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER
+    | typeof MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER;
 
 export type MarionetterComponentInfoKinds =
     | MarionetterPlayableDirectorComponentInfo
@@ -580,13 +603,14 @@ export const MarionetterCameraComponentInfoProperty = {
 
 // material
 
-export const MarionetterMaterialType = {
-    None: 0,
-    Lit: 1,
-    Unlit: 2,
-} as const;
+export const MARIONETTER_MATERIAL_TYPE_NONE = 0;
+export const MARIONETTER_MATERIAL_TYPE_LIT = 1;
+export const MARIONETTER_MATERIAL_TYPE_UNLIT = 2;
 
-export type MarionetterMaterialType = (typeof MarionetterMaterialType)[keyof typeof MarionetterMaterialType];
+export type MarionetterMaterialType =
+    | typeof MARIONETTER_MATERIAL_TYPE_NONE
+    | typeof MARIONETTER_MATERIAL_TYPE_LIT
+    | typeof MARIONETTER_MATERIAL_TYPE_UNLIT;
 
 export type MarionetterMaterialInfo = {
     type: MarionetterMaterialType;
@@ -994,18 +1018,22 @@ export type MarionetterClipKinds =
     | MarionetterActivationControlClip
     | MarionetterObjectMoveAndLookAtClip;
 
-export const MarionetterClipType = {
-    None: 0,
-    AnimationClip: 1,
-    LightControlClip: 2,
-    ActivationControlClip: 3,
-    SignalEmitter: 4,
-    ObjectMoveAndLookAtClip: 5,
-    // CUSTOM
-    // HumanClip: 6
-} as const;
+export const MARIONETTER_CLIP_TYPE_NONE = 0;
+export const MARIONETTER_CLIP_TYPE_ANIMATION_CLIP = 1;
+export const MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP = 2;
+export const MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP = 3;
+export const MARIONETTER_CLIP_TYPE_SIGNAL_EMITTER = 4;
+export const MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP = 5;
+// CUSTOM
+// HumanClip: 6
 
-export type MarionetterClipType = (typeof MarionetterClipType)[keyof typeof MarionetterClipType];
+export type MarionetterClipType =
+    | typeof MARIONETTER_CLIP_TYPE_NONE
+    | typeof MARIONETTER_CLIP_TYPE_ANIMATION_CLIP
+    | typeof MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP
+    | typeof MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP
+    | typeof MARIONETTER_CLIP_TYPE_SIGNAL_EMITTER
+    | typeof MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP;
 
 export type MarionetterClipArgs = { actor: Actor; time: number; scene: Scene };
 

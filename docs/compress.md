@@ -319,5 +319,33 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 - 中規模（10-20定数）: 約30-45分
 - 大規模（100+定数）: 約15分（推奨アプローチを使用した場合）
 
-**総作業時間**: 約6-7時間（全14回）
-**最適化された定数**: 合計約295個
+**総作業時間**: 約6.5-7.5時間（全15回）
+**最適化された定数**: 合計約332個（constants.ts: 295個、Marionetter: 37個）
+
+### Marionetterモジュールの定数オブジェクト
+
+**第15回（6個・37定数）**: MarionetterReceiveDataType, MarionetterTrackInfoType, MarionetterClipInfoType, MarionetterComponentType, MarionetterMaterialType, MarionetterClipType
+  - 修正ファイル数: 4ファイル（types/index.ts: 1ファイル、使用ファイル: 3ファイル）
+  - 使用箇所: 約33箇所（createMarionetter.ts: 9箇所、timeline.ts: 13箇所、buildMarionetterScene.ts: 11箇所）
+  - 主要修正箇所:
+    - src/Marionetter/types/index.ts: 6つの定数オブジェクトをフラット化
+    - src/Marionetter/createMarionetter.ts: MarionetterReceiveDataType（9箇所）
+    - src/Marionetter/timeline.ts: TrackInfoType（2箇所）、ClipInfoType（5箇所）、ClipType（4箇所）
+    - src/Marionetter/buildMarionetterScene.ts: ComponentType（10箇所）、MaterialType（2箇所）
+  - スキップ対象:
+    - `MarionetterAnimationClipType`: コメントアウトのみで実使用なし
+    - `TimelinePropertyBinderType` / `TimelinePropertyBinderTarget`: 使用箇所なし
+  - 型推論エラー: なし
+  - 所要時間: 約30分
+
+**完了済み**: 6オブジェクト（37定数）
+
+**未実装**:
+- `MarionetterAnimationClipType` (2定数): 使用箇所なし
+- `TimelinePropertyBinderType` (5定数): 使用箇所なし
+- `TimelinePropertyBinderTarget` (1定数): 使用箇所なし
+
+**注意事項**:
+- Marionetterは外部Unity連携用モジュール
+- `***Property`オブジェクト(実行時のプロパティマッピング用)は**フラット化対象外**
+- NeedsShortenによるJSON圧縮機能との併用に注意

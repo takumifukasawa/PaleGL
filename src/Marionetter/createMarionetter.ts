@@ -3,10 +3,18 @@ import {
     Marionetter,
     MarionetterArgs,
     MarionetterReceiveData,
-    MarionetterReceiveDataType,
     MarionetterReceiveSceneViewData,
     MarionetterReceiveSceneViewEnabledData,
     MarionetterReceiveTimeData,
+    MARIONETTER_RECEIVE_DATA_TYPE_SEEK_TIMELINE,
+    MARIONETTER_RECEIVE_DATA_TYPE_PLAY_TIMELINE,
+    MARIONETTER_RECEIVE_DATA_TYPE_STOP_TIMELINE,
+    MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_SCENE,
+    MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_HOT_RELOAD_SCENE,
+    MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_DATA,
+    MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_ENABLED,
+    MARIONETTER_RECEIVE_DATA_TYPE_BEGIN_PLAYER,
+    MARIONETTER_RECEIVE_DATA_TYPE_RELOAD,
 } from '@/Marionetter/types';
 
 /**
@@ -76,59 +84,59 @@ export function createMarionetter({
             }
 
             switch (json.type) {
-                case MarionetterReceiveDataType.SeekTimeline:
+                case MARIONETTER_RECEIVE_DATA_TYPE_SEEK_TIMELINE:
                     currentTime = (json as MarionetterReceiveTimeData).currentTime;
                     if (showLog) {
                         console.log(`[marionetter] seekTimeline: ${currentTime}`);
                     }
                     onSeek?.(currentTime);
                     break;
-                case MarionetterReceiveDataType.PlayTimeline:
+                case MARIONETTER_RECEIVE_DATA_TYPE_PLAY_TIMELINE:
                     currentTime = (json as MarionetterReceiveTimeData).currentTime;
                     if (showLog) {
                         console.log(`[marionetter] playTimeline: ${currentTime}`);
                     }
                     onPlay?.(currentTime);
                     break;
-                case MarionetterReceiveDataType.StopTimeline:
+                case MARIONETTER_RECEIVE_DATA_TYPE_STOP_TIMELINE:
                     if (showLog) {
                         console.log(`[marionetter] stopTimeline`);
                     }
                     onStop?.();
                     break;
-                case MarionetterReceiveDataType.ExportScene:
+                case MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_SCENE:
                     if (showLog) {
                         console.log(`[marionetter] exportScene`);
                     }
                     break;
-                case MarionetterReceiveDataType.ExportHotReloadScene:
+                case MARIONETTER_RECEIVE_DATA_TYPE_EXPORT_HOT_RELOAD_SCENE:
                     if (showLog) {
                         console.log(`[marionetter] hotReloadScene`);
                     }
                     onHotReloadCallback?.();
                     break;
-                case MarionetterReceiveDataType.SetSceneViewData:
+                case MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_DATA:
                     const sceneViewData = json as MarionetterReceiveSceneViewData;
                     if (showLog) {
                         console.log(`[marionetter] viewScene`);
                     }
                     onSetSceneViewData?.(sceneViewData);
                     break;
-                case MarionetterReceiveDataType.SetSceneViewEnabled:
+                case MARIONETTER_RECEIVE_DATA_TYPE_SET_SCENE_VIEW_ENABLED:
                     const sceneViewEnabledData = json as MarionetterReceiveSceneViewEnabledData;
                     if (showLog) {
                         console.log(`[marionetter] setSceneViewEnabled: ${sceneViewEnabledData.enabled}`);
                     }
                     onSceneViewEnabled?.(sceneViewEnabledData);
                     break;
-                case MarionetterReceiveDataType.BeginPlayer:
+                case MARIONETTER_RECEIVE_DATA_TYPE_BEGIN_PLAYER:
                     if (showLog) {
                         console.log(`[marionetter] beginPlayer`);
                     }
                     onBeginPlayer?.();
                     onPlay?.(0);
                     break;
-                case MarionetterReceiveDataType.Reload:
+                case MARIONETTER_RECEIVE_DATA_TYPE_RELOAD:
                     if (showLog) {
                         console.log(`[marionetter] reload`);
                     }
