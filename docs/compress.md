@@ -320,9 +320,11 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 - 小規模（～10定数）: 約10-20分
 - 中規模（10-20定数）: 約30-45分
 - 大規模（100+定数）: 約15分（推奨アプローチを使用した場合）
+- プラグイン実装: 約2時間（初回のみ、以降は自動化）
 
-**総作業時間**: 約7.0-8.0時間（全16回）
-**最適化された定数**: 合計約407個（constants.ts: 295個、Marionetter: 112個）
+**総作業時間**: 約9.0-10.0時間（全17回）
+**最適化された定数**: 合計約420個（constants.ts: 295個、Marionetter: 125個）
+**自動化ツール**: Viteプラグイン1個（Marionetter定数置換）
 
 ### Marionetterモジュールの定数オブジェクト
 
@@ -384,14 +386,29 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 
 **完了済み**: 30オブジェクト（112定数）
 
-**未実装**:
-- `MarionetterAnimationClipType` (2定数): 使用箇所なし
-- `TimelinePropertyBinderType` (5定数): 使用箇所なし
-- `TimelinePropertyBinderTarget` (1定数): 使用箇所なし
-- `MarionetterDirectionalLightComponentInfoProperty` (1定数): 使用箇所なし
-- `MarionetterFbmNoiseTextureControllerComponentInfoProperty` (5定数): 使用箇所なし
+**第17回（5個・13定数）**: 未使用`as const`オブジェクトの個別定数展開 + Viteプラグイン実装
+  - 修正ファイル数: 2ファイル（types/index.ts: 定数展開、新規プラグイン: 1ファイル）
+  - Phase 1: 未使用定数の展開
+    - `MarionetterAnimationClipType` (2定数): DEFAULT, GBUFFER_MATERIAL
+    - `TimelinePropertyBinderType` (5定数): FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR
+    - `TimelinePropertyBinderTarget` (1定数): MATERIAL
+    - `MarionetterFbmNoiseTextureControllerComponentInfoProperty` (5定数): GRID_SIZE, OCTAVES, AMPLITUDE, FREQUENCY, FACTOR
+    - `MarionetterDirectionalLightComponentInfoProperty` (1定数): 削除（未使用）
+  - Phase 2: Viteプラグイン実装
+    - ファイル: `PaleGL/plugins/vite-replace-marionetter-constants-plugin.ts`
+    - 機能: types/index.tsから74個の`MARIONETTER_*_PROPERTY_*`定数を解析し、ビルド時に`[CONSTANT_NAME]` → `["value"]`に自動置換
+    - 対象: buildMarionetterScene.ts (59箇所), timeline.ts (29箇所), curveUtilities.ts (22箇所), buildMarionetterSceneHooks.ts (2箇所)
+    - 効果: Terserの`mangle: { properties: { keep_quoted: true } }`と組み合わせることで、JSONとのプロパティマッチングを保証
+  - 背景:
+    - 問題: `marionetterScene[MARIONETTER_SCENE_PROPERTY_OBJECTS]`がTerserで`marionetterScene[a]`にmangleされ、JSON側の`"o"`とミスマッチ
+    - 解決: ビルド時に定数を文字列リテラル`["o"]`に置換することで、`keep_quoted: true`により保護
+  - 型推論エラー: なし
+  - 所要時間: 約2時間
+
+**完了済み**: 31オブジェクト（125定数）+ Viteプラグイン1個
 
 **注意事項**:
 - Marionetterは外部Unity連携用モジュール
 - 第16回で`***Property`オブジェクト（実行時のプロパティマッピング用）も展開対象に変更
+- 第17回でViteプラグインによる自動置換を実装し、Terser mangle対応を完了
 - NeedsShortenによるJSON圧縮機能との併用に注意
