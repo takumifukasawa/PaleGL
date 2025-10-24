@@ -412,3 +412,28 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 - 第16回で`***Property`オブジェクト（実行時のプロパティマッピング用）も展開対象に変更
 - 第17回でViteプラグインによる自動置換を実装し、Terser mangle対応を完了
 - NeedsShortenによるJSON圧縮機能との併用に注意
+
+### PostProcessモジュールのパラメータオブジェクト（試行・失敗）
+
+**第18回（試行・失敗）**: PostProcessパラメータの_ShortNamesオブジェクトの定数展開 + Viteプラグイン拡張
+  - 試行内容: 12個のpostprocessファイルの`_ShortNames`オブジェクトを個別定数に変換（Marionetterと同じパターン）
+  - 修正ファイル数: 14ファイル（postprocess: 12ファイル、postProcessControllerEntries.ts: 1ファイル、viteプラグイン: 1ファイル、makePropMap.ts削除: 1ファイル）
+  - 生成定数数: 164定数（82個のPROPERTY定数 + 82個のKEY定数）
+  - 対象ファイル: bloomPass.ts, chromaticAberrationPass.ts, depthOfFieldPass.ts, fogPass.ts, glitchPass.ts, lightShaftPass.ts, screenSpaceShadowPass.ts, ssaoPass.ts, ssrPass.ts, streakPass.ts, vignettePass.ts, volumetricLightPass.ts
+  - バグ発見:
+    - 現象: 実行時に `ssrPass.jitterSize` などのプロパティアクセスで undefined エラーが発生
+    - 原因: Viteプラグインは `[CONSTANT]` → `["value"]` のブラケット記法の置換のみ対応。ドット記法（`obj.propertyName`）のプロパティアクセスはTerser mangleの対象となり、プロパティ名が変更されてしまう
+    - 問題箇所: postProcessControllerEntries.ts ではブラケット記法を使用しているが、各passファイル内部でのドット記法アクセス（例: `ssrPass.jitterSize`）が保護されない
+    - Terser設定: `mangle: { properties: { keep_quoted: true } }` は引用符付き文字列（`["key"]`）のみ保護し、ドット記法は対象外
+  - 対策必要性:
+    - postprocessファイル内部でもブラケット記法に変更する必要がある（例: `ssrPass["jitterSize"]`）
+    - または、プロパティ名自体を保護リストに追加する必要がある
+    - しかし、どちらもファイルサイズ削減の観点から望ましくない
+  - 結果: **変更をすべて取り消し**（git revert 065a3936）
+  - 学び:
+    - Marionetterで成功した理由: Marionetterはブラケット記法のみでプロパティアクセスしているため
+    - PostProcessで失敗した理由: 内部実装でドット記法によるプロパティアクセスが多用されているため
+    - この手法は「ブラケット記法のみを使用するコード」でのみ有効
+  - 所要時間: 約2時間（試行 + 調査 + revert）
+
+**結論**: PostProcessモジュールの_ShortNamesオブジェクトは現状維持（定数展開は見送り）
