@@ -15,7 +15,6 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
 // import { Matrix4 } from '@/PaleGL/math/Matrix4';
 import { NeedsShorten } from '@/Marionetter/types';
-import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { Color, createColorBlack } from '@/PaleGL/math/color.ts';
@@ -42,31 +41,29 @@ export type SSAOPassParameters = {
     samplingTexture: Texture;
 };
 
-// 短縮名表（唯一の真実源）
-export const SSAO_ShortNames = {
-    enabled: 'ao_on',
-    occlusionSampleLength: 'ao_sl',
-    occlusionBias: 'ao_b',
-    occlusionMinDistance: 'ao_mid',
-    occlusionMaxDistance: 'ao_mad',
-    occlusionColor: 'ao_c',
-    occlusionPower: 'ao_p',
-    occlusionStrength: 'ao_s',
-    blendRate: 'ao_br',
-    samplingTexture: 'ao_tex',
-} as const satisfies ShortNamesFor<SSAOPassParameters>;
+// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
+export const SSAO_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'ao_on' : 'enabled';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_SAMPLE_LENGTH = NeedsShorten ? 'ao_sl' : 'occlusionSampleLength';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_BIAS = NeedsShorten ? 'ao_b' : 'occlusionBias';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MIN_DISTANCE = NeedsShorten ? 'ao_mid' : 'occlusionMinDistance';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MAX_DISTANCE = NeedsShorten ? 'ao_mad' : 'occlusionMaxDistance';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_COLOR = NeedsShorten ? 'ao_c' : 'occlusionColor';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_POWER = NeedsShorten ? 'ao_p' : 'occlusionPower';
+export const SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_STRENGTH = NeedsShorten ? 'ao_s' : 'occlusionStrength';
+export const SSAO_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'ao_br' : 'blendRate';
+export const SSAO_PASS_PARAMETERS_PROPERTY_SAMPLING_TEXTURE = NeedsShorten ? 'ao_tex' : 'samplingTexture';
 
-// 生成一式
-const SSAO = createShortenKit<SSAOPassParameters>()(SSAO_ShortNames);
-
-// NeedsShorten に応じたプロパティ名マップ
-export const SSAOPassParametersPropertyMap = SSAO.map(NeedsShorten);
-
-// 常に long キー（論理キー）
-export const SSAOPassParametersKey = makeLongKeyMap(SSAO_ShortNames);
-
-// 型（キーのユニオン）
-export type SSAOPassParametersKey = keyof typeof SSAOPassParametersKey;
+// KEY定数: 常に元の名前（プロパティアクセス用）
+export const SSAO_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_SAMPLE_LENGTH = 'occlusionSampleLength' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_BIAS = 'occlusionBias' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MIN_DISTANCE = 'occlusionMinDistance' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MAX_DISTANCE = 'occlusionMaxDistance' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_COLOR = 'occlusionColor' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_POWER = 'occlusionPower' as const;
+export const SSAO_PASS_PARAMETERS_KEY_OCCLUSION_STRENGTH = 'occlusionStrength' as const;
+export const SSAO_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+export const SSAO_PASS_PARAMETERS_KEY_SAMPLING_TEXTURE = 'samplingTexture' as const;
 
 /**
  *

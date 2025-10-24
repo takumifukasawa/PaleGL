@@ -1,7 +1,6 @@
 ﻿import { POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, RENDER_TARGET_TYPE_R11F_G11F_B10F, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_NAME_BLEND_RATE } from '@/PaleGL/constants';
 
 import { NeedsShorten } from '@/Marionetter/types';
-import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -37,29 +36,19 @@ export type LightShaftPassParameters = {
     rayStepStrength: number;
 };
 
-// ---- Short names (唯一の真実源 / C#に一致) ----
-export const LightShaft_ShortNames = {
-    enabled: 'ls_on',
-    ratio: 'ls_r',
-    blendRate: 'ls_br',
-    passScaleBase: 'ls_psb',
-    rayStepStrength: 'ls_rss',
-} as const satisfies ShortNamesFor<LightShaftPassParameters>;
+// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
+export const LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'ls_on' : 'enabled';
+export const LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RATIO = NeedsShorten ? 'ls_r' : 'ratio';
+export const LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'ls_br' : 'blendRate';
+export const LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_PASS_SCALE_BASE = NeedsShorten ? 'ls_psb' : 'passScaleBase';
+export const LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RAY_STEP_STRENGTH = NeedsShorten ? 'ls_rss' : 'rayStepStrength';
 
-// ---- 派生（テンプレ同様）----
-const LightShaft = createShortenKit<LightShaftPassParameters>()(LightShaft_ShortNames);
-
-// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
-export const LightShaftPassParametersPropertyMap = LightShaft.map(NeedsShorten);
-
-// 常に long キー（論理キー）
-export const LightShaftPassParametersKey = makeLongKeyMap(LightShaft_ShortNames);
-
-// long キーのユニオン（必要なら）
-export type LightShaftPassParametersKey = keyof typeof LightShaftPassParametersKey;
-
-// 短縮キーも含む拡張型（必要なら）
-export type LightShaftPassParametersProperty = typeof LightShaft.type;
+// KEY定数: 常に元の名前（プロパティアクセス用）
+export const LIGHT_SHAFT_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
+export const LIGHT_SHAFT_PASS_PARAMETERS_KEY_RATIO = 'ratio' as const;
+export const LIGHT_SHAFT_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
+export const LIGHT_SHAFT_PASS_PARAMETERS_KEY_PASS_SCALE_BASE = 'passScaleBase' as const;
+export const LIGHT_SHAFT_PASS_PARAMETERS_KEY_RAY_STEP_STRENGTH = 'rayStepStrength' as const;
 
 // ---
 

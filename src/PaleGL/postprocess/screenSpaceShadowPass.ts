@@ -1,5 +1,4 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
-import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW,
     UNIFORM_BLOCK_NAME_COMMON,
@@ -43,22 +42,23 @@ export type ScreenSpaceShadowPassParameters = {
     rayStepMultiplier: number;
 };
 
-export const SSS_ShortNames = {
-    enabled: 'sss_on',
-    bias: 'sss_b',
-    jitterSize: 'sss_js',
-    sharpness: 'sss_sh',
-    strength: 'sss_s',
-    ratio: 'sss_r',
-    rayStepMultiplier: 'sss_rsm',
-} as const satisfies ShortNamesFor<ScreenSpaceShadowPassParameters>;
+// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'sss_on' : 'enabled';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_BIAS = NeedsShorten ? 'sss_b' : 'bias';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_JITTER_SIZE = NeedsShorten ? 'sss_js' : 'jitterSize';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_SHARPNESS = NeedsShorten ? 'sss_sh' : 'sharpness';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_STRENGTH = NeedsShorten ? 'sss_s' : 'strength';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RATIO = NeedsShorten ? 'sss_r' : 'ratio';
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RAY_STEP_MULTIPLIER = NeedsShorten ? 'sss_rsm' : 'rayStepMultiplier';
 
-const SSS = createShortenKit<ScreenSpaceShadowPassParameters>()(SSS_ShortNames);
-export const ScreenSpaceShadowPassParametersPropertyMap = SSS.map(NeedsShorten);
-
-export const ScreenSpaceShadowPassParametersKey = makeLongKeyMap(SSS_ShortNames);
-
-export type ScreenSpaceShadowPassParametersKey = keyof typeof ScreenSpaceShadowPassParametersKey;
+// KEY定数: 常に元の名前（プロパティアクセス用）
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_BIAS = 'bias' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_JITTER_SIZE = 'jitterSize' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_SHARPNESS = 'sharpness' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_STRENGTH = 'strength' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RATIO = 'ratio' as const;
+export const SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RAY_STEP_MULTIPLIER = 'rayStepMultiplier' as const;
 
 // pass ---
 

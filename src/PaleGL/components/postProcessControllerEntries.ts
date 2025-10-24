@@ -1,32 +1,193 @@
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { Color, copyColor, createColorFromHex } from '@/PaleGL/math/color.ts';
 import { RawVector3, setV3, Vector3 } from '@/PaleGL/math/vector3.ts';
-import { BloomPassParametersKey, BloomPassParametersPropertyMap } from '@/PaleGL/postprocess/bloomPass.ts';
 import {
-    ChromaticAberrationPassParametersKey,
-    ChromaticAberrationPassParametersPropertyMap,
+    BLOOM_PASS_PARAMETERS_PROPERTY_ENABLED,
+    BLOOM_PASS_PARAMETERS_PROPERTY_THRESHOLD,
+    BLOOM_PASS_PARAMETERS_PROPERTY_TONE,
+    BLOOM_PASS_PARAMETERS_PROPERTY_BLOOM_AMOUNT,
+    BLOOM_PASS_PARAMETERS_KEY_ENABLED,
+    BLOOM_PASS_PARAMETERS_KEY_THRESHOLD,
+    BLOOM_PASS_PARAMETERS_KEY_TONE,
+    BLOOM_PASS_PARAMETERS_KEY_BLOOM_AMOUNT,
+} from '@/PaleGL/postprocess/bloomPass.ts';
+import {
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_ENABLED,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_SCALE,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_POWER,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_ENABLED,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_SCALE,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_POWER,
+    CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_BLEND_RATE,
 } from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
 import {
-    DepthOfFieldPassParametersKey,
-    DepthOfFieldPassParametersPropertyMap,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_ENABLED,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_DISTANCE,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_RANGE,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_BOKEH_RADIUS,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_ENABLED,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_DISTANCE,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_RANGE,
+    DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_BOKEH_RADIUS,
 } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
-import { FogPassParametersKey, FogPassParametersPropertyMap } from '@/PaleGL/postprocess/fogPass.ts';
-import { GlitchPassParametersKey, GlitchPassParametersPropertyMap } from '@/PaleGL/postprocess/glitchPass.ts';
 import {
-    LightShaftPassParametersKey,
-    LightShaftPassParametersPropertyMap,
+    FOG_PASS_PARAMETERS_PROPERTY_ENABLED,
+    FOG_PASS_PARAMETERS_PROPERTY_FOG_COLOR,
+    FOG_PASS_PARAMETERS_PROPERTY_FOG_STRENGTH,
+    FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY,
+    FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY_ATTENUATION,
+    FOG_PASS_PARAMETERS_PROPERTY_FOG_END_HEIGHT,
+    FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_START,
+    FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_POWER,
+    FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_END,
+    FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_RATE,
+    FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_COLOR,
+    FOG_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    FOG_PASS_PARAMETERS_KEY_ENABLED,
+    FOG_PASS_PARAMETERS_KEY_FOG_COLOR,
+    FOG_PASS_PARAMETERS_KEY_FOG_STRENGTH,
+    FOG_PASS_PARAMETERS_KEY_FOG_DENSITY,
+    FOG_PASS_PARAMETERS_KEY_FOG_DENSITY_ATTENUATION,
+    FOG_PASS_PARAMETERS_KEY_FOG_END_HEIGHT,
+    FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_START,
+    FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_POWER,
+    FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_END,
+    FOG_PASS_PARAMETERS_KEY_SSS_FOG_RATE,
+    FOG_PASS_PARAMETERS_KEY_SSS_FOG_COLOR,
+    FOG_PASS_PARAMETERS_KEY_BLEND_RATE,
+} from '@/PaleGL/postprocess/fogPass.ts';
+import {
+    GLITCH_PASS_PARAMETERS_PROPERTY_ENABLED,
+    GLITCH_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    GLITCH_PASS_PARAMETERS_KEY_ENABLED,
+    GLITCH_PASS_PARAMETERS_KEY_BLEND_RATE,
+} from '@/PaleGL/postprocess/glitchPass.ts';
+import {
+    LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_ENABLED,
+    LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RATIO,
+    LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_PASS_SCALE_BASE,
+    LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RAY_STEP_STRENGTH,
+    LIGHT_SHAFT_PASS_PARAMETERS_KEY_ENABLED,
+    LIGHT_SHAFT_PASS_PARAMETERS_KEY_RATIO,
+    LIGHT_SHAFT_PASS_PARAMETERS_KEY_BLEND_RATE,
+    LIGHT_SHAFT_PASS_PARAMETERS_KEY_PASS_SCALE_BASE,
+    LIGHT_SHAFT_PASS_PARAMETERS_KEY_RAY_STEP_STRENGTH,
 } from '@/PaleGL/postprocess/lightShaftPass.ts';
 import {
-    ScreenSpaceShadowPassParametersKey,
-    ScreenSpaceShadowPassParametersPropertyMap,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_ENABLED,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_BIAS,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_JITTER_SIZE,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_SHARPNESS,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_STRENGTH,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RATIO,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RAY_STEP_MULTIPLIER,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_ENABLED,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_BIAS,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_JITTER_SIZE,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_SHARPNESS,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_STRENGTH,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RATIO,
+    SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RAY_STEP_MULTIPLIER,
 } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
-import { SSAOPassParametersKey, SSAOPassParametersPropertyMap } from '@/PaleGL/postprocess/ssaoPass.ts';
-import { SSRPassParametersKey, SSRPassParametersPropertyMap } from '@/PaleGL/postprocess/ssrPass.ts';
-import { StreakPassParametersKey, StreakPassParametersPropertyMap } from '@/PaleGL/postprocess/streakPass.ts';
-import { VignettePassParametersKey, VignettePassParametersPropertyMap } from '@/PaleGL/postprocess/vignettePass.ts';
 import {
-    VolumetricLightPassParametersKey,
-    VolumetricLightPassParametersPropertyMap,
+    SSAO_PASS_PARAMETERS_PROPERTY_ENABLED,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_SAMPLE_LENGTH,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_BIAS,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MIN_DISTANCE,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MAX_DISTANCE,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_COLOR,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_POWER,
+    SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_STRENGTH,
+    SSAO_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    SSAO_PASS_PARAMETERS_PROPERTY_SAMPLING_TEXTURE,
+    SSAO_PASS_PARAMETERS_KEY_ENABLED,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_SAMPLE_LENGTH,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_BIAS,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MIN_DISTANCE,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MAX_DISTANCE,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_COLOR,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_POWER,
+    SSAO_PASS_PARAMETERS_KEY_OCCLUSION_STRENGTH,
+    SSAO_PASS_PARAMETERS_KEY_BLEND_RATE,
+    SSAO_PASS_PARAMETERS_KEY_SAMPLING_TEXTURE,
+} from '@/PaleGL/postprocess/ssaoPass.ts';
+import {
+    SSR_PASS_PARAMETERS_PROPERTY_ENABLED,
+    SSR_PASS_PARAMETERS_PROPERTY_RAY_DEPTH_BIAS,
+    SSR_PASS_PARAMETERS_PROPERTY_RAY_NEAREST_DISTANCE,
+    SSR_PASS_PARAMETERS_PROPERTY_RAY_MAX_DISTANCE,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_THICKNESS,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_X,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_Y,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MIN_DISTANCE,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MAX_DISTANCE,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ROUGHNESS_POWER,
+    SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ADDITIONAL_RATE,
+    SSR_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    SSR_PASS_PARAMETERS_KEY_ENABLED,
+    SSR_PASS_PARAMETERS_KEY_RAY_DEPTH_BIAS,
+    SSR_PASS_PARAMETERS_KEY_RAY_NEAREST_DISTANCE,
+    SSR_PASS_PARAMETERS_KEY_RAY_MAX_DISTANCE,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_THICKNESS,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_X,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_Y,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MIN_DISTANCE,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MAX_DISTANCE,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_ROUGHNESS_POWER,
+    SSR_PASS_PARAMETERS_KEY_REFLECTION_ADDITIONAL_RATE,
+    SSR_PASS_PARAMETERS_KEY_BLEND_RATE,
+} from '@/PaleGL/postprocess/ssrPass.ts';
+import {
+    STREAK_PASS_PARAMETERS_PROPERTY_ENABLED,
+    STREAK_PASS_PARAMETERS_PROPERTY_THRESHOLD,
+    STREAK_PASS_PARAMETERS_PROPERTY_STRETCH,
+    STREAK_PASS_PARAMETERS_PROPERTY_COLOR,
+    STREAK_PASS_PARAMETERS_PROPERTY_INTENSITY,
+    STREAK_PASS_PARAMETERS_PROPERTY_VERTICAL_SCALE,
+    STREAK_PASS_PARAMETERS_PROPERTY_HORIZONTAL_SCALE,
+    STREAK_PASS_PARAMETERS_KEY_ENABLED,
+    STREAK_PASS_PARAMETERS_KEY_THRESHOLD,
+    STREAK_PASS_PARAMETERS_KEY_STRETCH,
+    STREAK_PASS_PARAMETERS_KEY_COLOR,
+    STREAK_PASS_PARAMETERS_KEY_INTENSITY,
+    STREAK_PASS_PARAMETERS_KEY_VERTICAL_SCALE,
+    STREAK_PASS_PARAMETERS_KEY_HORIZONTAL_SCALE,
+} from '@/PaleGL/postprocess/streakPass.ts';
+import {
+    VIGNETTE_PASS_PARAMETERS_PROPERTY_ENABLED,
+    VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_FROM,
+    VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_TO,
+    VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_POWER,
+    VIGNETTE_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    VIGNETTE_PASS_PARAMETERS_KEY_ENABLED,
+    VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_FROM,
+    VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_TO,
+    VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_POWER,
+    VIGNETTE_PASS_PARAMETERS_KEY_BLEND_RATE,
+} from '@/PaleGL/postprocess/vignettePass.ts';
+import {
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_ENABLED,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_STEP,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_DENSITY_MULTIPLIER,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_JITTER_SIZE,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RATIO,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_ENABLED,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_STEP,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_BLEND_RATE,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_DENSITY_MULTIPLIER,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_JITTER_SIZE,
+    VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RATIO,
 } from '@/PaleGL/postprocess/volumetricLightPass.ts';
 
 type NumToBoolConverter = (n: number, prop: unknown, key: string) => void;
@@ -61,291 +222,291 @@ export const buildPostProcessControllerEntries = (renderer: Renderer) => {
     const entries = [
         // screen space shadow ---
         [
-            ScreenSpaceShadowPassParametersPropertyMap.enabled,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.enabled, numToBoolConverter],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.bias,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.bias],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_BIAS,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_BIAS],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.jitterSize,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.jitterSize, assignVector3Converter],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_JITTER_SIZE,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_JITTER_SIZE, assignVector3Converter],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.sharpness,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.sharpness],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_SHARPNESS,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_SHARPNESS],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.strength,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.strength],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_STRENGTH,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_STRENGTH],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.ratio,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.ratio],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RATIO,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RATIO],
         ],
         [
-            ScreenSpaceShadowPassParametersPropertyMap.rayStepMultiplier,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.rayStepMultiplier],
+            SCREEN_SPACE_SHADOW_PASS_PARAMETERS_PROPERTY_RAY_STEP_MULTIPLIER,
+            [renderer.screenSpaceShadowPass, SCREEN_SPACE_SHADOW_PASS_PARAMETERS_KEY_RAY_STEP_MULTIPLIER],
         ],
 
         // ssao ---
 
         [
-            SSAOPassParametersPropertyMap.enabled,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.enabled, numToBoolConverter],
+            SSAO_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionSampleLength,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionSampleLength],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_SAMPLE_LENGTH,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_SAMPLE_LENGTH],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionBias,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionBias],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_BIAS,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_BIAS],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionMinDistance,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionMinDistance],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MIN_DISTANCE,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MIN_DISTANCE],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionMaxDistance,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionMaxDistance],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_MAX_DISTANCE,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_MAX_DISTANCE],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionColor,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionColor, assignColorConverter],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_COLOR,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_COLOR, assignColorConverter],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionPower,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionPower],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_POWER,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_POWER],
         ],
         [
-            SSAOPassParametersPropertyMap.occlusionStrength,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.occlusionStrength],
+            SSAO_PASS_PARAMETERS_PROPERTY_OCCLUSION_STRENGTH,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_OCCLUSION_STRENGTH],
         ],
-        [SSAOPassParametersPropertyMap.blendRate, [renderer.ambientOcclusionPass, SSAOPassParametersKey.blendRate]],
+        [SSAO_PASS_PARAMETERS_PROPERTY_BLEND_RATE, [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_BLEND_RATE]],
         [
-            SSAOPassParametersPropertyMap.samplingTexture,
-            [renderer.ambientOcclusionPass, SSAOPassParametersKey.samplingTexture],
+            SSAO_PASS_PARAMETERS_PROPERTY_SAMPLING_TEXTURE,
+            [renderer.ambientOcclusionPass, SSAO_PASS_PARAMETERS_KEY_SAMPLING_TEXTURE],
         ],
 
         // screen space reflection ---
 
-        [SSRPassParametersPropertyMap.enabled, [renderer.ssrPass, SSRPassParametersKey.enabled, numToBoolConverter]],
-        [SSRPassParametersPropertyMap.rayDepthBias, [renderer.ssrPass, SSRPassParametersKey.rayDepthBias]],
-        [SSRPassParametersPropertyMap.rayNearestDistance, [renderer.ssrPass, SSRPassParametersKey.rayNearestDistance]],
-        [SSRPassParametersPropertyMap.rayMaxDistance, [renderer.ssrPass, SSRPassParametersKey.rayMaxDistance]],
+        [SSR_PASS_PARAMETERS_PROPERTY_ENABLED, [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter]],
+        [SSR_PASS_PARAMETERS_PROPERTY_RAY_DEPTH_BIAS, [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_RAY_DEPTH_BIAS]],
+        [SSR_PASS_PARAMETERS_PROPERTY_RAY_NEAREST_DISTANCE, [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_RAY_NEAREST_DISTANCE]],
+        [SSR_PASS_PARAMETERS_PROPERTY_RAY_MAX_DISTANCE, [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_RAY_MAX_DISTANCE]],
         [
-            SSRPassParametersPropertyMap.reflectionRayThickness,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionRayThickness],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_THICKNESS,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_THICKNESS],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionRayJitterSizeX,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionRayJitterSizeX],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_X,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_X],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionRayJitterSizeY,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionRayJitterSizeY],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_RAY_JITTER_SIZE_Y,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_RAY_JITTER_SIZE_Y],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionFadeMinDistance,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionFadeMinDistance],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MIN_DISTANCE,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MIN_DISTANCE],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionFadeMaxDistance,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionFadeMaxDistance],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_FADE_MAX_DISTANCE,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_FADE_MAX_DISTANCE],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionScreenEdgeFadeFactorMinX,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionScreenEdgeFadeFactorMinX],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_X],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionScreenEdgeFadeFactorMaxX,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionScreenEdgeFadeFactorMaxX],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_X],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionScreenEdgeFadeFactorMinY,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionScreenEdgeFadeFactorMinY],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MIN_Y],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionScreenEdgeFadeFactorMaxY,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionScreenEdgeFadeFactorMaxY],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_SCREEN_EDGE_FADE_FACTOR_MAX_Y],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionRoughnessPower,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionRoughnessPower],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ROUGHNESS_POWER,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_ROUGHNESS_POWER],
         ],
         [
-            SSRPassParametersPropertyMap.reflectionAdditionalRate,
-            [renderer.ssrPass, SSRPassParametersKey.reflectionAdditionalRate],
+            SSR_PASS_PARAMETERS_PROPERTY_REFLECTION_ADDITIONAL_RATE,
+            [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_REFLECTION_ADDITIONAL_RATE],
         ],
-        [SSRPassParametersPropertyMap.blendRate, [renderer.ssrPass, SSRPassParametersKey.blendRate]],
+        [SSR_PASS_PARAMETERS_PROPERTY_BLEND_RATE, [renderer.ssrPass, SSR_PASS_PARAMETERS_KEY_BLEND_RATE]],
 
         // light shaft ---
 
         [
-            LightShaftPassParametersPropertyMap.enabled,
-            [renderer.lightShaftPass, LightShaftPassParametersKey.enabled, numToBoolConverter],
+            LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.lightShaftPass, LIGHT_SHAFT_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
-        [LightShaftPassParametersPropertyMap.ratio, [renderer.lightShaftPass, LightShaftPassParametersKey.ratio]],
+        [LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RATIO, [renderer.lightShaftPass, LIGHT_SHAFT_PASS_PARAMETERS_KEY_RATIO]],
         [
-            LightShaftPassParametersPropertyMap.blendRate,
-            [renderer.lightShaftPass, LightShaftPassParametersKey.blendRate],
-        ],
-        [
-            LightShaftPassParametersPropertyMap.passScaleBase,
-            [renderer.lightShaftPass, LightShaftPassParametersKey.passScaleBase],
+            LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+            [renderer.lightShaftPass, LIGHT_SHAFT_PASS_PARAMETERS_KEY_BLEND_RATE],
         ],
         [
-            LightShaftPassParametersPropertyMap.rayStepStrength,
-            [renderer.lightShaftPass, LightShaftPassParametersKey.rayStepStrength],
+            LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_PASS_SCALE_BASE,
+            [renderer.lightShaftPass, LIGHT_SHAFT_PASS_PARAMETERS_KEY_PASS_SCALE_BASE],
+        ],
+        [
+            LIGHT_SHAFT_PASS_PARAMETERS_PROPERTY_RAY_STEP_STRENGTH,
+            [renderer.lightShaftPass, LIGHT_SHAFT_PASS_PARAMETERS_KEY_RAY_STEP_STRENGTH],
         ],
 
         // volumetric light ---
 
         [
-            VolumetricLightPassParametersPropertyMap.enabled,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.enabled, numToBoolConverter],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            VolumetricLightPassParametersPropertyMap.rayStep,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.rayStep],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_STEP,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_STEP],
         ],
         [
-            VolumetricLightPassParametersPropertyMap.blendRate,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.blendRate],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_BLEND_RATE],
         ],
         [
-            VolumetricLightPassParametersPropertyMap.densityMultiplier,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.densityMultiplier],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_DENSITY_MULTIPLIER,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_DENSITY_MULTIPLIER],
         ],
         [
-            VolumetricLightPassParametersPropertyMap.rayJitterSize,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.rayJitterSize, assignVector3Converter],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RAY_JITTER_SIZE,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RAY_JITTER_SIZE, assignVector3Converter],
         ],
         [
-            VolumetricLightPassParametersPropertyMap.ratio,
-            [renderer.volumetricLightPass, VolumetricLightPassParametersKey.ratio],
+            VOLUMETRIC_LIGHT_PASS_PARAMETERS_PROPERTY_RATIO,
+            [renderer.volumetricLightPass, VOLUMETRIC_LIGHT_PASS_PARAMETERS_KEY_RATIO],
         ],
 
         // fog ---
 
-        [FogPassParametersPropertyMap.enabled, [renderer.fogPass, FogPassParametersKey.enabled, numToBoolConverter]],
+        [FOG_PASS_PARAMETERS_PROPERTY_ENABLED, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter]],
         [
-            FogPassParametersPropertyMap.fogColor,
-            [renderer.fogPass, FogPassParametersKey.fogColor, assignColorConverter],
+            FOG_PASS_PARAMETERS_PROPERTY_FOG_COLOR,
+            [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_FOG_COLOR, assignColorConverter],
         ],
-        [FogPassParametersPropertyMap.fogStrength, [renderer.fogPass, FogPassParametersKey.fogStrength]],
-        [FogPassParametersPropertyMap.fogDensity, [renderer.fogPass, FogPassParametersKey.fogDensity]],
+        [FOG_PASS_PARAMETERS_PROPERTY_FOG_STRENGTH, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_FOG_STRENGTH]],
+        [FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_FOG_DENSITY]],
         [
-            FogPassParametersPropertyMap.fogDensityAttenuation,
-            [renderer.fogPass, FogPassParametersKey.fogDensityAttenuation],
+            FOG_PASS_PARAMETERS_PROPERTY_FOG_DENSITY_ATTENUATION,
+            [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_FOG_DENSITY_ATTENUATION],
         ],
-        [FogPassParametersPropertyMap.fogEndHeight, [renderer.fogPass, FogPassParametersKey.fogEndHeight]],
-        [FogPassParametersPropertyMap.distanceFogStart, [renderer.fogPass, FogPassParametersKey.distanceFogStart]],
-        [FogPassParametersPropertyMap.distanceFogPower, [renderer.fogPass, FogPassParametersKey.distanceFogPower]],
-        [FogPassParametersPropertyMap.distanceFogEnd, [renderer.fogPass, FogPassParametersKey.distanceFogEnd]],
-        [FogPassParametersPropertyMap.sssFogRate, [renderer.fogPass, FogPassParametersKey.sssFogRate]],
+        [FOG_PASS_PARAMETERS_PROPERTY_FOG_END_HEIGHT, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_FOG_END_HEIGHT]],
+        [FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_START, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_START]],
+        [FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_POWER, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_POWER]],
+        [FOG_PASS_PARAMETERS_PROPERTY_DISTANCE_FOG_END, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_DISTANCE_FOG_END]],
+        [FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_RATE, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_SSS_FOG_RATE]],
         [
-            FogPassParametersPropertyMap.sssFogColor,
-            [renderer.fogPass, FogPassParametersKey.sssFogColor, assignColorConverter],
+            FOG_PASS_PARAMETERS_PROPERTY_SSS_FOG_COLOR,
+            [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_SSS_FOG_COLOR, assignColorConverter],
         ],
-        [FogPassParametersPropertyMap.blendRate, [renderer.fogPass, FogPassParametersKey.blendRate]],
+        [FOG_PASS_PARAMETERS_PROPERTY_BLEND_RATE, [renderer.fogPass, FOG_PASS_PARAMETERS_KEY_BLEND_RATE]],
 
         // dof ---
 
         [
-            DepthOfFieldPassParametersPropertyMap.enabled,
-            [renderer.depthOfFieldPass, DepthOfFieldPassParametersKey.enabled, numToBoolConverter],
+            DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.depthOfFieldPass, DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            DepthOfFieldPassParametersPropertyMap.focusDistance,
-            [renderer.depthOfFieldPass, DepthOfFieldPassParametersKey.focusDistance],
+            DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_DISTANCE,
+            [renderer.depthOfFieldPass, DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_DISTANCE],
         ],
         [
-            DepthOfFieldPassParametersPropertyMap.focusRange,
-            [renderer.depthOfFieldPass, DepthOfFieldPassParametersKey.focusRange],
+            DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_RANGE,
+            [renderer.depthOfFieldPass, DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_RANGE],
         ],
         [
-            DepthOfFieldPassParametersPropertyMap.bokehRadius,
-            [renderer.depthOfFieldPass, DepthOfFieldPassParametersKey.bokehRadius],
+            DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_BOKEH_RADIUS,
+            [renderer.depthOfFieldPass, DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_BOKEH_RADIUS],
         ],
 
         // bloom ---
 
         [
-            BloomPassParametersPropertyMap.enabled,
-            [renderer.bloomPass, BloomPassParametersKey.enabled, numToBoolConverter],
+            BLOOM_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.bloomPass, BLOOM_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
-        [BloomPassParametersPropertyMap.threshold, [renderer.bloomPass, BloomPassParametersKey.threshold]],
-        [BloomPassParametersPropertyMap.tone, [renderer.bloomPass, BloomPassParametersKey.tone]],
-        [BloomPassParametersPropertyMap.bloomAmount, [renderer.bloomPass, BloomPassParametersKey.bloomAmount]],
+        [BLOOM_PASS_PARAMETERS_PROPERTY_THRESHOLD, [renderer.bloomPass, BLOOM_PASS_PARAMETERS_KEY_THRESHOLD]],
+        [BLOOM_PASS_PARAMETERS_PROPERTY_TONE, [renderer.bloomPass, BLOOM_PASS_PARAMETERS_KEY_TONE]],
+        [BLOOM_PASS_PARAMETERS_PROPERTY_BLOOM_AMOUNT, [renderer.bloomPass, BLOOM_PASS_PARAMETERS_KEY_BLOOM_AMOUNT]],
 
         // streak ---
 
         [
-            StreakPassParametersPropertyMap.enabled,
-            [renderer.streakPass, StreakPassParametersKey.enabled, numToBoolConverter],
+            STREAK_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
-        [StreakPassParametersPropertyMap.threshold, [renderer.streakPass, StreakPassParametersKey.threshold]],
-        [StreakPassParametersPropertyMap.stretch, [renderer.streakPass, StreakPassParametersKey.stretch]],
+        [STREAK_PASS_PARAMETERS_PROPERTY_THRESHOLD, [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_THRESHOLD]],
+        [STREAK_PASS_PARAMETERS_PROPERTY_STRETCH, [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_STRETCH]],
         [
-            StreakPassParametersPropertyMap.color,
-            [renderer.streakPass, StreakPassParametersKey.color, assignColorConverter],
+            STREAK_PASS_PARAMETERS_PROPERTY_COLOR,
+            [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_COLOR, assignColorConverter],
         ],
-        [StreakPassParametersPropertyMap.intensity, [renderer.streakPass, StreakPassParametersKey.intensity]],
-        [StreakPassParametersPropertyMap.verticalScale, [renderer.streakPass, StreakPassParametersKey.verticalScale]],
+        [STREAK_PASS_PARAMETERS_PROPERTY_INTENSITY, [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_INTENSITY]],
+        [STREAK_PASS_PARAMETERS_PROPERTY_VERTICAL_SCALE, [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_VERTICAL_SCALE]],
         [
-            StreakPassParametersPropertyMap.horizontalScale,
-            [renderer.streakPass, StreakPassParametersKey.horizontalScale],
+            STREAK_PASS_PARAMETERS_PROPERTY_HORIZONTAL_SCALE,
+            [renderer.streakPass, STREAK_PASS_PARAMETERS_KEY_HORIZONTAL_SCALE],
         ],
 
         // vignette ---
 
         [
-            VignettePassParametersPropertyMap.enabled,
-            [renderer.vignettePass, VignettePassParametersKey.enabled, numToBoolConverter],
+            VIGNETTE_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.vignettePass, VIGNETTE_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            VignettePassParametersPropertyMap.vignetteRadiusFrom,
-            [renderer.vignettePass, VignettePassParametersKey.vignetteRadiusFrom],
+            VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_FROM,
+            [renderer.vignettePass, VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_FROM],
         ],
         [
-            VignettePassParametersPropertyMap.vignetteRadiusTo,
-            [renderer.vignettePass, VignettePassParametersKey.vignetteRadiusTo],
+            VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_RADIUS_TO,
+            [renderer.vignettePass, VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_RADIUS_TO],
         ],
         [
-            VignettePassParametersPropertyMap.vignettePower,
-            [renderer.vignettePass, VignettePassParametersKey.vignettePower],
+            VIGNETTE_PASS_PARAMETERS_PROPERTY_VIGNETTE_POWER,
+            [renderer.vignettePass, VIGNETTE_PASS_PARAMETERS_KEY_VIGNETTE_POWER],
         ],
-        [VignettePassParametersPropertyMap.blendRate, [renderer.vignettePass, VignettePassParametersKey.blendRate]],
+        [VIGNETTE_PASS_PARAMETERS_PROPERTY_BLEND_RATE, [renderer.vignettePass, VIGNETTE_PASS_PARAMETERS_KEY_BLEND_RATE]],
 
         // chromatic aberration ---
 
         [
-            ChromaticAberrationPassParametersPropertyMap.enabled,
-            [renderer.chromaticAberrationPass, ChromaticAberrationPassParametersKey.enabled, numToBoolConverter],
+            CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.chromaticAberrationPass, CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
         [
-            ChromaticAberrationPassParametersPropertyMap.scale,
-            [renderer.chromaticAberrationPass, ChromaticAberrationPassParametersKey.scale],
+            CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_SCALE,
+            [renderer.chromaticAberrationPass, CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_SCALE],
         ],
         [
-            ChromaticAberrationPassParametersPropertyMap.power,
-            [renderer.chromaticAberrationPass, ChromaticAberrationPassParametersKey.power],
+            CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_POWER,
+            [renderer.chromaticAberrationPass, CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_POWER],
         ],
         [
-            ChromaticAberrationPassParametersPropertyMap.blendRate,
-            [renderer.chromaticAberrationPass, ChromaticAberrationPassParametersKey.blendRate],
+            CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_BLEND_RATE,
+            [renderer.chromaticAberrationPass, CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_BLEND_RATE],
         ],
 
         // glitch ---
 
         [
-            GlitchPassParametersPropertyMap.enabled,
-            [renderer.glitchPass, GlitchPassParametersKey.enabled, numToBoolConverter],
+            GLITCH_PASS_PARAMETERS_PROPERTY_ENABLED,
+            [renderer.glitchPass, GLITCH_PASS_PARAMETERS_KEY_ENABLED, numToBoolConverter],
         ],
-        [GlitchPassParametersPropertyMap.blendRate, [renderer.glitchPass, GlitchPassParametersKey.blendRate]],
+        [GLITCH_PASS_PARAMETERS_PROPERTY_BLEND_RATE, [renderer.glitchPass, GLITCH_PASS_PARAMETERS_KEY_BLEND_RATE]],
     ] satisfies ReadonlyArray<readonly [string, PostProcessParameterBindingValue]>;
 
     return new Map<string, PostProcessParameterBindingValue>(entries);

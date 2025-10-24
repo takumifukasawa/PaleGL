@@ -1,5 +1,4 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
-import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import {
     POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD,
     RENDER_TARGET_TYPE_R16F,
@@ -42,7 +41,6 @@ const UNIFORM_NAME_DOF_TEXTURE = 'uDofTexture';
 
 // ---
 
-// ---- Type（既存）----
 export type DepthOfFieldPassParameters = {
     enabled: boolean;
     focusDistance: number;
@@ -50,26 +48,17 @@ export type DepthOfFieldPassParameters = {
     bokehRadius: number;
 };
 
-// ---- Short names（C#定数に完全一致）----
-export const DepthOfField_ShortNames = {
-    enabled: 'dof_on',
-    focusDistance: 'dof_fd',
-    focusRange: 'dof_fr',
-    bokehRadius: 'dof_br',
-} as const satisfies ShortNamesFor<DepthOfFieldPassParameters>;
+// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'dof_on' : 'enabled';
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_DISTANCE = NeedsShorten ? 'dof_fd' : 'focusDistance';
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_FOCUS_RANGE = NeedsShorten ? 'dof_fr' : 'focusRange';
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_PROPERTY_BOKEH_RADIUS = NeedsShorten ? 'dof_br' : 'bokehRadius';
 
-// ---- 派生（テンプレ同様）----
-const DepthOfField = createShortenKit<DepthOfFieldPassParameters>()(DepthOfField_ShortNames);
-
-// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
-export const DepthOfFieldPassParametersPropertyMap = DepthOfField.map(NeedsShorten);
-
-// 常に long キー（論理キー）
-export const DepthOfFieldPassParametersKey = makeLongKeyMap(DepthOfField_ShortNames);
-
-// 任意：キーのユニオン／拡張型
-export type DepthOfFieldPassParametersKey = keyof typeof DepthOfFieldPassParametersKey;
-export type DepthOfFieldPassParametersProperty = typeof DepthOfField.type;
+// KEY定数: 常に元の名前（プロパティアクセス用）
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_DISTANCE = 'focusDistance' as const;
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_FOCUS_RANGE = 'focusRange' as const;
+export const DEPTH_OF_FIELD_PASS_PARAMETERS_KEY_BOKEH_RADIUS = 'bokehRadius' as const;
 
 // ---
 

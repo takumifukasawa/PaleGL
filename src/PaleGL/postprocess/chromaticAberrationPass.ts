@@ -1,5 +1,4 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
-import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
 import { POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
@@ -20,7 +19,6 @@ const UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER = 1;
 
 // ---
 
-// ---- Type（既存）----
 export type ChromaticAberrationPassParameters = {
     enabled: boolean;
     scale: number;
@@ -28,26 +26,17 @@ export type ChromaticAberrationPassParameters = {
     blendRate: number;
 };
 
-// ---- Short names（C#定数に完全一致）----
-export const ChromaticAberration_ShortNames = {
-    enabled: 'ca_on',
-    scale: 'ca_s',
-    power: 'ca_p',
-    blendRate: 'ca_br',
-} as const satisfies ShortNamesFor<ChromaticAberrationPassParameters>;
+// PROPERTY定数: NeedsShortenで出し分け（JSON読み込み用）
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_ENABLED = NeedsShorten ? 'ca_on' : 'enabled';
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_SCALE = NeedsShorten ? 'ca_s' : 'scale';
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_POWER = NeedsShorten ? 'ca_p' : 'power';
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_PROPERTY_BLEND_RATE = NeedsShorten ? 'ca_br' : 'blendRate';
 
-// ---- 派生（テンプレ同様）----
-const ChromaticAberration = createShortenKit<ChromaticAberrationPassParameters>()(ChromaticAberration_ShortNames);
-
-// NeedsShorten に応じた「元キー -> 実キー」マップ（short/long 切替）
-export const ChromaticAberrationPassParametersPropertyMap = ChromaticAberration.map(NeedsShorten);
-
-// 常に long キー（論理キー）
-export const ChromaticAberrationPassParametersKey = makeLongKeyMap(ChromaticAberration_ShortNames);
-
-// 任意：キーのユニオン／拡張型
-export type ChromaticAberrationPassParametersKey = keyof typeof ChromaticAberrationPassParametersKey;
-export type ChromaticAberrationPassParametersProperty = typeof ChromaticAberration.type;
+// KEY定数: 常に元の名前（プロパティアクセス用）
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_ENABLED = 'enabled' as const;
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_SCALE = 'scale' as const;
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_POWER = 'power' as const;
+export const CHROMATIC_ABERRATION_PASS_PARAMETERS_KEY_BLEND_RATE = 'blendRate' as const;
 
 // ---
 
