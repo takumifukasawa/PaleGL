@@ -94,9 +94,7 @@ export type MarionetterScene = {
     o: MarionetterObjectInfo[];
 };
 
-export const MarionetterSceneProperty = {
-    objects: NeedsShorten ? 'o' : 'objects',
-} as const;
+export const MARIONETTER_SCENE_PROPERTY_OBJECTS = NeedsShorten ? 'o' : 'objects';
 
 export type MarionetterObjectInfo = {
     name: string;
@@ -110,12 +108,10 @@ export type MarionetterObjectInfo = {
     ch: MarionetterObjectInfo[];
 };
 
-export const MarionetterObjectInfoProperty = {
-    name: NeedsShorten ? 'n' : 'name',
-    transform: NeedsShorten ? 't' : 'transform',
-    components: NeedsShorten ? 'co' : 'components',
-    children: NeedsShorten ? 'ch' : 'children',
-} as const;
+export const MARIONETTER_OBJECT_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
+export const MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM = NeedsShorten ? 't' : 'transform';
+export const MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS = NeedsShorten ? 'co' : 'components';
+export const MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN = NeedsShorten ? 'ch' : 'children';
 
 export type MarionetterTransformInfo = {
     localPosition: { x: number; y: number; z: number };
@@ -127,11 +123,9 @@ export type MarionetterTransformInfo = {
     ls: { x: number; y: number; z: number };
 };
 
-export const MarionetterTransformInfoProperty = {
-    localPosition: NeedsShorten ? 'lp' : 'localPosition',
-    localRotation: NeedsShorten ? 'lr' : 'localRotation',
-    localScale: NeedsShorten ? 'ls' : 'localScale',
-} as const;
+export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
+export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION = NeedsShorten ? 'lr' : 'localRotation';
+export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE = NeedsShorten ? 'ls' : 'localScale';
 
 //
 // track
@@ -161,9 +155,7 @@ export type MarionetterTrackInfoBase = {
     t: MarionetterTrackInfoType;
 };
 
-export const MarionetterTrackInfoBaseProperty = {
-    type: NeedsShorten ? 't' : 'type',
-} as const;
+export const MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 
 export type MarionetterDefaultTrackInfo = MarionetterTrackInfoBase & {
     targetName: string;
@@ -173,10 +165,8 @@ export type MarionetterDefaultTrackInfo = MarionetterTrackInfoBase & {
     cs: MarionetterClipInfoKinds[];
 };
 
-export const MarionetterDefaultTrackInfoProperty = {
-    targetName: NeedsShorten ? 'tn' : 'targetName',
-    clips: NeedsShorten ? 'cs' : 'clips',
-} as const;
+export const MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME = NeedsShorten ? 'tn' : 'targetName';
+export const MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS = NeedsShorten ? 'cs' : 'clips';
 
 export type MarionetterMarkerTrackInfo = MarionetterTrackInfoBase & {
     signalEmitters: MarionetterSignalEmitter[];
@@ -184,9 +174,7 @@ export type MarionetterMarkerTrackInfo = MarionetterTrackInfoBase & {
     ses: MarionetterSignalEmitter[];
 };
 
-export const MarionetterMarkerTrackInfoProperty = {
-    signalEmitters: NeedsShorten ? 'ses' : 'signalEmitters',
-} as const;
+export const MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS = NeedsShorten ? 'ses' : 'signalEmitters';
 
 export type MarionetterTrackInfoKinds = MarionetterDefaultTrackInfo | MarionetterMarkerTrackInfo;
 
@@ -198,10 +186,8 @@ export type MarionetterSignalEmitter = {
     t: number;
 };
 
-export const MarionetterSignalEmitterProperty = {
-    name: NeedsShorten ? 'n' : 'name',
-    time: NeedsShorten ? 't' : 'time',
-} as const;
+export const MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
+export const MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME = NeedsShorten ? 't' : 'time';
 
 export type MarionetterClipInfoKinds =
     | MarionetterAnimationClipInfo
@@ -239,11 +225,9 @@ export type MarionetterClipInfoBase = {
     d: number;
 };
 
-export const MarionetterClipInfoBaseProperty = {
-    type: NeedsShorten ? 't' : 'type',
-    start: NeedsShorten ? 's' : 'start',
-    duration: NeedsShorten ? 'd' : 'duration',
-} as const;
+export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
+export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
+export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
 
 // NOTE: unity側に合わせる
 export const MarionetterAnimationClipType = {
@@ -267,12 +251,10 @@ export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
     b: MarionetterClipBinding[];
 };
 
-export const MarionetterAnimationClipInfoProperty = {
-    animationClipType: NeedsShorten ? 'act' : 'animationClipType',
-    offsetPosition: NeedsShorten ? 'op' : 'offsetPosition',
-    offsetRotation: NeedsShorten ? 'or' : 'offsetRotation',
-    bindings: NeedsShorten ? 'b' : 'bindings',
-} as const;
+export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_ANIMATION_CLIP_TYPE = NeedsShorten ? 'act' : 'animationClipType';
+export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_POSITION = NeedsShorten ? 'op' : 'offsetPosition';
+export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_ROTATION = NeedsShorten ? 'or' : 'offsetRotation';
+export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
 
 export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
     bindings: MarionetterClipBinding[];
@@ -280,9 +262,7 @@ export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
     b: MarionetterClipBinding[];
 };
 
-export const MarionetterLightControlClipInfoProperty = {
-    bindings: NeedsShorten ? 'b' : 'bindings',
-} as const;
+export const MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
 
 export type MarionetterActivationControlClipInfo = MarionetterClipInfoBase;
 
@@ -298,17 +278,20 @@ export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase & {
     b: MarionetterClipBinding[];
 };
 
-export const MarionetterObjectMoveAndLookAtClipInfoProperty = {
-    localPosition: NeedsShorten ? 'lp' : 'localPosition',
-    lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
-    bindings: NeedsShorten ? 'b' : 'bindings',
-    localPositionX: NeedsShorten ? 'lp.x' : 'LocalPosition.x',
-    localPositionY: NeedsShorten ? 'lp.y' : 'LocalPosition.y',
-    localPositionZ: NeedsShorten ? 'lp.z' : 'LocalPosition.z',
-} as const;
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten ? 'tn' : 'lookAtTargetName';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X = NeedsShorten ? 'lp.x' : 'LocalPosition.x';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y = NeedsShorten ? 'lp.y' : 'LocalPosition.y';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z = NeedsShorten ? 'lp.z' : 'LocalPosition.z';
 
 export type MarionetterObjectMoveAndLookAtClipInfoProperty =
-    (typeof MarionetterObjectMoveAndLookAtClipInfoProperty)[keyof typeof MarionetterObjectMoveAndLookAtClipInfoProperty];
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y
+    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z;
 
 // export type MarionetterHumanClipInfo = MarionetterClipInfoBase & {
 //     leftShoulderRotation: RawVector3;
@@ -332,10 +315,8 @@ export type MarionetterClipBinding = {
     k: MarionetterAnimationClipKeyframe[];
 };
 
-export const MarionetterClipBindingProperty = {
-    propertyName: NeedsShorten ? 'n' : 'propertyName',
-    keyframes: NeedsShorten ? 'k' : 'keyframes',
-} as const;
+export const MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME = NeedsShorten ? 'n' : 'propertyName';
+export const MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES = NeedsShorten ? 'k' : 'keyframes';
 
 // // for obj
 // export type MarionetterAnimationClipKeyframe = NeedsShorten extends true
@@ -383,12 +364,10 @@ export type MarionetterCurveKeyframeConstraint = NeedsShorten extends true
           inTangent: number;
           outTangent: number;
       };
-export const MarionetterCurveKeyframeProperty = {
-    time: NeedsShorten ? 't' : 'time',
-    value: NeedsShorten ? 'v' : 'value',
-    inTangent: NeedsShorten ? 'i' : 'inTangent',
-    outTangent: NeedsShorten ? 'o' : 'outTangent',
-} as const;
+export const MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME = NeedsShorten ? 't' : 'time';
+export const MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE = NeedsShorten ? 'v' : 'value';
+export const MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT = NeedsShorten ? 'i' : 'inTangent';
+export const MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT = NeedsShorten ? 'o' : 'outTangent';
 
 // for arr
 // export type MarionetterCurveKeyframe = number[];
@@ -403,9 +382,7 @@ export type MarionetterComponentInfoBase = {
     t: MarionetterComponentType;
 };
 
-export const MarionetterComponentInfoBaseProperty = {
-    type: NeedsShorten ? 't' : 'type',
-} as const;
+export const MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 
 // unity側に合わせる
 export const MARIONETTER_COMPONENT_TYPE_NONE = 0;
@@ -460,11 +437,9 @@ export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoB
     ts: MarionetterTrackInfoKinds[];
 };
 
-export const MarionetterPlayableDirectorComponentInfoProperty = {
-    name: NeedsShorten ? 'n' : 'name',
-    duration: NeedsShorten ? 'd' : 'duration',
-    tracks: NeedsShorten ? 'ts' : 'tracks',
-} as const;
+export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
+export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
+export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS = NeedsShorten ? 'ts' : 'tracks';
 
 export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
     lightType: 'Directional' | 'Point' | 'Spot';
@@ -476,11 +451,9 @@ export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
     c: string; // hex string
 };
 
-export const MarionetterLightComponentInfoProperty = {
-    lightType: NeedsShorten ? 'l' : 'lightType',
-    intensity: NeedsShorten ? 'i' : 'intensity',
-    color: NeedsShorten ? 'c' : 'color',
-} as const;
+export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE = NeedsShorten ? 'l' : 'lightType';
+export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY = NeedsShorten ? 'i' : 'intensity';
+export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
 
 // light: directional light
 
@@ -508,12 +481,10 @@ export type MarionetterSpotLightComponentInfo = MarionetterLightComponentInfo & 
     sa: number;
 };
 
-export const MarionetterSpotLightComponentInfoProperty = {
-    lightType: NeedsShorten ? 'l' : 'lightType',
-    range: NeedsShorten ? 'r' : 'range',
-    innerSpotAngle: NeedsShorten ? 'isa' : 'innerSpotAngle',
-    spotAngle: NeedsShorten ? 'sa' : 'spotAngle',
-} as const;
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE = NeedsShorten ? 'l' : 'lightType';
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE = NeedsShorten ? 'r' : 'range';
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE = NeedsShorten ? 'isa' : 'innerSpotAngle';
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE = NeedsShorten ? 'sa' : 'spotAngle';
 
 // // volume: postprocess
 //
@@ -595,11 +566,9 @@ export type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
     f: number;
 };
 
-export const MarionetterCameraComponentInfoProperty = {
-    cameraType: NeedsShorten ? 'ct' : 'cameraType',
-    isMain: NeedsShorten ? 'im' : 'isMain',
-    fov: NeedsShorten ? 'f' : 'fov',
-} as const;
+export const MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE = NeedsShorten ? 'ct' : 'cameraType';
+export const MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_IS_MAIN = NeedsShorten ? 'im' : 'isMain';
+export const MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV = NeedsShorten ? 'f' : 'fov';
 
 // material
 
@@ -620,10 +589,8 @@ export type MarionetterMaterialInfo = {
     n: string;
 };
 
-export const MarionetterMaterialInfoProperty = {
-    type: NeedsShorten ? 't' : 'type',
-    name: NeedsShorten ? 'n' : 'name',
-} as const;
+export const MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
+export const MARIONETTER_MATERIAL_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
 
 export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
     color: string;
@@ -641,14 +608,12 @@ export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
     rs: number;
 };
 
-export const MarionetterLitMaterialInfoProperty = {
-    color: NeedsShorten ? 'c' : 'color',
-    tiling: NeedsShorten ? 'ti' : 'tiling',
-    metallic: NeedsShorten ? 'm' : 'metallic',
-    roughness: NeedsShorten ? 'r' : 'roughness',
-    emission: NeedsShorten ? 'e' : 'emission',
-    receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
-} as const;
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING = NeedsShorten ? 'ti' : 'tiling';
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC = NeedsShorten ? 'm' : 'metallic';
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS = NeedsShorten ? 'r' : 'roughness';
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION = NeedsShorten ? 'e' : 'emission';
+export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW = NeedsShorten ? 'rs' : 'receiveShadow';
 
 export type MarionetterUnlitMaterialInfo = MarionetterMaterialInfo & {
     color: string;
@@ -660,11 +625,9 @@ export type MarionetterUnlitMaterialInfo = MarionetterMaterialInfo & {
     rs: number;
 };
 
-export const MarionetterUnlitMaterialInfoProperty = {
-    color: NeedsShorten ? 'c' : 'color',
-    // emission: NeedsShorten ? 'e' : 'emission',
-    receiveShadow: NeedsShorten ? 'rs' : 'receiveShadow',
-} as const;
+export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
+// export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_EMISSION = NeedsShorten ? 'e' : 'emission';
+export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW = NeedsShorten ? 'rs' : 'receiveShadow';
 
 // merge
 export type MarionetterMaterialKinds = MarionetterLitMaterialInfo & MarionetterUnlitMaterialInfo;
@@ -679,10 +642,8 @@ export type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase 
     m: MarionetterMaterialKinds;
 };
 
-export const MarionetterMeshRendererComponentInfoProperty = {
-    materialName: NeedsShorten ? 'mn' : 'materialName',
-    material: NeedsShorten ? 'm' : 'material',
-} as const;
+export const MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL_NAME = NeedsShorten ? 'mn' : 'materialName';
+export const MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL = NeedsShorten ? 'm' : 'material';
 
 // mesh filter
 
@@ -692,9 +653,7 @@ export type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & 
     mn: string;
 };
 
-export const MarionetterMeshFilterComponentInfoProperty = {
-    meshName: NeedsShorten ? 'mn' : 'meshName',
-} as const;
+export const MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME = NeedsShorten ? 'mn' : 'meshName';
 
 // post process controller component
 
@@ -882,9 +841,7 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
     gl_br: number;
 };
 
-export const MarionetterPostProcessControllerComponentInfoProperty = {
-    bloomAmount: NeedsShorten ? 'bl_a' : 'bloomAmount',
-} as const;
+export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten ? 'bl_a' : 'bloomAmount';
 
 // object move and look at controller component
 
@@ -896,10 +853,8 @@ export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterC
     tn: string;
 };
 
-export const MarionetterObjectMoveAndLookAtControllerComponentInfoProperty = {
-    localPosition: NeedsShorten ? 'lp' : 'localPosition',
-    lookAtTargetName: NeedsShorten ? 'tn' : 'lookAtTargetName',
-} as const;
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten ? 'tn' : 'lookAtTargetName';
 
 // fbm noise texture controller component
 
@@ -930,12 +885,10 @@ export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterCompo
     roughness: number;
 };
 
-export const MarionetterGBufferMaterialControllerComponentInfoProperty = {
-    baseColor: NeedsShorten ? 'bc' : 'baseColor',
-    emissiveColor: NeedsShorten ? 'ec' : 'emissiveColor',
-    metallic: NeedsShorten ? 'ec' : 'metallic',
-    roughness: NeedsShorten ? 'r' : 'roughness',
-} as const;
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR = NeedsShorten ? 'bc' : 'baseColor';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR = NeedsShorten ? 'ec' : 'emissiveColor';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_METALLIC = NeedsShorten ? 'ec' : 'metallic';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_ROUGHNESS = NeedsShorten ? 'r' : 'roughness';
 
 // //
 // // post process component properties

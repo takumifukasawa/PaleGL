@@ -5,9 +5,11 @@
 ## 対象範囲
 
 - 相対パス
-  - ../src/ 以下
   - ./ 以下
     -./demos/ は対象外
+  - このファイルから ../../src/ 以下
+    - このプロジェクト(PaleGL)からは ../
+    - このプロジェクト(PaleGL)をラップしてるプロジェクトが存在している可能性がある
 
 ## 定数オブジェクトのフラット化
 
@@ -319,8 +321,8 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 - 中規模（10-20定数）: 約30-45分
 - 大規模（100+定数）: 約15分（推奨アプローチを使用した場合）
 
-**総作業時間**: 約6.5-7.5時間（全15回）
-**最適化された定数**: 合計約332個（constants.ts: 295個、Marionetter: 37個）
+**総作業時間**: 約7.0-8.0時間（全16回）
+**最適化された定数**: 合計約407個（constants.ts: 295個、Marionetter: 112個）
 
 ### Marionetterモジュールの定数オブジェクト
 
@@ -338,14 +340,58 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
   - 型推論エラー: なし
   - 所要時間: 約30分
 
-**完了済み**: 6オブジェクト（37定数）
+**第16回（24個・75定数）**: Marionetterプロパティオブジェクト群の展開
+  - 修正ファイル数: 6ファイル（types/index.ts: 1ファイル、使用ファイル: 5ファイル）
+  - 使用箇所: 約119箇所
+  - 主要修正箇所:
+    - src/Marionetter/types/index.ts: 24つのプロパティオブジェクトをフラット化（69プロパティ定数）
+    - src/Marionetter/buildMarionetterScene.ts: 約65箇所
+    - src/Marionetter/timeline.ts: 約34箇所
+    - src/Marionetter/curveUtilities.ts: 約18箇所
+    - src/PaleGL/components/gbufferMaterialController.ts: 約2箇所
+  - 展開対象オブジェクト:
+    - MarionetterSceneProperty (1)
+    - MarionetterObjectInfoProperty (4)
+    - MarionetterTransformInfoProperty (3)
+    - MarionetterTrackInfoBaseProperty (1)
+    - MarionetterDefaultTrackInfoProperty (2)
+    - MarionetterMarkerTrackInfoProperty (1)
+    - MarionetterSignalEmitterProperty (2)
+    - MarionetterClipInfoBaseProperty (3)
+    - MarionetterAnimationClipInfoProperty (4)
+    - MarionetterLightControlClipInfoProperty (1)
+    - MarionetterObjectMoveAndLookAtClipInfoProperty (7)
+    - MarionetterClipBindingProperty (2)
+    - MarionetterCurveKeyframeProperty (4)
+    - MarionetterComponentInfoBaseProperty (1)
+    - MarionetterPlayableDirectorComponentInfoProperty (3)
+    - MarionetterLightComponentInfoProperty (3)
+    - MarionetterSpotLightComponentInfoProperty (4)
+    - MarionetterCameraComponentInfoProperty (3)
+    - MarionetterMaterialInfoProperty (2)
+    - MarionetterLitMaterialInfoProperty (6)
+    - MarionetterUnlitMaterialInfoProperty (2)
+    - MarionetterMeshRendererComponentInfoProperty (2)
+    - MarionetterMeshFilterComponentInfoProperty (1)
+    - MarionetterPostProcessControllerComponentInfoProperty (1)
+    - MarionetterObjectMoveAndLookAtControllerComponentInfoProperty (2)
+    - MarionetterGBufferMaterialControllerComponentInfoProperty (4)
+  - スキップ対象:
+    - `MarionetterDirectionalLightComponentInfoProperty`: 使用箇所なし
+    - `MarionetterFbmNoiseTextureControllerComponentInfoProperty`: 使用箇所なし
+  - 型推論エラー: なし
+  - 所要時間: 約30-40分
+
+**完了済み**: 30オブジェクト（112定数）
 
 **未実装**:
 - `MarionetterAnimationClipType` (2定数): 使用箇所なし
 - `TimelinePropertyBinderType` (5定数): 使用箇所なし
 - `TimelinePropertyBinderTarget` (1定数): 使用箇所なし
+- `MarionetterDirectionalLightComponentInfoProperty` (1定数): 使用箇所なし
+- `MarionetterFbmNoiseTextureControllerComponentInfoProperty` (5定数): 使用箇所なし
 
 **注意事項**:
 - Marionetterは外部Unity連携用モジュール
-- `***Property`オブジェクト(実行時のプロパティマッピング用)は**フラット化対象外**
+- 第16回で`***Property`オブジェクト（実行時のプロパティマッピング用）も展開対象に変更
 - NeedsShortenによるJSON圧縮機能との併用に注意

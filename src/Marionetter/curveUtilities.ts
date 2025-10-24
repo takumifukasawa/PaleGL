@@ -1,7 +1,10 @@
 import {
     MarionetterAnimationClipKeyframe,
     MarionetterCurveKeyframe,
-    MarionetterCurveKeyframeProperty,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT,
 } from '@/Marionetter/types';
 
 /**
@@ -33,16 +36,16 @@ function curveUtilityEvaluateRaw(t: number, k0: MarionetterCurveKeyframe, k1: Ma
     const h11 = t3 - t2;
 
     const r0 =
-        k0[MarionetterCurveKeyframeProperty.outTangent] *
-        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
+        k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT] *
+        (k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]);
     const r1 =
-        k1[MarionetterCurveKeyframeProperty.inTangent] *
-        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
+        k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT] *
+        (k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]);
 
     return (
-        h00 * k0[MarionetterCurveKeyframeProperty.value] +
+        h00 * k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE] +
         h10 * r0 +
-        h01 * k1[MarionetterCurveKeyframeProperty.value] +
+        h01 * k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE] +
         h11 * r1
     );
 }
@@ -56,17 +59,17 @@ function curveUtilityEvaluateRaw(t: number, k0: MarionetterCurveKeyframe, k1: Ma
 function curveUtilityEvaluate(t: number, k0: MarionetterCurveKeyframe, k1: MarionetterCurveKeyframe) {
     // const rt = Mathf.InverseLerp(k0.time, k1.time, t);
     const rt =
-        (t - k0[MarionetterCurveKeyframeProperty.time]) /
-        (k1[MarionetterCurveKeyframeProperty.time] - k0[MarionetterCurveKeyframeProperty.time]);
+        (t - k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) /
+        (k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]);
     return curveUtilityEvaluateRaw(rt, k0, k1);
 }
 
 export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): MarionetterCurveKeyframe {
     return {
-        // [MarionetterCurveKeyframeProperty.time]: keyframe[0],
-        // [MarionetterCurveKeyframeProperty.value]: keyframe[1],
-        // [MarionetterCurveKeyframeProperty.inTangent]: keyframe[2],
-        // [MarionetterCurveKeyframeProperty.outTangent]: keyframe[3],
+        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]: keyframe[0],
+        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE]: keyframe[1],
+        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT]: keyframe[2],
+        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT]: keyframe[3],
         // // TODO: うまいことproperty名をまとめられるはず
         ["time"]: keyframe[0],
         ["value"]: keyframe[1],
@@ -92,7 +95,7 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
     const lastK = buildKeyframe(keys[keys.length - 1]);
     
     // for debug
-    // console.log(`[curveUtilityEvaluateCurve] debug - keys.length: ${keys.length}, firstK.v: ${firstK["v"]}, lastK.v: ${lastK["v"]}, t: ${t}`, keys, firstK, lastK, MarionetterCurveKeyframeProperty.value);
+    // console.log(`[curveUtilityEvaluateCurve] debug - keys.length: ${keys.length}, firstK.v: ${firstK["v"]}, lastK.v: ${lastK["v"]}, t: ${t}`, keys, firstK, lastK, MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE);
 
     if (keys.length === 0) {
         console.error('[curveUtilityEvaluateCurve] curve.keys.Length == 0');
@@ -100,23 +103,23 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
     }
 
     if (keys.length === 1) {
-        return firstK[MarionetterCurveKeyframeProperty.value];
+        return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
-    if (t < firstK[MarionetterCurveKeyframeProperty.time]) {
-        return firstK[MarionetterCurveKeyframeProperty.value];
+    if (t < firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
+        return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
-    if (t >= lastK[MarionetterCurveKeyframeProperty.time]) {
-        return lastK[MarionetterCurveKeyframeProperty.value];
+    if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
+        return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
     // TODO: keyframeが多いとループ数が増えるのでtimeをbinarysearchかけるとよい
     for (let i = 0; i < keys.length - 1; i++) {
         const k0 = buildKeyframe(keys[i]);
         const k1 = buildKeyframe(keys[i + 1]);
-        const k0t = k0[MarionetterCurveKeyframeProperty.time];
-        const k1t = k1[MarionetterCurveKeyframeProperty.time];
+        const k0t = k0[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME];
+        const k1t = k1[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME];
         if (k0t <= t && t < k1t) {
             // for debug
             //Debug.Log($"time: {t}, k0.time: {k0.time}");

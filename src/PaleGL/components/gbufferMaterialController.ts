@@ -1,15 +1,18 @@
-import { MarionetterGBufferMaterialControllerComponentInfoProperty } from '@/Marionetter/types';
+import {
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR,
+} from '@/Marionetter/types';
 import { createMaterialController, MaterialController } from '@/PaleGL/components/materialController.ts';
 import { UNIFORM_NAME_BASE_COLOR, UNIFORM_NAME_EMISSIVE_COLOR } from '@/PaleGL/constants';
 
 const bindings = new Map([
     // prettier-ignore
     [
-        MarionetterGBufferMaterialControllerComponentInfoProperty.baseColor,
+        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR,
         UNIFORM_NAME_BASE_COLOR
     ],
     [
-        MarionetterGBufferMaterialControllerComponentInfoProperty.emissiveColor,
+        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR,
         UNIFORM_NAME_EMISSIVE_COLOR
     ],
 ]);

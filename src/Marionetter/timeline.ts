@@ -27,37 +27,27 @@ import {
     MarionetterActivationControlClipInfo,
     MarionetterAnimationClip,
     MarionetterAnimationClipInfo,
-    MarionetterAnimationClipInfoProperty,
     MarionetterClipArgs,
-    MarionetterClipBindingProperty,
-    MarionetterClipInfoBaseProperty,
     MarionetterClipInfoKinds,
     MarionetterClipKinds,
     MarionetterDefaultTrackInfo,
-    MarionetterDefaultTrackInfoProperty,
     MarionetterLightControlClip,
     MarionetterLightControlClipInfo,
-    MarionetterLightControlClipInfoProperty,
     MarionetterMarkerTrackInfo,
-    MarionetterMarkerTrackInfoProperty,
     MarionetterObjectMoveAndLookAtClip,
     MarionetterObjectMoveAndLookAtClipInfo,
-    MarionetterObjectMoveAndLookAtClipInfoProperty,
     MarionetterPlayableDirectorComponentInfo,
-    MarionetterPlayableDirectorComponentInfoProperty,
     // MarionetterPostProcessBloom,
     // MarionetterPostProcessDepthOfField,
     // MarionetterPostProcessVignette,
     // MarionetterPostProcessVolumetricLight,
     MarionetterSignalEmitter,
-    MarionetterSignalEmitterProperty,
     MarionetterTimeline,
     MarionetterTimelineDefaultTrack,
     MarionetterTimelineMarkerTrack,
     MarionetterTimelineSignalEmitter,
     MarionetterTimelineTrackExecuteArgs,
     MarionetterTimelineTrackKinds,
-    MarionetterTrackInfoBaseProperty,
     // MarionetterAnimationClipType,
     MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK,
     MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK,
@@ -69,6 +59,25 @@ import {
     MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
     MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
     MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE,
+    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME,
+    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS,
+    MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS,
+    MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME,
+    MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME,
+    MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE,
+    MARIONETTER_CLIP_INFO_BASE_PROPERTY_START,
+    MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION,
+    MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS,
+    MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
+    MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME,
+    MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES,
+    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
+    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -149,13 +158,13 @@ export function buildMarionetterTimeline(
     const buildSignalEmitter = (signalEmitter: MarionetterSignalEmitter): MarionetterTimelineSignalEmitter => {
         let triggered = false;
         const execute = (time: number) => {
-            if (time > signalEmitter[MarionetterSignalEmitterProperty.time] && triggered) {
+            if (time > signalEmitter[MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME] && triggered) {
                 triggered = true;
             }
         };
         return {
-            name: signalEmitter[MarionetterSignalEmitterProperty.name],
-            time: signalEmitter[MarionetterSignalEmitterProperty.time],
+            name: signalEmitter[MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME],
+            time: signalEmitter[MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME],
             // ...signalEmitter,
             triggered,
             execute,
@@ -168,15 +177,15 @@ export function buildMarionetterTimeline(
 
     for (
         let i = 0;
-        i < marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks].length;
+        i < marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
         i++
     ) {
         const track =
-            marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.tracks][i];
+            marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
 
-        if (track[MarionetterTrackInfoBaseProperty.type] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
+        if (track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
             const signalEmitters = (track as MarionetterMarkerTrackInfo)[
-                MarionetterMarkerTrackInfoProperty.signalEmitters
+                MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS
             ];
             tracks.push({
                 signalEmitters: signalEmitters.map((signalEmitter) => {
@@ -185,8 +194,8 @@ export function buildMarionetterTimeline(
                 execute: () => {},
             } as MarionetterTimelineMarkerTrack);
         } else {
-            const targetName = (track as MarionetterDefaultTrackInfo)[MarionetterDefaultTrackInfoProperty.targetName];
-            const clips = (track as MarionetterDefaultTrackInfo)[MarionetterDefaultTrackInfoProperty.clips];
+            const targetName = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME];
+            const clips = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS];
             // const targetActors = [
             //     findActorByName(marionetterActors, targetName),
             //     // Scene.find(placedScene.children, targetName),
@@ -226,9 +235,9 @@ export function buildMarionetterTimeline(
                         (clip) =>
                             isTimeInClip(
                                 time,
-                                clip.clipInfo[MarionetterClipInfoBaseProperty.start],
-                                clip.clipInfo[MarionetterClipInfoBaseProperty.start] +
-                                    clip.clipInfo[MarionetterClipInfoBaseProperty.duration]
+                                clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START],
+                                clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START] +
+                                    clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION]
                             )
                     );
 
@@ -241,7 +250,7 @@ export function buildMarionetterTimeline(
                     }
 
                     if (
-                        track[MarionetterTrackInfoBaseProperty.type] === MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+                        track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
                     ) {
                         if (targetActor != null) {
                             // const clipAtTime = marionetterClips.find(
@@ -285,7 +294,7 @@ export function buildMarionetterTimeline(
         // const frameTime = Math.floor(rawTime / spf) * spf;
         // pattern2: use raw time
         const frameTime =
-            time % marionetterPlayableDirectorComponentInfo[MarionetterPlayableDirectorComponentInfoProperty.duration];
+            time % marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute({ time: frameTime, scene });
         }
@@ -333,7 +342,7 @@ function createMarionetterClips(
 
     for (let i = 0; i < clips.length; i++) {
         const clip = clips[i];
-        switch (clip[MarionetterClipInfoBaseProperty.type]) {
+        switch (clip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE]) {
             case MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP:
                 marionetterClips.push(
                     createMarionetterAnimationClip(
@@ -407,8 +416,8 @@ function createMarionetterAnimationClip(
         setV3(localRotationEulerDegree, 0, 0, 0);
         setV3(localScale, 1, 1, 1);
 
-        const start = animationClip[MarionetterClipInfoBaseProperty.start];
-        const bindings = animationClip[MarionetterAnimationClipInfoProperty.bindings];
+        const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+        const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
 
         // // for debug
         // // for debug
@@ -417,8 +426,8 @@ function createMarionetterAnimationClip(
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            const propertyName = binding[MarionetterClipBindingProperty.propertyName];
-            const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+            const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+            const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
             switch (propertyName) {
@@ -658,13 +667,13 @@ function createMarionetterLightControlClip(
         let spotLightRange = 0;
 
         // const { start, bindings } = lightControlClip;
-        const start = lightControlClip[MarionetterClipInfoBaseProperty.start];
-        const bindings = lightControlClip[MarionetterLightControlClipInfoProperty.bindings];
+        const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+        const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            const propertyName = binding[MarionetterClipBindingProperty.propertyName];
-            const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+            const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+            const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
             switch (propertyName) {
@@ -782,23 +791,23 @@ function createMarionetterObjectMoveAndLookAtClip(
 
             const localPosition: Vector3 = createVector3Zero();
 
-            const start = objectMoveAndLookAtClip[MarionetterClipInfoBaseProperty.start];
-            const bindings = objectMoveAndLookAtClip[MarionetterObjectMoveAndLookAtClipInfoProperty.bindings];
+            const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+            const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {
-                const propertyName = binding[MarionetterClipBindingProperty.propertyName];
-                const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+                const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+                const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
                 const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
                 switch (propertyName) {
-                    case MarionetterObjectMoveAndLookAtClipInfoProperty.localPositionX:
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X:
                         setV3x(localPosition, value);
                         break;
-                    case MarionetterObjectMoveAndLookAtClipInfoProperty.localPositionY:
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y:
                         setV3y(localPosition, value);
                         break;
-                    case MarionetterObjectMoveAndLookAtClipInfoProperty.localPositionZ:
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z:
                         setV3z(localPosition, value);
                         break;
                     default:
@@ -837,13 +846,13 @@ function createMarionetterObjectMoveAndLookAtClip(
 // 
 //             const leftShoulderRotationEulerDegree: Vector3 = createVector3Zero();
 // 
-//             const start = humanClip[MarionetterClipInfoBaseProperty.start];
+//             const start = humanClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
 //             const bindings = humanClip[MarionetterHumanClipInfoProperty.bindings];
 //             
 //             // TODO: typeがあった方がよい. ex) animation clip, light control clip
 //             bindings.forEach((binding) => {
-//                 const propertyName = binding[MarionetterClipBindingProperty.propertyName];
-//                 const keyframes = binding[MarionetterClipBindingProperty.keyframes];
+//                 const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+//                 const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
 //                 const value = curveUtilityEvaluateCurve(time - start, keyframes);
 // 
 //                 switch (propertyName) {
