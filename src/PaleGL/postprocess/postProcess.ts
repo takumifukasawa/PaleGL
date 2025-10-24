@@ -8,7 +8,7 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
+import { PostProcessPassType, UNIFORM_NAME_VIEW_PROJECTION_MATRIX, UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX, UNIFORM_NAME_INVERSE_VIEW_MATRIX, UNIFORM_NAME_INVERSE_PROJECTION_MATRIX, UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX, UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_NAME_GBUFFER_D_TEXTURE, UNIFORM_NAME_DEPTH_TEXTURE } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
@@ -24,7 +24,7 @@ import {
 import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/matrix4.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/matrix4.ts";
-// import {PostProcessUniformNames} from "@/PaleGL/constants.ts";
+// import {PostProcess} from "@/PaleGL/constants.ts";
 // import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 
 type PostProcessRenderArgs = {
@@ -154,51 +154,51 @@ export function updatePassMaterial({
         // basic
         //
 
-        setMaterialUniformValue(passMaterial, UniformNames.ViewProjectionMatrix, targetCamera.viewProjectionMatrix);
+        setMaterialUniformValue(passMaterial, UNIFORM_NAME_VIEW_PROJECTION_MATRIX, targetCamera.viewProjectionMatrix);
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.InverseViewProjectionMatrix,
+            UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
             targetCamera.inverseViewProjectionMatrix
         );
-        setMaterialUniformValue(passMaterial, UniformNames.InverseViewMatrix, targetCamera.inverseViewMatrix);
+        setMaterialUniformValue(passMaterial, UNIFORM_NAME_INVERSE_VIEW_MATRIX, targetCamera.inverseViewMatrix);
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.InverseProjectionMatrix,
+            UNIFORM_NAME_INVERSE_PROJECTION_MATRIX,
             targetCamera.inverseProjectionMatrix
         );
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.TransposeInverseViewMatrix,
+            UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
             transposeMat4(invertMat4(cloneMat4(targetCamera.viewMatrix)))
         );
 
-        // passMaterial.uniforms.setValue(UniformNames.Time, time);
+        // passMaterial.uniforms.setValue(UNIFORM_NAME_TIME, time);
 
         // g-buffers
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.GBufferATexture,
+            UNIFORM_NAME_GBUFFER_A_TEXTURE,
             renderer.gBufferRenderTargets.gBufferATexture
         );
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.GBufferBTexture,
+            UNIFORM_NAME_GBUFFER_B_TEXTURE,
             renderer.gBufferRenderTargets.gBufferBTexture
         );
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.GBufferCTexture,
+            UNIFORM_NAME_GBUFFER_C_TEXTURE,
             renderer.gBufferRenderTargets.gBufferCTexture
         );
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.GBufferDTexture,
+            UNIFORM_NAME_GBUFFER_D_TEXTURE,
             renderer.gBufferRenderTargets.gBufferDTexture
         );
-        // passMaterial.uniforms.setValue(UniformNames.DepthTexture, renderer.gBufferRenderTargets.depthTexture);
+        // passMaterial.uniforms.setValue(UNIFORM_NAME_DEPTH_TEXTURE, renderer.gBufferRenderTargets.depthTexture);
         setMaterialUniformValue(
             passMaterial,
-            UniformNames.DepthTexture,
+            UNIFORM_NAME_DEPTH_TEXTURE,
             renderer.depthPrePassRenderTarget.depthTexture
         );
     });

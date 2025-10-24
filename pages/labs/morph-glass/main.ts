@@ -16,7 +16,9 @@ import {
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RENDER_TARGET_TYPE_DEPTH,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
-    UniformNames,
+    UNIFORM_NAME_METALLIC,
+    UNIFORM_NAME_ROUGHNESS,
+    UNIFORM_NAME_SCENE_TEXTURE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
 } from '@/PaleGL/constants';
@@ -454,8 +456,8 @@ const main = async () => {
     });
     setScaling(streetFloorActor.transform, createFillVector3(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_METALLIC, 0.5);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_ROUGHNESS, 1);
 
     //
     // bg actor
@@ -510,7 +512,7 @@ const main = async () => {
                     faceSide: FACE_SIDE_FRONT,
                     uniforms: [
                         {
-                            name: UniformNames.SceneTexture,
+                            name: UNIFORM_NAME_SCENE_TEXTURE,
                             type: UNIFORM_TYPE_TEXTURE,
                             value: null,
                         },

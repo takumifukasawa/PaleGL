@@ -4,7 +4,9 @@ import {
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
     UNIFORM_BLOCK_NAME_TIMELINE,
-    UniformNames,
+    UNIFORM_NAME_VIEW_DIRECTION,
+    UNIFORM_NAME_TARGET_WIDTH,
+    UNIFORM_NAME_TARGET_HEIGHT,
     UNIFORM_TYPE_VECTOR3,
 } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
@@ -44,7 +46,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
 
     const mergedUniforms: UniformsData = [
         {
-            name: UniformNames.ViewDirection,
+            name: UNIFORM_NAME_VIEW_DIRECTION,
             type: UNIFORM_TYPE_VECTOR3,
             value: createVector3Zero(),
         },
@@ -111,8 +113,8 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
 
 export const setSizeScreenSpaceRaymarchMesh = (actor: Actor, width: number, height: number) => {
     const mesh = actor as ScreenSpaceRaymarchMesh;
-    setMaterialUniformValue(getMeshMainMaterial(mesh), UniformNames.TargetWidth, width);
-    setMaterialUniformValue(getMeshMaterial(mesh), UniformNames.TargetHeight, height);
+    setMaterialUniformValue(getMeshMainMaterial(mesh), UNIFORM_NAME_TARGET_WIDTH, width);
+    setMaterialUniformValue(getMeshMaterial(mesh), UNIFORM_NAME_TARGET_HEIGHT, height);
 };
 
 // updateMaterial(args: { cameras: Camera }) {
@@ -120,15 +122,15 @@ export const setSizeScreenSpaceRaymarchMesh = (actor: Actor, width: number, heig
 // 
 //     // const { cameras } = args;
 // 
-//     // this.mainMaterial.uniforms.setValue(UniformNames.ViewDirection, cameras.getWorldForward());
-//     // this.mainMaterial.uniforms.setValue(UniformNames.TargetWidth, width);
-//     // this.mainMaterial.uniforms.setValue(UniformNames.TargetHeight, height);
+//     // this.mainMaterial.uniforms.setValue(UNIFORM_NAME_VIEW_DIRECTION, cameras.getWorldForward());
+//     // this.mainMaterial.uniforms.setValue(UNIFORM_NAME_TARGET_WIDTH, width);
+//     // this.mainMaterial.uniforms.setValue(UNIFORM_NAME_TARGET_HEIGHT, height);
 // 
 //     // // TODO: orthographic対応
 //     // if (cameras.isPerspective()) {
 //     //     const perspectiveCamera = cameras as PerspectiveCamera;
-//     //     this.setUniformValueToAllMaterials(UniformNames.CameraAspect, perspectiveCamera.aspect);
-//     //     this.setUniformValueToAllMaterials(UniformNames.CameraFov, perspectiveCamera.fov);
+//     //     this.setUniformValueToAllMaterials(UNIFORM_NAME_CAMERA_ASPECT, perspectiveCamera.aspect);
+//     //     this.setUniformValueToAllMaterials(UNIFORM_NAME_CAMERA_FOV, perspectiveCamera.fov);
 //     // }
 // }
 // 
@@ -136,7 +138,7 @@ export const setSizeScreenSpaceRaymarchMesh = (actor: Actor, width: number, heig
 //     super.updateDepthMaterial({ cameras });
 //     // if (cameras.isPerspective()) {
 //     //     const perspectiveCamera = cameras as PerspectiveCamera;
-//     //     this.setUniformValueToAllMaterials(UniformNames.CameraAspect, perspectiveCamera.aspect);
-//     //     this.setUniformValueToAllMaterials(UniformNames.CameraFov, perspectiveCamera.fov);
+//     //     this.setUniformValueToAllMaterials(UNIFORM_NAME_CAMERA_ASPECT, perspectiveCamera.aspect);
+//     //     this.setUniformValueToAllMaterials(UNIFORM_NAME_CAMERA_FOV, perspectiveCamera.fov);
 //     // }
 // }

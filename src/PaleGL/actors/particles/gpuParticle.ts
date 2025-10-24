@@ -2,7 +2,10 @@ import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/Pa
 import {
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
-    UniformNames,
+    UNIFORM_NAME_POSITION_MAP,
+    UNIFORM_NAME_UP_MAP,
+    UNIFORM_NAME_VAT_RESOLUTION,
+    UNIFORM_NAME_VELOCITY_MAP,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2,
 
@@ -50,7 +53,7 @@ const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDo
     // prettier-ignore
     setMaterialUniformValue(
         material,
-        UniformNames.VelocityMap,
+        UNIFORM_NAME_VELOCITY_MAP,
         getReadVelocityMap(mrtDoubleBuffer)
     );
 
@@ -58,14 +61,14 @@ const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDo
     // prettier-ignore
     setMaterialUniformValue(
         material,
-        UniformNames.PositionMap,
+        UNIFORM_NAME_POSITION_MAP,
         getReadPositionMap(mrtDoubleBuffer)
     );
 
     // prettier-ignore
     setMaterialUniformValue(
         material,
-        UniformNames.UpMap,
+        UNIFORM_NAME_UP_MAP,
         getReadUpMap(mrtDoubleBuffer)
     );
 
@@ -95,17 +98,17 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
 
     const createUniforms = (): UniformsData => [
         {
-            name: UniformNames.VelocityMap,
+            name: UNIFORM_NAME_VELOCITY_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.PositionMap,
+            name: UNIFORM_NAME_POSITION_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.UpMap,
+            name: UNIFORM_NAME_UP_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
@@ -128,14 +131,14 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         mat.useVAT = true;
         // depthが作られる前なのでdepthUniformsにも設定する
         const vatResolution = createVector2(vatWidth, vatHeight);
-        addUniformValue(mat.uniforms, UniformNames.VelocityMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UniformNames.PositionMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UniformNames.UpMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UniformNames.VATResolution, UNIFORM_TYPE_VECTOR2, vatResolution);
-        addUniformValue(mat.depthUniforms, UniformNames.VelocityMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UniformNames.PositionMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UniformNames.UpMap, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UniformNames.VATResolution, UNIFORM_TYPE_VECTOR2, vatResolution);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 
     const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtDoubleBuffer };
@@ -158,9 +161,9 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         tmpReadVelocityMap = getReadVelocityMap(mrtDoubleBuffer);
         tmpReadPositionMap = getReadPositionMap(mrtDoubleBuffer);
         tmpReadUpMap = getReadUpMap(mrtDoubleBuffer);
-        setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.VelocityMap, tmpReadVelocityMap);
-        setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.PositionMap, tmpReadPositionMap);
-        setUniformValueToAllMeshMaterials(gpuParticle, UniformNames.UpMap, tmpReadUpMap);
+        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_VELOCITY_MAP, tmpReadVelocityMap);
+        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_POSITION_MAP, tmpReadPositionMap);
+        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_UP_MAP, tmpReadUpMap);
     });
 
     return vatGPUParticle;

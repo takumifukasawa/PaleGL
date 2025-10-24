@@ -41,7 +41,7 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         // fragmentShader: gaussianBlurFragmentShader({
         //     isHorizontal: true,
         //     pixelNum: blurPixelNum,
-        //     srcTextureUniformName: UniformNames.SrcTexture
+        //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE
         // }),
         uniforms: [
             {
@@ -76,7 +76,7 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         // fragmentShader: gaussianBlurFragmentShader({
         //     isHorizontal: false,
         //     pixelNum: blurPixelNum,
-        //     srcTextureUniformName: UniformNames.SrcTexture,
+        //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE,
         // }),
         uniforms: [
             {
@@ -178,9 +178,9 @@ export function renderGaussianBlurPass(
 
     //     // TODO: mesh経由する必要たぶんない
     //     pass.mesh.updateTransform();
-    //     // pass.material.uniforms[UniformNames.SceneTexture].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
+    //     // pass.material.uniforms[UNIFORM_NAME_SCENE_TEXTURE].value = i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture;
     //     pass.material.uniforms.setValue(
-    //         UniformNames.SrcTexture,
+    //         UNIFORM_NAME_SRC_TEXTURE,
     //         // i === 0 ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
     //         (i === 0 && prevRenderTarget) ? prevRenderTarget.texture : this.#passes[i - 1].renderTarget.texture
     //     );

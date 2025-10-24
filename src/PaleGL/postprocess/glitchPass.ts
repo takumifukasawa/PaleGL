@@ -3,9 +3,9 @@ import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/t
 import {
     POST_PROCESS_PASS_TYPE_GLITCH,
     UNIFORM_BLOCK_NAME_COMMON,
-    UniformNames,
     UNIFORM_TYPE_FLOAT,
-
+    UNIFORM_NAME_BLEND_RATE,
+    UNIFORM_NAME_ASPECT,
 } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
@@ -17,8 +17,6 @@ import {
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { renderPostProcessSinglePassBehaviour } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
 import glitchFragment from '@/PaleGL/shaders/glitch-fragment.glsl';
-
-const UNIFORM_NAME_BLEND_RATE = UniformNames.BlendRate;
 
 // ---
 
@@ -72,7 +70,7 @@ export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
                     value: blendRate,
                 },
                 {
-                    name: UniformNames.Aspect,
+                    name: UNIFORM_NAME_ASPECT,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },

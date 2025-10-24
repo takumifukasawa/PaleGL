@@ -16,7 +16,11 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_FONT_MAP,
+    UNIFORM_NAME_FONT_TILING,
+    UNIFORM_NAME_UI_CHAR_RECT,
+    UNIFORM_NAME_UI_ANCHOR,
+    UNIFORM_NAME_UI_FONT_SIZE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
@@ -73,12 +77,12 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
             value: color,
         },
         {
-            name: UniformNames.FontMap,
+            name: UNIFORM_NAME_FONT_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: shapeFontTexture,
         },
         {
-            name: UniformNames.FontTiling,
+            name: UNIFORM_NAME_FONT_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             // value: tilingOffset,
             value: createVector4(1, 1, 0, 0),
@@ -93,17 +97,17 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const mergedUniforms: UniformsData = [
         ...baseUniforms,
         {
-            name: UniformNames.UICharRect,
+            name: UNIFORM_NAME_UI_CHAR_RECT,
             type: UNIFORM_TYPE_VECTOR2,
             value: createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect), // w: 1 を基準とする
         },
         {
-            name: UniformNames.UIAnchor,
+            name: UNIFORM_NAME_UI_ANCHOR,
             type: UNIFORM_TYPE_VECTOR2,
             value: createVector2(0, 0),
         },
         {
-            name: UniformNames.UIFontSize,
+            name: UNIFORM_NAME_UI_FONT_SIZE,
             type: UNIFORM_TYPE_FLOAT,
             value: fontSize,
         },

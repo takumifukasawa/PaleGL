@@ -4,12 +4,12 @@
     TEXTURE_WRAP_TYPE_REPEAT,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_FLOAT_ARRAY,
     UNIFORM_TYPE_COLOR,
-
+    UNIFORM_NAME_GBUFFER_B_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
 } from '@/PaleGL/constants';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import ssaoFragmentShader from '@/PaleGL/shaders/ssao-fragment.glsl';
@@ -172,12 +172,12 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
             fragmentShader,
             uniforms: [
                 {
-                    name: UniformNames.GBufferBTexture,
+                    name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
-                    name: UniformNames.DepthTexture,
+                    name: UNIFORM_NAME_DEPTH_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
@@ -256,8 +256,8 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
 //     const ssaoPass = postProcessPass as SsaoPass;
 //     setPostProcessPassSize();
 //     super.setSize(width, height);
-//     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
-//     setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_WIDTH, width);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
 export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {

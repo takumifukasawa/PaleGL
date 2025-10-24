@@ -30,7 +30,9 @@ import {
     CAMERA_TYPE_ORTHOGRAPHIC,
     FACE_SIDE_DOUBLE,
     PRIMITIVE_TYPE_LINES,
-    UniformNames,
+    UNIFORM_NAME_PROJECTION_MATRIX,
+    UNIFORM_NAME_VIEW_MATRIX,
+    UNIFORM_NAME_WORLD_MATRIX,
 } from '@/PaleGL/constants.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
@@ -217,7 +219,7 @@ export const updateCamera = (actor: Actor, args: ActorUpdateArgs) => {
 layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
 #include <lighting>
 #include <ub>
-void main() {gl_Position=${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);}
+void main() {gl_Position=${UNIFORM_NAME_PROJECTION_MATRIX} * ${UNIFORM_NAME_VIEW_MATRIX} * ${UNIFORM_NAME_WORLD_MATRIX} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);}
 `,
                 fragmentShader: `
 out vec4 o; void main() {o=vec4(0,1.,0,1.);}

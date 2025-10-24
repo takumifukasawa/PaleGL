@@ -63,6 +63,6 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
 
 // export function setFXAAPassSize(fxaaPass: FxaaPass, width: number, height: number) {
 //     setPostProcessPassSize(fxaaPass, width, height);
-//     setMaterialUniformValue(fxaaPass.material, UniformNames.TargetWidth, width);
-//     setMaterialUniformValue(fxaaPass.material, UniformNames.TargetHeight, height);
+//     setMaterialUniformValue(fxaaPass.material, UNIFORM_NAME_TARGET_WIDTH, width);
+//     setMaterialUniformValue(fxaaPass.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }

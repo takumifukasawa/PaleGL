@@ -1,4 +1,4 @@
-﻿import { POST_PROCESS_PASS_TYPE_BLOOM, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_BLOOM, RENDER_TARGET_TYPE_R11F_G11F_B10F, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY, UNIFORM_NAME_SRC_TEXTURE, UNIFORM_NAME_TARGET_WIDTH, UNIFORM_NAME_TARGET_HEIGHT } from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 // import { gaussianBlurFragmentShader } from '@/PaleGL/shaders/gaussianBlurShader';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -165,7 +165,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         fragmentShader: gaussianBlurFragmentShader,
         uniforms: [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -189,7 +189,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         fragmentShader: gaussianBlurFragmentShader,
         uniforms: [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -213,7 +213,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         fragmentShader: bloomCompositeFragmentShader,
         uniforms: [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -332,16 +332,16 @@ function renderBlur(
     const h = bloomPass.height / downSize;
 
     setRenderTargetToRendererAndClear(renderer, horizontalRenderTarget, true);
-    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.SrcTexture, beforeRenderTarget.texture);
-    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.TargetWidth, w);
-    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UniformNames.TargetHeight, w);
+    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UNIFORM_NAME_SRC_TEXTURE, beforeRenderTarget.texture);
+    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UNIFORM_NAME_TARGET_WIDTH, w);
+    setMaterialUniformValue(bloomPass.horizontalBlurMaterial, UNIFORM_NAME_TARGET_HEIGHT, w);
     renderMesh(renderer, bloomPass.geometry, bloomPass.horizontalBlurMaterial);
 
     setRenderTargetToRendererAndClear(renderer, verticalRenderTarget, true);
     // renderer.clearColor(0, 0, 0, 1);
-    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UniformNames.SrcTexture, horizontalRenderTarget.texture);
-    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UniformNames.TargetWidth, w);
-    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UniformNames.TargetHeight, h);
+    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UNIFORM_NAME_SRC_TEXTURE, horizontalRenderTarget.texture);
+    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UNIFORM_NAME_TARGET_WIDTH, w);
+    setMaterialUniformValue(bloomPass.verticalBlurMaterial, UNIFORM_NAME_TARGET_HEIGHT, h);
     renderMesh(renderer, bloomPass.geometry, bloomPass.verticalBlurMaterial);
 }
 
@@ -420,7 +420,7 @@ export function renderBloomPass(postProcessPass: PostProcessPassBase, args: Post
     );
 
     if (prevRenderTarget) {
-        setMaterialUniformValue(bloomPass.compositePass.material, UniformNames.SrcTexture, prevRenderTarget.texture);
+        setMaterialUniformValue(bloomPass.compositePass.material, UNIFORM_NAME_SRC_TEXTURE, prevRenderTarget.texture);
     } else {
         console.error('invalid prev render target');
     }

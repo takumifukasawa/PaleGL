@@ -6,7 +6,22 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_BASE_COLOR,
+    UNIFORM_NAME_BASE_MAP,
+    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_EMISSIVE_COLOR,
+    UNIFORM_NAME_HEIGHT_MAP,
+    UNIFORM_NAME_HEIGHT_MAP_TILING,
+    UNIFORM_NAME_HEIGHT_SCALE,
+    UNIFORM_NAME_METALLIC,
+    UNIFORM_NAME_METALLIC_MAP,
+    UNIFORM_NAME_METALLIC_MAP_TILING,
+    UNIFORM_NAME_NORMAL_MAP,
+    UNIFORM_NAME_NORMAL_MAP_TILING,
+    UNIFORM_NAME_ROUGHNESS,
+    UNIFORM_NAME_ROUGHNESS_MAP,
+    UNIFORM_NAME_ROUGHNESS_MAP_TILING,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR4,
@@ -82,27 +97,27 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
 
     const commonUniforms: UniformsData = [
         {
-            name: UniformNames.BaseMap,
+            name: UNIFORM_NAME_BASE_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
-            name: UniformNames.BaseMapTiling,
+            name: UNIFORM_NAME_BASE_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling,
         },
         {
-            name: UniformNames.HeightMap,
+            name: UNIFORM_NAME_HEIGHT_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: heightMap,
         },
         {
-            name: UniformNames.HeightMapTiling,
+            name: UNIFORM_NAME_HEIGHT_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: heightMapTiling,
         },
         {
-            name: UniformNames.HeightScale,
+            name: UNIFORM_NAME_HEIGHT_SCALE,
             type: UNIFORM_TYPE_FLOAT,
             value: heightScale,
         },
@@ -110,68 +125,68 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
 
     const gbufferUniforms: UniformsData = [
         {
-            name: UniformNames.BaseColor,
+            name: UNIFORM_NAME_BASE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },
 
         {
-            name: UniformNames.Metallic,
+            name: UNIFORM_NAME_METALLIC,
             type: UNIFORM_TYPE_FLOAT,
             value: metallic,
         },
         {
-            name: UniformNames.MetallicMap,
+            name: UNIFORM_NAME_METALLIC_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
-            name: UniformNames.MetallicMapTiling,
+            name: UNIFORM_NAME_METALLIC_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
         {
-            name: UniformNames.Roughness,
+            name: UNIFORM_NAME_ROUGHNESS,
             type: UNIFORM_TYPE_FLOAT,
             value: roughness,
         },
         {
-            name: UniformNames.RoughnessMap,
+            name: UNIFORM_NAME_ROUGHNESS_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: roughnessMap,
         },
         {
-            name: UniformNames.RoughnessMapTiling,
+            name: UNIFORM_NAME_ROUGHNESS_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: roughnessMapTiling,
         },
         {
-            name: UniformNames.MetallicMap,
+            name: UNIFORM_NAME_METALLIC_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
-            name: UniformNames.MetallicMapTiling,
+            name: UNIFORM_NAME_METALLIC_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
         {
-            name: UniformNames.NormalMap,
+            name: UNIFORM_NAME_NORMAL_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: normalMap,
         },
         {
-            name: UniformNames.NormalMapTiling,
+            name: UNIFORM_NAME_NORMAL_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: normalMapTiling,
         },
         {
-            name: UniformNames.EmissiveColor,
+            name: UNIFORM_NAME_EMISSIVE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
         {
-            name: UniformNames.ShadingModelId,
+            name: UNIFORM_NAME_SHADING_MODEL_ID,
             type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },
@@ -204,12 +219,12 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
     });
 
     // const updateUniforms = () => {
-    //     setMaterialUniformValue(material, UniformNames.RoughnessMap, _roughnessMap);
-    //     setMaterialUniformValue(material, UniformNames.Roughness, _roughnessMap ? 1 : _roughness);
-    //     setMaterialUniformValue(material, UniformNames.RoughnessMapTiling, _roughnessMapTiling);
-    //     setMaterialUniformValue(material, UniformNames.MetallicMap, _metallicMap);
-    //     setMaterialUniformValue(material, UniformNames.Metallic, _metallicMap ? 1 : _metallic);
-    //     setMaterialUniformValue(material, UniformNames.MetallicMapTiling, _metallicMapTiling);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_ROUGHNESS_MAP, _roughnessMap);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_ROUGHNESS, _roughnessMap ? 1 : _roughness);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_ROUGHNESS_MAP_TILING, _roughnessMapTiling);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_METALLIC_MAP, _metallicMap);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_METALLIC, _metallicMap ? 1 : _metallic);
+    //     setMaterialUniformValue(material, UNIFORM_NAME_METALLIC_MAP_TILING, _metallicMapTiling);
     // };
     
     // const gBufferIndividualParameters: GBufferMaterialIndividualParameters = {

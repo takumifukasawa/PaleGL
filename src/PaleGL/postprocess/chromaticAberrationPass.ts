@@ -93,8 +93,8 @@ export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs)
 // export function setChromaticAberrationPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
 //     const pass = postProcessPass as PostProcessSinglePass;
 //     setPostProcessSinglePassSizeBehaviour(pass, width, height);
-//     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
-//     setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_WIDTH, width);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
 export function renderChromaticAberrationPass(

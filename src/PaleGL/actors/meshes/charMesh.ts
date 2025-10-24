@@ -11,7 +11,9 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_FONT_MAP,
+    UNIFORM_NAME_FONT_TILING,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
@@ -80,12 +82,12 @@ export function createCharMesh({
             value: color,
         },
         {
-            name: UniformNames.FontMap,
+            name: UNIFORM_NAME_FONT_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: fontTexture,
         },
         {
-            name: UniformNames.FontTiling,
+            name: UNIFORM_NAME_FONT_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             // value: Vector4.one
             value: createVector4(sw, sh, sx, sy), // TODO: dummy
@@ -94,7 +96,7 @@ export function createCharMesh({
 
     const mergedUniforms: UniformsData = [
         {
-            name: UniformNames.ShadingModelId,
+            name: UNIFORM_NAME_SHADING_MODEL_ID,
             type: UNIFORM_TYPE_INT,
             value: SHADING_MODEL_ID_UNLIT,
         },

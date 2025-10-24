@@ -5,7 +5,10 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_BASE_COLOR,
+    UNIFORM_NAME_BASE_MAP,
+    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
     UNIFORM_TYPE_INT,
@@ -47,22 +50,22 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
 
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.BaseMap,
+            name: UNIFORM_NAME_BASE_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
-            name: UniformNames.BaseMapTiling,
+            name: UNIFORM_NAME_BASE_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.BaseColor,
+            name: UNIFORM_NAME_BASE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },
         {
-            name: UniformNames.ShadingModelId,
+            name: UNIFORM_NAME_SHADING_MODEL_ID,
             type: UNIFORM_TYPE_INT,
             value: SHADING_MODEL_ID_UNLIT,
         },
@@ -72,17 +75,17 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
 
     const depthUniforms: UniformsData = [
         {
-            name: UniformNames.BaseMap,
+            name: UNIFORM_NAME_BASE_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: baseMap || null,
         },
         {
-            name: UniformNames.BaseMapTiling,
+            name: UNIFORM_NAME_BASE_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: baseMapTiling || createVector4(1, 1, 0, 0),
         },
         {
-            name: UniformNames.BaseColor,
+            name: UNIFORM_NAME_BASE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: baseColor || createColorWhite(),
         },

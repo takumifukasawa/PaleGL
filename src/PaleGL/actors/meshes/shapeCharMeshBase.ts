@@ -84,12 +84,12 @@ export const createShapeCharMeshBase: <T, U extends ShapeFontBase<T>>(
     //         value: color,
     //     },
     //     {
-    //         name: UniformNames.FontMap,
+    //         name: UNIFORM_NAME_FONT_MAP,
     //         type: UNIFORM_TYPE_TEXTURE,
     //         value: fontTexture,
     //     },
     //     {
-    //         name: UniformNames.FontTiling,
+    //         name: UNIFORM_NAME_FONT_TILING,
     //         type: UNIFORM_TYPE_VECTOR4,
     //         value: tilingOffset,
     //     },

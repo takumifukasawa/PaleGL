@@ -5,7 +5,7 @@ import {
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_WRAP_TYPE_REPEAT,
     UNIFORM_BLOCK_NAME_COMMON,
-    UniformNames,
+    UNIFORM_NAME_SRC_TEXTURE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
 
@@ -126,7 +126,7 @@ export const createEffectTextureSystem: (
 
         const uniforms: UniformsData = [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -160,7 +160,7 @@ export const createEffectTextureSystem: (
         });
 
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, compositeMaterial);
-        setMaterialUniformValue(compositeMaterial, UniformNames.SrcTexture, effectRenderTarget.texture);
+        setMaterialUniformValue(compositeMaterial, UNIFORM_NAME_SRC_TEXTURE, effectRenderTarget.texture);
     }
 
     return {

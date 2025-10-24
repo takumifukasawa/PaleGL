@@ -35,7 +35,7 @@ export const createUnlitShapeCharMesh: <T, U extends ShapeFontBase<T>>(
 }: ShapeCharMeshArgs<T, U>): UnlitShapeCharMesh => {
     // const mergedUniforms: UniformsData = [
     //     {
-    //         name: UniformNames.ShadingModelId,
+    //         name: UNIFORM_NAME_SHADING_MODEL_ID,
     //         type: UNIFORM_TYPE_INT,
     //         value: ShadingModelIds.Unlit,
     //     },

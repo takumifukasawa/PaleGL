@@ -308,138 +308,197 @@ export type UniformTypes =
     | typeof UNIFORM_TYPE_TEXTURE_ARRAY
     | typeof UNIFORM_TYPE_BOOL;
 
-// TODO: Texture -> Map にしたい？
-// TODO: objectじゃなくて単体のconst_stringにするべき
-export const UniformNames = {
-    // transforms
-    WorldMatrix: 'uWorldMatrix',
-    ViewMatrix: 'uViewMatrix',
-    ProjectionMatrix: 'uProjectionMatrix',
-    WVPMatrix: 'uWVPMatrix',
-    ViewProjectionMatrix: 'uViewProjectionMatrix',
-    NormalMatrix: 'uNormalMatrix',
-    InverseWorldMatrix: 'uInverseWorldMatrix',
-    InverseViewMatrix: 'uInverseViewMatrix',
-    InverseViewProjectionMatrix: 'uInverseViewProjectionMatrix',
-    InverseProjectionMatrix: 'uInverseProjectionMatrix',
-    TransposeInverseViewMatrix: 'uTransposeInverseViewMatrix',
-    ViewDirectionProjectionInverse: 'uViewDirectionProjectionInverse',
-    ViewPosition: 'uViewPosition',
-    ViewDirection: 'uViewDirection',
-    CameraAspect: 'uAspect',
-    CameraFov: 'uFov',
-    // g-buffer
-    GBufferATexture: 'uGBufferATexture',
-    GBufferBTexture: 'uGBufferBTexture',
-    GBufferCTexture: 'uGBufferCTexture',
-    GBufferDTexture: 'uGBufferDTexture',
-    // shading model id
-    ShadingModelId: 'uShadingModelId',
-    // depth
-    DepthTexture: 'uDepthTexture',
-    // surface
-    BaseMap: 'uBaseMap',
-    BaseColor: 'uBaseColor',
-    BaseMapTiling: 'uBaseMapTiling',
-    Metallic: 'uMetallic',
-    MetallicMap: 'uMetallicMap',
-    MetallicMapTiling: 'uMetallicMapTiling',
-    Roughness: 'uRoughness',
-    RoughnessMap: 'uRoughnessMap',
-    RoughnessMapTiling: 'uRoughnessMapTiling',
-    EmissiveColor: 'uEmissiveColor',
-    EmissiveMap: 'uEmissiveMap',
-    EmissiveMapTiling: 'uEmissiveMapTiling',
-    NormalMap: 'uNormalMap',
-    NormalMapTiling: 'uNormalMapTiling',
-    HeightMap: 'uHeightMap',
-    HeightMapTiling: 'uHeightMapTiling',
-    HeightScale: 'uHeightScale',
-    // ao
-    // AmbientOcclusionTexture: "uAmbientOcclusionTexture",
-    // skinning
-    JointMatrices: 'uJointMatrices',
-    JointTexture: 'uJointTexture',
-    BoneCount: 'uBoneCount',
-    JointTextureColNum: 'uJointTextureColNum',
-    TotalFrameCount: 'uTotalFrameCount', // TODO: 名前変えたい
-    // vat
-    PositionMap: 'uPositionMap',
-    VelocityMap: 'uVelocityMap',
-    UpMap: 'uUpMap',
-    // VATWidth: 'uVATWidth',
-    // VATHeight: 'uVATWidth',
-    VATResolution: 'uVATResolution',
-    // shadow map
-    // ShadowBias: 'uShadowBias',
-    // LightViewProjectionMatrix: 'uLightViewProjectionMatrix',
-    // time
-    Time: 'uTime',
-    DeltaTime: 'uDeltaTime',
-    // timeline time
-    TimelineTime: 'uTimelineTime',
-    TimelineDeltaTime: 'uTimelineDeltaTime',
-    // viewport
-    Viewport: 'uViewport',
-    // usualy post process
-    TargetWidth: 'uTargetWidth',
-    TargetHeight: 'uTargetHeight',
-    Aspect: 'uAspect',
-    TexelSize: 'uTexelSize',
-    // cameras
-    CameraNear: 'uNearClip',
-    CameraFar: 'uFarClip',
-    // cubemap
-    CubeTexture: 'uCubeTexture',
-    // light
-    DirectionalLight: 'uDirectionalLight',
-    SpotLight: 'uSpotLight',
-    PointLight: 'uPointLight',
-    LightDirection: 'direction',
-    LightIntensity: 'intensity',
-    LightColor: 'color',
-    ShadowMap: 'shadowMap',
-    // LightViewProjectionMatrix: 'lightViewProjectionMatrix',
-    ShadowMapProjectionMatrix: 'shadowMapProjectionMatrix',
-    ShadowBias: 'shadowBias',
-    DirectionalLightShadowMap: 'uDirectionalLightShadowMap',
-    SpotLightShadowMap: 'uSpotLightShadowMap',
-    // spot light
-    LightPosition: 'position',
-    LightDistance: 'distance',
-    LightAttenuation: 'attenuation',
-    LightConeCos: 'coneCos',
-    LightPenumbraCos: 'penumbraCos',
-    SpotLightColor: 'uSpotLightColor',
-    SpotLightIntensity: 'uSpotLightIntensity',
-    // renderer
-    SceneTexture: 'uSceneTexture',
-    // ui
-    // UICanvas: 'uUICanvas',
-    UICharRect: 'uUICharRect',
-    UIFontSize: 'uUIFontSize',
-    UIAnchor: 'uUIAnchor',
-    // post process
-    SrcTexture: 'uSrcTexture',
-    BlendRate: 'uBlendRate',
-    // font
-    FontMap: 'uFontMap',
-    FontTiling: 'uFontTiling',
-    // skybox
-    Skybox: 'uSkybox',
-    RotationOffset: 'uRotationOffset', // TODO: 名前変えたい
-    // raymarch
-    ObjectSpaceRaymarchBoundsScale: 'uBoundsScale',
-    // effect texture
-    GridSize: 'uGridSize',
-    Octaves: 'uOctaves',
-    Amplitude: 'uAmplitude',
-    Frequency: 'uFrequency',
-    Factor: 'uFactor'
-    // misc
-} as const;
+// Individual uniform name constants
+export const UNIFORM_NAME_WORLD_MATRIX = 'uWorldMatrix';
+export const UNIFORM_NAME_VIEW_MATRIX = 'uViewMatrix';
+export const UNIFORM_NAME_PROJECTION_MATRIX = 'uProjectionMatrix';
+export const UNIFORM_NAME_WVP_MATRIX = 'uWVPMatrix';
+export const UNIFORM_NAME_VIEW_PROJECTION_MATRIX = 'uViewProjectionMatrix';
+export const UNIFORM_NAME_NORMAL_MATRIX = 'uNormalMatrix';
+export const UNIFORM_NAME_INVERSE_WORLD_MATRIX = 'uInverseWorldMatrix';
+export const UNIFORM_NAME_INVERSE_VIEW_MATRIX = 'uInverseViewMatrix';
+export const UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX = 'uInverseViewProjectionMatrix';
+export const UNIFORM_NAME_INVERSE_PROJECTION_MATRIX = 'uInverseProjectionMatrix';
+export const UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX = 'uTransposeInverseViewMatrix';
+export const UNIFORM_NAME_VIEW_DIRECTION_PROJECTION_INVERSE = 'uViewDirectionProjectionInverse';
+export const UNIFORM_NAME_VIEW_POSITION = 'uViewPosition';
+export const UNIFORM_NAME_VIEW_DIRECTION = 'uViewDirection';
+export const UNIFORM_NAME_CAMERA_ASPECT = 'uAspect';
+export const UNIFORM_NAME_CAMERA_FOV = 'uFov';
+export const UNIFORM_NAME_GBUFFER_A_TEXTURE = 'uGBufferATexture';
+export const UNIFORM_NAME_GBUFFER_B_TEXTURE = 'uGBufferBTexture';
+export const UNIFORM_NAME_GBUFFER_C_TEXTURE = 'uGBufferCTexture';
+export const UNIFORM_NAME_GBUFFER_D_TEXTURE = 'uGBufferDTexture';
+export const UNIFORM_NAME_SHADING_MODEL_ID = 'uShadingModelId';
+export const UNIFORM_NAME_DEPTH_TEXTURE = 'uDepthTexture';
+export const UNIFORM_NAME_BASE_MAP = 'uBaseMap';
+export const UNIFORM_NAME_BASE_COLOR = 'uBaseColor';
+export const UNIFORM_NAME_BASE_MAP_TILING = 'uBaseMapTiling';
+export const UNIFORM_NAME_METALLIC = 'uMetallic';
+export const UNIFORM_NAME_METALLIC_MAP = 'uMetallicMap';
+export const UNIFORM_NAME_METALLIC_MAP_TILING = 'uMetallicMapTiling';
+export const UNIFORM_NAME_ROUGHNESS = 'uRoughness';
+export const UNIFORM_NAME_ROUGHNESS_MAP = 'uRoughnessMap';
+export const UNIFORM_NAME_ROUGHNESS_MAP_TILING = 'uRoughnessMapTiling';
+export const UNIFORM_NAME_EMISSIVE_COLOR = 'uEmissiveColor';
+export const UNIFORM_NAME_EMISSIVE_MAP = 'uEmissiveMap';
+export const UNIFORM_NAME_EMISSIVE_MAP_TILING = 'uEmissiveMapTiling';
+export const UNIFORM_NAME_NORMAL_MAP = 'uNormalMap';
+export const UNIFORM_NAME_NORMAL_MAP_TILING = 'uNormalMapTiling';
+export const UNIFORM_NAME_HEIGHT_MAP = 'uHeightMap';
+export const UNIFORM_NAME_HEIGHT_MAP_TILING = 'uHeightMapTiling';
+export const UNIFORM_NAME_HEIGHT_SCALE = 'uHeightScale';
+export const UNIFORM_NAME_JOINT_MATRICES = 'uJointMatrices';
+export const UNIFORM_NAME_JOINT_TEXTURE = 'uJointTexture';
+export const UNIFORM_NAME_BONE_COUNT = 'uBoneCount';
+export const UNIFORM_NAME_JOINT_TEXTURE_COL_NUM = 'uJointTextureColNum';
+export const UNIFORM_NAME_TOTAL_FRAME_COUNT = 'uTotalFrameCount';
+export const UNIFORM_NAME_POSITION_MAP = 'uPositionMap';
+export const UNIFORM_NAME_VELOCITY_MAP = 'uVelocityMap';
+export const UNIFORM_NAME_UP_MAP = 'uUpMap';
+export const UNIFORM_NAME_VAT_RESOLUTION = 'uVATResolution';
+export const UNIFORM_NAME_TIME = 'uTime';
+export const UNIFORM_NAME_DELTA_TIME = 'uDeltaTime';
+export const UNIFORM_NAME_TIMELINE_TIME = 'uTimelineTime';
+export const UNIFORM_NAME_TIMELINE_DELTA_TIME = 'uTimelineDeltaTime';
+export const UNIFORM_NAME_VIEWPORT = 'uViewport';
+export const UNIFORM_NAME_TARGET_WIDTH = 'uTargetWidth';
+export const UNIFORM_NAME_TARGET_HEIGHT = 'uTargetHeight';
+export const UNIFORM_NAME_ASPECT = 'uAspect';
+export const UNIFORM_NAME_TEXEL_SIZE = 'uTexelSize';
+export const UNIFORM_NAME_CAMERA_NEAR = 'uNearClip';
+export const UNIFORM_NAME_CAMERA_FAR = 'uFarClip';
+export const UNIFORM_NAME_CUBE_TEXTURE = 'uCubeTexture';
+export const UNIFORM_NAME_DIRECTIONAL_LIGHT = 'uDirectionalLight';
+export const UNIFORM_NAME_SPOT_LIGHT = 'uSpotLight';
+export const UNIFORM_NAME_POINT_LIGHT = 'uPointLight';
+export const UNIFORM_NAME_LIGHT_DIRECTION = 'direction';
+export const UNIFORM_NAME_LIGHT_INTENSITY = 'intensity';
+export const UNIFORM_NAME_LIGHT_COLOR = 'color';
+export const UNIFORM_NAME_SHADOW_MAP = 'shadowMap';
+export const UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX = 'shadowMapProjectionMatrix';
+export const UNIFORM_NAME_SHADOW_BIAS = 'shadowBias';
+export const UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP = 'uDirectionalLightShadowMap';
+export const UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP = 'uSpotLightShadowMap';
+export const UNIFORM_NAME_LIGHT_POSITION = 'position';
+export const UNIFORM_NAME_LIGHT_DISTANCE = 'distance';
+export const UNIFORM_NAME_LIGHT_ATTENUATION = 'attenuation';
+export const UNIFORM_NAME_LIGHT_CONE_COS = 'coneCos';
+export const UNIFORM_NAME_LIGHT_PENUMBRA_COS = 'penumbraCos';
+export const UNIFORM_NAME_SPOT_LIGHT_COLOR = 'uSpotLightColor';
+export const UNIFORM_NAME_SPOT_LIGHT_INTENSITY = 'uSpotLightIntensity';
+export const UNIFORM_NAME_SCENE_TEXTURE = 'uSceneTexture';
+export const UNIFORM_NAME_UI_CHAR_RECT = 'uUICharRect';
+export const UNIFORM_NAME_UI_FONT_SIZE = 'uUIFontSize';
+export const UNIFORM_NAME_UI_ANCHOR = 'uUIAnchor';
+export const UNIFORM_NAME_SRC_TEXTURE = 'uSrcTexture';
+export const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
+export const UNIFORM_NAME_FONT_MAP = 'uFontMap';
+export const UNIFORM_NAME_FONT_TILING = 'uFontTiling';
+export const UNIFORM_NAME_SKYBOX = 'uSkybox';
+export const UNIFORM_NAME_ROTATION_OFFSET = 'uRotationOffset';
+export const UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE = 'uBoundsScale';
+export const UNIFORM_NAME_GRID_SIZE = 'uGridSize';
+export const UNIFORM_NAME_OCTAVES = 'uOctaves';
+export const UNIFORM_NAME_AMPLITUDE = 'uAmplitude';
+export const UNIFORM_NAME_FREQUENCY = 'uFrequency';
+export const UNIFORM_NAME_FACTOR = 'uFactor';
 
-export type UniformName = (typeof UniformNames)[keyof typeof UniformNames];
+export type UniformName =
+    | typeof UNIFORM_NAME_WORLD_MATRIX
+    | typeof UNIFORM_NAME_VIEW_MATRIX
+    | typeof UNIFORM_NAME_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_WVP_MATRIX
+    | typeof UNIFORM_NAME_VIEW_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_NORMAL_MATRIX
+    | typeof UNIFORM_NAME_INVERSE_WORLD_MATRIX
+    | typeof UNIFORM_NAME_INVERSE_VIEW_MATRIX
+    | typeof UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_INVERSE_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX
+    | typeof UNIFORM_NAME_VIEW_DIRECTION_PROJECTION_INVERSE
+    | typeof UNIFORM_NAME_VIEW_POSITION
+    | typeof UNIFORM_NAME_VIEW_DIRECTION
+    | typeof UNIFORM_NAME_CAMERA_ASPECT
+    | typeof UNIFORM_NAME_CAMERA_FOV
+    | typeof UNIFORM_NAME_GBUFFER_A_TEXTURE
+    | typeof UNIFORM_NAME_GBUFFER_B_TEXTURE
+    | typeof UNIFORM_NAME_GBUFFER_C_TEXTURE
+    | typeof UNIFORM_NAME_GBUFFER_D_TEXTURE
+    | typeof UNIFORM_NAME_SHADING_MODEL_ID
+    | typeof UNIFORM_NAME_DEPTH_TEXTURE
+    | typeof UNIFORM_NAME_BASE_MAP
+    | typeof UNIFORM_NAME_BASE_COLOR
+    | typeof UNIFORM_NAME_BASE_MAP_TILING
+    | typeof UNIFORM_NAME_METALLIC
+    | typeof UNIFORM_NAME_METALLIC_MAP
+    | typeof UNIFORM_NAME_METALLIC_MAP_TILING
+    | typeof UNIFORM_NAME_ROUGHNESS
+    | typeof UNIFORM_NAME_ROUGHNESS_MAP
+    | typeof UNIFORM_NAME_ROUGHNESS_MAP_TILING
+    | typeof UNIFORM_NAME_EMISSIVE_COLOR
+    | typeof UNIFORM_NAME_EMISSIVE_MAP
+    | typeof UNIFORM_NAME_EMISSIVE_MAP_TILING
+    | typeof UNIFORM_NAME_NORMAL_MAP
+    | typeof UNIFORM_NAME_NORMAL_MAP_TILING
+    | typeof UNIFORM_NAME_HEIGHT_MAP
+    | typeof UNIFORM_NAME_HEIGHT_MAP_TILING
+    | typeof UNIFORM_NAME_HEIGHT_SCALE
+    | typeof UNIFORM_NAME_JOINT_MATRICES
+    | typeof UNIFORM_NAME_JOINT_TEXTURE
+    | typeof UNIFORM_NAME_BONE_COUNT
+    | typeof UNIFORM_NAME_JOINT_TEXTURE_COL_NUM
+    | typeof UNIFORM_NAME_TOTAL_FRAME_COUNT
+    | typeof UNIFORM_NAME_POSITION_MAP
+    | typeof UNIFORM_NAME_VELOCITY_MAP
+    | typeof UNIFORM_NAME_UP_MAP
+    | typeof UNIFORM_NAME_VAT_RESOLUTION
+    | typeof UNIFORM_NAME_TIME
+    | typeof UNIFORM_NAME_DELTA_TIME
+    | typeof UNIFORM_NAME_TIMELINE_TIME
+    | typeof UNIFORM_NAME_TIMELINE_DELTA_TIME
+    | typeof UNIFORM_NAME_VIEWPORT
+    | typeof UNIFORM_NAME_TARGET_WIDTH
+    | typeof UNIFORM_NAME_TARGET_HEIGHT
+    | typeof UNIFORM_NAME_ASPECT
+    | typeof UNIFORM_NAME_TEXEL_SIZE
+    | typeof UNIFORM_NAME_CAMERA_NEAR
+    | typeof UNIFORM_NAME_CAMERA_FAR
+    | typeof UNIFORM_NAME_CUBE_TEXTURE
+    | typeof UNIFORM_NAME_DIRECTIONAL_LIGHT
+    | typeof UNIFORM_NAME_SPOT_LIGHT
+    | typeof UNIFORM_NAME_POINT_LIGHT
+    | typeof UNIFORM_NAME_LIGHT_DIRECTION
+    | typeof UNIFORM_NAME_LIGHT_INTENSITY
+    | typeof UNIFORM_NAME_LIGHT_COLOR
+    | typeof UNIFORM_NAME_SHADOW_MAP
+    | typeof UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_SHADOW_BIAS
+    | typeof UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP
+    | typeof UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP
+    | typeof UNIFORM_NAME_LIGHT_POSITION
+    | typeof UNIFORM_NAME_LIGHT_DISTANCE
+    | typeof UNIFORM_NAME_LIGHT_ATTENUATION
+    | typeof UNIFORM_NAME_LIGHT_CONE_COS
+    | typeof UNIFORM_NAME_LIGHT_PENUMBRA_COS
+    | typeof UNIFORM_NAME_SPOT_LIGHT_COLOR
+    | typeof UNIFORM_NAME_SPOT_LIGHT_INTENSITY
+    | typeof UNIFORM_NAME_SCENE_TEXTURE
+    | typeof UNIFORM_NAME_UI_CHAR_RECT
+    | typeof UNIFORM_NAME_UI_FONT_SIZE
+    | typeof UNIFORM_NAME_UI_ANCHOR
+    | typeof UNIFORM_NAME_SRC_TEXTURE
+    | typeof UNIFORM_NAME_BLEND_RATE
+    | typeof UNIFORM_NAME_FONT_MAP
+    | typeof UNIFORM_NAME_FONT_TILING
+    | typeof UNIFORM_NAME_SKYBOX
+    | typeof UNIFORM_NAME_ROTATION_OFFSET
+    | typeof UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE
+    | typeof UNIFORM_NAME_GRID_SIZE
+    | typeof UNIFORM_NAME_OCTAVES
+    | typeof UNIFORM_NAME_AMPLITUDE
+    | typeof UNIFORM_NAME_FREQUENCY
+    | typeof UNIFORM_NAME_FACTOR;
 
 export const UNIFORM_BLOCK_NAME_COMMON = 'ubCommon';
 export const UNIFORM_BLOCK_NAME_TRANSFORMATIONS = 'ubTransformations';

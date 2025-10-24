@@ -29,7 +29,6 @@ import { createTouchInputController } from '@/PaleGL/inputs/touchInputController
 import { createMouseInputController } from '@/PaleGL/inputs/mouseInputController.ts';
 import {
     RENDER_TARGET_TYPE_DEPTH,
-    UniformNames,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     ACTOR_TYPE_MESH,
     UNIFORM_TYPE_TEXTURE,
@@ -38,6 +37,9 @@ import {
     DEPTH_FUNC_TYPE_LEQUAL,
     FACE_SIDE_FRONT,
     RENDER_QUEUE_TYPE_TRANSPARENT,
+    UNIFORM_NAME_METALLIC,
+    UNIFORM_NAME_ROUGHNESS,
+    UNIFORM_NAME_SCENE_TEXTURE,
 } from '@/PaleGL/constants.ts';
 import type { RenderQueueType, FaceSide } from '@/PaleGL/constants.ts';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
@@ -300,8 +302,8 @@ const main = async () => {
     });
     setScaling(streetFloorActor.transform, createFillVector3(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_METALLIC, 0.5);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_ROUGHNESS, 1);
 
     //
     // bg actor
@@ -353,7 +355,7 @@ const main = async () => {
                 faceSide: FACE_SIDE_FRONT,
                 uniforms: [
                     {
-                        name: UniformNames.SceneTexture,
+                        name: UNIFORM_NAME_SCENE_TEXTURE,
                         type: UNIFORM_TYPE_TEXTURE,
                         value: null,
                     },

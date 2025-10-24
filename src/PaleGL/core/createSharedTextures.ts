@@ -45,7 +45,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectFragmentShader: fbmNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -87,7 +87,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectFragmentShader: randomNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -111,7 +111,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectFragmentShader: perlinNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -138,7 +138,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectFragmentShader: perlinNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -165,7 +165,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
         effectFragmentShader: simplexNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },

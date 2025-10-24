@@ -16,13 +16,20 @@ import {
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_SPOT_LIGHT,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR3,
     UNIFORM_TYPE_MATRIX4,
     UNIFORM_TYPE_TEXTURE_ARRAY,
-
+    UNIFORM_NAME_WORLD_MATRIX,
+    UNIFORM_NAME_VIEW_MATRIX,
+    UNIFORM_NAME_PROJECTION_MATRIX,
+    UNIFORM_NAME_TARGET_WIDTH,
+    UNIFORM_NAME_TARGET_HEIGHT,
+    UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
+    UNIFORM_NAME_GBUFFER_A_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_BLEND_RATE,
 } from '@/PaleGL/constants';
 import { renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
@@ -132,10 +139,10 @@ export function createVolumetricLightPass(args: VolumetricLightPassArgs): Volume
     const spotLightFrustumMaterial = createMaterial({
         vertexShader: `
 layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
-uniform mat4 ${UniformNames.WorldMatrix};
-uniform mat4 ${UniformNames.ViewMatrix};
-uniform mat4 ${UniformNames.ProjectionMatrix};
-void main() {vec4 wp=${UniformNames.WorldMatrix}*vec4(${ATTRIBUTE_NAME_POSITION},1.);gl_Position=${UniformNames.ProjectionMatrix}*${UniformNames.ViewMatrix}*wp;}
+uniform mat4 ${UNIFORM_NAME_WORLD_MATRIX};
+uniform mat4 ${UNIFORM_NAME_VIEW_MATRIX};
+uniform mat4 ${UNIFORM_NAME_PROJECTION_MATRIX};
+void main() {vec4 wp=${UNIFORM_NAME_WORLD_MATRIX}*vec4(${ATTRIBUTE_NAME_POSITION},1.);gl_Position=${UNIFORM_NAME_PROJECTION_MATRIX}*${UNIFORM_NAME_VIEW_MATRIX}*wp;}
 `,
         fragmentShader: `
 out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
@@ -148,17 +155,17 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         faceSide: FACE_SIDE_DOUBLE, // TODO: doubleである必要ない？
         uniforms: [
             {
-                name: UniformNames.WorldMatrix,
+                name: UNIFORM_NAME_WORLD_MATRIX,
                 type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
             {
-                name: UniformNames.ViewMatrix,
+                name: UNIFORM_NAME_VIEW_MATRIX,
                 type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
             {
-                name: UniformNames.ProjectionMatrix,
+                name: UNIFORM_NAME_PROJECTION_MATRIX,
                 type: UNIFORM_TYPE_MATRIX4,
                 value: null,
             },
@@ -174,7 +181,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             fragmentShader,
             uniforms: [
                 {
-                    name: UniformNames.SpotLightShadowMap,
+                    name: UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
                     type: UNIFORM_TYPE_TEXTURE_ARRAY,
                     value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
                 },
@@ -194,12 +201,12 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
                     value: createVector3Zero(),
                 },
                 {
-                    name: UniformNames.GBufferATexture,
+                    name: UNIFORM_NAME_GBUFFER_A_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
-                    name: UniformNames.DepthTexture,
+                    name: UNIFORM_NAME_DEPTH_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
@@ -209,7 +216,7 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
                     value: null,
                 },
                 {
-                    name: UniformNames.BlendRate,
+                    name: UNIFORM_NAME_BLEND_RATE,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
@@ -253,12 +260,12 @@ export function setVolumetricLightPassSize(postProcessPass: PostProcessPassBase,
 
     setMaterialUniformValue(
         volumetricLightPass.spotLightFrustumMaterial,
-        UniformNames.TargetWidth,
+        UNIFORM_NAME_TARGET_WIDTH,
         volumetricLightPass.width
     );
     setMaterialUniformValue(
         volumetricLightPass.spotLightFrustumMaterial,
-        UniformNames.TargetHeight,
+        UNIFORM_NAME_TARGET_HEIGHT,
         volumetricLightPass.height
     );
 }
@@ -279,19 +286,19 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
 
     setMaterialUniformValue(
         volumetricLightPass.spotLightFrustumMaterial,
-        UniformNames.ViewMatrix,
+        UNIFORM_NAME_VIEW_MATRIX,
         options.targetCamera.viewMatrix
     );
     setMaterialUniformValue(
         volumetricLightPass.spotLightFrustumMaterial,
-        UniformNames.ProjectionMatrix,
+        UNIFORM_NAME_PROJECTION_MATRIX,
         options.targetCamera.projectionMatrix
     );
     volumetricLightPass.spotLights.forEach((spotLight) => {
         if (spotLight.shadowCamera && spotLight.shadowCamera.visibleFrustumMesh !== null) {
             setMaterialUniformValue(
                 volumetricLightPass.spotLightFrustumMaterial,
-                UniformNames.WorldMatrix,
+                UNIFORM_NAME_WORLD_MATRIX,
                 spotLight.shadowCamera.transform.worldMatrix
             );
             // TODO: この描画だけでvolumeを計算したい
@@ -305,7 +312,7 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
 
     setMaterialUniformValue(
         volumetricLightPass.material,
-        UniformNames.SpotLightShadowMap,
+        UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
         volumetricLightPass.spotLights.map((spotLight) =>
             spotLight.shadowMap ? spotLight.shadowMap?.depthTexture : null
         )
@@ -326,7 +333,7 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
         UNIFORM_NAME_RAY_JITTER_SIZE,
         volumetricLightPass.rayJitterSize
     );
-    setMaterialUniformValue(volumetricLightPass.material, UniformNames.BlendRate, volumetricLightPass.blendRate);
+    setMaterialUniformValue(volumetricLightPass.material, UNIFORM_NAME_BLEND_RATE, volumetricLightPass.blendRate);
 
     // console.log(this.material.uniforms)
 

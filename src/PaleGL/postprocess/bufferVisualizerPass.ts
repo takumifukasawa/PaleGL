@@ -1,4 +1,4 @@
-﻿import { POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_TYPE_MATRIX4 } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_TYPE_MATRIX4, UNIFORM_NAME_CAMERA_NEAR, UNIFORM_NAME_CAMERA_FAR, UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getDummyBlackTexture, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -115,17 +115,17 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
             fragmentShader: bufferVisualizerRow0PassFragmentShader,
             uniforms: [
                 {
-                    name: UniformNames.CameraNear,
+                    name: UNIFORM_NAME_CAMERA_NEAR,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 0.1,
                 },
                 {
-                    name: UniformNames.CameraFar,
+                    name: UNIFORM_NAME_CAMERA_FAR,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
                 {
-                    name: UniformNames.InverseViewProjectionMatrix,
+                    name: UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
                     type: UNIFORM_TYPE_MATRIX4,
                     value: createMat4Identity(),
                 },

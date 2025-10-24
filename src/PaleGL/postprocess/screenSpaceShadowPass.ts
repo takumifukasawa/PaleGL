@@ -6,10 +6,11 @@ import {
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_POINT_LIGHT,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR3,
+    UNIFORM_NAME_GBUFFER_B_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
 } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
@@ -84,12 +85,12 @@ export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
             fragmentShader,
             uniforms: [
                 {
-                    name: UniformNames.GBufferBTexture,
+                    name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
                 {
-                    name: UniformNames.DepthTexture,
+                    name: UNIFORM_NAME_DEPTH_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },

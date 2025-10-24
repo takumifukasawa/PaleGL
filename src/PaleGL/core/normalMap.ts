@@ -5,7 +5,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     RENDER_TARGET_TYPE_RGBA,
     TEXTURE_WRAP_TYPE_REPEAT,
-    UniformNames,
+    UNIFORM_NAME_TEXEL_SIZE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
@@ -72,7 +72,7 @@ export const createNormalMapConverter: (
                     value: 1.0,
                 },
                 {
-                    name: UniformNames.TexelSize,
+                    name: UNIFORM_NAME_TEXEL_SIZE,
                     type: UNIFORM_TYPE_VECTOR2,
                     value: createVector2(1, 1),
                 },
@@ -93,7 +93,7 @@ export const convertNormalMapFromHeightMap = (renderer: Renderer, converter: Nor
         converter.srcTexture || converter.srcRenderTarget!.texture
     );
     setV2(tmpTexelSize, 1 / converter.width, 1 / converter.height);
-    setMaterialUniformValue(convertNormalMapFromHeightMapMaterial, UniformNames.TexelSize, tmpTexelSize);
+    setMaterialUniformValue(convertNormalMapFromHeightMapMaterial, UNIFORM_NAME_TEXEL_SIZE, tmpTexelSize);
 
     blitRenderTarget(renderer, converter.renderTarget, renderer.sharedQuad, convertNormalMapFromHeightMapMaterial);
 };

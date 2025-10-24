@@ -11,7 +11,19 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_BASE_COLOR,
+    UNIFORM_NAME_BASE_MAP,
+    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_EMISSIVE_COLOR,
+    UNIFORM_NAME_METALLIC,
+    UNIFORM_NAME_METALLIC_MAP,
+    UNIFORM_NAME_METALLIC_MAP_TILING,
+    UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
+    UNIFORM_NAME_ROUGHNESS,
+    UNIFORM_NAME_ROUGHNESS_MAP,
+    UNIFORM_NAME_ROUGHNESS_MAP_TILING,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR3,
@@ -98,65 +110,65 @@ export function createObjectSpaceRaymarchMaterial({
 
     const commonUniforms: UniformsData = [
         {
-            name: UniformNames.ObjectSpaceRaymarchBoundsScale,
+            name: UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
             type: UNIFORM_TYPE_VECTOR3,
             value: createVector3One(),
         },
         {
-            name: UniformNames.DepthTexture,
+            name: UNIFORM_NAME_DEPTH_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.BaseMap,
+            name: UNIFORM_NAME_BASE_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: baseMap,
         },
         {
-            name: UniformNames.BaseColor,
+            name: UNIFORM_NAME_BASE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: baseColor,
         },
         {
-            name: UniformNames.BaseMapTiling,
+            name: UNIFORM_NAME_BASE_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             // value: Vector2.one,
             value: baseMapTiling,
         },
         {
-            name: UniformNames.Metallic,
+            name: UNIFORM_NAME_METALLIC,
             type: UNIFORM_TYPE_FLOAT,
             value: metallic,
         },
         {
-            name: UniformNames.MetallicMap,
+            name: UNIFORM_NAME_METALLIC_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: metallicMap,
         },
         {
-            name: UniformNames.MetallicMapTiling,
+            name: UNIFORM_NAME_METALLIC_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: metallicMapTiling,
         },
 
         {
-            name: UniformNames.Roughness,
+            name: UNIFORM_NAME_ROUGHNESS,
             type: UNIFORM_TYPE_FLOAT,
             value: roughness,
         },
         {
-            name: UniformNames.RoughnessMap,
+            name: UNIFORM_NAME_ROUGHNESS_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: roughnessMap,
         },
         {
-            name: UniformNames.RoughnessMapTiling,
+            name: UNIFORM_NAME_ROUGHNESS_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             value: roughnessMapTiling,
         },
 
         {
-            name: UniformNames.EmissiveColor,
+            name: UNIFORM_NAME_EMISSIVE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
@@ -165,7 +177,7 @@ export function createObjectSpaceRaymarchMaterial({
     
     const shadingUniforms: UniformsData = [
         {
-            name: UniformNames.ShadingModelId,
+            name: UNIFORM_NAME_SHADING_MODEL_ID,
             type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },

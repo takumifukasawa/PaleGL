@@ -3,7 +3,7 @@ import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { isPerspectiveCamera } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { setUniformValueToAllMeshMaterials, UpdateMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { ObjectSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/objectSpaceRaymarchMesh.ts';
-import { UniformNames } from '@/PaleGL/constants.ts';
+import { UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE } from '@/PaleGL/constants.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { updateMaterialSkyboxUniforms } from '@/PaleGL/postprocess/deferredShadingPass.ts';
 
@@ -20,15 +20,15 @@ export const updateObjectSpaceRaymarchMesh: UpdateActorFunc = (actor: Actor) => 
 
     mesh.materials.forEach((material) => {
         // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.scale);
+        setMaterialUniformValue(material, UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, mesh.transform.scale);
         // wp
-        // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
+        // material.uniforms.setValue(UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, this.transform.getWorldScale());
     });
     mesh.depthMaterials.forEach((material) => {
         // local
-        setMaterialUniformValue(material, UniformNames.ObjectSpaceRaymarchBoundsScale, mesh.transform.scale);
+        setMaterialUniformValue(material, UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, mesh.transform.scale);
         // wp
-        // material.uniforms.setValue(UniformNames.ObjectSpaceRaymarchBoundsScale, this.transform.getWorldScale());
+        // material.uniforms.setValue(UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, this.transform.getWorldScale());
     });
 };
 

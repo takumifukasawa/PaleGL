@@ -220,13 +220,13 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         //     );
         //     addUniformValue(
         //         mat.uniforms,
-        //         UniformNames.VATResolution,
+        //         UNIFORM_NAME_VAT_RESOLUTION,
         //         UNIFORM_TYPE_VECTOR2,
         //         vatResolution
         //     );
         //     addUniformValue(
         //         mat.depthUniforms,
-        //         UniformNames.VATResolution,
+        //         UNIFORM_NAME_VAT_RESOLUTION,
         //         UNIFORM_TYPE_VECTOR2,
         //         vatResolution
         //     );

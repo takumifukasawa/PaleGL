@@ -76,7 +76,9 @@ import {
     type AttributeUsageType,
     ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
     ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW,
-    UniformNames,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_METALLIC,
+    UNIFORM_NAME_ROUGHNESS,
     FACE_SIDE_DOUBLE,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     UNIFORM_BLOCK_NAME_COMMON,
@@ -651,7 +653,7 @@ layout (std140) uniform ubCommon {
         // `,
         uniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -990,8 +992,8 @@ emissiveColor *= d;
         },
     ];
     console.log(streetFloorMaterial);
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Metallic, 0.5);
-    setUniformValue(streetFloorMaterial.uniforms, UniformNames.Roughness, 1);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_METALLIC, 0.5);
+    setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_ROUGHNESS, 1);
 
     //
     // street light
@@ -1266,7 +1268,7 @@ void main() {
                 value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
             },
             {
-                name: UniformNames.DepthTexture,
+                name: UNIFORM_NAME_DEPTH_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },

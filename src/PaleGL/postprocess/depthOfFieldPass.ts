@@ -6,11 +6,12 @@ import {
     RENDER_TARGET_TYPE_RGBA16F,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
-
+    UNIFORM_NAME_SRC_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_TEXEL_SIZE,
 } from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material';
@@ -104,12 +105,12 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         fragmentShader: dofCircleOfConfusionFragmentShader,
         uniforms: [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
-                name: UniformNames.DepthTexture,
+                name: UNIFORM_NAME_DEPTH_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -156,11 +157,11 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         gpu,
         fragmentShader: dofPreFilterFragmentShader,
         uniforms: [
-            // [UniformNames.SrcTexture]: {
+            // [UNIFORM_NAME_SRC_TEXTURE]: {
             //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
-            // [UniformNames.DepthTexture]: {
+            // [UNIFORM_NAME_DEPTH_TEXTURE]: {
             //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
@@ -178,7 +179,7 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
                 value: null,
             },
             {
-                name: UniformNames.TexelSize,
+                name: UNIFORM_NAME_TEXEL_SIZE,
                 type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
@@ -303,9 +304,9 @@ export function getDepthOfFieldPassRenderTarget(pass: PostProcessPassBase) {
 //  *
 //  */
 // setup() {
-//     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraNear, cameras.near);
-//     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.CameraFar, cameras.far);
-//     // this.circleOfConfusionPass.material.uniforms.setValue(UniformNames.DepthTexture, depthTexture);
+//     // this.circleOfConfusionPass.material.uniforms.setValue(UNIFORM_NAME_CAMERA_NEAR, cameras.near);
+//     // this.circleOfConfusionPass.material.uniforms.setValue(UNIFORM_NAME_CAMERA_FAR, cameras.far);
+//     // this.circleOfConfusionPass.material.uniforms.setValue(UNIFORM_NAME_DEPTH_TEXTURE, depthTexture);
 // }
 
 export function setDepthOfFieldPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
@@ -391,7 +392,7 @@ export function renderDepthOfFieldPass(
 
     setMaterialUniformValue(
         depthOfFieldPass.preFilterPass.material,
-        UniformNames.TexelSize,
+        UNIFORM_NAME_TEXEL_SIZE,
         createVector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
     );
 

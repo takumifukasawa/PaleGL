@@ -12,13 +12,19 @@ import {
     UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
     UNIFORM_BLOCK_NAME_SPOT_LIGHT,
     UNIFORM_BLOCK_NAME_POINT_LIGHT,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_TEXTURE_ARRAY,
     UNIFORM_TYPE_CUBE_MAP,
     UNIFORM_TYPE_STRUCT,
-
+    UNIFORM_NAME_GBUFFER_A_TEXTURE,
+    UNIFORM_NAME_GBUFFER_B_TEXTURE,
+    UNIFORM_NAME_GBUFFER_C_TEXTURE,
+    UNIFORM_NAME_GBUFFER_D_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP,
+    UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
+    UNIFORM_NAME_SKYBOX,
 } from '@/PaleGL/constants.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
@@ -42,27 +48,27 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
     const uniforms: UniformsData = [
         // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
         {
-            name: UniformNames.GBufferATexture,
+            name: UNIFORM_NAME_GBUFFER_A_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.GBufferBTexture,
+            name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.GBufferCTexture,
+            name: UNIFORM_NAME_GBUFFER_C_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.GBufferDTexture,
+            name: UNIFORM_NAME_GBUFFER_D_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.DepthTexture,
+            name: UNIFORM_NAME_DEPTH_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
@@ -78,13 +84,13 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
         },
 
         {
-            name: UniformNames.DirectionalLightShadowMap,
+            name: UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
 
         {
-            name: UniformNames.SpotLightShadowMap,
+            name: UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
             type: UNIFORM_TYPE_TEXTURE_ARRAY,
             value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
         },
@@ -116,7 +122,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
 export function createSkyboxUniforms(): UniformsData {
     return [
         {
-            name: UniformNames.Skybox,
+            name: UNIFORM_NAME_SKYBOX,
             type: UNIFORM_TYPE_STRUCT,
             value: [
                 {
@@ -150,7 +156,7 @@ export function createSkyboxUniforms(): UniformsData {
 }
 
 export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
-    setMaterialUniformValue(material, UniformNames.Skybox, [
+    setMaterialUniformValue(material, UNIFORM_NAME_SKYBOX, [
         {
             name: CUBE_MAP_UNIFORM_NAME,
             type: UNIFORM_TYPE_CUBE_MAP,

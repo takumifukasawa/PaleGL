@@ -8,7 +8,13 @@ import {
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_BASE_COLOR,
+    UNIFORM_NAME_BASE_MAP,
+    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_EMISSIVE_COLOR,
+    UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR3,
     UNIFORM_TYPE_VECTOR4,
@@ -65,33 +71,33 @@ export function createObjectSpaceRaymarchGlassMaterial(
     
     const commonUniforms: UniformsData = [
         {
-            name: UniformNames.ObjectSpaceRaymarchBoundsScale,
+            name: UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
             type: UNIFORM_TYPE_VECTOR3,
             value: createVector3One(),
         },
         {
-            name: UniformNames.DepthTexture,
+            name: UNIFORM_NAME_DEPTH_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.BaseMap,
+            name: UNIFORM_NAME_BASE_MAP,
             type: UNIFORM_TYPE_TEXTURE,
             value: baseMap,
         },
         {
-            name: UniformNames.BaseColor,
+            name: UNIFORM_NAME_BASE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: baseColor,
         },
         {
-            name: UniformNames.BaseMapTiling,
+            name: UNIFORM_NAME_BASE_MAP_TILING,
             type: UNIFORM_TYPE_VECTOR4,
             // value: Vector2.one,
             value: baseMapTiling,
         },
         {
-            name: UniformNames.EmissiveColor,
+            name: UNIFORM_NAME_EMISSIVE_COLOR,
             type: UNIFORM_TYPE_COLOR,
             value: emissiveColor,
         },
@@ -100,7 +106,7 @@ export function createObjectSpaceRaymarchGlassMaterial(
     ] as UniformsData;
     const shadingUniforms: UniformsData = [
         {
-            name: UniformNames.ShadingModelId,
+            name: UNIFORM_NAME_SHADING_MODEL_ID,
             type: UNIFORM_TYPE_INT, // float,intどちらでもいい
             value: shadingModelId,
         },

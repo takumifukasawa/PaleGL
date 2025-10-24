@@ -6,7 +6,9 @@ import {
 
     PRIMITIVE_TYPE_TRIANGLES,
     ACTOR_TYPE_SKYBOX,
-    UniformNames,
+    UNIFORM_NAME_CUBE_TEXTURE,
+    UNIFORM_NAME_ROTATION_OFFSET,
+    UNIFORM_NAME_SHADING_MODEL_ID,
     SHADING_MODEL_ID_SKYBOX,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
@@ -142,22 +144,22 @@ export function createSkybox({
         faceSide: FACE_SIDE_BACK,
         uniforms: [
             {
-                name: UniformNames.CubeTexture,
+                name: UNIFORM_NAME_CUBE_TEXTURE,
                 type: UNIFORM_TYPE_CUBE_MAP,
                 value: cubeMap,
             },
             // {
-            //     name: UniformNames.ViewDirectionProjectionInverse,
+            //     name: UNIFORM_NAME_VIEW_DIRECTION_PROJECTION_INVERSE,
             //     type: UNIFORM_TYPE_MATRIX4,
             //     value: Matrix4.identity,
             // },
             {
-                name: UniformNames.RotationOffset,
+                name: UNIFORM_NAME_ROTATION_OFFSET,
                 type: UNIFORM_TYPE_FLOAT,
                 value: rotationOffset,
             },
             {
-                name: UniformNames.ShadingModelId,
+                name: UNIFORM_NAME_SHADING_MODEL_ID,
                 type: UNIFORM_TYPE_INT,
                 value: SHADING_MODEL_ID_SKYBOX,
             },

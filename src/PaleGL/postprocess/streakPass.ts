@@ -3,12 +3,12 @@ import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/t
 import {
     POST_PROCESS_PASS_TYPE_STREAK,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
     UNIFORM_TYPE_COLOR,
-
+    UNIFORM_NAME_SRC_TEXTURE,
+    UNIFORM_NAME_TEXEL_SIZE,
 } from '@/PaleGL/constants';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -124,12 +124,12 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         fragmentShader: streakPrefilterFragmentShader,
         uniforms: [
             {
-                name: UniformNames.SrcTexture,
+                name: UNIFORM_NAME_SRC_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
             {
-                name: UniformNames.TexelSize,
+                name: UNIFORM_NAME_TEXEL_SIZE,
                 type: UNIFORM_TYPE_VECTOR2,
                 value: createVector2Zero(),
             },
@@ -156,7 +156,7 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             fragmentShader: streakDownSampleFragmentShader,
             uniforms: [
                 {
-                    name: UniformNames.TexelSize,
+                    name: UNIFORM_NAME_TEXEL_SIZE,
                     type: UNIFORM_TYPE_VECTOR2,
                     value: createVector2Zero(),
                 },
@@ -357,7 +357,7 @@ export function renderStreakPass(
         setPostProcessPassSize(pass, width, streakPass.halfHeight);
         setMaterialUniformValue(
             pass.material,
-            UniformNames.TexelSize,
+            UNIFORM_NAME_TEXEL_SIZE,
             createVector2(1 / width, 1 / streakPass.halfHeight)
         );
         setMaterialUniformValue(pass.material, UNIFORM_NAME_PREV_TEXTURE, prevPass.renderTarget.texture);

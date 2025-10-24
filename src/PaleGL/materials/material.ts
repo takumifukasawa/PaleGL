@@ -20,7 +20,8 @@
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RENDER_QUEUE_TYPE_SKYBOX,
     UniformBlockName,
-    UniformNames,
+    UNIFORM_NAME_INVERSE_WORLD_MATRIX,
+    UNIFORM_NAME_TIME,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_MATRIX4,
     UniformTypes,
@@ -302,14 +303,14 @@ export function createMaterial(args: MaterialArgs): Material {
     // - skinning回りもここで入れたい？
     const commonUniforms: UniformsData = [
         {
-            name: UniformNames.InverseWorldMatrix,
+            name: UNIFORM_NAME_INVERSE_WORLD_MATRIX,
             type: UNIFORM_TYPE_MATRIX4,
             value: createMat4Identity(),
         },
 
         // TODO: commonを呼んでさえいればいらないはず
         {
-            name: UniformNames.Time,
+            name: UNIFORM_NAME_TIME,
             type: UNIFORM_TYPE_FLOAT,
             value: 0,
         },

@@ -11,7 +11,14 @@ import {
     PRIMITIVE_TYPE_LINES,
     PRIMITIVE_TYPE_POINTS,
     TEXTURE_TYPE_RGBA32F,
-    UniformNames,
+    UNIFORM_NAME_TOTAL_FRAME_COUNT,
+    UNIFORM_NAME_TIME,
+    UNIFORM_NAME_JOINT_TEXTURE,
+    UNIFORM_NAME_JOINT_TEXTURE_COL_NUM,
+    UNIFORM_NAME_BONE_COUNT,
+    UNIFORM_NAME_WORLD_MATRIX,
+    UNIFORM_NAME_VIEW_MATRIX,
+    UNIFORM_NAME_PROJECTION_MATRIX,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_INT,
 } from '@/PaleGL/constants.ts';
@@ -308,10 +315,10 @@ export function startSkinnedMesh(actor: Actor, args: ActorStartArgs) {
         });
 
         skinnedMesh.materials.forEach((material) =>
-            setMaterialUniformValue(material, UniformNames.TotalFrameCount, framesDuration)
+            setMaterialUniformValue(material, UNIFORM_NAME_TOTAL_FRAME_COUNT, framesDuration)
         );
         skinnedMesh.depthMaterials.forEach((depthMaterial) => {
-            setMaterialUniformValue(depthMaterial, UniformNames.TotalFrameCount, framesDuration);
+            setMaterialUniformValue(depthMaterial, UNIFORM_NAME_TOTAL_FRAME_COUNT, framesDuration);
         });
 
         // for debug
@@ -361,16 +368,16 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
     }
 
     if (skinnedMesh.gpuSkinning) {
-        skinnedMesh.materials.forEach((mat) => setMaterialUniformValue(mat, UniformNames.Time, time));
+        skinnedMesh.materials.forEach((mat) => setMaterialUniformValue(mat, UNIFORM_NAME_TIME, time));
         skinnedMesh.depthMaterials.forEach((depthMaterial) => {
-            setMaterialUniformValue(depthMaterial, UniformNames.Time, time);
+            setMaterialUniformValue(depthMaterial, UNIFORM_NAME_TIME, time);
         });
 
         skinnedMesh.materials.forEach((mat) =>
-            setMaterialUniformValue(mat, UniformNames.JointTexture, skinnedMesh.jointTexture)
+            setMaterialUniformValue(mat, UNIFORM_NAME_JOINT_TEXTURE, skinnedMesh.jointTexture)
         );
         skinnedMesh.depthMaterials.forEach((depthMaterial) => {
-            setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, skinnedMesh.jointTexture);
+            setMaterialUniformValue(depthMaterial, UNIFORM_NAME_JOINT_TEXTURE, skinnedMesh.jointTexture);
         });
     } else {
         // NOTE: test update skinning by cpu
@@ -401,10 +408,10 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
         }
 
         skinnedMesh.materials.forEach((mat) =>
-            setMaterialUniformValue(mat, UniformNames.JointTexture, skinnedMesh.jointTexture)
+            setMaterialUniformValue(mat, UNIFORM_NAME_JOINT_TEXTURE, skinnedMesh.jointTexture)
         );
         skinnedMesh.depthMaterials.forEach((depthMaterial) => {
-            setMaterialUniformValue(depthMaterial, UniformNames.JointTexture, skinnedMesh.jointTexture);
+            setMaterialUniformValue(depthMaterial, UNIFORM_NAME_JOINT_TEXTURE, skinnedMesh.jointTexture);
         });
     }
 }
@@ -417,24 +424,24 @@ const generateSkinningUniforms = (skinnedMesh: SkinnedMesh): UniformsData => {
         //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
         // };
         {
-            name: UniformNames.JointTexture,
+            name: UNIFORM_NAME_JOINT_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.JointTextureColNum,
+            name: UNIFORM_NAME_JOINT_TEXTURE_COL_NUM,
             type: UNIFORM_TYPE_INT,
             value: skinnedMesh.jointTextureColNum,
         },
         ...(skinnedMesh.gpuSkinning
             ? ([
                   {
-                      name: UniformNames.BoneCount,
+                      name: UNIFORM_NAME_BONE_COUNT,
                       type: UNIFORM_TYPE_INT,
                       value: skinnedMesh.boneCount,
                   },
                   {
-                      name: UniformNames.TotalFrameCount,
+                      name: UNIFORM_NAME_TOTAL_FRAME_COUNT,
                       type: UNIFORM_TYPE_INT,
                       value: 0,
                   },
@@ -509,12 +516,12 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
             vertexShader: `
                 layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
                 
-                uniform mat4 ${UniformNames.WorldMatrix};
-                uniform mat4 ${UniformNames.ViewMatrix};
-                uniform mat4 ${UniformNames.ProjectionMatrix};
+                uniform mat4 ${UNIFORM_NAME_WORLD_MATRIX};
+                uniform mat4 ${UNIFORM_NAME_VIEW_MATRIX};
+                uniform mat4 ${UNIFORM_NAME_PROJECTION_MATRIX};
                 
                 void main() {
-                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
+                    gl_Position = ${UNIFORM_NAME_PROJECTION_MATRIX} * ${UNIFORM_NAME_VIEW_MATRIX} * ${UNIFORM_NAME_WORLD_MATRIX} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
                 }
                 `,
             fragmentShader: `
@@ -552,12 +559,12 @@ const createSkinDebugger = (skinnedMesh: SkinnedMesh, { gpu }: { gpu: Gpu }) => 
             vertexShader: `
                 layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
                 
-                uniform mat4 ${UniformNames.WorldMatrix};
-                uniform mat4 ${UniformNames.ViewMatrix};
-                uniform mat4 ${UniformNames.ProjectionMatrix};
+                uniform mat4 ${UNIFORM_NAME_WORLD_MATRIX};
+                uniform mat4 ${UNIFORM_NAME_VIEW_MATRIX};
+                uniform mat4 ${UNIFORM_NAME_PROJECTION_MATRIX};
                 
                 void main() {
-                    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
+                    gl_Position = ${UNIFORM_NAME_PROJECTION_MATRIX} * ${UNIFORM_NAME_VIEW_MATRIX} * ${UNIFORM_NAME_WORLD_MATRIX} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
                     gl_PointSize = 6.;
                 }
                 `,

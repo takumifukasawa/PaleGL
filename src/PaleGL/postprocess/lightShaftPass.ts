@@ -1,4 +1,4 @@
-﻿import { POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, RENDER_TARGET_TYPE_R11F_G11F_B10F, UniformNames, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2 } from '@/PaleGL/constants';
+﻿import { POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, RENDER_TARGET_TYPE_R11F_G11F_B10F, UNIFORM_TYPE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR2, UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_NAME_BLEND_RATE } from '@/PaleGL/constants';
 
 import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
@@ -94,7 +94,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         // renderTargetType: RENDER_TARGET_TYPE_R16F,
         uniforms: [
             {
-                name: UniformNames.DepthTexture,
+                name: UNIFORM_NAME_DEPTH_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },
@@ -221,7 +221,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
                 value: null,
             },
             {
-                name: UniformNames.BlendRate,
+                name: UNIFORM_NAME_BLEND_RATE,
                 type: UNIFORM_TYPE_FLOAT,
                 value: blendRate,
             },
@@ -393,7 +393,7 @@ export function renderLightShaftPass(
         'uLightShaftTexture',
         lightShaftPass.blur3Pass.renderTarget.texture
     );
-    setMaterialUniformValue(lightShaftPass.compositePass.material, UniformNames.BlendRate, lightShaftPass.blendRate);
+    setMaterialUniformValue(lightShaftPass.compositePass.material, UNIFORM_NAME_BLEND_RATE, lightShaftPass.blendRate);
 
     renderPostProcessPass(lightShaftPass.compositePass, {
         gpu,

@@ -2,7 +2,7 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { parseObj } from '@/PaleGL/loaders/loadObj.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import {ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, BLEND_TYPE_TRANSPARENT, UNIFORM_BLOCK_NAME_COMMON, UniformNames} from '@/PaleGL/constants.ts';
+import {ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, BLEND_TYPE_TRANSPARENT, UNIFORM_BLOCK_NAME_COMMON, UNIFORM_NAME_PROJECTION_MATRIX, UNIFORM_NAME_VIEW_MATRIX, UNIFORM_NAME_WORLD_MATRIX} from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import {setScaling} from "@/PaleGL/core/transform.ts";
@@ -191,13 +191,13 @@ f 23/56/18 22/55/18 20/53/18
 //             vertexShader: `
 //             layout (location = 0) in vec3 ${ATTRIBUTE_NAME_POSITION};
 //             layout (location = 1) in vec2 ${ATTRIBUTE_NAME_UV};
-//             uniform mat4 ${UniformNames.WorldMatrix};
-//             uniform mat4 ${UniformNames.ViewMatrix};
-//             uniform mat4 ${UniformNames.ProjectionMatrix};
+//             uniform mat4 ${UNIFORM_NAME_WORLD_MATRIX};
+//             uniform mat4 ${UNIFORM_NAME_VIEW_MATRIX};
+//             uniform mat4 ${UNIFORM_NAME_PROJECTION_MATRIX};
 //             out vec2 vUv;
 //             void main() {
 //                 vUv = aUv;
-//                 gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
+//                 gl_Position = ${UNIFORM_NAME_PROJECTION_MATRIX} * ${UNIFORM_NAME_VIEW_MATRIX} * ${UNIFORM_NAME_WORLD_MATRIX} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
 //             }
 //             `,
 //             fragmentShader: `
@@ -257,7 +257,7 @@ precision highp float;
 out vec2 vUv;
 void main() {
     vUv = aUv;
-    gl_Position = ${UniformNames.ProjectionMatrix} * ${UniformNames.ViewMatrix} * ${UniformNames.WorldMatrix} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
+    gl_Position = ${UNIFORM_NAME_PROJECTION_MATRIX} * ${UNIFORM_NAME_VIEW_MATRIX} * ${UNIFORM_NAME_WORLD_MATRIX} * vec4(${ATTRIBUTE_NAME_POSITION}, 1.);
 }
             `,
         fragmentShader: `

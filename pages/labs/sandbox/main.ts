@@ -106,7 +106,12 @@ import {
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
     UNIFORM_BLOCK_NAME_COMMON,
-    UniformNames,
+    UNIFORM_NAME_BASE_MAP,
+    UNIFORM_NAME_HEIGHT_MAP,
+    UNIFORM_NAME_HEIGHT_MAP_TILING,
+    UNIFORM_NAME_HEIGHT_SCALE,
+    UNIFORM_NAME_NORMAL_MAP,
+    UNIFORM_NAME_NORMAL_MAP_TILING,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
     UNIFORM_TYPE_VECTOR3,
@@ -371,7 +376,7 @@ const createTestGPUParticle = (gpu: Gpu) => {
     subscribeActorOnStart(testMesh, () => {
         setUniformValue(
             getMeshMaterial(testMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
         );
     });
@@ -412,7 +417,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkVelocityMesh, () => {
         setUniformValue(
             getMeshMaterial(checkVelocityMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
         );
     });
@@ -427,7 +432,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkPositionMesh, () => {
         setUniformValue(
             getMeshMaterial(checkPositionMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
         );
     });
@@ -442,7 +447,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkUpMesh, () => {
         setUniformValue(
             getMeshMaterial(checkUpMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
         );
     });
@@ -483,7 +488,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkVelocityMesh, () => {
         setUniformValue(
             getMeshMaterial(checkVelocityMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[0]
         );
     });
@@ -498,7 +503,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkPositionMesh, () => {
         setUniformValue(
             getMeshMaterial(checkPositionMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[1]
         );
     });
@@ -513,7 +518,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
     subscribeActorOnStart(checkUpMesh, () => {
         setUniformValue(
             getMeshMaterial(checkUpMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             vatGPUParticle.mrtDoubleBuffer.multipleRenderTargets[0].textures[2]
         );
     });
@@ -528,7 +533,7 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         // effectFragmentShader: simplexNoiseFragment,
         // effectUniforms: [
         //     // {
-        //     //     name: UniformNames.Time,
+        //     //     name: UNIFORM_NAME_TIME,
         //     //     type: UNIFORM_TYPE_FLOAT,
         //     //     value: 0,
         //     // },
@@ -544,7 +549,7 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
         effectFragmentShader: fbmNoiseFragment,
         effectUniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -605,11 +610,11 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
     subscribeActorOnUpdate(checkMesh, () => {
         renderEffectTexture(renderer, effectTextureSystem);
         convertNormalMapFromHeightMap(renderer, converter);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMap, effectTextureSystem.texture);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightMapTiling, tiling);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.HeightScale, 0.8);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMap, converter.renderTarget.texture);
-        setUniformValueToAllMeshMaterials(checkMesh, UniformNames.NormalMapTiling, tiling);
+        setUniformValueToAllMeshMaterials(checkMesh, UNIFORM_NAME_HEIGHT_MAP, effectTextureSystem.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UNIFORM_NAME_HEIGHT_MAP_TILING, tiling);
+        setUniformValueToAllMeshMaterials(checkMesh, UNIFORM_NAME_HEIGHT_SCALE, 0.8);
+        setUniformValueToAllMeshMaterials(checkMesh, UNIFORM_NAME_NORMAL_MAP, converter.renderTarget.texture);
+        setUniformValueToAllMeshMaterials(checkMesh, UNIFORM_NAME_NORMAL_MAP_TILING, tiling);
     });
 };
 
@@ -1094,7 +1099,7 @@ const createTransformFeedbackDrivenMesh = () => {
         }
         `,
         uniforms: {
-            [UniformNames.Time]: {
+            [UNIFORM_NAME_TIME]: {
                 type: UNIFORM_TYPE_FLOAT,
                 value: 0,
             },
@@ -1454,7 +1459,7 @@ layout (std140) uniform ubCommon {
         // `,
         uniforms: [
             // {
-            //     name: UniformNames.Time,
+            //     name: UNIFORM_NAME_TIME,
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
@@ -1581,7 +1586,7 @@ const createGLTFSkinnedMesh = async (instanceNum: number) => {
     subscribeActorOnUpdate(particle, ({ deltaTime }) => {
         // mesh.material.uniforms.uTime.value = time;
 
-        // transformFeedbackDoubleBuffer.uniforms.setValue(UniformNames.Time, time);
+        // transformFeedbackDoubleBuffer.uniforms.setValue(UNIFORM_NAME_TIME, time);
         setUniformValue(
             transformFeedbackDoubleBuffer.uniforms,
             'uNormalizedInputPosition',
@@ -2136,7 +2141,7 @@ function createSharedTextureMesh(engine: Engine, key: SharedTexturesType) {
         getSharedTexture(engine, key).needsUpdate = true;
         setUniformValue(
             getMeshMaterial(textureMesh).uniforms,
-            UniformNames.BaseMap,
+            UNIFORM_NAME_BASE_MAP,
             getSharedTexture(engine, key).texture
         );
     });

@@ -7,7 +7,7 @@ import {
     FragmentShaderModifiers,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
+    UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2_ARRAY,
     VertexShaderModifiers,
@@ -203,7 +203,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                 ],
             },
             {
-                name: UniformNames.DepthTexture,
+                name: UNIFORM_NAME_DEPTH_TEXTURE,
                 type: UNIFORM_TYPE_TEXTURE,
                 value: null,
             },

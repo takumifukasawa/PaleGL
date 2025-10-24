@@ -5,11 +5,11 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_CAMERA,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_COLOR,
-
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_BLEND_RATE,
 } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -124,7 +124,7 @@ export function createFogPass(args: FogPassArgs) {
                 },
                 {
                     // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
-                    name: UniformNames.DepthTexture,
+                    name: UNIFORM_NAME_DEPTH_TEXTURE,
                     type: UNIFORM_TYPE_TEXTURE,
                     value: null,
                 },
@@ -194,7 +194,7 @@ export function createFogPass(args: FogPassArgs) {
                     value: null,
                 },
                 {
-                    name: UniformNames.BlendRate,
+                    name: UNIFORM_NAME_BLEND_RATE,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
@@ -243,7 +243,7 @@ export function renderFogPass(postProcessPass: PostProcessPassBase, options: Pos
     setMaterialUniformValue(fogPass.material, UNIFORM_DISTANCE_FOG_POWER, fogPass.distanceFogPower);
     setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_RATE, fogPass.sssFogRate);
     setMaterialUniformValue(fogPass.material, UNIFORM_SSS_FOG_COLOR, fogPass.sssFogColor);
-    setMaterialUniformValue(fogPass.material, UniformNames.BlendRate, fogPass.blendRate);
+    setMaterialUniformValue(fogPass.material, UNIFORM_NAME_BLEND_RATE, fogPass.blendRate);
 
     renderPostProcessSinglePassBehaviour(fogPass, options);
 }

@@ -1,6 +1,6 @@
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { POST_PROCESS_PASS_TYPE_BLOOM, POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD, POST_PROCESS_PASS_TYPE_FOG, POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, POST_PROCESS_PASS_TYPE_GLITCH, POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, POST_PROCESS_PASS_TYPE_SSAO, POST_PROCESS_PASS_TYPE_SSR, POST_PROCESS_PASS_TYPE_STREAK, POST_PROCESS_PASS_TYPE_VIGNETTE, POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT, PostProcessPassType, UniformNames } from '@/PaleGL/constants.ts';
+import { POST_PROCESS_PASS_TYPE_BLOOM, POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD, POST_PROCESS_PASS_TYPE_FOG, POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, POST_PROCESS_PASS_TYPE_GLITCH, POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, POST_PROCESS_PASS_TYPE_SSAO, POST_PROCESS_PASS_TYPE_SSR, POST_PROCESS_PASS_TYPE_STREAK, POST_PROCESS_PASS_TYPE_VIGNETTE, POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT, PostProcessPassType, UNIFORM_NAME_TARGET_WIDTH, UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_NAME_TEXEL_SIZE, UNIFORM_NAME_ASPECT, UNIFORM_NAME_SRC_TEXTURE } from '@/PaleGL/constants.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -63,17 +63,17 @@ export const setPostProcessSinglePassSizeBehaviour: SetPostProcessPassSizeBehavi
     setRenderTargetSize(renderTarget, width, height);
     // setRenderTargetSize(postProcessPass.renderTarget, width, height);
     // TODO: pass base で更新しちゃって大丈夫？
-    setMaterialUniformValue(postProcessPass.material, UniformNames.TargetWidth, postProcessPass.width);
-    setMaterialUniformValue(postProcessPass.material, UniformNames.TargetHeight, postProcessPass.height);
+    setMaterialUniformValue(postProcessPass.material, UNIFORM_NAME_TARGET_WIDTH, postProcessPass.width);
+    setMaterialUniformValue(postProcessPass.material, UNIFORM_NAME_TARGET_HEIGHT, postProcessPass.height);
     setMaterialUniformValue(
         postProcessPass.material,
-        UniformNames.TexelSize,
+        UNIFORM_NAME_TEXEL_SIZE,
         postProcessPass.width / postProcessPass.height
     );
     // TODO: いらない？
     setMaterialUniformValue(
         postProcessPass.material,
-        UniformNames.Aspect,
+        UNIFORM_NAME_ASPECT,
         postProcessPass.width / postProcessPass.height
     );
 };
@@ -188,7 +188,7 @@ export const renderPostProcessSinglePassBehaviour: RenderPostProcessPassBehaviou
     // 渡してない場合はなにもしない. src texture がいらないとみなす
     // TODO: 無理やり渡しちゃっても良い気もしなくもない
     if (prevRenderTarget) {
-        setMaterialUniformValue(pass.material, UniformNames.SrcTexture, prevRenderTarget.texture);
+        setMaterialUniformValue(pass.material, UNIFORM_NAME_SRC_TEXTURE, prevRenderTarget.texture);
     }
 
     beforeRenderPostProcessPass(postProcessPass);

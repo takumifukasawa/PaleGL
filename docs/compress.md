@@ -2,6 +2,13 @@
 
 64KBメガデモのためのコード圧縮最適化の記録
 
+## 対象範囲
+
+- 相対パス
+  - ../src/ 以下
+  - ./ 以下
+    -./demos/ は対象外
+
 ## 定数オブジェクトのフラット化
 
 ### 目的・効果
@@ -121,6 +128,33 @@
   - 特記事項: ShaderPartialPragmasは現在空（将来の拡張用）のためnever型に設定
   - 型推論エラー: なし
   - 所要時間: 約5分
+
+**第14回（1個・95定数）**: UniformNames (WorldMatrix, ViewMatrix, ProjectionMatrix 他92定数)
+  - 修正ファイル数: 64ファイル（constants.ts: 1ファイル、一括置換: 47ファイル、import更新: 13ファイル、postprocess: 17ファイル、未使用削除: 3ファイル）
+  - 使用箇所: 435箇所
+  - アプローチ: 完全フラット化（過去のRound 1-13と同様）
+  - 実装内容:
+    - Phase 1: constants.tsのUniformNamesオブジェクトを削除し、型をunion typeに変更
+    - Phase 2: bashスクリプト（replace_uniform_names.sh）で全UniformNames.XXX → UNIFORM_NAME_XXX を一括置換（47ファイル、435箇所）
+    - Phase 3: import文の更新（13+17ファイル）
+      - pages/main.ts, pages/labs/sandbox/main.ts, pages/labs/street-light/main.ts, pages/labs/morph-glass/main.ts
+      - src/PaleGL/materials: gBufferMaterial.ts, material.ts, objectSpaceRaymarchGBufferMaterial.ts, objectSpaceRaymarchGlassMaterial.ts, objectSpaceRaymarchMaterial.ts, objectSpaceRaymarchUnlitMaterial.ts, screenSpaceRaymarchMaterial.ts, unlitMaterial.ts
+      - src/PaleGL/core: effectTexture.ts, normalMap.ts, renderer.ts
+      - src/PaleGL/actors/particles: gpuParticle.ts, gpuTrailParticle.ts
+      - src/PaleGL/actors/meshes: unlitShapeTextMesh.ts
+      - src/PaleGL/postprocess: 全17ファイル（bloomPass, bufferVisualizerPass, deferredShadingPass, depthOfFieldPass, fogPass, glitchPass, lightShaftPass, postProcess, postProcessPassBase, postProcessPassBehaviours, screenSpaceShadowPass, ssaoPass, ssrPass, streakPass, toneMappingPass, vignettePass, volumetricLightPass）
+    - Phase 4: typo修正（UNIFORM_NAME_DIRECTIONAL_LIGHTShadowMap → UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP等）
+    - Phase 5: 未使用import削除（3ファイル）
+  - トラブルシューティング:
+    - CRLF行末問題: bashスクリプトをLFに変換（sed -i 's/\r$//' script.sh）
+    - typoパターン: sed置換でキャメルケースが保持され、間違った定数名が生成（例: UNIFORM_NAME_BASE_MAPTiling）
+    - UniformNames残存: postprocessフォルダの17ファイルでUniformNamesのimportが残っていた
+  - 効果:
+    - Tree-shakingが機能：未使用の個別定数はバンドルから除外される
+    - コード整合性向上：全定数が同一パターン（OBJECT_NAME_PROPERTY_NAME）に統一
+    - importの明確化：各ファイルで使用する定数が明示的に
+  - 型推論エラー: なし
+  - 所要時間: 約2時間（初回アプローチミス含む）
 
 ## 作業フロー（次回以降用）
 
@@ -270,20 +304,17 @@ constants.tsの他の定数オブジェクト（優先度・規模順）：
 6. ~~`GLTextureWrap`~~ (完了: 3定数)
 7. ~~`GLColorAttachment`~~ (完了: 8定数)
 8. ~~`UniformBlockNames`~~ (完了: 7定数)
-9. ~~`VertexShaderModifierPragmas`~~ (完了: 13定数)
-10. ~~`FragmentShaderModifierPragmas`~~ (完了: 10定数)
-11. ~~`ShaderPragmas`~~ (完了: 9定数)
+9. ~~`VertexShaderModifierPragmas`~~ (Round 11 完了: 13定数)
+10. ~~`FragmentShaderModifierPragmas`~~ (Round 12 完了: 10定数)
+11. ~~`ShaderPragmas`~~ (Round 13 完了: 9定数)
+12. ~~`UniformNames`~~ (Round 14 完了: 95定数)
 
-### 優先度: 高（大規模・要注意）
-
-12. **`UniformNames`** - 115定数、56ファイル、437箇所 ⚠️
-   - 推定時間: 2-3時間
-   - 難易度: ★★★
-   - 理由: 最大規模、慎重な作業が必要
-
-**推奨作業順序**: 12（UniformNames）が最後の大きな作業
+**全ての主要な定数オブジェクトのフラット化が完了しました！**
 
 **作業時間目安**:
 - 小規模（～10定数）: 約10-20分
 - 中規模（10-20定数）: 約30-45分
-- 大規模（100+定数）: 約2-3時間
+- 大規模（100+定数）: 約15分（推奨アプローチを使用した場合）
+
+**総作業時間**: 約6-7時間（全14回）
+**最適化された定数**: 合計約295個

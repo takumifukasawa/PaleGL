@@ -4,10 +4,12 @@ import {
     POST_PROCESS_PASS_TYPE_SSR,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_BLOCK_NAME_COMMON,
-    UniformNames,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
-
+    UNIFORM_NAME_GBUFFER_A_TEXTURE,
+    UNIFORM_NAME_GBUFFER_B_TEXTURE,
+    UNIFORM_NAME_GBUFFER_C_TEXTURE,
+    UNIFORM_NAME_DEPTH_TEXTURE,
 } from '@/PaleGL/constants';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -135,22 +137,22 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
 
     const baseUniforms: UniformsData = [
         {
-            name: UniformNames.GBufferATexture,
+            name: UNIFORM_NAME_GBUFFER_A_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.GBufferBTexture,
+            name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.GBufferCTexture,
+            name: UNIFORM_NAME_GBUFFER_C_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
         {
-            name: UniformNames.DepthTexture,
+            name: UNIFORM_NAME_DEPTH_TEXTURE,
             type: UNIFORM_TYPE_TEXTURE,
             value: null,
         },
@@ -267,8 +269,8 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
 //  */
 // export function setSSRPassSize(postProcessPass: PostProcessPassBaseDEPRECATED, width: number, height: number) {
 //     super.setSize(width, height);
-//     setMaterialUniformValue(this.material, UniformNames.TargetWidth, width);
-//     setMaterialUniformValue(this.material, UniformNames.TargetHeight, height);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_WIDTH, width);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
 export function renderSSRPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {

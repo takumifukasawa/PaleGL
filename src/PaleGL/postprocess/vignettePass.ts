@@ -1,6 +1,6 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { POST_PROCESS_PASS_TYPE_VIGNETTE, UniformNames, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants';
+import { POST_PROCESS_PASS_TYPE_VIGNETTE, UNIFORM_TYPE_FLOAT, UNIFORM_NAME_ASPECT } from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
@@ -100,7 +100,7 @@ export function createVignettePass(args: VignettePassArgs): VignettePass {
                     value: UNIFORM_VALUE_BLEND_RATE,
                 },
                 {
-                    name: UniformNames.Aspect,
+                    name: UNIFORM_NAME_ASPECT,
                     type: UNIFORM_TYPE_FLOAT,
                     value: 1,
                 },
@@ -117,7 +117,7 @@ export function createVignettePass(args: VignettePassArgs): VignettePass {
 
 // setSize(width: number, height: number) {
 //     super.setSize(width, height);
-//     setMaterialUniformValue(this.material, UniformNames.Aspect, width / height);
+//     setMaterialUniformValue(this.material, UNIFORM_NAME_ASPECT, width / height);
 // }
 
 export function renderVignettePass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
