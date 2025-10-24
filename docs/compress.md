@@ -130,25 +130,28 @@
   - 所要時間: 約5分
 
 **第14回（1個・95定数）**: UniformNames (WorldMatrix, ViewMatrix, ProjectionMatrix 他92定数)
-  - 修正ファイル数: 64ファイル（constants.ts: 1ファイル、一括置換: 47ファイル、import更新: 13ファイル、postprocess: 17ファイル、未使用削除: 3ファイル）
-  - 使用箇所: 435箇所
+  - 修正ファイル数: 65ファイル（constants.ts: 1ファイル、一括置換: 47ファイル、import更新: 13ファイル、postprocess: 17ファイル、sceneBuilder: 1ファイル、未使用削除: 3ファイル）
+  - 使用箇所: 447箇所（PaleGL配下: 435箇所、root/src: 12箇所）
   - アプローチ: 完全フラット化（過去のRound 1-13と同様）
   - 実装内容:
     - Phase 1: constants.tsのUniformNamesオブジェクトを削除し、型をunion typeに変更
     - Phase 2: bashスクリプト（replace_uniform_names.sh）で全UniformNames.XXX → UNIFORM_NAME_XXX を一括置換（47ファイル、435箇所）
-    - Phase 3: import文の更新（13+17ファイル）
-      - pages/main.ts, pages/labs/sandbox/main.ts, pages/labs/street-light/main.ts, pages/labs/morph-glass/main.ts
+    - Phase 3: import文の更新（13+17+1ファイル）
+      - pages: main.ts, labs/sandbox/main.ts, labs/street-light/main.ts, labs/morph-glass/main.ts
       - src/PaleGL/materials: gBufferMaterial.ts, material.ts, objectSpaceRaymarchGBufferMaterial.ts, objectSpaceRaymarchGlassMaterial.ts, objectSpaceRaymarchMaterial.ts, objectSpaceRaymarchUnlitMaterial.ts, screenSpaceRaymarchMaterial.ts, unlitMaterial.ts
       - src/PaleGL/core: effectTexture.ts, normalMap.ts, renderer.ts
       - src/PaleGL/actors/particles: gpuParticle.ts, gpuTrailParticle.ts
       - src/PaleGL/actors/meshes: unlitShapeTextMesh.ts
       - src/PaleGL/postprocess: 全17ファイル（bloomPass, bufferVisualizerPass, deferredShadingPass, depthOfFieldPass, fogPass, glitchPass, lightShaftPass, postProcess, postProcessPassBase, postProcessPassBehaviours, screenSpaceShadowPass, ssaoPass, ssrPass, streakPass, toneMappingPass, vignettePass, volumetricLightPass）
-    - Phase 4: typo修正（UNIFORM_NAME_DIRECTIONAL_LIGHTShadowMap → UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP等）
+      - root/src/pages/scripts: sceneBuilder.ts（12箇所：GridSize, Octaves, Amplitude, Frequency, Factor, HeightMap, HeightMapTiling, HeightScale, NormalMap, NormalMapTiling, RoughnessMap, RoughnessMapTiling）
+    - Phase 4: typo修正（UNIFORM_NAME_DIRECTIONAL_LIGHTShadowMap → UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP、UNIFORM_NAME_HEIGHT_MAPTiling → UNIFORM_NAME_HEIGHT_MAP_TILING等）
     - Phase 5: 未使用import削除（3ファイル）
+    - Phase 6: クリーンアップ（.bakファイル47個、replace_uniform_names.sh削除）
   - トラブルシューティング:
     - CRLF行末問題: bashスクリプトをLFに変換（sed -i 's/\r$//' script.sh）
     - typoパターン: sed置換でキャメルケースが保持され、間違った定数名が生成（例: UNIFORM_NAME_BASE_MAPTiling）
-    - UniformNames残存: postprocessフォルダの17ファイルでUniformNamesのimportが残っていた
+    - UniformNames残存: postprocessフォルダの17ファイル + root/src/pages/scripts/sceneBuilder.tsでUniformNamesのimportが残っていた
+    - 見落とし: root/srcディレクトリのファイルも対象であることを見落とし
   - 効果:
     - Tree-shakingが機能：未使用の個別定数はバンドルから除外される
     - コード整合性向上：全定数が同一パターン（OBJECT_NAME_PROPERTY_NAME）に統一
