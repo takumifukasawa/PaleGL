@@ -230,14 +230,9 @@ export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 's
 export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
 
 // NOTE: unity側に合わせる
-export const MarionetterAnimationClipType = {
-    Default: 0,
-    GBufferMaterial: 1,
-    // custom
-} as const;
-
-export type MarionetterAnimationClipType =
-    (typeof MarionetterAnimationClipType)[keyof typeof MarionetterAnimationClipType];
+export const MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT = 0;
+export const MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL = 1;
+export type MarionetterAnimationClipType = typeof MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT | typeof MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL;
 
 export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
     animationClipType: MarionetterAnimationClipType;
@@ -462,10 +457,6 @@ export type MarionetterDirectionalLightComponentInfo = MarionetterLightComponent
     // shorten
     l: 'Directional';
 };
-
-export const MarionetterDirectionalLightComponentInfoProperty = {
-    lightType: NeedsShorten ? 'l' : 'lightType',
-} as const;
 
 // light: spotlight
 
@@ -866,15 +857,11 @@ export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterCompo
     factor: number;
 };
 
-// fbm noise texture controller component
-
-export const MarionetterFbmNoiseTextureControllerComponentInfoProperty = {
-    gridSize: NeedsShorten ? 'gs' : 'gridSize',
-    octaves: NeedsShorten ? 'o' : 'octaves',
-    amplitude: NeedsShorten ? 'a' : 'amplitude',
-    frequency: NeedsShorten ? 'f' : 'frequency',
-    factor: NeedsShorten ? 'fa' : 'factor',
-} as const;
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_GRID_SIZE = NeedsShorten ? 'gs' : 'gridSize';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_OCTAVES = NeedsShorten ? 'o' : 'octaves';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_AMPLITUDE = NeedsShorten ? 'a' : 'amplitude';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FREQUENCY = NeedsShorten ? 'f' : 'frequency';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FACTOR = NeedsShorten ? 'fa' : 'factor';
 
 // gbuffer material controller component
 
@@ -1030,21 +1017,14 @@ export type MarionetterObjectMoveAndLookAtClip = MarionetterAnimationClipBase & 
 // timeline properties
 //
 
-export const TimelinePropertyBinderType = {
-    Float: 0,
-    Vector2: 1,
-    Vector3: 2,
-    Vector4: 3,
-    Color: 4,
-} as const;
+export const TIMELINE_PROPERTY_BINDER_TYPE_FLOAT = 0;
+export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR2 = 1;
+export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR3 = 2;
+export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR4 = 3;
+export const TIMELINE_PROPERTY_BINDER_TYPE_COLOR = 4;
+export type TimelinePropertyBinderType = typeof TIMELINE_PROPERTY_BINDER_TYPE_FLOAT | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR2 | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR3 | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR4 | typeof TIMELINE_PROPERTY_BINDER_TYPE_COLOR;
 
-export type TimelinePropertyBinderType = (typeof TimelinePropertyBinderType)[keyof typeof TimelinePropertyBinderType];
-
-export const TimelinePropertyBinderTarget = {
-    Material: 0,
-} as const;
-
-export type TimelinePropertyBinderTarget =
-    (typeof TimelinePropertyBinderTarget)[keyof typeof TimelinePropertyBinderTarget];
+export const TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL = 0;
+export type TimelinePropertyBinderTarget = typeof TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL;
 
 export type TimelinePropertyValue = number | Color;
