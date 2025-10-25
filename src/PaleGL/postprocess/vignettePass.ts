@@ -79,31 +79,11 @@ export function createVignettePass(args: VignettePassArgs): VignettePass {
             type: POST_PROCESS_PASS_TYPE_VIGNETTE,
             fragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_VIGNETTE_RADIUS_FROM,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_VIGNETTE_RADIUS_FROM,
-                },
-                {
-                    name: UNIFORM_NAME_VIGNETTE_RADIUS_TO,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_VIGNETTE_RADIUS_TO,
-                },
-                {
-                    name: UNIFORM_NAME_VIGNETTE_POWER,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_VIGNETTE_POWER,
-                },
-                {
-                    name: UNIFORM_NAME_BLEND_RATE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_BLEND_RATE,
-                },
-                {
-                    name: UNIFORM_NAME_ASPECT,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 1,
-                },
+                [UNIFORM_NAME_VIGNETTE_RADIUS_FROM, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_VIGNETTE_RADIUS_FROM],
+                [UNIFORM_NAME_VIGNETTE_RADIUS_TO, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_VIGNETTE_RADIUS_TO],
+                [UNIFORM_NAME_VIGNETTE_POWER, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_VIGNETTE_POWER],
+                [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_BLEND_RATE],
+                [UNIFORM_NAME_ASPECT, UNIFORM_TYPE_FLOAT, 1],
             ],
             enabled,
         }),

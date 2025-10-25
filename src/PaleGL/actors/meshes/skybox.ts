@@ -143,26 +143,14 @@ export function createSkybox({
         useEnvMap: true,
         faceSide: FACE_SIDE_BACK,
         uniforms: [
-            {
-                name: UNIFORM_NAME_CUBE_TEXTURE,
-                type: UNIFORM_TYPE_CUBE_MAP,
-                value: cubeMap,
-            },
+            [UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_CUBE_MAP, cubeMap],
             // {
             //     name: UNIFORM_NAME_VIEW_DIRECTION_PROJECTION_INVERSE,
             //     type: UNIFORM_TYPE_MATRIX4,
             //     value: Matrix4.identity,
             // },
-            {
-                name: UNIFORM_NAME_ROTATION_OFFSET,
-                type: UNIFORM_TYPE_FLOAT,
-                value: rotationOffset,
-            },
-            {
-                name: UNIFORM_NAME_SHADING_MODEL_ID,
-                type: UNIFORM_TYPE_INT,
-                value: SHADING_MODEL_ID_SKYBOX,
-            },
+            [UNIFORM_NAME_ROTATION_OFFSET, UNIFORM_TYPE_FLOAT, rotationOffset],
+            [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_SKYBOX],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
     });

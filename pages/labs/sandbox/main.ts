@@ -90,8 +90,11 @@ import testGPUTrailParticleUpdateFragmentShader from '@/PaleGL/shaders/gpu-trail
 // others
 import {
     ATTRIBUTE_NAME_INSTANCE_POSITION,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ATTRIBUTE_NAME_INSTANCE_SCALE,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ATTRIBUTE_NAME_INSTANCE_ROTATION,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
     ATTRIBUTE_NAME_INSTANCE_VELOCITY,
     // @ts-ignore - type-only import
@@ -115,6 +118,7 @@ import {
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
     UNIFORM_TYPE_VECTOR3,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
     VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
@@ -333,6 +337,7 @@ const createSpotLightDebugger = (debuggerGUI: DebuggerGUI, spotLight: SpotLight,
     });
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createTestGPUParticle = (gpu: Gpu) => {
     // vat gpu particle
     const vatWidth = 32;
@@ -382,6 +387,7 @@ const createTestGPUParticle = (gpu: Gpu) => {
     });
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
     // vat gpu particle
     const vatWidth = 32;
@@ -524,6 +530,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
     });
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
     const TEXTURE_SIZE = 1024;
 
@@ -553,31 +560,11 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
-            {
-                name: 'uGridSize',
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2(4.4, 4.4),
-            },
-            {
-                name: 'uOctaves',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 8,
-            },
-            {
-                name: 'uAmplitude',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0.307,
-            },
-            {
-                name: 'uFrequency',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1.357,
-            },
-            {
-                name: 'uFactor',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0.597,
-            },
+            ['uGridSize', UNIFORM_TYPE_VECTOR2, createVector2(4.4, 4.4)],
+            ['uOctaves', UNIFORM_TYPE_FLOAT, 8],
+            ['uAmplitude', UNIFORM_TYPE_FLOAT, 0.307],
+            ['uFrequency', UNIFORM_TYPE_FLOAT, 1.357],
+            ['uFactor', UNIFORM_TYPE_FLOAT, 0.597],
         ],
     });
     const converter = createNormalMapConverter(gpu, renderer, { srcTexture: effectTextureSystem.texture });
@@ -744,7 +731,7 @@ const orbitCameraController = createOrbitCameraController(captureSceneCamera);
 subscribeActorOnStart(captureSceneCamera, () => {
     setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
 });
-captureSceneCamera.onFixedUpdate = () => {
+captureSceneCamera.onFixedUpdate = [() => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -754,7 +741,7 @@ captureSceneCamera.onFixedUpdate = () => {
         setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
-};
+}];
 
 const directionalLight = createDirectionalLight({
     // intensity: 1.2,
@@ -1463,21 +1450,9 @@ layout (std140) uniform ubCommon {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
-            {
-                name: 'uNormalizedInputPosition',
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: 'uAttractTargetPosition',
-                type: UNIFORM_TYPE_VECTOR3,
-                value: createVector3Zero(),
-            },
-            {
-                name: 'uAttractRate',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            ['uNormalizedInputPosition', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            ['uAttractTargetPosition', UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+            ['uAttractRate', UNIFORM_TYPE_FLOAT, 0],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
         drawCount: instanceNum,
@@ -1712,7 +1687,7 @@ const main = async () => {
         setScaling(attractSphereMesh.transform, createVector3(0.5, 0.5, 0.5));
         // actor.transform.setTranslation(new Vector3(0, 3, 0));
     });
-    attractSphereMesh.onFixedUpdate = () => {
+    attractSphereMesh.onFixedUpdate = [() => {
         const w = 10;
         const d = 10;
         const ix = v2x(inputController.normalizedInputPosition) * 2 - 1;
@@ -1722,7 +1697,7 @@ const main = async () => {
         const y = 1;
         setTranslation(attractSphereMesh.transform, createVector3(x, y, z));
         // console.log(inputController.normalizedInputPosition.x);
-    };
+    }];
 
     //
     // lighting mesh

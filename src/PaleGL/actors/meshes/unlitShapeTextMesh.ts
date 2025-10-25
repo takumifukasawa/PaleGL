@@ -47,36 +47,15 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const actor = options.actor || createActor({ name: 'unlit-shape-text-mesh' });
 
     const baseUniforms: UniformsData = [
-        {
-            name: 'uColor',
-            type: UNIFORM_TYPE_COLOR,
-            value: color,
-        },
-        {
-            name: UNIFORM_NAME_FONT_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: shapeFontTexture,
-        },
-        {
-            name: UNIFORM_NAME_FONT_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            // value: tilingOffset,
-            value: createVector4(1, 1, 0, 0),
-        },
-        {
-            name: 'uFontAspect',
-            type: UNIFORM_TYPE_FLOAT,
-            value: shapeFontRenderer.shapeFontAtlas.aspect,
-        },
+        ['uColor', UNIFORM_TYPE_COLOR, color],
+        [UNIFORM_NAME_FONT_MAP, UNIFORM_TYPE_TEXTURE, shapeFontTexture],
+        [UNIFORM_NAME_FONT_TILING, UNIFORM_TYPE_VECTOR4, createVector4(1, 1, 0, 0)],
+        ['uFontAspect', UNIFORM_TYPE_FLOAT, shapeFontRenderer.shapeFontAtlas.aspect],
     ];
 
     const mergedUniforms: UniformsData = [
         ...baseUniforms,
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT,
-            value: SHADING_MODEL_ID_UNLIT,
-        },
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_UNLIT],
         ...(uniforms || []),
     ];
 

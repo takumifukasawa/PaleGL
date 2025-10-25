@@ -123,26 +123,10 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         gpu,
         fragmentShader: streakPrefilterFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_TEXEL_SIZE,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: 'uThreshold',
-                type: UNIFORM_TYPE_FLOAT,
-                value: threshold,
-            },
-            {
-                name: 'uVerticalScale',
-                type: UNIFORM_TYPE_FLOAT,
-                value: verticalScale,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            ['uThreshold', UNIFORM_TYPE_FLOAT, threshold],
+            ['uVerticalScale', UNIFORM_TYPE_FLOAT, verticalScale],
             ...getPostProcessCommonUniforms(),
         ],
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -155,21 +139,9 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             gpu,
             fragmentShader: streakDownSampleFragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_TEXEL_SIZE,
-                    type: UNIFORM_TYPE_VECTOR2,
-                    value: createVector2Zero(),
-                },
-                {
-                    name: UNIFORM_NAME_PREV_TEXTURE,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: UNIFORM_NAME_HORIZONTAL_SCALE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: horizontalScale,
-                },
+                [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_HORIZONTAL_SCALE, UNIFORM_TYPE_FLOAT, horizontalScale],
                 ...getPostProcessCommonUniforms(),
             ],
         });
@@ -190,21 +162,9 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
             gpu,
             fragmentShader: streakUpSampleFragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_DOWN_SAMPLE_TEXTURE,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: UNIFORM_NAME_PREV_TEXTURE,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: UNIFORM_NAME_STRETCH,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: stretch,
-                },
+                [UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_STRETCH, UNIFORM_TYPE_FLOAT, stretch],
                 ...getPostProcessCommonUniforms(),
             ],
         });
@@ -226,21 +186,9 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
         gpu,
         fragmentShader: streakCompositeFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_STREAK_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_COLOR,
-                type: UNIFORM_TYPE_COLOR,
-                value: color,
-            },
-            {
-                name: UNIFORM_NAME_INTENSITY,
-                type: UNIFORM_TYPE_FLOAT,
-                value: intensity,
-            },
+            [UNIFORM_NAME_STREAK_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_COLOR, UNIFORM_TYPE_COLOR, color],
+            [UNIFORM_NAME_INTENSITY, UNIFORM_TYPE_FLOAT, intensity],
             ...getPostProcessCommonUniforms(),
         ],
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,

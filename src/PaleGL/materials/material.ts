@@ -24,6 +24,9 @@
     UNIFORM_NAME_TIME,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_MATRIX4,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UniformTypes,
     // UniformType
     VertexShaderModifiers,
@@ -302,27 +305,10 @@ export function createMaterial(args: MaterialArgs): Material {
     // - シェーダーごとにわける？(postprocessやreceiveShadow:falseの場合はいらないuniformなどがある
     // - skinning回りもここで入れたい？
     const commonUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_INVERSE_WORLD_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-
+        [UNIFORM_NAME_INVERSE_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
         // TODO: commonを呼んでさえいればいらないはず
-        {
-            name: UNIFORM_NAME_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        ...(alphaTest !== null
-            ? ([
-                  {
-                      name: 'uAlphaTestThreshold',
-                      type: UNIFORM_TYPE_FLOAT,
-                      value: alphaTest,
-                  },
-              ] as UniformsData)
-            : []),
+        [UNIFORM_NAME_TIME, UNIFORM_TYPE_FLOAT, 0],
+        ...(alphaTest !== null ? ([['uAlphaTestThreshold', UNIFORM_TYPE_FLOAT, alphaTest]] as UniformsData) : []),
     ] as UniformsData;
 
     const uniforms = createUniforms(commonUniforms, args.uniforms || []);
@@ -482,17 +468,13 @@ export const startMaterial = (
 
 // materialのuniform値をまるっとコピーする
 export const copyUniformValues = (source: Material, destination: Material) => {
-    source.uniforms.data.forEach((srcData) => {
-        const dstData = destination.uniforms.data.find((d) => d.name === srcData.name);
-        if (dstData) {
-            dstData.value = srcData.value;
-        }
+    destination.uniforms.data = destination.uniforms.data.map((dstData) => {
+        const srcData = source.uniforms.data.find((s) => s[UNIFORM_INDEX_NAME] === dstData[UNIFORM_INDEX_NAME]);
+        return srcData ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]] : dstData;
     });
-    source.depthUniforms.data.forEach((srcData) => {
-        const dstData = destination.depthUniforms.data.find((d) => d.name === srcData.name);
-        if (dstData) {
-            dstData.value = srcData.value;
-        }
+    destination.depthUniforms.data = destination.depthUniforms.data.map((dstData) => {
+        const srcData = source.depthUniforms.data.find((s) => s[UNIFORM_INDEX_NAME] === dstData[UNIFORM_INDEX_NAME]);
+        return srcData ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]] : dstData;
     });
 };
 

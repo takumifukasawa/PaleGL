@@ -149,23 +149,11 @@ export function createPostProcessSinglePass(args: {
         rawVertexShader,
         rawFragmentShader,
         uniforms: [
-            ...[
-                {
-                    name: UNIFORM_NAME_BLEND_RATE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 1,
-                },
-            ] as UniformsData,
+            ...[[UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 1]] as UniformsData,
             ...uniforms,
             ...getPostProcessCommonUniforms(),
             ...(srcTextureEnabled
-                ? ([
-                      {
-                          name: UNIFORM_NAME_SRC_TEXTURE,
-                          type: UNIFORM_TYPE_TEXTURE,
-                          value: null,
-                      },
-                  ] as UniformsData)
+                ? ([[UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null]] as UniformsData)
                 : []),
         ] as UniformsData,
         uniformBlockNames,
@@ -213,25 +201,9 @@ export function getPostProcessBaseVertexShader() {
 
 export function getPostProcessCommonUniforms(): UniformsData {
     return [
-        {
-            name: UNIFORM_NAME_TEXEL_SIZE,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 1,
-        },
-        {
-            name: UNIFORM_NAME_TARGET_WIDTH,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 1,
-        },
-        {
-            name: UNIFORM_NAME_TARGET_HEIGHT,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 1,
-        },
-        {
-            name: UNIFORM_NAME_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
+        [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_FLOAT, 1],
+        [UNIFORM_NAME_TARGET_WIDTH, UNIFORM_TYPE_FLOAT, 1],
+        [UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_TYPE_FLOAT, 1],
+        [UNIFORM_NAME_TIME, UNIFORM_TYPE_FLOAT, 0],
     ];
 }

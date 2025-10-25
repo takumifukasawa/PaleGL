@@ -35,25 +35,13 @@ export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
                 // 1/32 = 0.03125 ... visible limit
                 // 1/16 = 0.0625 ... high quality
                 // 1/12 = 0.0833 ... upper limit
-                {
-                    name: 'uContrastThreshold',
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0.0625,
-                },
+                ['uContrastThreshold', UNIFORM_TYPE_FLOAT, 0.0625],
                 // 1/3 = 0.333 ... too little
                 // 1/4 = 0.25 ... low quality
                 // 1/8 = 0.125 ... high quality
                 // 1/16 = 0.0625 ... overkill
-                {
-                    name: 'uRelativeThreshold',
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0.125,
-                },
-                {
-                    name: 'uSubpixelBlending',
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0.75,
-                },
+                ['uRelativeThreshold', UNIFORM_TYPE_FLOAT, 0.125],
+                ['uSubpixelBlending', UNIFORM_TYPE_FLOAT, 0.75],
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],
             enabled,

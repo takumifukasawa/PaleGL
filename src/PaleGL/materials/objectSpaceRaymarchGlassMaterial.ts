@@ -70,46 +70,19 @@ export function createObjectSpaceRaymarchGlassMaterial(
     const emissiveColor = args.emissiveColor ?? createColorBlack();
     
     const commonUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
-            type: UNIFORM_TYPE_VECTOR3,
-            value: createVector3One(),
-        },
-        {
-            name: UNIFORM_NAME_DEPTH_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: baseMap,
-        },
-        {
-            name: UNIFORM_NAME_BASE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: baseColor,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            // value: Vector2.one,
-            value: baseMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_EMISSIVE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: emissiveColor,
-        },
+        [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
+        [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor],
+        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
+        // value: Vector2.one,
+        [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
         ...createObjectSpaceRaymarchUniforms(),
         ...createSkyboxUniforms(),
     ] as UniformsData;
     const shadingUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
-            value: shadingModelId,
-        },
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, shadingModelId],
+        // float,intどちらでもいい
     ];
 
     const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];

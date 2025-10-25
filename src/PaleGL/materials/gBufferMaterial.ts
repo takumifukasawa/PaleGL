@@ -96,100 +96,29 @@ export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMateria
     const shadingModelId: ShadingModelIds = args.shadingModelId || SHADING_MODEL_ID_LIT;
 
     const commonUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_BASE_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: baseMap || null,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: baseMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_HEIGHT_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: heightMap,
-        },
-        {
-            name: UNIFORM_NAME_HEIGHT_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: heightMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_HEIGHT_SCALE,
-            type: UNIFORM_TYPE_FLOAT,
-            value: heightScale,
-        },
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
+        [UNIFORM_NAME_HEIGHT_MAP, UNIFORM_TYPE_TEXTURE, heightMap],
+        [UNIFORM_NAME_HEIGHT_MAP_TILING, UNIFORM_TYPE_VECTOR4, heightMapTiling],
+        [UNIFORM_NAME_HEIGHT_SCALE, UNIFORM_TYPE_FLOAT, heightScale],
     ];
 
     const gbufferUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_BASE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: baseColor || createColorWhite(),
-        },
+        [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
 
-        {
-            name: UNIFORM_NAME_METALLIC,
-            type: UNIFORM_TYPE_FLOAT,
-            value: metallic,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: metallicMap,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: metallicMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_ROUGHNESS,
-            type: UNIFORM_TYPE_FLOAT,
-            value: roughness,
-        },
-        {
-            name: UNIFORM_NAME_ROUGHNESS_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: roughnessMap,
-        },
-        {
-            name: UNIFORM_NAME_ROUGHNESS_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: roughnessMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: metallicMap,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: metallicMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_NORMAL_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: normalMap,
-        },
-        {
-            name: UNIFORM_NAME_NORMAL_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: normalMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_EMISSIVE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: emissiveColor,
-        },
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
-            value: shadingModelId,
-        },
+        [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, metallic],
+        [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
+        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
+        [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, roughness],
+        [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, roughnessMap],
+        [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, roughnessMapTiling],
+        [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
+        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
+        [UNIFORM_NAME_NORMAL_MAP, UNIFORM_TYPE_TEXTURE, normalMap],
+        [UNIFORM_NAME_NORMAL_MAP_TILING, UNIFORM_TYPE_VECTOR4, normalMapTiling],
+        [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, shadingModelId],
+        // float,intどちらでもいい
     ];
 
     const mergedUniforms: UniformsData = [...commonUniforms, ...gbufferUniforms, ...uniforms];

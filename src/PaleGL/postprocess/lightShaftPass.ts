@@ -93,11 +93,7 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         // renderTargetType: RENDER_TARGET_TYPE_R16F,
         uniforms: [
-            {
-                name: UNIFORM_NAME_DEPTH_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
             ...getPostProcessCommonUniforms(),
         ],
         // uniforms: {}
@@ -118,26 +114,10 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         fragmentShader: lightShaftRadialBlurFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            {
-                name: radialBlurPassIndexUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
-            {
-                name: radialBlurOriginUniformName,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: radialBlurPassScaleBaseUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: passScaleBase,
-            },
-            {
-                name: radialBlurRayStepStrengthUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: rayStepStrength,
-            },
+            [radialBlurPassIndexUniformName, UNIFORM_TYPE_FLOAT, 0],
+            [radialBlurOriginUniformName, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            [radialBlurPassScaleBaseUniformName, UNIFORM_TYPE_FLOAT, passScaleBase],
+            [radialBlurRayStepStrengthUniformName, UNIFORM_TYPE_FLOAT, rayStepStrength],
         ],
     });
 
@@ -149,26 +129,10 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         fragmentShader: lightShaftRadialBlurFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            {
-                name: radialBlurPassIndexUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
-            {
-                name: radialBlurOriginUniformName,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: radialBlurPassScaleBaseUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: passScaleBase,
-            },
-            {
-                name: radialBlurRayStepStrengthUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: rayStepStrength,
-            },
+            [radialBlurPassIndexUniformName, UNIFORM_TYPE_FLOAT, 1],
+            [radialBlurOriginUniformName, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            [radialBlurPassScaleBaseUniformName, UNIFORM_TYPE_FLOAT, passScaleBase],
+            [radialBlurRayStepStrengthUniformName, UNIFORM_TYPE_FLOAT, rayStepStrength],
         ],
     });
 
@@ -180,26 +144,10 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         fragmentShader: lightShaftRadialBlurFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            {
-                name: radialBlurPassIndexUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 2,
-            },
-            {
-                name: radialBlurOriginUniformName,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: radialBlurPassScaleBaseUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: passScaleBase,
-            },
-            {
-                name: radialBlurRayStepStrengthUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: rayStepStrength,
-            },
+            [radialBlurPassIndexUniformName, UNIFORM_TYPE_FLOAT, 2],
+            [radialBlurOriginUniformName, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            [radialBlurPassScaleBaseUniformName, UNIFORM_TYPE_FLOAT, passScaleBase],
+            [radialBlurRayStepStrengthUniformName, UNIFORM_TYPE_FLOAT, rayStepStrength],
         ],
     });
 
@@ -215,16 +163,8 @@ export function createLightShaftPass(args: LightShaftPassParametersArgs): LightS
         fragmentShader: lightShaftCompositeFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            {
-                name: 'uLightShaftTexture',
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLEND_RATE,
-                type: UNIFORM_TYPE_FLOAT,
-                value: blendRate,
-            },
+            ['uLightShaftTexture', UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, blendRate],
         ],
     });
 

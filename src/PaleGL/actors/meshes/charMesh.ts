@@ -76,30 +76,13 @@ export function createCharMesh({
     const sy = charInfo.y / h;
 
     const bUniforms: UniformsData = [
-        {
-            name: 'uColor',
-            type: UNIFORM_TYPE_COLOR,
-            value: color,
-        },
-        {
-            name: UNIFORM_NAME_FONT_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: fontTexture,
-        },
-        {
-            name: UNIFORM_NAME_FONT_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            // value: Vector4.one
-            value: createVector4(sw, sh, sx, sy), // TODO: dummy
-        },
+        ['uColor', UNIFORM_TYPE_COLOR, color],
+        [UNIFORM_NAME_FONT_MAP, UNIFORM_TYPE_TEXTURE, fontTexture],
+        [UNIFORM_NAME_FONT_TILING, UNIFORM_TYPE_VECTOR4, createVector4(sw, sh, sx, sy)],
     ];
 
     const mergedUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT,
-            value: SHADING_MODEL_ID_UNLIT,
-        },
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_UNLIT],
         ...bUniforms,
         ...uniforms,
     ];

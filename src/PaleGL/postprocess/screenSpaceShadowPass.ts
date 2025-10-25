@@ -84,41 +84,13 @@ export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
             type: POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW,
             fragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: UNIFORM_NAME_DEPTH_TEXTURE,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: UNIFORM_BIAS_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_JITTER_SIZE_NAME,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: createVector3Zero(),
-                },
-                {
-                    name: UNIFORM_SHARPNESS_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_STRENGTH_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_RAY_STEP_MULTIPLIER_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
+                [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_BIAS_NAME, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_JITTER_SIZE_NAME, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                [UNIFORM_SHARPNESS_NAME, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_STRENGTH_NAME, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_RAY_STEP_MULTIPLIER_NAME, UNIFORM_TYPE_FLOAT, 0],
             ],
             uniformBlockNames: [
                 UNIFORM_BLOCK_NAME_COMMON,

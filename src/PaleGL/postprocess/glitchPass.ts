@@ -64,16 +64,8 @@ export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
             type: POST_PROCESS_PASS_TYPE_GLITCH,
             fragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_BLEND_RATE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: blendRate,
-                },
-                {
-                    name: UNIFORM_NAME_ASPECT,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 1,
-                },
+                [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, blendRate],
+                [UNIFORM_NAME_ASPECT, UNIFORM_TYPE_FLOAT, 1],
             ],
             uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
             enabled,

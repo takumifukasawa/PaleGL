@@ -70,16 +70,8 @@ export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs)
             type: POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION,
             fragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE,
-                },
-                {
-                    name: UNIFORM_NAME_CHROMATIC_ABERRATION_POWER,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER,
-                },
+                [UNIFORM_NAME_CHROMATIC_ABERRATION_SCALE, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE],
+                [UNIFORM_NAME_CHROMATIC_ABERRATION_POWER, UNIFORM_TYPE_FLOAT, UNIFORM_VALUE_CHROMATIC_ABERRATION_POWER],
             ],
             enabled,
         }),

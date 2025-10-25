@@ -11,6 +11,9 @@ import {
     UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_STRUCT,
     UNIFORM_TYPE_STRUCT_ARRAY,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UniformTypes,
 } from '@/PaleGL/constants.ts';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
@@ -164,16 +167,16 @@ export const updateUniformBufferValue = (
         // TODO: update struct
         case UNIFORM_TYPE_STRUCT:
             (value as unknown as UniformBufferObjectStructValue).forEach((v) => {
-                const structElementName = `${uniformName}.${v.name}`;
-                const data: number[] = getStructElementValue(v.type, v.value);
+                const structElementName = `${uniformName}.${v[UNIFORM_INDEX_NAME]}`;
+                const data: number[] = getStructElementValue(v[UNIFORM_INDEX_TYPE], v[UNIFORM_INDEX_VALUE]);
                 updateUniformBufferData(ubo, structElementName, new Float32Array(data));
             });
             break;
         case UNIFORM_TYPE_STRUCT_ARRAY:
             (value as UniformBufferObjectStructArrayValue).forEach((v, i) => {
                 v.forEach((vv) => {
-                    const structElementName = `${uniformName}[${i}].${vv.name}`;
-                    const data: number[] = getStructElementValue(vv.type, vv.value);
+                    const structElementName = `${uniformName}[${i}].${vv[UNIFORM_INDEX_NAME]}`;
+                    const data: number[] = getStructElementValue(vv[UNIFORM_INDEX_TYPE], vv[UNIFORM_INDEX_VALUE]);
                     updateUniformBufferData(ubo, structElementName, new Float32Array(data));
                 });
             });

@@ -186,27 +186,15 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         vertexShader,
         fragmentShader,
         uniforms: [
-            {
-                name: 'uParticleMap',
-                type: UNIFORM_TYPE_TEXTURE,
-                value: particleMap,
-            },
-            {
-                name: 'uBillboardPositionConverters',
-                type: UNIFORM_TYPE_VECTOR2_ARRAY,
-                value: [
-                    // prettier-ignore
-                    createVector2(-1, 1),
-                    createVector2(-1, -1),
-                    createVector2(1, 1),
-                    createVector2(1, -1),
-                ],
-            },
-            {
-                name: UNIFORM_NAME_DEPTH_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
+            ['uParticleMap', UNIFORM_TYPE_TEXTURE, particleMap],
+            ['uBillboardPositionConverters', UNIFORM_TYPE_VECTOR2_ARRAY, [
+                // prettier-ignore
+                createVector2(-1, 1),
+                createVector2(-1, -1),
+                createVector2(1, 1),
+                createVector2(1, -1),
+            ]],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
         // blendType: BlendTypes.Additive

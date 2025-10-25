@@ -378,7 +378,7 @@ orbitCameraController.lookAtTarget = createVector3(0, 3, 0);
 subscribeActorOnStart(captureSceneCamera, () => {
     setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
 });
-captureSceneCamera.onFixedUpdate = () => {
+captureSceneCamera.onFixedUpdate = [() => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -388,7 +388,7 @@ captureSceneCamera.onFixedUpdate = () => {
         setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
-};
+}];
 
 const directionalLight = createDirectionalLight({
     intensity: 0.1,
@@ -657,21 +657,9 @@ layout (std140) uniform ubCommon {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 0,
             // },
-            {
-                name: 'uNormalizedInputPosition',
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: 'uAttractTargetPosition',
-                type: UNIFORM_TYPE_VECTOR3,
-                value: createVector3Zero(),
-            },
-            {
-                name: 'uAttractRate',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            ['uNormalizedInputPosition', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            ['uAttractTargetPosition', UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+            ['uAttractRate', UNIFORM_TYPE_FLOAT, 0],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
         drawCount: instanceNum,
@@ -1027,7 +1015,7 @@ emissiveColor *= d;
     subscribeActorOnStart(attractSphereMesh, () => {
         setScaling(attractSphereMesh.transform, createFillVector3(0.5));
     });
-    attractSphereMesh.onFixedUpdate = () => {
+    attractSphereMesh.onFixedUpdate = [() => {
         const ray = viewpointToRay(
             captureSceneCamera,
             createVector2(
@@ -1044,7 +1032,7 @@ emissiveColor *= d;
             const p = createVector3(x, posY, z);
             setTranslation(attractSphereMesh.transform, p);
         }
-    };
+    }];
 
     //
     // instancing mesh
@@ -1257,21 +1245,9 @@ void main() {
 }
         `,
         uniforms: [
-            {
-                name: 'uParticleMap',
-                type: UNIFORM_TYPE_TEXTURE,
-                value: particleMap,
-            },
-            {
-                name: 'uBillboardPositionConverters',
-                type: UNIFORM_TYPE_VECTOR2_ARRAY,
-                value: [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)],
-            },
-            {
-                name: UNIFORM_NAME_DEPTH_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
+            ['uParticleMap', UNIFORM_TYPE_TEXTURE, particleMap],
+            ['uBillboardPositionConverters', UNIFORM_TYPE_VECTOR2_ARRAY, [createVector2(-1, 1), createVector2(-1, -1), createVector2(1, 1), createVector2(1, -1)]],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
         ],
         blendType: BLEND_TYPE_TRANSPARENT,
         depthWrite: false,

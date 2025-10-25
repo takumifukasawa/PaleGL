@@ -114,16 +114,8 @@ export function loadGLSLSound(
         ],
         vertexShader: glslSound.vertexShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_BLOCK_OFFSET,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
-            {
-                name: UNIFORM_NAME_SAMPLE_RATE,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            [UNIFORM_NAME_BLOCK_OFFSET, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SAMPLE_RATE, UNIFORM_TYPE_FLOAT, 0],
         ],
         // fragmentShader: transformFeedbackFragmentShader,
         drawCount: SAMPLES,

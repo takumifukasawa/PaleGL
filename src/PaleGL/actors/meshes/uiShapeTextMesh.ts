@@ -71,46 +71,18 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const actor = options.actor || createUIActor({ name: 'ui-shape-text-mesh' });
 
     const baseUniforms: UniformsData = [
-        {
-            name: 'uColor',
-            type: UNIFORM_TYPE_COLOR,
-            value: color,
-        },
-        {
-            name: UNIFORM_NAME_FONT_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: shapeFontTexture,
-        },
-        {
-            name: UNIFORM_NAME_FONT_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            // value: tilingOffset,
-            value: createVector4(1, 1, 0, 0),
-        },
-        {
-            name: 'uFontAspect',
-            type: UNIFORM_TYPE_FLOAT,
-            value: shapeFontRenderer.shapeFontAtlas.aspect,
-        },
+        ['uColor', UNIFORM_TYPE_COLOR, color],
+        [UNIFORM_NAME_FONT_MAP, UNIFORM_TYPE_TEXTURE, shapeFontTexture],
+        [UNIFORM_NAME_FONT_TILING, UNIFORM_TYPE_VECTOR4, createVector4(1, 1, 0, 0)],
+        // value: tilingOffset,
+        ['uFontAspect', UNIFORM_TYPE_FLOAT, shapeFontRenderer.shapeFontAtlas.aspect],
     ];
-    
+
     const mergedUniforms: UniformsData = [
         ...baseUniforms,
-        {
-            name: UNIFORM_NAME_UI_CHAR_RECT,
-            type: UNIFORM_TYPE_VECTOR2,
-            value: createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect), // w: 1 を基準とする
-        },
-        {
-            name: UNIFORM_NAME_UI_ANCHOR,
-            type: UNIFORM_TYPE_VECTOR2,
-            value: createVector2(0, 0),
-        },
-        {
-            name: UNIFORM_NAME_UI_FONT_SIZE,
-            type: UNIFORM_TYPE_FLOAT,
-            value: fontSize,
-        },
+        [UNIFORM_NAME_UI_CHAR_RECT, UNIFORM_TYPE_VECTOR2, createVector2(1, 1 / shapeFontRenderer.shapeFontAtlas.aspect)], // w: 1 を基準とする
+        [UNIFORM_NAME_UI_ANCHOR, UNIFORM_TYPE_VECTOR2, createVector2(0, 0)],
+        [UNIFORM_NAME_UI_FONT_SIZE, UNIFORM_TYPE_FLOAT, fontSize],
         ...(uniforms || []),
     ];
 

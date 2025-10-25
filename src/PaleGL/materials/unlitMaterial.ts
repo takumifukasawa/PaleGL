@@ -49,46 +49,18 @@ export function createUnlitMaterial(args: UnlitMaterialArgs = {}): UnlitMaterial
     } = args;
 
     const baseUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_BASE_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: baseMap || null,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: baseMapTiling || createVector4(1, 1, 0, 0),
-        },
-        {
-            name: UNIFORM_NAME_BASE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: baseColor || createColorWhite(),
-        },
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT,
-            value: SHADING_MODEL_ID_UNLIT,
-        },
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
+        [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_UNLIT],
     ];
 
     const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
     const depthUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_BASE_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: baseMap || null,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: baseMapTiling || createVector4(1, 1, 0, 0),
-        },
-        {
-            name: UNIFORM_NAME_BASE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: baseColor || createColorWhite(),
-        },
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
+        [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         ...uniforms,
     ];
 

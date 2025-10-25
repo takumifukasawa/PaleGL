@@ -83,6 +83,9 @@
     UNIFORM_TYPE_CUBE_MAP,
     UNIFORM_TYPE_STRUCT,
     UNIFORM_TYPE_STRUCT_ARRAY,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UniformTypes,
 } from '@/PaleGL/constants';
 import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
@@ -437,22 +440,22 @@ export function setGPUUniformValues(gpu: Gpu) {
     // uniforms
     if (gpu.uniforms) {
         gpu.uniforms.data.forEach((uniformData) => {
-            if (uniformData.type === UNIFORM_TYPE_STRUCT) {
-                const uniformStructValue = uniformData.value as UniformStructValue;
+            if (uniformData[UNIFORM_INDEX_TYPE] === UNIFORM_TYPE_STRUCT) {
+                const uniformStructValue = uniformData[UNIFORM_INDEX_VALUE] as UniformStructValue;
                 uniformStructValue.forEach((structData) => {
-                    const uniformName = `${uniformData.name}.${structData.name}`;
-                    setUniformValueInternal(structData.type, uniformName, structData.value);
+                    const uniformName = `${uniformData[UNIFORM_INDEX_NAME]}.${structData[UNIFORM_INDEX_NAME]}`;
+                    setUniformValueInternal(structData[UNIFORM_INDEX_TYPE], uniformName, structData[UNIFORM_INDEX_VALUE]);
                 });
-            } else if (uniformData.type === UNIFORM_TYPE_STRUCT_ARRAY) {
-                (uniformData.value as UniformStructArrayValue).forEach((uniformStructValue, i) => {
+            } else if (uniformData[UNIFORM_INDEX_TYPE] === UNIFORM_TYPE_STRUCT_ARRAY) {
+                (uniformData[UNIFORM_INDEX_VALUE] as UniformStructArrayValue).forEach((uniformStructValue, i) => {
                     uniformStructValue.forEach((structData) => {
-                        const uniformName = `${uniformData.name}[${i}].${structData.name}`;
-                        // console.log(structData.type, uniformName, structData.value)
-                        setUniformValueInternal(structData.type, uniformName, structData.value);
+                        const uniformName = `${uniformData[UNIFORM_INDEX_NAME]}[${i}].${structData[UNIFORM_INDEX_NAME]}`;
+                        // console.log(structData[UNIFORM_INDEX_TYPE], uniformName, structData[UNIFORM_INDEX_VALUE])
+                        setUniformValueInternal(structData[UNIFORM_INDEX_TYPE], uniformName, structData[UNIFORM_INDEX_VALUE]);
                     });
                 });
             } else {
-                setUniformValueInternal(uniformData.type, uniformData.name, uniformData.value);
+                setUniformValueInternal(uniformData[UNIFORM_INDEX_TYPE], uniformData[UNIFORM_INDEX_NAME], uniformData[UNIFORM_INDEX_VALUE]);
             }
         });
     }
@@ -663,21 +666,21 @@ export function createGPUUniformBufferObject(
     // const variableNames: string[] = uniformBufferObjectBlockData.map((data) => data.name);
     const variableNames: string[] = [];
     uniformBufferObjectBlockData.forEach((data) => {
-        switch (data.type) {
+        switch (data[UNIFORM_INDEX_TYPE]) {
             case UNIFORM_TYPE_STRUCT:
-                (data.value as UniformStructValue).forEach((structElement) => {
-                    variableNames.push(`${data.name}.${structElement.name}`);
+                (data[UNIFORM_INDEX_VALUE] as UniformStructValue).forEach((structElement) => {
+                    variableNames.push(`${data[UNIFORM_INDEX_NAME]}.${structElement[UNIFORM_INDEX_NAME]}`);
                 });
                 break;
             case UNIFORM_TYPE_STRUCT_ARRAY:
-                (data.value as UniformStructArrayValue).forEach((structValue, i) => {
+                (data[UNIFORM_INDEX_VALUE] as UniformStructArrayValue).forEach((structValue, i) => {
                     structValue.forEach((structElement) => {
-                        variableNames.push(`${data.name}[${i}].${structElement.name}`);
+                        variableNames.push(`${data[UNIFORM_INDEX_NAME]}[${i}].${structElement[UNIFORM_INDEX_NAME]}`);
                     });
                 });
                 break;
             default:
-                variableNames.push(data.name);
+                variableNames.push(data[UNIFORM_INDEX_NAME]);
                 break;
         }
     });

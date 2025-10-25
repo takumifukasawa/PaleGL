@@ -104,31 +104,11 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         gpu,
         fragmentShader: dofCircleOfConfusionFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_DEPTH_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: 'uFocusDistance',
-                type: UNIFORM_TYPE_FLOAT,
-                value: focusDistance,
-            },
-            {
-                name: 'uFocusRange',
-                type: UNIFORM_TYPE_FLOAT,
-                value: focusRange,
-            },
-            {
-                name: 'uBokehRadius',
-                type: UNIFORM_TYPE_FLOAT,
-                value: bokehRadius,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            ['uFocusDistance', UNIFORM_TYPE_FLOAT, focusDistance],
+            ['uFocusRange', UNIFORM_TYPE_FLOAT, focusRange],
+            ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
             // {
             //     name: 'uCocParams',
             //     type: UNIFORM_TYPE_VECTOR4,
@@ -173,16 +153,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: this.focusRange,
             // }
-            {
-                name: UNIFORM_NAME_COC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_TEXEL_SIZE,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
+            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
             ...getPostProcessCommonUniforms(),
         ],
         // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
@@ -209,16 +181,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 1,
             // },
-            {
-                name: 'uTexelSize',
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: 'uBokehRadius',
-                type: UNIFORM_TYPE_FLOAT,
-                value: bokehRadius,
-            },
+            ['uTexelSize', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
         ],
     });
     materials.push(...dofBokehPass.materials);
@@ -233,16 +197,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         uniforms: [
-            {
-                name: 'uTexelSize',
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2Zero(),
-            },
-            {
-                name: 'uBokehRadius',
-                type: UNIFORM_TYPE_FLOAT,
-                value: bokehRadius,
-            },
+            ['uTexelSize', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
         ],
     });
     materials.push(...bokehBlurPass.materials);
@@ -256,16 +212,8 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         fragmentShader: dofCompositeFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            {
-                name: UNIFORM_NAME_COC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_DOF_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
+            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_DOF_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
         ],
     });
 

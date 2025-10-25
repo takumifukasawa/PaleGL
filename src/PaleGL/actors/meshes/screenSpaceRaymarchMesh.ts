@@ -45,11 +45,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
     const { gpu, name = '', uniforms = [], materialArgs } = args;
 
     const mergedUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_VIEW_DIRECTION,
-            type: UNIFORM_TYPE_VECTOR3,
-            value: createVector3Zero(),
-        },
+        [UNIFORM_NAME_VIEW_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
         ...uniforms,
         ...getPostProcessCommonUniforms(),
     ];

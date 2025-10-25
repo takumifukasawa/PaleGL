@@ -44,26 +44,10 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE
         // }),
         uniforms: [
-            {
-                name: 'uTargetWidth',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
-            {
-                name: 'uTargetHeight',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
-            {
-                name: 'uBlurWeights',
-                type: UNIFORM_TYPE_FLOAT_ARRAY,
-                value: new Float32Array(blurWeights),
-            },
-            {
-                name: 'uIsHorizontal',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
+            ['uTargetWidth', UNIFORM_TYPE_FLOAT, 1],
+            ['uTargetHeight', UNIFORM_TYPE_FLOAT, 1],
+            ['uBlurWeights', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
+            ['uIsHorizontal', UNIFORM_TYPE_FLOAT, 1],
         ],
     });
     passes.push(horizontalBlurPass);
@@ -79,26 +63,10 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE,
         // }),
         uniforms: [
-            {
-                name: 'uTargetWidth',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
-            {
-                name: 'uTargetHeight',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
-            {
-                name: 'uBlurWeights',
-                type: UNIFORM_TYPE_FLOAT_ARRAY,
-                value: new Float32Array(blurWeights),
-            },
-            {
-                name: 'uIsHorizontal',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            ['uTargetWidth', UNIFORM_TYPE_FLOAT, 1],
+            ['uTargetHeight', UNIFORM_TYPE_FLOAT, 1],
+            ['uBlurWeights', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
+            ['uIsHorizontal', UNIFORM_TYPE_FLOAT, 0],
         ],
     });
     passes.push(verticalBlurPass);

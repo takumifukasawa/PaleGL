@@ -296,21 +296,9 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     const createUniforms = (): UniformsData => [
-        {
-            name: UNIFORM_NAME_VELOCITY_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_POSITION_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_UP_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
+        [UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
     ];
 
     const materialForInitialize = createGraphicsDoubleBufferMaterial(

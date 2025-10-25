@@ -5,21 +5,23 @@ import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Color } from '@/PaleGL/math/color.ts';
-import { UNIFORM_TYPE_STRUCT, UNIFORM_TYPE_STRUCT_ARRAY, UniformTypes } from '@/PaleGL/constants.ts';
+import {
+    UNIFORM_TYPE_STRUCT,
+    UNIFORM_TYPE_STRUCT_ARRAY,
+    UNIFORM_INDEX_VALUE,
+    UniformTypes
+} from '@/PaleGL/constants.ts';
 import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
 
 //
 // uniform values
 //
 
-type UniformTypeValuePair = {
-    type: UniformTypes;
-    value: UniformValue;
-};
-
-type UniformData = {
-    name: string;
-} & UniformTypeValuePair;
+type UniformData = [
+    name: string,
+    type: UniformTypes,
+    value: UniformValue
+];
 
 export type UniformStructValue = UniformData[];
 
@@ -56,14 +58,11 @@ export type UniformsData = UniformData[];
 // uniform buffer object values
 //
 
-type UniformBufferObjectTypeValuePair = {
-    type: UniformTypes;
-    value: UniformBufferObjectValue;
-};
-
-type UniformBufferObjectData = {
-    name: string;
-} & UniformBufferObjectTypeValuePair;
+type UniformBufferObjectData = [
+    name: string,
+    type: UniformTypes,
+    value: UniformBufferObjectValue
+];
 
 export type UniformBufferObjectStructValue = UniformBufferObjectData[];
 
@@ -109,12 +108,12 @@ export function createUniforms(...dataArray: UniformsData[]): Uniforms {
 
     for (let i = 0; i < dataArray.length; i++) {
         for (let j = 0; j < dataArray[i].length; j++) {
-            const elem = dataArray[i][j];
-            const elemIndex = data.findIndex((d) => d.name === elem.name);
+            const [elemName, , elemValue] = dataArray[i][j];
+            const elemIndex = data.findIndex(([name]) => name === elemName);
             if (elemIndex < 0) {
-                data.push(elem);
+                data.push(dataArray[i][j]);
             } else {
-                data[elemIndex].value = elem.value;
+                data[elemIndex][UNIFORM_INDEX_VALUE] = elemValue;
             }
         }
     }
@@ -133,21 +132,17 @@ export function createUniforms(...dataArray: UniformsData[]): Uniforms {
 }
 
 export const findUniformByName = (uniforms: Uniforms, name: string) => {
-    return uniforms.data.find((d) => d.name === name);
+    return uniforms.data.find(([uniformName]) => uniformName === name);
 };
 
 // 新しい要素を追加
 export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value: UniformValue) => {
-    uniforms.data.push({
-        name,
-        type,
-        value,
-    });
+    uniforms.data.push([name, type, value]);
 };
 
 export const addUniformData = (uniforms: Uniforms, uniformsData: UniformsData) => {
     for (let i = 0; i < uniformsData.length; i++) {
-        const { name, type, value } = uniformsData[i];
+        const [name, type, value] = uniformsData[i];
         addUniformValue(uniforms, name, type, value);
     }
 };
@@ -165,26 +160,29 @@ export const setUniformValue = (uniforms: Uniforms, name: string, newValue: Unif
     // | UniformStructValue
     // | UniformStructArrayValue
     if (data) {
-        if (data.type === UNIFORM_TYPE_STRUCT) {
-            (newValue as UniformStructValue).forEach((elem) => {
-                const index = (data.value as UniformStructValue).findIndex((needle) => needle.name === elem.name);
+        const [, type] = data;
+        if (type === UNIFORM_TYPE_STRUCT) {
+            (newValue as UniformStructValue).forEach(([elemName, , elemValue]) => {
+                const structValue = data[UNIFORM_INDEX_VALUE] as UniformStructValue;
+                const index = structValue.findIndex(([needleName]) => needleName === elemName);
                 if (index >= 0) {
-                    (data.value as UniformStructValue)[index].value = elem.value;
+                    structValue[index][UNIFORM_INDEX_VALUE] = elemValue;
                 }
             });
-        } else if (data.type === UNIFORM_TYPE_STRUCT_ARRAY) {
+        } else if (type === UNIFORM_TYPE_STRUCT_ARRAY) {
             (newValue as UniformStructArrayValue).forEach((newStructValue, structArrayIndex) => {
-                newStructValue.forEach((elem) => {
-                    const index = (data.value as UniformStructArrayValue)[structArrayIndex].findIndex(
-                        (needle) => needle.name === elem.name
+                const structArrayValue = data[UNIFORM_INDEX_VALUE] as UniformStructArrayValue;
+                newStructValue.forEach(([elemName, , elemValue]) => {
+                    const index = structArrayValue[structArrayIndex].findIndex(
+                        ([needleName]) => needleName === elemName
                     );
                     if (index >= 0) {
-                        (data.value as UniformStructArrayValue)[structArrayIndex][index].value = elem.value;
+                        structArrayValue[structArrayIndex][index][UNIFORM_INDEX_VALUE] = elemValue;
                     }
                 });
             });
         } else {
-            data.value = newValue;
+            data[UNIFORM_INDEX_VALUE] = newValue;
         }
     }
 };

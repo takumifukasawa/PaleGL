@@ -148,11 +148,7 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         gpu,
         fragmentShader: extractBrightnessFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_THRESHOLD,
-                type: UNIFORM_TYPE_FLOAT,
-                value: threshold,
-            },
+            [UNIFORM_NAME_THRESHOLD, UNIFORM_TYPE_FLOAT, threshold],
         ],
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
     });
@@ -164,21 +160,9 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: gaussianBlurFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_WEIGHTS,
-                type: UNIFORM_TYPE_FLOAT_ARRAY,
-                value: new Float32Array(blurWeights),
-            },
-            {
-                name: UNIFORM_NAME_IS_HORIZONTAL,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_WEIGHTS, UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
+            [UNIFORM_NAME_IS_HORIZONTAL, UNIFORM_TYPE_FLOAT, 1],
             ...getPostProcessCommonUniforms(),
         ],
     });
@@ -188,21 +172,9 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: gaussianBlurFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_WEIGHTS,
-                type: UNIFORM_TYPE_FLOAT_ARRAY,
-                value: new Float32Array(blurWeights),
-            },
-            {
-                name: UNIFORM_NAME_IS_HORIZONTAL,
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_WEIGHTS, UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
+            [UNIFORM_NAME_IS_HORIZONTAL, UNIFORM_TYPE_FLOAT, 0],
             ...getPostProcessCommonUniforms(),
         ],
     });
@@ -212,51 +184,15 @@ export function createBloomPass(args: BloomPassArgs): BloomPass {
         gpu,
         fragmentShader: bloomCompositeFragmentShader,
         uniforms: [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_4_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_8_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_16_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_32_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_BLUR_64_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: UNIFORM_NAME_TONE,
-                type: UNIFORM_TYPE_FLOAT,
-                value: tone,
-            },
-            {
-                name: UNIFORM_NAME_BLOOM_AMOUNT,
-                type: UNIFORM_TYPE_FLOAT,
-                value: bloomAmount,
-            },
-            {
-                name: UNIFORM_NAME_EXTRACT_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_4_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_8_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_16_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_32_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_BLUR_64_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_TONE, UNIFORM_TYPE_FLOAT, tone],
+            [UNIFORM_NAME_BLOOM_AMOUNT, UNIFORM_TYPE_FLOAT, bloomAmount],
+            [UNIFORM_NAME_EXTRACT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
             ...getPostProcessCommonUniforms(),
         ],
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,

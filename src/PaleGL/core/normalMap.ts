@@ -56,26 +56,10 @@ export const createNormalMapConverter: (
             vertexShader,
             fragmentShader,
             uniforms: [
-                {
-                    name: uniformNameSrcMap,
-                    type: UNIFORM_TYPE_TEXTURE,
-                    value: null,
-                },
-                {
-                    name: 'uParallaxScale',
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0.001,
-                },
-                {
-                    name: 'uNormalScale',
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 1.0,
-                },
-                {
-                    name: UNIFORM_NAME_TEXEL_SIZE,
-                    type: UNIFORM_TYPE_VECTOR2,
-                    value: createVector2(1, 1),
-                },
+                [uniformNameSrcMap, UNIFORM_TYPE_TEXTURE, null],
+                ['uParallaxScale', UNIFORM_TYPE_FLOAT, 0.001],
+                ['uNormalScale', UNIFORM_TYPE_FLOAT, 1.0],
+                [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2(1, 1)],
             ],
         });
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, convertNormalMapFromHeightMapMaterial);

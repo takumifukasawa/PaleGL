@@ -423,28 +423,12 @@ const generateSkinningUniforms = (skinnedMesh: SkinnedMesh): UniformsData => {
         //     type: UNIFORM_TYPE_MATRIX4_ARRAY,
         //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
         // };
-        {
-            name: UNIFORM_NAME_JOINT_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_JOINT_TEXTURE_COL_NUM,
-            type: UNIFORM_TYPE_INT,
-            value: skinnedMesh.jointTextureColNum,
-        },
+        [UNIFORM_NAME_JOINT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_JOINT_TEXTURE_COL_NUM, UNIFORM_TYPE_INT, skinnedMesh.jointTextureColNum],
         ...(skinnedMesh.gpuSkinning
             ? ([
-                  {
-                      name: UNIFORM_NAME_BONE_COUNT,
-                      type: UNIFORM_TYPE_INT,
-                      value: skinnedMesh.boneCount,
-                  },
-                  {
-                      name: UNIFORM_NAME_TOTAL_FRAME_COUNT,
-                      type: UNIFORM_TYPE_INT,
-                      value: 0,
-                  },
+                  [UNIFORM_NAME_BONE_COUNT, UNIFORM_TYPE_INT, skinnedMesh.boneCount],
+                  [UNIFORM_NAME_TOTAL_FRAME_COUNT, UNIFORM_TYPE_INT, 0],
               ] as UniformsData)
             : []),
     ];

@@ -47,53 +47,17 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
 
     const uniforms: UniformsData = [
         // TODO: passのuniformのいくつかは強制的に全部渡すようにしちゃって良い気がする
-        {
-            name: UNIFORM_NAME_GBUFFER_A_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_GBUFFER_C_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_GBUFFER_D_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_DEPTH_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: 'uScreenSpaceShadowTexture',
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: 'uAmbientOcclusionTexture',
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
+        [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_D_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        ['uScreenSpaceShadowTexture', UNIFORM_TYPE_TEXTURE, null],
+        ['uAmbientOcclusionTexture', UNIFORM_TYPE_TEXTURE, null],
 
-        {
-            name: UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
+        [UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP, UNIFORM_TYPE_TEXTURE, null],
 
-        {
-            name: UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
-            type: UNIFORM_TYPE_TEXTURE_ARRAY,
-            value: maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null),
-        },
+        [UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP, UNIFORM_TYPE_TEXTURE_ARRAY, maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null)],
 
         ...createSkyboxUniforms(),
     ];
@@ -121,66 +85,22 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
 
 export function createSkyboxUniforms(): UniformsData {
     return [
-        {
-            name: UNIFORM_NAME_SKYBOX,
-            type: UNIFORM_TYPE_STRUCT,
-            value: [
-                {
-                    name: CUBE_MAP_UNIFORM_NAME,
-                    type: UNIFORM_TYPE_CUBE_MAP,
-                    value: null,
-                },
-                {
-                    name: BASE_INTENSITY_UNIFORM_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: SPECULAR_INTENSITY_UNIFORM_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: ROTATION_OFFSET_UNIFORM_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: MAX_LOD_LEVEL_UNIFORM_NAME,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-            ],
-        },
+        [UNIFORM_NAME_SKYBOX, UNIFORM_TYPE_STRUCT, [
+            [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, null],
+            [BASE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+            [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+            [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+            [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+        ]],
     ];
 }
 
 export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
     setMaterialUniformValue(material, UNIFORM_NAME_SKYBOX, [
-        {
-            name: CUBE_MAP_UNIFORM_NAME,
-            type: UNIFORM_TYPE_CUBE_MAP,
-            value: skybox.cubeMap,
-        },
-        {
-            name: BASE_INTENSITY_UNIFORM_NAME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: skybox.baseIntensity,
-        },
-        {
-            name: SPECULAR_INTENSITY_UNIFORM_NAME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: skybox.specularIntensity,
-        },
-        {
-            name: ROTATION_OFFSET_UNIFORM_NAME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: skybox.rotationOffset,
-        },
-        {
-            name: MAX_LOD_LEVEL_UNIFORM_NAME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: skybox.cubeMap.maxLodLevel,
-        },
+        [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, skybox.cubeMap],
+        [BASE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],
+        [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.specularIntensity],
+        [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.rotationOffset],
+        [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.cubeMap.maxLodLevel],
     ]);
 }

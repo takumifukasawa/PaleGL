@@ -100,11 +100,7 @@ export const createEffectTextureSystem: (
         fragmentShader: effectFragmentShader,
         uniforms: [
             ...effectUniforms,
-            {
-                name: 'uSpeed',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 1.0, // Default speed, can be overridden
-            },
+            ['uSpeed', UNIFORM_TYPE_FLOAT, 1.0],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
     });
@@ -125,31 +121,11 @@ export const createEffectTextureSystem: (
         });
 
         const uniforms: UniformsData = [
-            {
-                name: UNIFORM_NAME_SRC_TEXTURE,
-                type: UNIFORM_TYPE_TEXTURE,
-                value: null,
-            },
-            {
-                name: 'uTilingEnabled',
-                type: UNIFORM_TYPE_FLOAT,
-                value: tilingEnabled ? 1 : 0,
-            },
-            {
-                name: 'uEdgeMaskMix',
-                type: UNIFORM_TYPE_FLOAT,
-                value: edgeMaskMix,
-            },
-            {
-                name: 'uRemapMin',
-                type: UNIFORM_TYPE_FLOAT,
-                value: remapMin!,
-            },
-            {
-                name: 'uRemapMax',
-                type: UNIFORM_TYPE_FLOAT,
-                value: remapMax!,
-            },
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            ['uTilingEnabled', UNIFORM_TYPE_FLOAT, tilingEnabled ? 1 : 0],
+            ['uEdgeMaskMix', UNIFORM_TYPE_FLOAT, edgeMaskMix],
+            ['uRemapMin', UNIFORM_TYPE_FLOAT, remapMin!],
+            ['uRemapMax', UNIFORM_TYPE_FLOAT, remapMax!],
         ];
 
         compositeMaterial = createMaterial({

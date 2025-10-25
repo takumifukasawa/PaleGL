@@ -117,6 +117,9 @@ import {
     UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_STRUCT,
     UNIFORM_TYPE_STRUCT_ARRAY,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UniformTypes,
 } from '@/PaleGL/constants';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
@@ -475,61 +478,17 @@ export function createRenderer({
     );
 
     const transformationsUniformBlockData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_WORLD_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_VIEW_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_PROJECTION_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_WVP_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_NORMAL_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_INVERSE_WORLD_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_VIEW_PROJECTION_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_INVERSE_VIEW_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_INVERSE_PROJECTION_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
-        {
-            name: UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: createMat4Identity(),
-        },
+        [UNIFORM_NAME_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_VIEW_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_WVP_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_NORMAL_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_INVERSE_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_VIEW_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_INVERSE_VIEW_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_INVERSE_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
+        [UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
     ];
 
     globalUniformBufferObjects.push({
@@ -543,36 +502,12 @@ export function createRenderer({
     });
 
     const cameraUniformBufferData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_VIEW_POSITION,
-            type: UNIFORM_TYPE_VECTOR3,
-            value: createVector3Zero(),
-        },
-        {
-            name: UNIFORM_NAME_VIEW_DIRECTION,
-            type: UNIFORM_TYPE_VECTOR3,
-            value: createVector3Zero(),
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_NEAR,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_FAR,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_ASPECT,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_FOV,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
+        [UNIFORM_NAME_VIEW_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+        [UNIFORM_NAME_VIEW_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+        [UNIFORM_NAME_CAMERA_NEAR, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_CAMERA_FAR, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_CAMERA_ASPECT, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_CAMERA_FOV, UNIFORM_TYPE_FLOAT, 0],
     ];
     globalUniformBufferObjects.push({
         uniformBufferObject: createGPUUniformBufferObject(
@@ -585,32 +520,16 @@ export function createRenderer({
     });
 
     const directionalLightUniformBufferData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_DIRECTIONAL_LIGHT,
-            type: UNIFORM_TYPE_STRUCT,
-            value: [
-                {
-                    name: UNIFORM_NAME_LIGHT_DIRECTION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: createVector3Zero(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_INTENSITY,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_COLOR,
-                    type: UNIFORM_TYPE_COLOR,
-                    value: createColorBlack(),
-                },
-                {
-                    name: UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX,
-                    type: UNIFORM_TYPE_MATRIX4,
-                    value: createMat4Identity(),
-                },
+        [
+            UNIFORM_NAME_DIRECTIONAL_LIGHT,
+            UNIFORM_TYPE_STRUCT,
+            [
+                [UNIFORM_NAME_LIGHT_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+                [UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
             ],
-        },
+        ],
     ];
     globalUniformBufferObjects.push({
         uniformBufferObject: createGPUUniformBufferObject(
@@ -623,57 +542,21 @@ export function createRenderer({
     });
 
     const spotLightUniformBufferData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_SPOT_LIGHT,
-            type: UNIFORM_TYPE_STRUCT_ARRAY,
-            value: maton.range(MAX_SPOT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
-                {
-                    name: UNIFORM_NAME_LIGHT_COLOR,
-                    type: UNIFORM_TYPE_COLOR,
-                    value: createColorBlack(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_POSITION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: createVector3Zero(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DIRECTION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: createVector3Zero(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_INTENSITY,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DISTANCE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_ATTENUATION,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_CONE_COS,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_PENUMBRA_COS,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX,
-                    type: UNIFORM_TYPE_MATRIX4,
-                    value: createMat4Identity(),
-                },
+        [
+            UNIFORM_NAME_SPOT_LIGHT,
+            UNIFORM_TYPE_STRUCT_ARRAY,
+            maton.range(MAX_SPOT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
+                [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+                [UNIFORM_NAME_LIGHT_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                [UNIFORM_NAME_LIGHT_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_CONE_COS, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_PENUMBRA_COS, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
             ]) as UniformBufferObjectStructArrayValue,
-        },
+        ],
     ];
     globalUniformBufferObjects.push({
         uniformBufferObject: createGPUUniformBufferObject(
@@ -686,37 +569,17 @@ export function createRenderer({
     });
 
     const pointLightUniformBufferData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_POINT_LIGHT,
-            type: UNIFORM_TYPE_STRUCT_ARRAY,
-            value: maton.range(MAX_POINT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
-                {
-                    name: UNIFORM_NAME_LIGHT_COLOR,
-                    type: UNIFORM_TYPE_COLOR,
-                    value: createColorBlack(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_POSITION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: createVector3Zero(),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_INTENSITY,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DISTANCE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_ATTENUATION,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0,
-                },
+        [
+            UNIFORM_NAME_POINT_LIGHT,
+            UNIFORM_TYPE_STRUCT_ARRAY,
+            maton.range(MAX_POINT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
+                [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+                [UNIFORM_NAME_LIGHT_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_LIGHT_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
             ]) as UniformBufferObjectStructArrayValue,
-        },
+        ],
     ];
     globalUniformBufferObjects.push({
         uniformBufferObject: createGPUUniformBufferObject(
@@ -729,16 +592,8 @@ export function createRenderer({
     });
 
     const timelineUniformBufferData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_TIMELINE_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_TIMELINE_DELTA_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
+        [UNIFORM_NAME_TIMELINE_TIME, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_TIMELINE_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
     ];
     globalUniformBufferObjects.push({
         uniformBufferObject: createGPUUniformBufferObject(
@@ -751,21 +606,9 @@ export function createRenderer({
     });
 
     const commonUniformBlockData: UniformBufferObjectBlockData = [
-        {
-            name: UNIFORM_NAME_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_DELTA_TIME,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_VIEWPORT,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: createVector4zero(),
-        },
+        [UNIFORM_NAME_TIME, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_VIEWPORT, UNIFORM_TYPE_VECTOR4, createVector4zero()],
     ];
     // TODO: 一番最初の要素としてpushするとなぜかエラーになる
     globalUniformBufferObjects.push({
@@ -1627,7 +1470,7 @@ export function setUniformBlockValue(
     const targetUbo = targetGlobalUniformBufferObject.uniformBufferObject;
 
     const targetUniformData = targetGlobalUniformBufferObject.data.find((d) => {
-        return d.name === uniformName;
+        return d[UNIFORM_INDEX_NAME] === uniformName;
     });
 
     if (!targetUniformData) {
@@ -1635,7 +1478,7 @@ export function setUniformBlockValue(
         return;
     }
 
-    updateUniformBufferValue(targetUbo, uniformName, targetUniformData.type, value);
+    updateUniformBufferValue(targetUbo, uniformName, targetUniformData[UNIFORM_INDEX_TYPE], value);
 }
 
 export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: RenderMeshInfo[], camera: Camera) {
@@ -2121,7 +1964,7 @@ function updateUniformBlockValue(
     const targetUbo = targetGlobalUniformBufferObject.uniformBufferObject;
 
     const targetUniformData = targetGlobalUniformBufferObject.data.find((d) => {
-        return d.name === uniformName;
+        return d[UNIFORM_INDEX_NAME] === uniformName;
     });
 
     if (!targetUniformData) {
@@ -2168,20 +2011,20 @@ function updateUniformBlockValue(
         return data;
     };
 
-    switch (targetUniformData.type) {
+    switch (targetUniformData[UNIFORM_INDEX_TYPE]) {
         // TODO: update struct
         case UNIFORM_TYPE_STRUCT:
             (value as unknown as UniformBufferObjectStructValue).forEach((v) => {
-                const structElementName = `${uniformName}.${v.name}`;
-                const data: number[] = getStructElementValue(v.type, v.value);
+                const structElementName = `${uniformName}.${v[UNIFORM_INDEX_NAME]}`;
+                const data: number[] = getStructElementValue(v[UNIFORM_INDEX_TYPE], v[UNIFORM_INDEX_VALUE]);
                 updateUniformBufferData(targetUbo, structElementName, new Float32Array(data));
             });
             break;
         case UNIFORM_TYPE_STRUCT_ARRAY:
             (value as UniformBufferObjectStructArrayValue).forEach((v, i) => {
                 v.forEach((vv) => {
-                    const structElementName = `${uniformName}[${i}].${vv.name}`;
-                    const data: number[] = getStructElementValue(vv.type, vv.value);
+                    const structElementName = `${uniformName}[${i}].${vv[UNIFORM_INDEX_NAME]}`;
+                    const data: number[] = getStructElementValue(vv[UNIFORM_INDEX_TYPE], vv[UNIFORM_INDEX_VALUE]);
                     if (showLog) {
                         // console.log(structElementName, data);
                     }
@@ -2246,31 +2089,15 @@ export function updateTimelineUniforms(renderer: Renderer, timelineTime: number,
 
 function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: DirectionalLight) {
     updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT, UNIFORM_NAME_DIRECTIONAL_LIGHT, [
-        {
-            name: UNIFORM_NAME_LIGHT_DIRECTION,
-            type: UNIFORM_TYPE_VECTOR3,
-            // pattern: normalizeし、光源の位置から降り注ぐとみなす
-            value: normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
-            // pattern: 回転を適用
-            // TODO: quaternion側にバグがありそう
-            // value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
-        },
-        {
-            name: UNIFORM_NAME_LIGHT_INTENSITY,
-            type: UNIFORM_TYPE_FLOAT,
-            value: directionalLight.intensity,
-        },
-        {
-            name: UNIFORM_NAME_LIGHT_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: directionalLight.color,
-        },
-        {
-            // name: UniformNames.LightViewProjectionMatrix,
-            name: UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX,
-            type: UNIFORM_TYPE_MATRIX4,
-            value: directionalLight.shadowMapProjectionMatrix,
-        },
+        // pattern: normalizeし、光源の位置から降り注ぐとみなす
+        // pattern: 回転を適用
+        // TODO: quaternion側にバグがありそう
+        // value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
+        [UNIFORM_NAME_LIGHT_DIRECTION, UNIFORM_TYPE_VECTOR3, normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position)))],
+        [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, directionalLight.intensity],
+        [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, directionalLight.color],
+        // name: UniformNames.LightViewProjectionMatrix,
+        [UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, directionalLight.shadowMapProjectionMatrix],
     ]);
 }
 
@@ -2281,51 +2108,15 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
         UNIFORM_NAME_SPOT_LIGHT,
         spotLights.map((spotLight): UniformBufferObjectStructValue => {
             return [
-                {
-                    name: UNIFORM_NAME_LIGHT_COLOR,
-                    type: UNIFORM_TYPE_COLOR,
-                    value: spotLight.color,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_POSITION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: spotLight.transform.position,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DIRECTION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: cloneVector3(getWorldForward(spotLight.transform)),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_INTENSITY,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: spotLight.intensity,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DISTANCE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: spotLight.distance,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_ATTENUATION,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: spotLight.attenuation,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_CONE_COS,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: getSpotLightConeCos(spotLight),
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_PENUMBRA_COS,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: getSpotLightPenumbraCos(spotLight),
-                },
-                {
-                    name: UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX,
-                    type: UNIFORM_TYPE_MATRIX4,
-                    value: spotLight.shadowMapProjectionMatrix,
-                },
+                [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, spotLight.color],
+                [UNIFORM_NAME_LIGHT_POSITION, UNIFORM_TYPE_VECTOR3, spotLight.transform.position],
+                [UNIFORM_NAME_LIGHT_DIRECTION, UNIFORM_TYPE_VECTOR3, cloneVector3(getWorldForward(spotLight.transform))],
+                [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, spotLight.intensity],
+                [UNIFORM_NAME_LIGHT_DISTANCE, UNIFORM_TYPE_FLOAT, spotLight.distance],
+                [UNIFORM_NAME_LIGHT_ATTENUATION, UNIFORM_TYPE_FLOAT, spotLight.attenuation],
+                [UNIFORM_NAME_LIGHT_CONE_COS, UNIFORM_TYPE_FLOAT, getSpotLightConeCos(spotLight)],
+                [UNIFORM_NAME_LIGHT_PENUMBRA_COS, UNIFORM_TYPE_FLOAT, getSpotLightPenumbraCos(spotLight)],
+                [UNIFORM_NAME_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, spotLight.shadowMapProjectionMatrix],
             ];
         }) as UniformBufferObjectStructArrayValue
     );
@@ -2338,31 +2129,11 @@ function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]
         UNIFORM_NAME_POINT_LIGHT,
         pointLights.map((pointLight): UniformBufferObjectStructValue => {
             return [
-                {
-                    name: UNIFORM_NAME_LIGHT_COLOR,
-                    type: UNIFORM_TYPE_COLOR,
-                    value: pointLight.color,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_POSITION,
-                    type: UNIFORM_TYPE_VECTOR3,
-                    value: pointLight.transform.position,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_INTENSITY,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: pointLight.intensity,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_DISTANCE,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: pointLight.distance,
-                },
-                {
-                    name: UNIFORM_NAME_LIGHT_ATTENUATION,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: pointLight.attenuation,
-                },
+                [UNIFORM_NAME_LIGHT_COLOR, UNIFORM_TYPE_COLOR, pointLight.color],
+                [UNIFORM_NAME_LIGHT_POSITION, UNIFORM_TYPE_VECTOR3, pointLight.transform.position],
+                [UNIFORM_NAME_LIGHT_INTENSITY, UNIFORM_TYPE_FLOAT, pointLight.intensity],
+                [UNIFORM_NAME_LIGHT_DISTANCE, UNIFORM_TYPE_FLOAT, pointLight.distance],
+                [UNIFORM_NAME_LIGHT_ATTENUATION, UNIFORM_TYPE_FLOAT, pointLight.attenuation],
             ];
         }) as UniformBufferObjectStructArrayValue,
         true

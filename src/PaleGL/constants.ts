@@ -267,6 +267,11 @@ export type PostProcessPassType = typeof POST_PROCESS_PASS_TYPE_BLOOM | typeof P
 // uniforms
 // -----------------------------------------------------------------------------
 
+// UniformData array indices (for array-based UniformData optimization)
+export const UNIFORM_INDEX_NAME = 0;
+export const UNIFORM_INDEX_TYPE = 1;
+export const UNIFORM_INDEX_VALUE = 2;
+
 export const UNIFORM_TYPE_MATRIX4 = 0;
 export const UNIFORM_TYPE_MATRIX4_ARRAY = 1;
 export const UNIFORM_TYPE_TEXTURE = 2;

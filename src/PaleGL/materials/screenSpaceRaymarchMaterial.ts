@@ -84,81 +84,26 @@ export function createScreenSpaceRaymarchMaterial({
     const _emissiveColor = emissiveColor || createColorBlack();
 
     const commonUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_DEPTH_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_FOV,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: UNIFORM_NAME_CAMERA_ASPECT,
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_CAMERA_FOV, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_CAMERA_ASPECT, UNIFORM_TYPE_FLOAT, 0],
 
-        {
-            name: UNIFORM_NAME_BASE_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: _baseMap,
-        },
-        {
-            name: UNIFORM_NAME_BASE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: _baseColor,
-        },
-        {
-            name: UNIFORM_NAME_BASE_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            // value: Vector2.one,
-            value: _baseMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC,
-            type: UNIFORM_TYPE_FLOAT,
-            value: _metallic,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: _metallicMap,
-        },
-        {
-            name: UNIFORM_NAME_METALLIC_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: _metallicMapTiling,
-        },
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, _baseMap],
+        [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, _baseColor],
+        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, _baseMapTiling],
+        // value: Vector2.one,
+        [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, _metallic],
+        [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, _metallicMap],
+        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, _metallicMapTiling],
 
-        {
-            name: UNIFORM_NAME_ROUGHNESS,
-            type: UNIFORM_TYPE_FLOAT,
-            value: _roughness,
-        },
-        {
-            name: UNIFORM_NAME_ROUGHNESS_MAP,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: _roughnessMap,
-        },
-        {
-            name: UNIFORM_NAME_ROUGHNESS_MAP_TILING,
-            type: UNIFORM_TYPE_VECTOR4,
-            value: _roughnessMapTiling,
-        },
-        {
-            name: UNIFORM_NAME_EMISSIVE_COLOR,
-            type: UNIFORM_TYPE_COLOR,
-            value: _emissiveColor,
-        },
+        [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, _roughness],
+        [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, _roughnessMap],
+        [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, _roughnessMapTiling],
+        [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, _emissiveColor],
     ];
     const shadingUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_SHADING_MODEL_ID,
-            type: UNIFORM_TYPE_INT, // float,intどちらでもいい
-            value: shadingModelId,
-        },
+        [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, shadingModelId],
+        // float,intどちらでもいい
     ];
 
     const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];

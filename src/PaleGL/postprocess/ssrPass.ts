@@ -136,101 +136,25 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
     const blendRate = args.blendRate ?? 1;
 
     const baseUniforms: UniformsData = [
-        {
-            name: UNIFORM_NAME_GBUFFER_A_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_GBUFFER_B_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_GBUFFER_C_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: UNIFORM_NAME_DEPTH_TEXTURE,
-            type: UNIFORM_TYPE_TEXTURE,
-            value: null,
-        },
-        {
-            name: 'uRayDepthBias',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uRayNearestDistance',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uRayMaxDistance',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionAdditionalRate',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionRayThickness',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionRayJitterSizeX',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionRayJitterSizeY',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionFadeMinDistance',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionFadeMaxDistance',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionScreenEdgeFadeFactorMinX',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionScreenEdgeFadeFactorMaxX',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionScreenEdgeFadeFactorMinY',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionScreenEdgeFadeFactorMaxY',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uReflectionRoughnessPower',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 0,
-        },
-        {
-            name: 'uBlendRate',
-            type: UNIFORM_TYPE_FLOAT,
-            value: 1,
-        },
+        [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        ['uRayDepthBias', UNIFORM_TYPE_FLOAT, 0],
+        ['uRayNearestDistance', UNIFORM_TYPE_FLOAT, 0],
+        ['uRayMaxDistance', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionAdditionalRate', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionRayThickness', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionRayJitterSizeX', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionRayJitterSizeY', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionFadeMinDistance', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionFadeMaxDistance', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionScreenEdgeFadeFactorMinX', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionScreenEdgeFadeFactorMaxX', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionScreenEdgeFadeFactorMinY', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionScreenEdgeFadeFactorMaxY', UNIFORM_TYPE_FLOAT, 0],
+        ['uReflectionRoughnessPower', UNIFORM_TYPE_FLOAT, 0],
+        ['uBlendRate', UNIFORM_TYPE_FLOAT, 1],
     ];
 
     return {

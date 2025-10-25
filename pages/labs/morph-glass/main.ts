@@ -22,7 +22,6 @@ import {
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
 } from '@/PaleGL/constants';
-import type { RenderQueueType, FaceSide } from '@/PaleGL/constants';
 import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import {
     createEngine,
@@ -359,7 +358,7 @@ orbitCameraController.lookAtTarget = createVector3(0, 4.5, 0);
 subscribeActorOnStart(captureSceneCamera, () => {
     setCameraClearColor(captureSceneCamera, createVector4(0, 0, 0, 1));
 });
-captureSceneCamera.onFixedUpdate = () => {
+captureSceneCamera.onFixedUpdate = [() => {
     // 1: fixed position
     // actor.transform.position = new Vector3(-7 * 1.1, 4.5 * 1.4, 11 * 1.2);
 
@@ -369,7 +368,7 @@ captureSceneCamera.onFixedUpdate = () => {
         setOrbitCameraControllerDelta(orbitCameraController, v2o(inputController.deltaNormalizedInputPosition));
     }
     fixedUpdateOrbitCameraController(orbitCameraController);
-};
+}];
 
 const directionalLight = createDirectionalLight({
     intensity: 1,
@@ -511,16 +510,8 @@ const main = async () => {
                     depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
                     faceSide: FACE_SIDE_FRONT,
                     uniforms: [
-                        {
-                            name: UNIFORM_NAME_SCENE_TEXTURE,
-                            type: UNIFORM_TYPE_TEXTURE,
-                            value: null,
-                        },
-                        {
-                            name: 'uMorphRate',
-                            type: UNIFORM_TYPE_FLOAT,
-                            value: 0,
-                        },
+                        [UNIFORM_NAME_SCENE_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                        ['uMorphRate', UNIFORM_TYPE_FLOAT, 0],
                     ],
                     //                 fragmentShaderModifiers: [
                     //                     {

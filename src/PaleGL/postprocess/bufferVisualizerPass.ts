@@ -114,21 +114,9 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
             gpu,
             fragmentShader: bufferVisualizerRow0PassFragmentShader,
             uniforms: [
-                {
-                    name: UNIFORM_NAME_CAMERA_NEAR,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 0.1,
-                },
-                {
-                    name: UNIFORM_NAME_CAMERA_FAR,
-                    type: UNIFORM_TYPE_FLOAT,
-                    value: 1,
-                },
-                {
-                    name: UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
-                    type: UNIFORM_TYPE_MATRIX4,
-                    value: createMat4Identity(),
-                },
+                [UNIFORM_NAME_CAMERA_NEAR, UNIFORM_TYPE_FLOAT, 0.1],
+                [UNIFORM_NAME_CAMERA_FAR, UNIFORM_TYPE_FLOAT, 1],
+                [UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
                 // {
                 //     name: 'uDepthTexture',
                 //     type: UNIFORM_TYPE_TEXTURE,
@@ -440,25 +428,13 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         fragmentShader: bufferVisualizerCompositePassFragmentShader,
         srcTextureEnabled: false,
         uniforms: [
-            {
-                name: 'uFullViewTexture',
-                type: UNIFORM_TYPE_TEXTURE,
-                value: getDummyBlackTexture(gpu),
-            },
-            {
-                name: 'uFullViewTextureEnabled',
-                type: UNIFORM_TYPE_FLOAT,
-                value: 0,
-            },
+            ['uFullViewTexture', UNIFORM_TYPE_TEXTURE, getDummyBlackTexture(gpu)],
+            ['uFullViewTextureEnabled', UNIFORM_TYPE_FLOAT, 0],
             ...maton
                 .range(ROW_NUM)
                 .map((_, i) => {
                     return [
-                        {
-                            name: `uRow${i}Texture`,
-                            type: UNIFORM_TYPE_TEXTURE,
-                            value: getDummyBlackTexture(gpu),
-                        },
+                        [`uRow${i}Texture`, UNIFORM_TYPE_TEXTURE, getDummyBlackTexture(gpu)],
                     ] as UniformsData;
                 })
                 .flat(),
