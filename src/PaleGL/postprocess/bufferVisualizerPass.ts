@@ -21,7 +21,6 @@ import {
 import bufferVisualizerCompositePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-composite-pass-fragment.glsl';
 import bufferVisualizerRow0PassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-0-pass-fragment.glsl';
 import bufferVisualizerRowBasePassFragmentShader from '@/PaleGL/shaders/buffer-visualizer-row-base-pass-fragment.glsl';
-import { maton } from '@/PaleGL/utilities/maton.ts';
 
 // ------------------------------------------------------------------------------
 // constants
@@ -29,6 +28,37 @@ import { maton } from '@/PaleGL/utilities/maton.ts';
 
 const COL_NUM = 7;
 const ROW_NUM = 7;
+
+// Composite pass row texture uniform names (pre-enumerated to avoid dynamic generation)
+const ROW_TEXTURE_UNIFORM_NAMES = [
+    'uRow0Texture',
+    'uRow1Texture',
+    'uRow2Texture',
+    'uRow3Texture',
+    'uRow4Texture',
+    'uRow5Texture',
+    'uRow6Texture',
+] as const;
+
+// Row pass column texture uniform names (pre-enumerated to avoid dynamic generation)
+// Note: Shaders only define 6 columns (uTextureCol0-5), not 7
+const COL_TEXTURE_UNIFORM_NAMES = [
+    'uTextureCol0',
+    'uTextureCol1',
+    'uTextureCol2',
+    'uTextureCol3',
+    'uTextureCol4',
+    'uTextureCol5',
+] as const;
+
+const COL_UV_OFFSET_UNIFORM_NAMES = [
+    'uTextureCol0UvOffset',
+    'uTextureCol1UvOffset',
+    'uTextureCol2UvOffset',
+    'uTextureCol3UvOffset',
+    'uTextureCol4UvOffset',
+    'uTextureCol5UvOffset',
+] as const;
 
 const DEPTH_TEXTURE_KEY = 'depthTexture';
 const GBUFFER_A_TEXTURE_KEY = 'gBufferATexture';
@@ -430,14 +460,7 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         uniforms: [
             ['uFullViewTexture', UNIFORM_TYPE_TEXTURE, getDummyBlackTexture(gpu)],
             ['uFullViewTextureEnabled', UNIFORM_TYPE_FLOAT, 0],
-            ...maton
-                .range(ROW_NUM)
-                .map((_, i) => {
-                    return [
-                        [`uRow${i}Texture`, UNIFORM_TYPE_TEXTURE, getDummyBlackTexture(gpu)],
-                    ] as UniformsData;
-                })
-                .flat(),
+            ...ROW_TEXTURE_UNIFORM_NAMES.map((name) => [name, UNIFORM_TYPE_TEXTURE, getDummyBlackTexture(gpu)]),
             ...getPostProcessCommonUniforms(),
         ] as UniformsData,
     });
@@ -452,13 +475,12 @@ export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): Buff
         // pass.material.uniforms.addValue('uTiling', UNIFORM_TYPE_VECTOR2, new Vector2(COL_NUM, ROW_NUM));
         addMaterialUniformValue(pass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(COL_NUM, 1));
         for (const [key, tile] of tiles) {
-            const uniformNamePrefix = tile.uniformNamePrefix || 'uTextureCol';
-            const uniformNameTexture = `${uniformNamePrefix}${colIndex}`;
-            const uniformNameUvOffset = `${uniformNameTexture}UvOffset`;
+            const uniformNameTexture = tile.uniformNamePrefix || COL_TEXTURE_UNIFORM_NAMES[colIndex];
+            const uniformNameUvOffset = COL_UV_OFFSET_UNIFORM_NAMES[colIndex];
             const colOffset = -colIndex;
 
             if (!tile.uniformNamePrefix) {
-                tiles.get(key)!.uniformNamePrefix = uniformNamePrefix;
+                tiles.get(key)!.uniformNamePrefix = COL_TEXTURE_UNIFORM_NAMES[colIndex];
             }
 
             if (tile.type === 'Texture') {
@@ -930,7 +952,7 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
             renderPostProcessPass(pass, { ...args, isLastPass: false });
             setMaterialUniformValue(
                 bufferVisualizerPass.compositePass.material,
-                `uRow${i}Texture`,
+                ROW_TEXTURE_UNIFORM_NAMES[i],
                 pass.renderTarget.texture
             );
         }
