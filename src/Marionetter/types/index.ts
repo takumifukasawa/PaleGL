@@ -246,9 +246,10 @@ export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
     b: MarionetterClipBinding[];
 };
 
-export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_ANIMATION_CLIP_TYPE = NeedsShorten ? 'act' : 'animationClipType';
-export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_POSITION = NeedsShorten ? 'op' : 'offsetPosition';
-export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_ROTATION = NeedsShorten ? 'or' : 'offsetRotation';
+// offset周りは一旦使わない
+// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_ANIMATION_CLIP_TYPE = NeedsShorten ? 'act' : 'animationClipType';
+// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_POSITION = NeedsShorten ? 'op' : 'offsetPosition';
+// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_ROTATION = NeedsShorten ? 'or' : 'offsetRotation';
 export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
 
 export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
