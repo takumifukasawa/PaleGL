@@ -870,6 +870,14 @@ export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterC
     tn: string;
 };
 
+// wip
+// export type MarionetterObjectMoveAndLookAtControllerComponentInfo = [
+//     // prettier-ignore
+//     MarionetterComponentType, // type
+//     string, // name
+//     number, number, number, // lp: 2-4
+// ];
+
 export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten
     ? 'lp'
     : 'localPosition';
