@@ -332,7 +332,7 @@ function replaceInTypeScript(code: string, map: Map<string, string>): string {
         const doubleQuoteRegex = new RegExp(`"${oldName}"`, 'g');
         const backQuoteRegex = new RegExp(`\`${oldName}\``, 'g');
 
-        result = result.replace(singleQuoteRegex, `'${newName}'`);
+result = result.replace(singleQuoteRegex, `'${newName}'`);
         result = result.replace(doubleQuoteRegex, `"${newName}"`);
         result = result.replace(backQuoteRegex, `\`${newName}\``);
 
