@@ -41,12 +41,11 @@ export const shaderIdentifierReplacementPlugin = (
 
     const identifierMap = new Map<string, string>(); // 元の名前 → 短縮名
     const existingIdentifiers = new Set<string>(); // 既存の識別子（衝突回避用）
-    const glslFileCache = new Map<string, string>(); // GLSLファイルの置換済みコードキャッシュ
 
     return {
         name: 'shader-identifier-replacement',
         // enforceを指定しない（デフォルトのタイミングで実行）
-        // load()はpreで実行、transform()はnormalタイミングで実行される
+        // transform()はnormalタイミングで実行され、HMR時も正しく動作する
 
         async buildStart() {
             console.log('[shader-identifier] Starting identifier collection...');
@@ -138,53 +137,9 @@ export const shaderIdentifierReplacementPlugin = (
                     JSON.stringify(uniformList, null, 2)
                 );
                 console.log(`[shader-identifier] Saved uniform list to tmp/vite-plugin-uniforms.json (${uniformList.length} uniforms)`);
-
-
-                // 各GLSLファイルの置換済みコードをキャッシュに保存
-                if (identifierMap.size > 0) {
-                    console.log('[shader-identifier] Caching replaced GLSL files...');
-                    for (const file of glslFiles) {
-                        const originalContent = fs.readFileSync(file, 'utf-8');
-                        const replacedContent = replaceInGlsl(originalContent, identifierMap);
-                        glslFileCache.set(file, replacedContent);
-
-                        if (verbose && originalContent !== replacedContent) {
-                            console.log(`[shader-identifier] Cached ${path.basename(file)}`);
-                        }
-                    }
-                    console.log(`[shader-identifier] Cached ${glslFileCache.size} GLSL files`);
-                }
             } catch (error) {
                 console.error('[shader-identifier] Error during buildStart:', error);
             }
-        },
-
-        load(id: string) {
-            // GLSLファイルの読み込み時に置換済みコードを返す
-            // これによりvite-plugin-glslには置換済みのGLSLが渡される
-            if (id.endsWith('.glsl')) {
-                const normalizedId = path.resolve(id);
-
-                if (glslFileCache.has(normalizedId)) {
-                    const replacedCode = glslFileCache.get(normalizedId);
-
-                    // デバッグ: 特定のファイルの置換内容を確認
-                    if (id.includes('gbuffer-vertex.glsl')) {
-                        const originalCode = fs.readFileSync(normalizedId, 'utf-8');
-                        console.log('\n=== gbuffer-vertex.glsl DEBUG ===');
-                        console.log('Original uniforms:', originalCode.match(/uniform\s+\w+\s+u[A-Z]\w+/g)?.slice(0, 5));
-                        console.log('Replaced uniforms:', replacedCode?.match(/uniform\s+\w+\s+u\d+/g)?.slice(0, 5));
-                        console.log('=================================\n');
-                    }
-
-                    if (verbose) {
-                        console.log(`[shader-identifier] Returning replaced GLSL: ${path.basename(id)}`);
-                    }
-                    return replacedCode;
-                }
-            }
-
-            return null; // 他のプラグインに処理を委譲
         },
 
         transform(code: string, id: string) {
