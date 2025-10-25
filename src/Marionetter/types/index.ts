@@ -99,13 +99,13 @@ export const MARIONETTER_SCENE_PROPERTY_OBJECTS = NeedsShorten ? 'o' : 'objects'
 export type MarionetterObjectInfo = {
     name: string;
     transform: MarionetterTransformInfo;
-    components: MarionetterComponentInfoKinds[];
-    children: MarionetterObjectInfo[];
+    components: MarionetterComponentInfoKinds[] | undefined;
+    children: MarionetterObjectInfo[] | undefined;
     // shorten
     n: string;
     t: MarionetterTransformInfo;
-    co: MarionetterComponentInfoKinds[];
-    ch: MarionetterObjectInfo[];
+    co: MarionetterComponentInfoKinds[] | undefined;
+    ch: MarionetterObjectInfo[] | undefined;
 };
 
 export const MARIONETTER_OBJECT_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';

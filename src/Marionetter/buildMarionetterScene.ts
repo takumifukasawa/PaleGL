@@ -1,5 +1,44 @@
 import { buildMarionetterTimeline } from '@/Marionetter/timeline.ts';
 import {
+    MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE,
+    MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV,
+    MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE,
+    MARIONETTER_COMPONENT_TYPE_CAMERA,
+    MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_LIGHT,
+    MARIONETTER_COMPONENT_TYPE_MESH_FILTER,
+    MARIONETTER_COMPONENT_TYPE_MESH_RENDERER,
+    MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
+    MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
+    MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
+    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR,
+    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY,
+    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS,
+    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING,
+    MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE,
+    MARIONETTER_MATERIAL_TYPE_LIT,
+    MARIONETTER_MATERIAL_TYPE_UNLIT,
+    MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
+    MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL,
+    MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN,
+    MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS,
+    MARIONETTER_OBJECT_INFO_PROPERTY_NAME,
+    MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME,
+    MARIONETTER_SCENE_PROPERTY_OBJECTS,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE,
+    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION,
+    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION,
+    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE,
     MarionetterCameraComponentInfo,
     MarionetterDirectionalLightComponentInfo,
     MarionetterFbmNoiseTextureControllerComponentInfo,
@@ -15,45 +54,6 @@ import {
     MarionetterSceneStructure,
     MarionetterSpotLightComponentInfo,
     MarionetterTimeline,
-    MARIONETTER_COMPONENT_TYPE_MESH_FILTER,
-    MARIONETTER_COMPONENT_TYPE_MESH_RENDERER,
-    MARIONETTER_COMPONENT_TYPE_CAMERA,
-    MARIONETTER_COMPONENT_TYPE_LIGHT,
-    MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
-    MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
-    MARIONETTER_COMPONENT_TYPE_FBM_NOISE_TEXTURE_CONTROLLER,
-    MARIONETTER_COMPONENT_TYPE_GBUFFER_MATERIAL_CONTROLLER,
-    MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
-    MARIONETTER_MATERIAL_TYPE_LIT,
-    MARIONETTER_MATERIAL_TYPE_UNLIT,
-    MARIONETTER_SCENE_PROPERTY_OBJECTS,
-    MARIONETTER_OBJECT_INFO_PROPERTY_NAME,
-    MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM,
-    MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS,
-    MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE,
-    MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE,
-    MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW,
-    MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL,
-    MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
-    MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE,
-    MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME,
 } from '@/Marionetter/types';
 import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
@@ -136,11 +136,14 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 
 // export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
 export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
-    return (
-        (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
-            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
-        ) as T) || null
-    );
+    const co = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS];
+    if (co) {
+        return (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
+              (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
+          ) as T) || null;
+    } else {
+        return null;
+    }
 }
 
 // export function findMarionetterComponentAsNumber<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
@@ -299,7 +302,9 @@ export function buildMarionetterScene(
             ) {
                 case MARIONETTER_MATERIAL_TYPE_LIT:
                     const litMaterial = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
-                    const tiling = createVector4FromRawVector4(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING]);
+                    const tiling = createVector4FromRawVector4(
+                        litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING]
+                    );
                     material = createGBufferMaterial({
                         baseColor: createColorFromHex(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR]),
                         baseMapTiling: tiling,
@@ -336,7 +341,13 @@ export function buildMarionetterScene(
             const camera = cameraComponent;
             if (camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE] === 'Perspective') {
                 // TODO: near, far を受け取りたい
-                actor = createPerspectiveCamera(camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV], 1, 0.1, 1000, name);
+                actor = createPerspectiveCamera(
+                    camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV],
+                    1,
+                    0.1,
+                    1000,
+                    name
+                );
             } else {
                 console.error(
                     `[buildMarionetterActors] invalid camera type: ${camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE]}`
@@ -353,7 +364,9 @@ export function buildMarionetterScene(
                     actor = createDirectionalLight({
                         name,
                         intensity: directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY],
-                        color: createColorFromHex(directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR]),
+                        color: createColorFromHex(
+                            directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR]
+                        ),
                     });
                     break;
                 case 'Spot':
@@ -365,7 +378,8 @@ export function buildMarionetterScene(
                         intensity: spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY],
                         distance: spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE],
                         coneAngle: spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE] / 2,
-                        penumbraAngle: spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE] / 2,
+                        penumbraAngle:
+                            spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE] / 2,
                     });
                     break;
                 default:
@@ -467,14 +481,18 @@ export function buildMarionetterScene(
                 createRotatorFromQuaternion(
                     resolveInvertRotationLeftHandAxisToRightHandAxis(
                         createQuaternion(
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION]
-                                .x,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION]
-                                .y,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION]
-                                .z,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION]
-                                .w
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            ].x,
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            ].y,
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            ].z,
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            ].w
                         ),
                         actor,
                         needsFlip
@@ -497,8 +515,11 @@ export function buildMarionetterScene(
             }
 
             // 子要素があれば再帰的に処理
-            for (let i = 0; i < obj[MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN].length; i++) {
-                recursiveBuildActor(obj[MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN][i], actor, needsFlip);
+            const ch = obj[MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN];
+            if (ch) {
+                for (let i = 0; i < ch.length; i++) {
+                    recursiveBuildActor(ch[i], actor, needsFlip);
+                }
             }
 
             return;
@@ -543,16 +564,19 @@ export function buildMarionetterTimelineFromScene(
 ): MarionetterTimeline | null {
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MARIONETTER_SCENE_PROPERTY_OBJECTS].forEach((obj) => {
-        const timelineComponent = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
-            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
-        );
-        if (timelineComponent) {
-            marionetterTimeline = buildMarionetterTimeline(
-                marionetterSceneActors,
-                timelineComponent as MarionetterPlayableDirectorComponentInfo
-                // placedScene
-                // needsSomeActorsConvertLeftHandAxisToRightHandAxis
+        const co = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS];
+        if (co) {
+            const timelineComponent = co.find(
+                (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
             );
+            if (timelineComponent) {
+                marionetterTimeline = buildMarionetterTimeline(
+                    marionetterSceneActors,
+                    timelineComponent as MarionetterPlayableDirectorComponentInfo
+                    // placedScene
+                    // needsSomeActorsConvertLeftHandAxisToRightHandAxis
+                );
+            }
         }
     });
     return marionetterTimeline;
