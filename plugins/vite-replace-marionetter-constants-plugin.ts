@@ -74,8 +74,9 @@ export const replaceMarionetterConstantsPlugin: () => Plugin = () => {
             let replacementCount = 0;
 
             // 各定数について [CONSTANT_NAME] -> ["value"] に置換
+            // 改行や空白を含むパターンにも対応
             for (const [constantName, value] of constantsMap.entries()) {
-                const pattern = new RegExp(`\\[${constantName}\\]`, 'g');
+                const pattern = new RegExp(`\\[\\s*${constantName}\\s*\\]`, 'g');
                 const replacement = `["${value}"]`;
 
                 const beforeLength = modified.length;

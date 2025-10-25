@@ -36,9 +36,9 @@ import {
     MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE,
     MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE,
     MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION,
-    MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE,
+    // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION,
+    // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION,
+    // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE,
     MarionetterCameraComponentInfo,
     MarionetterDirectionalLightComponentInfo,
     MarionetterFbmNoiseTextureControllerComponentInfo,
@@ -446,17 +446,17 @@ export function buildMarionetterScene(
             //
             // transform情報
             //
-
+            
             // actors.push(actor);
             setScaling(
                 actor.transform,
                 createVector3(
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][7],
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][8],
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][9]
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].x,
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].y,
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].z
+                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][7],
+                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][8],
+                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][9]
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].x,
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].y,
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].z
                 )
             );
             // euler ver
@@ -487,22 +487,22 @@ export function buildMarionetterScene(
                 createRotatorFromQuaternion(
                     resolveInvertRotationLeftHandAxisToRightHandAxis(
                         createQuaternion(
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            ].x,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            ].y,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            ].z,
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                                MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            ].w
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][3],
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][4],
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][5],
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][6]
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            // ].x,
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            // ].y,
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            // ].z,
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
+                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
+                            // ].w
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][3],
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][4],
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][5],
+                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][6]
                         ),
                         actor,
                         needsFlip
@@ -510,12 +510,12 @@ export function buildMarionetterScene(
                 )
             );
             actor.transform.position = createVector3(
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].x,
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].y,
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].z
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0],
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1],
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2]
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].x,
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].y,
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].z
+                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0],
+                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1],
+                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2]
             );
 
             generatedActorHook?.(gpu, actor);

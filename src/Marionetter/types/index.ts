@@ -113,30 +113,30 @@ export const MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM = NeedsShorten ? 't' : '
 export const MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS = NeedsShorten ? 'co' : 'components';
 export const MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN = NeedsShorten ? 'ch' : 'children';
 
-export type MarionetterTransformInfo = {
-    localPosition: { x: number; y: number; z: number };
-    localRotation: { x: number; y: number; z: number; w: number };
-    localScale: { x: number; y: number; z: number };
-    // shorten
-    lp: { x: number; y: number; z: number };
-    lr: { x: number; y: number; z: number; w: number };
-    ls: { x: number; y: number; z: number };
-};
+// export type MarionetterTransformInfo = {
+//     localPosition: { x: number; y: number; z: number };
+//     localRotation: { x: number; y: number; z: number; w: number };
+//     localScale: { x: number; y: number; z: number };
+//     // shorten
+//     lp: { x: number; y: number; z: number };
+//     lr: { x: number; y: number; z: number; w: number };
+//     ls: { x: number; y: number; z: number };
+// };
 
 // [
 //      lp.x, lp.y, lp.z, // 0,1,2
 //      lr.x, lr.y, lr.z, lr.w, // 3,4,5,6
 //      ls.x, ls.y, ls.z // 7,8,9
 // ]
-// export type MarionetterTransformInfo = number[];
+export type MarionetterTransformInfo = number[];
 
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_X_INDEX = 0;
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Y_INDEX = 1;
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Z_INDEX = 2;
 
-export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
-export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION = NeedsShorten ? 'lr' : 'localRotation';
-export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE = NeedsShorten ? 'ls' : 'localScale';
+// export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
+// export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION = NeedsShorten ? 'lr' : 'localRotation';
+// export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE = NeedsShorten ? 'ls' : 'localScale';
 
 //
 // track
