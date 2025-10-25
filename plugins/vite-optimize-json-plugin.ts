@@ -20,7 +20,7 @@ export const optimizeJsonPlugin: () => Plugin = () => {
                     const cleanId = id.replace('?raw', '');
                     const content = readFileSync(cleanId, 'utf-8');
                     const parsed = JSON.parse(content);
-                    const optimized = optimizeJsonData(parsed, PRECISION);
+                    const optimized = optimizeJsonData(parsed, PRECISION, cleanId);
                     const optimizedStr = JSON.stringify(optimized);
                     return `export default ${JSON.stringify(optimizedStr)}`;
                 } catch (error) {
@@ -35,7 +35,7 @@ export const optimizeJsonPlugin: () => Plugin = () => {
                 console.log(`[optimizeJsonPlugin] transform: ${id}`);
                 try {
                     const parsed = JSON.parse(code);
-                    const optimized = optimizeJsonData(parsed, PRECISION);
+                    const optimized = optimizeJsonData(parsed, PRECISION, id);
                     return {
                         code: `export default ${JSON.stringify(optimized)}`,
                         map: null,
