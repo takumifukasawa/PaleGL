@@ -98,9 +98,28 @@ export const shaderIdentifierReplacementPlugin = (
                 }
 
                 if (includeAttributes) {
-                    const attributes = collectIdentifiers(allContent, /\b(?:attribute|in)\s+\w+\s+(a[A-Z]\w+)\b/g, 'attribute');
+                    // GLSL定義から検出（念のため残す）
+                    const attributesFromGLSL = collectIdentifiers(allContent, /\b(?:attribute|in)\s+\w+\s+(a[A-Z]\w+)\b/g, 'attribute');
+
+                    // TypeScript文字列リテラルから検出
+                    const attributesFromStrings = collectIdentifiers(allContent, /['"`](a[A-Z]\w+)['"`]/g, 'attribute');
+
+                    // 重複を除いてマージ
+                    const attributeMap = new Map<string, IdentifierInfo>();
+                    for (const attr of [...attributesFromGLSL, ...attributesFromStrings]) {
+                        if (attributeMap.has(attr.name)) {
+                            // 既存のcountに加算
+                            const existing = attributeMap.get(attr.name)!;
+                            existing.count += attr.count;
+                            existing.savings = existing.count * (existing.length - 2);
+                        } else {
+                            attributeMap.set(attr.name, attr);
+                        }
+                    }
+                    const attributes = Array.from(attributeMap.values());
+
                     identifiers.push(...attributes);
-                    console.log(`[shader-identifier] Found ${attributes.length} attributes`);
+                    console.log(`[shader-identifier] Found ${attributes.length} attributes (${attributesFromGLSL.length} from GLSL, ${attributesFromStrings.length} from strings)`);
                 }
 
                 // 優先順位付け（削減効果の高い順）
