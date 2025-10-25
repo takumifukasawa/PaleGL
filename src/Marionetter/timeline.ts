@@ -177,7 +177,8 @@ export function buildMarionetterTimeline(
 
     for (
         let i = 0;
-        i < marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
+        i <
+        marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
         i++
     ) {
         const track =
@@ -194,7 +195,9 @@ export function buildMarionetterTimeline(
                 execute: () => {},
             } as MarionetterTimelineMarkerTrack);
         } else {
-            const targetName = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME];
+            const targetName = (track as MarionetterDefaultTrackInfo)[
+                MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME
+            ];
             const clips = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS];
             // const targetActors = [
             //     findActorByName(marionetterActors, targetName),
@@ -250,7 +253,8 @@ export function buildMarionetterTimeline(
                     }
 
                     if (
-                        track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+                        track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
+                        MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
                     ) {
                         if (targetActor != null) {
                             // const clipAtTime = marionetterClips.find(
@@ -294,7 +298,8 @@ export function buildMarionetterTimeline(
         // const frameTime = Math.floor(rawTime / spf) * spf;
         // pattern2: use raw time
         const frameTime =
-            time % marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
+            time %
+            marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute({ time: frameTime, scene });
         }
@@ -426,8 +431,9 @@ function createMarionetterAnimationClip(
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
-            const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+            // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+            // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+            const [propertyName, keyframes] = binding;
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
             switch (propertyName) {
@@ -672,8 +678,9 @@ function createMarionetterLightControlClip(
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
-            const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+            // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+            // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+            const [propertyName, keyframes] = binding;
             const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
             switch (propertyName) {
@@ -796,8 +803,9 @@ function createMarionetterObjectMoveAndLookAtClip(
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {
-                const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
-                const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+                // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
+                // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
+                const [propertyName, keyframes] = binding;
                 const value = curveUtilityEvaluateCurve(time - start, keyframes);
 
                 switch (propertyName) {

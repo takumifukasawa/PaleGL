@@ -326,16 +326,19 @@ export type MarionetterObjectMoveAndLookAtClipInfoProperty =
 // export type MarionetterHumanClipInfoProperty =
 //     (typeof MarionetterHumanClipInfoProperty)[keyof typeof MarionetterHumanClipInfoProperty];
 
-export type MarionetterClipBinding = {
-    propertyName: string;
-    keyframes: MarionetterAnimationClipKeyframe[];
-    // shorten
-    n: string;
-    k: MarionetterAnimationClipKeyframe[];
-};
+// export type MarionetterClipBinding = {
+//     propertyName: string;
+//     keyframes: MarionetterAnimationClipKeyframe[];
+//     // shorten
+//     n: string;
+//     k: MarionetterAnimationClipKeyframe[];
+// };
 
-export const MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME = NeedsShorten ? 'n' : 'propertyName';
-export const MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES = NeedsShorten ? 'k' : 'keyframes';
+// [name, keyframes]
+export type MarionetterClipBinding = [string,  MarionetterAnimationClipKeyframe[]];
+
+// export const MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME = NeedsShorten ? 'n' : 'propertyName';
+// export const MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES = NeedsShorten ? 'k' : 'keyframes';
 
 // // for obj
 // export type MarionetterAnimationClipKeyframe = NeedsShorten extends true

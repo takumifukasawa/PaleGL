@@ -97,23 +97,27 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
     // for debug
     // console.log(`[curveUtilityEvaluateCurve] debug - keys.length: ${keys.length}, firstK.v: ${firstK["v"]}, lastK.v: ${lastK["v"]}, t: ${t}`, keys, firstK, lastK, MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE);
 
+    // そもそもkeyがなかったら何かがおかしい. 何もしない
     if (keys.length === 0) {
         console.error('[curveUtilityEvaluateCurve] curve.keys.Length == 0');
         return 0;
     }
 
+    // keyが1個のときは最初のkeyをそのまま返す
     if (keys.length === 1) {
         return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
+    // tが最初のkeyよりも小さい場合は最初のkeyを使う
     if (t < firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
         return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
     if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
+        // console.log("hogehoge", t, lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]);
         return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
-
+    
     // TODO: keyframeが多いとループ数が増えるのでtimeをbinarysearchかけるとよい
     for (let i = 0; i < keys.length - 1; i++) {
         const k0 = buildKeyframe(keys[i]);
