@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export interface PartialGlslMinifierPluginOptions {
-    targetDir?: string;
+    targetDirs?: string[];
     verbose?: boolean;
 }
 
@@ -17,14 +17,14 @@ interface VariableInfo {
 /**
  * Partial GLSL Minifier Plugin
  *
- * src/pages/shaders/ 配下のmain関数を持たないpartial GLSLファイルの
+ * 指定されたディレクトリ配下のmain関数を持たないpartial GLSLファイルの
  * ローカル変数と関数引数を短縮し、ビルドサイズを削減する。
  */
 export const partialGlslMinifierPlugin = (
     options: PartialGlslMinifierPluginOptions = {}
 ): Plugin => {
     const {
-        targetDir = 'src/pages/shaders',
+        targetDirs = ['src/pages/shaders'],
         verbose = false,
     } = options;
 
@@ -35,7 +35,7 @@ export const partialGlslMinifierPlugin = (
 
         transform(code: string, id: string) {
             // 対象ディレクトリのGLSLファイルのみ処理
-            if (!id.endsWith('.glsl') || !id.includes(targetDir)) {
+            if (!id.endsWith('.glsl') || !targetDirs.some(dir => id.includes(dir))) {
                 return null;
             }
 
@@ -151,6 +151,20 @@ function collectVariables(content: string): VariableInfo[] {
         /^[a-zA-Z_][0-9]$/,
     ];
 
+    // struct内の変数名を収集（除外用）
+    const structFieldNames = new Set<string>();
+    const structPattern = /struct\s+\w+\s*\{([^}]*)\}/g;
+    const structMatches = content.matchAll(structPattern);
+    for (const match of structMatches) {
+        const structBody = match[1];
+        const fieldPattern = /\b(vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool)\s+([a-zA-Z_]\w+)/g;
+        const fieldMatches = structBody.matchAll(fieldPattern);
+        for (const fieldMatch of fieldMatches) {
+            const fieldName = fieldMatch[2];
+            structFieldNames.add(fieldName);
+        }
+    }
+
     // 関数名を収集（除外用）
     const functionNames = new Set<string>();
     const functionDefPattern = /\b(float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+([a-zA-Z_]\w+)\s*\(/g;
@@ -195,6 +209,11 @@ function collectVariables(content: string): VariableInfo[] {
     for (const match of localVarMatches) {
         const name = match[2];
 
+        // struct内の変数名は除外
+        if (structFieldNames.has(name)) {
+            continue;
+        }
+
         // 関数名は除外
         if (functionNames.has(name)) {
             continue;
@@ -229,6 +248,11 @@ function collectVariables(content: string): VariableInfo[] {
             const paramMatch = trimmed.match(/\b(vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool)\s+([a-zA-Z_]\w+)\b/);
             if (paramMatch) {
                 const name = paramMatch[2];
+
+                // struct内の変数名は除外
+                if (structFieldNames.has(name)) {
+                    continue;
+                }
 
                 // 除外パターンに該当するかチェック
                 if (excludePatterns.some(pattern => pattern.test(name))) {
@@ -274,7 +298,7 @@ function generateMappings(
 
     let pIndex = 1; // position系
     let dIndex = 1; // distance系
-    let vIndex = 1; // その他変数
+    let tIndex = 1; // その他変数（vはvaryingと衝突するため使用しない）
     let sIndex = 1; // scale系
     let eIndex = 1; // envelope系
 
@@ -304,9 +328,9 @@ function generateMappings(
                 candidate = `e${eIndex++}`;
             } while (existingIdentifiers.has(candidate));
         } else {
-            // その他
+            // その他（vはvaryingと衝突するためtを使用）
             do {
-                candidate = `v${vIndex++}`;
+                candidate = `t${tIndex++}`;
             } while (existingIdentifiers.has(candidate));
         }
 
@@ -330,7 +354,8 @@ function replaceVariables(code: string, map: Map<string, string>): string {
 
     for (const [oldName, newName] of sortedEntries) {
         // word boundaryを使って正確にマッチ
-        const regex = new RegExp(`\\b${oldName}\\b`, 'g');
+        // ただし、ドット（.）の直後は除外（メンバーアクセス/swizzle演算子）
+        const regex = new RegExp(`(?<!\\.)\\b${oldName}\\b`, 'g');
         result = result.replace(regex, newName);
     }
 
