@@ -1,5 +1,5 @@
 
-struct Skybox {
+struct sSkybox {
     samplerCube cubeMap;
     float diffuseIntensity;
     float specularIntensity;
@@ -7,16 +7,16 @@ struct Skybox {
     float maxLodLevel;
 };
 
-uniform Skybox uSkybox;
+uniform sSkybox uSkybox;
 
-struct SkyboxLight {
+struct sSkyboxLight {
     float diffuseIntensity;
     float specularIntensity;
     float rotationOffset;
     float maxLodLevel;
 };
 
-struct IncidentSkyboxLight {
+struct sIncidentSkyboxLight {
     // samplerCube cubeMap;
     // vec3 baseColor;
     vec3 diffuseDirection;
@@ -36,9 +36,9 @@ vec3 calcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
 }
 
 void getSkyboxLightIrradiance(
-    const in SkyboxLight skyboxLight,
-    const in GeometricContext geometry,
-    out IncidentSkyboxLight directLight
+    const in sSkyboxLight skyboxLight,
+    const in sGeometricContext geometry,
+    out sIncidentSkyboxLight directLight
 ) {
     vec3 envDir = reflect(
         -geometry.viewDir,

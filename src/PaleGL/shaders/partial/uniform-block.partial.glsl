@@ -27,15 +27,15 @@ layout (std140) uniform ubCamera {
     float uFov;
 };
 layout (std140) uniform ubDirectionalLight {
-    DirectionalLight uDirectionalLight;
+    sDirectionalLight uDirectionalLight;
 };
 
 layout (std140) uniform ubSpotLight {
-    SpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
+    sSpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 };
 
 layout (std140) uniform ubPointLight {
-    PointLight uPointLight[MAX_POINT_LIGHT_COUNT];
+    sPointLight uPointLight[MAX_POINT_LIGHT_COUNT];
 };
 
 layout (std140) uniform ubTimeline {

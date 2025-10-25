@@ -80,7 +80,7 @@ void main() {
 
     // surface.specularAmount = uSpecularAmount;
 
-    Surface surface;
+    sSurface surface;
     surface.worldPosition = vWorldPosition;
     surface.worldNormal = worldNormal;
     surface.baseColor = baseColor;

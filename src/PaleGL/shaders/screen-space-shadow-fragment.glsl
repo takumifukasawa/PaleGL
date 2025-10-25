@@ -21,7 +21,7 @@ uniform float uSharpness;
 uniform float uStrength;
 uniform float uRayStepMultiplier;
 
-void calcOcclusion(PointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
+void calcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
     vec3 rawLightPos = pointLight.position;
     vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.position, 1.)).xyz;
 
@@ -135,7 +135,7 @@ void main() {
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
     // TODO: point light count
     #pragma UNROLL_START 1
-        calcOcclusion(uPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
+        calcOcclusion(usPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
     #pragma UNROLL_END
 
     occlusion *= uStrength;

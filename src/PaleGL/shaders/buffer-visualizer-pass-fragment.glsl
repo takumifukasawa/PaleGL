@@ -62,10 +62,10 @@ void main() {
     vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
     vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
   
-    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUv);
-    GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUv);
-    GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, gBufferCUv);
-    GBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, gBufferDUv);
+    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUv);
+    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUv);
+    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, gBufferCUv);
+    sGBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, gBufferDUv);
 
     float rawDepth = texture(uDepthTexture, depthUv).x * isArea(depthUv);
     float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);

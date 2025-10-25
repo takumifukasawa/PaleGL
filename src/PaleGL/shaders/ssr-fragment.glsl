@@ -47,9 +47,9 @@ void main() {
 
     vec2 uv = vUv;
    
-    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
-    GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
-    GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
+    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
+    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
 
     vec3 worldNormal = gBufferB.normal;
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);

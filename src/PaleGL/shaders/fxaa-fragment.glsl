@@ -12,14 +12,14 @@ uniform float uContrastThreshold;
 uniform float uRelativeThreshold;
 uniform float uSubpixelBlending;
        
-struct EdgeData {
+struct sEdgeData {
     bool isHorizontal;
     float pixelStep;
     float oppositeLuma;
     float gradient;
 };
 
-struct LuminanceData {
+struct sLuminanceData {
     float center;
     float top;
     float right;
@@ -64,8 +64,8 @@ vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY
     return sampleTexture(tex, coord + vec2(offsetX, offsetY));
 }
 
-LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
-    LuminanceData l;
+sLuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
+    sLuminanceData l;
 
     // get nearest side pixels
     vec3 rgbTop = sampleTextureOffset(uSrcTexture, uv, 0., texelSize.y).xyz;
@@ -116,11 +116,11 @@ LuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     return l;
 }
 
-bool shouldSkipPixel(LuminanceData l) {
+bool shouldSkipPixel(sLuminanceData l) {
     return l.contrast < max(uContrastThreshold, l.highest * uRelativeThreshold);
 }
 
-float determinePixelBlendFactor(LuminanceData l) {
+float determinePixelBlendFactor(sLuminanceData l) {
     // sub-pixel blend 用のカーネル
     // | 1 | 2 | 1 | 
     // | 2 | 0 | 2 |
@@ -150,8 +150,8 @@ float determinePixelBlendFactor(LuminanceData l) {
     return pixelBlendFactor;
 }
 
-EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
-    EdgeData e;
+sEdgeData determineEdge(sLuminanceData l, vec2 texelSize) {
+    sEdgeData e;
     
     // # エッジの方向検出
    
@@ -244,7 +244,7 @@ EdgeData determineEdge(LuminanceData l, vec2 texelSize) {
     return e;
 }
 
-float determineEdgeBlendFactor(LuminanceData l, EdgeData e, vec2 uv, vec2 texelSize) {
+float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texelSize) {
 
     // # high quality
     // const edgeStepsArray = [1, 1.5, 2, 2, 2, 2, 2, 2, 2, 4];
@@ -382,14 +382,14 @@ void main() {
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
     
-    LuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
+    sLuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
 
     if(shouldSkipPixel(l)) {
         outColor = sampleTexture(uSrcTexture, uv);
         return;
     }
     
-    EdgeData e = determineEdge(l, texelSize);
+    sEdgeData e = determineEdge(l, texelSize);
     float pixelBlend = determinePixelBlendFactor(l); 
     float edgeBlend = determineEdgeBlendFactor(l, e, uv, texelSize);
     

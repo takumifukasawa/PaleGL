@@ -2,7 +2,7 @@
 #define MAX_SPOT_LIGHT_COUNT 2
 #define MAX_POINT_LIGHT_COUNT 1
 
-struct Surface {
+struct sSurface {
     vec3 worldNormal;
     vec3 worldPosition;
     vec4 baseColor;
@@ -10,14 +10,14 @@ struct Surface {
 };
 
 
-struct DirectionalLight {
+struct sDirectionalLight {
     vec3 direction; // 光源自体の向く方向
     float intensity;
     vec4 color;
     mat4 shadowMapProjectionMatrix;
 };
 
-struct SpotLight {
+struct sSpotLight {
     vec4 color;
     vec3 position;
     vec3 direction; // spotlightの向き先
@@ -29,7 +29,7 @@ struct SpotLight {
     mat4 shadowMapProjectionMatrix;
 };
 
-struct PointLight {
+struct sPointLight {
     vec4 color;
     vec3 position;
     float intensity;

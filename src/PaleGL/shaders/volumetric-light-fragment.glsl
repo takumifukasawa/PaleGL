@@ -42,7 +42,7 @@ uniform vec3 uRayJitterSize;
 
 // voidでもいいが手動unrollの関係でバグるのでfloatで返す
 float calcTransmittance(
-    SpotLight spotLight,
+    sSpotLight spotLight,
     sampler2D spotLightShadowMap,
     vec3 rayPosInWorld,
     vec3 rayPosInView,
@@ -104,7 +104,7 @@ float calcTransmittance(
 void main() {
     vec2 uv = vUv;
 
-    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
     float rawDepth = texture(uDepthTexture, uv).r;
 
     float jitter = rand(uv + uTime) * 2. - 1.;

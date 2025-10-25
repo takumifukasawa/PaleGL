@@ -16,21 +16,21 @@
 // ref: https://zenn.dev/mebiusbox/books/619c81d2fbeafd/viewer/7c1069
 //
 
-struct IncidentLight {
+struct sIncidentLight {
     vec3 color;
     vec3 direction; // 光源への方向
     bool visible;
     float intensity;
 };
 
-struct ReflectedLight {
+struct sReflectedLight {
     vec3 directBase;
     vec3 directSpecular;
     vec3 indirectBase;
     vec3 indirectSpecular;
 };
 
-struct Material {
+struct sMaterial {
     vec3 baseColor;
     vec3 specularColor;
     float roughness;
@@ -59,7 +59,7 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 // directional light
 //
 
-void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight) {
+void getsDirectionalLightIrradiance(const in sDirectionalLight directionalLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     directLight.color = directionalLight.color.xyz;
     directLight.direction = -directionalLight.direction; // 光源への方向にするので反転
     directLight.visible = true;
@@ -70,7 +70,7 @@ void getDirectionalLightIrradiance(const in DirectionalLight directionalLight, c
 // spot light
 //
 
-void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight) {
+void getSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     // vec3 L = spotLight.position - geometry.position;
     vec3 surfaceToLight = spotLight.position - geometry.position;
     vec3 PtoL = normalize(surfaceToLight);
@@ -110,7 +110,7 @@ void getSpotLightIrradiance(const in SpotLight spotLight, const in GeometricCont
 // point light
 //
 
-void getPointLightIrradiance(const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight) {
+void getPointLightIrradiance(const in sPointLight pointLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     vec3 surfaceToLight = pointLight.position - geometry.position;
     float lightDistance = length(surfaceToLight);
     vec3 L = normalize(surfaceToLight);
@@ -173,8 +173,8 @@ float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
 
 // cook-torrance
 
-// vec3 SpecularBRDF(const in IncidentLight directLight, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
-vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+// vec3 SpecularBRDF(const in sIncidentLight directLight, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+vec3 SpecularBRDF(const vec3 lightDirection, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
     vec3 N = normalize(geometry.normal);
     vec3 V = normalize(geometry.viewDir);
     vec3 L = normalize(lightDirection);
@@ -200,10 +200,10 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in GeometricContext geometry,
 // -------------------------------------------------------------------------------
 
 void RE_Direct(
-    const in IncidentLight directLight,
-    const in GeometricContext geometry,
-    const in Material material,
-    inout ReflectedLight reflectedLight,
+    const in sIncidentLight directLight,
+    const in sGeometricContext geometry,
+    const in sMaterial material,
+    inout sReflectedLight reflectedLight,
     const in float shadow
 ) {
     // directionは光源への方向
@@ -242,10 +242,10 @@ void RE_Direct(
 // base: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
 void RE_DirectSkyboxFakeIBL(
     samplerCube cubeMap,
-    const in IncidentSkyboxLight skyboxLight,
-    const in GeometricContext geometry,
-    const in Material material,
-    inout ReflectedLight reflectedLight
+    const in sIncidentSkyboxLight skyboxLight,
+    const in sGeometricContext geometry,
+    const in sMaterial material,
+    inout sReflectedLight reflectedLight
 ) {
     //
     // base
@@ -369,7 +369,7 @@ float calcDirectionalLightShadowAttenuation(
     return clamp(shadow, 0., 1.);
 }
 
-float calcSpotLightShadowAttenuation(
+float calcsSpotLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
@@ -474,10 +474,10 @@ void main() {
 
     vec2 uv = vUv;
 
-    GBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
-    GBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
-    GBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
-    GBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, uv);
+    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
+    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
+    sGBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, uv);
 
     // TODO: use encode func
     // surface
@@ -538,7 +538,7 @@ void main() {
     // outColor = vec4(vec3(aoRate), 1.);
     // return;
 
-    Surface surface;
+    sSurface surface;
     surface.worldPosition = worldPosition;
     surface.worldNormal = worldNormal;
     surface.baseColor = vec4(baseColor, 1.);
@@ -551,22 +551,22 @@ void main() {
     // resultColor = calcDirectionalLight(surface, uDirectionalLight, camera);
 
     // pbr
-    GeometricContext geometry;
+    sGeometricContext geometry;
     geometry.position = surface.worldPosition;
     geometry.normal = surface.worldNormal;
     geometry.viewDir = normalize(uViewPosition - surface.worldPosition);
-    Material material;
+    sMaterial material;
     vec3 albedo = baseColor;
     material.baseColor = albedo;
     material.baseColor = mix(albedo, vec3(0.), metallic);// 金属は拡散反射しない
     material.specularColor = mix(vec3(.04), albedo, metallic);// 非金属でも4%は鏡面反射をさせる（多くの不導体に対応）
     material.roughness = roughness;
     material.metallic = metallic;
-    ReflectedLight reflectedLight = ReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
+    sReflectedLight reflectedLight = sReflectedLight(vec3(0.), vec3(0.), vec3(0.), vec3(0.));
     // TODO: なくていい？
     float opacity = 1.;
 
-    IncidentLight directLight;
+    sIncidentLight directLight;
     float shadow = 0.;
 
     // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
@@ -577,11 +577,11 @@ void main() {
     // directional light
     //
 
-    DirectionalLight directionalLight;
+    sDirectionalLight directionalLight;
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     directionalLight.intensity = uDirectionalLight.intensity;
-    getDirectionalLightIrradiance(directionalLight, geometry, directLight);
+    getsDirectionalLightIrradiance(directionalLight, geometry, directLight);
     shadow = calcDirectionalLightShadowAttenuation(
         worldPosition,
         surface.worldNormal,
@@ -597,12 +597,12 @@ void main() {
     //
     // spot light
     //
-    SpotLight spotLight;
+    sSpotLight spotLight;
     // TODO: shadow blend rate は light か何かに持たせたい
     // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
         getSpotLightIrradiance(uSpotLight[UNROLL_N], geometry, directLight);
-        shadow = calcSpotLightShadowAttenuation(
+        shadow = calcsSpotLightShadowAttenuation(
             worldPosition,
             surface.worldNormal,
             uSpotLight[UNROLL_N].direction,
@@ -620,7 +620,7 @@ void main() {
     // point light
     //
 
-    PointLight pointLight;
+    sPointLight pointLight;
 
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
     #pragma UNROLL_START MAX_POINT_LIGHT_COUNT
@@ -634,12 +634,12 @@ void main() {
     //
 
 #ifdef USE_ENV_MAP
-    SkyboxLight skyboxLight;
+    sSkyboxLight skyboxLight;
     skyboxLight.diffuseIntensity = uSkybox.diffuseIntensity;
     skyboxLight.specularIntensity = uSkybox.specularIntensity;
     skyboxLight.rotationOffset = uSkybox.rotationOffset;
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
-    IncidentSkyboxLight directSkyboxLight;
+    sIncidentSkyboxLight directSkyboxLight;
     directSkyboxLight.diffuseDirection = vec3(0.); // minifierでdirectSkyboxLightを消さないtrick
     getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
     RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
