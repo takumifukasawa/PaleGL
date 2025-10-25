@@ -356,22 +356,22 @@ export function setGPUUniformValues(gpu: Gpu) {
                 gl.uniform1fv(location, value as Float32Array);
                 break;
             case UNIFORM_TYPE_VECTOR2:
-                gl.uniform2fv(location, (value as Vector2).e);
+                gl.uniform2fv(location, value as Vector2);
                 break;
             case UNIFORM_TYPE_VECTOR2_ARRAY:
-                gl.uniform2fv(location, (value as Vector2[]).map((v) => [...v.e]).flat());
+                gl.uniform2fv(location, (value as Vector2[]).map((v) => [...v]).flat());
                 break;
             case UNIFORM_TYPE_VECTOR3:
-                gl.uniform3fv(location, (value as Vector3).e);
+                gl.uniform3fv(location, value as Vector3);
                 break;
             case UNIFORM_TYPE_VECTOR3_ARRAY:
-                gl.uniform3fv(location, (value as Vector3[]).map((v) => [...v.e]).flat());
+                gl.uniform3fv(location, (value as Vector3[]).map((v) => [...v]).flat());
                 break;
             case UNIFORM_TYPE_VECTOR4:
-                gl.uniform4fv(location, (value as Vector4).e);
+                gl.uniform4fv(location, value as Vector4);
                 break;
             case UNIFORM_TYPE_VECTOR4_ARRAY:
-                gl.uniform4fv(location, (value as Vector4[]).map((v) => [...v.e]).flat());
+                gl.uniform4fv(location, (value as Vector4[]).map((v) => [...v]).flat());
                 break;
             case UNIFORM_TYPE_MATRIX4:
                 // arg[1] ... use transpose.

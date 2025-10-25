@@ -2146,15 +2146,15 @@ function updateUniformBlockValue(
                 data.push(0);
                 break;
             case UNIFORM_TYPE_VECTOR2:
-                data.push(...(value as Vector2).e);
+                data.push(...(value as Vector2));
                 data.push(0);
                 break;
             case UNIFORM_TYPE_VECTOR3:
-                data.push(...(value as Vector3).e);
+                data.push(...(value as Vector3));
                 data.push(0);
                 break;
             case UNIFORM_TYPE_VECTOR4:
-                data.push(...(value as Vector4).e);
+                data.push(...(value as Vector4));
                 break;
             case UNIFORM_TYPE_MATRIX4:
                 data.push(...(value as Matrix4).e);
@@ -2204,7 +2204,8 @@ function updateUniformBlockValue(
                         data.push(0);
                         data.push(0);
                     } else {
-                        data.push(...(v as UniformBufferObjectElementValueNoNeedsPadding).e);
+                        const val = v as UniformBufferObjectElementValueNoNeedsPadding;
+                        data.push(...(val instanceof Float32Array ? val : (val as {e: Float32Array}).e));
                     }
                 });
                 updateUniformBufferData(targetUbo, uniformName, new Float32Array(data));
@@ -2214,7 +2215,9 @@ function updateUniformBlockValue(
                     uniformName,
                     typeof value === 'number'
                         ? new Float32Array([value])
-                        : (value as Vector2 | Vector3 | Vector4 | Matrix4 | Color).e
+                        : value instanceof Float32Array
+                        ? value
+                        : (value as {e: Float32Array}).e
                 );
             }
             break;

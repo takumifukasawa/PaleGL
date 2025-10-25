@@ -91,10 +91,10 @@ import {
 
 export type RawVector4 = { x: number; y: number; z: number; w: number };
 
-export type Vector4 = { e: Float32Array };
+export type Vector4 = Float32Array;
 
 export function createVector4(x: number, y: number, z: number, w: number): Vector4 {
-    return { e: new Float32Array([x, y, z, w]) };
+    return new Float32Array([x, y, z, w]);
 }
 
 export function createVector4One() {
@@ -126,14 +126,14 @@ export function createVector4FromRawVector4(obj: { x: number; y: number; z: numb
     return createVector4(obj.x, obj.y, obj.z, obj.w);
 }
 
-export const v4x = (v: Vector4) => v.e[0];
-export const v4y = (v: Vector4) => v.e[1];
-export const v4z = (v: Vector4) => v.e[2];
-export const v4w = (v: Vector4) => v.e[3];
-export const setV4x = (v: Vector4, value: number) => (v.e[0] = value);
-export const setV4y = (v: Vector4, value: number) => (v.e[1] = value);
-export const setV4z = (v: Vector4, value: number) => (v.e[2] = value);
-export const setV4w = (v: Vector4, value: number) => (v.e[3] = value);
+export const v4x = (v: Vector4) => v[0];
+export const v4y = (v: Vector4) => v[1];
+export const v4z = (v: Vector4) => v[2];
+export const v4w = (v: Vector4) => v[3];
+export const setV4x = (v: Vector4, value: number) => (v[0] = value);
+export const setV4y = (v: Vector4, value: number) => (v[1] = value);
+export const setV4z = (v: Vector4, value: number) => (v[2] = value);
+export const setV4w = (v: Vector4, value: number) => (v[3] = value);
 
 export function multiplyVector4AndMatrix4(v: Vector4, m: Matrix4) {
     const tmpX = v4x(v);

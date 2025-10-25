@@ -12,19 +12,22 @@ import {
 } from '@/PaleGL/math/matrix4.ts';
 import {createVector3, v3x, v3y, v3z, Vector3} from "@/PaleGL/math/vector3.ts";
 
-export type Quaternion = { e :Float32Array };
+export type Quaternion = Float32Array;
 
 export function createQuaternion(x: number, y: number, z: number, w: number) {
-    return {e: new Float32Array([x, y, z, w])};
+    return new Float32Array([x, y, z, w]);
 }
 
-export const qx = (q: Quaternion) => q.e[0];
-export const qy = (q: Quaternion) => q.e[1];
-export const qz = (q: Quaternion) => q.e[2];
-export const qw = (q: Quaternion) => q.e[3];
+export const qx = (q: Quaternion) => q[0];
+export const qy = (q: Quaternion) => q[1];
+export const qz = (q: Quaternion) => q[2];
+export const qw = (q: Quaternion) => q[3];
 
 export function copyQuaternion(sq: Quaternion, tq: Quaternion) {
-    sq.e = new Float32Array(tq.e);
+    sq[0] = tq[0];
+    sq[1] = tq[1];
+    sq[2] = tq[2];
+    sq[3] = tq[3];
     return sq;
 }
 

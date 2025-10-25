@@ -240,15 +240,15 @@ out vec4 o; void main() {o=vec4(0,1.,0,1.);}
         }
 
         // near clip
-        const nlt = frustumPositions.nlt.e; // nearLeftTop: 0
-        const nlb = frustumPositions.nlb.e; // nearLeftBottom: 1
-        const nrt = frustumPositions.nrt.e; // nearRightTop: 2
-        const nrb = frustumPositions.nrb.e; // nearRightBottom: 3
+        const nlt = frustumPositions.nlt; // nearLeftTop: 0
+        const nlb = frustumPositions.nlb; // nearLeftBottom: 1
+        const nrt = frustumPositions.nrt; // nearRightTop: 2
+        const nrb = frustumPositions.nrb; // nearRightBottom: 3
         // far clip
-        const flt = frustumPositions.flt.e; // farLeftTop: 4
-        const flb = frustumPositions.flb.e; // farLeftBottom: 5
-        const frt = frustumPositions.frt.e; // farRightTop: 6
-        const frb = frustumPositions.frb.e; // farRightBottom: 7
+        const flt = frustumPositions.flt; // farLeftTop: 4
+        const flb = frustumPositions.flb; // farLeftBottom: 5
+        const frt = frustumPositions.frt; // farRightTop: 6
+        const frb = frustumPositions.frb; // farRightBottom: 7
 
         // console.log(nlt);
         // console.log(nrt);

@@ -22,40 +22,18 @@ export function createVector3FromRaw(raw: RawVector3) {
 
 // export const createVector3Zero = () => new Vector3(0, 0, 0);
 
-export type Vector3 = { e: Float32Array; x: number; y: number; z: number };
+export type Vector3 = Float32Array;
 
 export function createVector3(x: number, y: number, z: number): Vector3 {
-    // return { e: new Float32Array([x, y, z]), x:  };
-    const e = new Float32Array([x, y, z]);
-    return {
-        e,
-        get x() {
-            return e[0];
-        },
-        // set x(value) {
-        //     e[0] = value;
-        // },
-        get y() {
-            return e[1];
-        },
-        // set y(value) {
-        //     e[1] = value;
-        // },
-        get z() {
-            return e[2];
-        },
-        // set z(value) {
-        //     e[2] = value;
-        // },
-    };
+    return new Float32Array([x, y, z]);
 }
 
-export const v3x = (v: Vector3) => v.e[0];
-export const v3y = (v: Vector3) => v.e[1];
-export const v3z = (v: Vector3) => v.e[2];
-export const setV3x = (v: Vector3, value: number) => (v.e[0] = value);
-export const setV3y = (v: Vector3, value: number) => (v.e[1] = value);
-export const setV3z = (v: Vector3, value: number) => (v.e[2] = value);
+export const v3x = (v: Vector3) => v[0];
+export const v3y = (v: Vector3) => v[1];
+export const v3z = (v: Vector3) => v[2];
+export const setV3x = (v: Vector3, value: number) => (v[0] = value);
+export const setV3y = (v: Vector3, value: number) => (v[1] = value);
+export const setV3z = (v: Vector3, value: number) => (v[2] = value);
 export const setV3 = (v: Vector3, x: number, y: number, z: number) => {
     setV3x(v, x);
     setV3y(v, y);

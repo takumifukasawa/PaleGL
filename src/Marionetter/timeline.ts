@@ -606,7 +606,7 @@ function createMarionetterAnimationClip(
                     vector4PropertyMap.set(key, v4);
                     break;
                 default:
-                    console.error(`[createMarionetterAnimationClip] invalid vector4 length: ${v4.e.length}`);
+                    console.error(`[createMarionetterAnimationClip] invalid vector4 length: ${v4.length}`);
                     break;
             }
         });

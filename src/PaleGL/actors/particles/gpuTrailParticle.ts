@@ -32,7 +32,7 @@ import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { createVector3, normalizeVector3 } from '@/PaleGL/math/vector3.ts';
+import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 
 export type GPUTrailParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
@@ -173,7 +173,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
         for (let ai = 0; ai < angleSegment; ai++) {
             const angle = ai * angleStep + Math.PI * 0.5;
             const position = createVector3(radius * Math.cos(angle), radius * Math.sin(angle), 0.0);
-            posCount = addVertex3(positions, posCount, position.x, position.y, position.z);
+            posCount = addVertex3(positions, posCount, v3x(position), v3y(position), v3z(position));
             if (ti === 0) {
                 // 前のcap部分
                 normalCount = addVertex3(normals, normalCount, 0.0, 0.0, -1.0);
@@ -185,7 +185,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
             } else {
                 // 後ろのcap
                 const normal = normalizeVector3(position);
-                normalCount = addVertex3(normals, normalCount, normal.x, normal.y, 0.0);
+                normalCount = addVertex3(normals, normalCount, v3x(normal), v3y(normal), 0.0);
                 trailVertices[trailVertexCount++] = ti - 1;
             }
         }

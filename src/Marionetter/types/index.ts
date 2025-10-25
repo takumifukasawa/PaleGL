@@ -1,9 +1,9 @@
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 import { Color } from '@/PaleGL/math/color.ts';
-import { RawVector2 } from '@/PaleGL/math/vector2.ts';
-import { RawVector3 } from '@/PaleGL/math/vector3.ts';
-import { RawVector4 } from '@/PaleGL/math/vector4.ts';
+import { RawVector2, Vector2 } from '@/PaleGL/math/vector2.ts';
+import { RawVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { RawVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 //
 // settings
@@ -1027,4 +1027,4 @@ export type TimelinePropertyBinderType = typeof TIMELINE_PROPERTY_BINDER_TYPE_FL
 export const TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL = 0;
 export type TimelinePropertyBinderTarget = typeof TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL;
 
-export type TimelinePropertyValue = number | Color;
+export type TimelinePropertyValue = number | Vector2 | Vector3 | Vector4 | Color;

@@ -14,8 +14,8 @@ export function createTangentsAndBinormals(normals: number[]) {
         const n = createVector3(x, y, z);
         const t = getVector3Tangent(n);
         const b = getBinormalFromTangent(t, n);
-        tangents.push(...t.e);
-        binormals.push(...b.e);
+        tangents.push(...t);
+        binormals.push(...b);
     }
     return {
         tangents,
@@ -29,7 +29,7 @@ export function createBinormals(normals: number[], tangents: number[]) {
         const n = createVector3(normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2]);
         const t = createVector3(tangents[i * 3 + 0], tangents[i * 3 + 1], tangents[i * 3 + 2]);
         const b = getBinormalFromTangent(t, n);
-        binormals.push(...b.e);
+        binormals.push(...b);
     }
     return binormals;
 }

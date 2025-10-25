@@ -47,14 +47,14 @@ export function createBoxGeometryRawData(size: Vector3 = createVector3One()) {
     // 1 ---- 3
     // -----------------------------
 
-    const boxPosition_0 = [-s.x, s.y, s.z];
-    const boxPosition_1 = [-s.x, -s.y, s.z];
-    const boxPosition_2 = [s.x, s.y, s.z];
-    const boxPosition_3 = [s.x, -s.y, s.z];
-    const boxPosition_4 = [s.x, s.y, -s.z];
-    const boxPosition_5 = [s.x, -s.y, -s.z];
-    const boxPosition_6 = [-s.x, s.y, -s.z];
-    const boxPosition_7 = [-s.x, -s.y, -s.z];
+    const boxPosition_0 = [-s[0], s[1], s[2]];
+    const boxPosition_1 = [-s[0], -s[1], s[2]];
+    const boxPosition_2 = [s[0], s[1], s[2]];
+    const boxPosition_3 = [s[0], -s[1], s[2]];
+    const boxPosition_4 = [s[0], s[1], -s[2]];
+    const boxPosition_5 = [s[0], -s[1], -s[2]];
+    const boxPosition_6 = [-s[0], s[1], -s[2]];
+    const boxPosition_7 = [-s[0], -s[1], -s[2]];
 
     const normalsRaw = [
         [0, 0, 1], // front
@@ -156,14 +156,14 @@ export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
     const { gpu, size = createVector3One() } = args; // デフォルトが長さ1
 
     const s = scaleVector3ByScalar(size, 0.5);
-    const boxPosition_0 = [-s.x, s.y, s.z];
-    const boxPosition_1 = [-s.x, -s.y, s.z];
-    const boxPosition_2 = [s.x, s.y, s.z];
-    const boxPosition_3 = [s.x, -s.y, s.z];
-    const boxPosition_4 = [s.x, s.y, -s.z];
-    const boxPosition_5 = [s.x, -s.y, -s.z];
-    const boxPosition_6 = [-s.x, s.y, -s.z];
-    const boxPosition_7 = [-s.x, -s.y, -s.z];
+    const boxPosition_0 = [-s[0], s[1], s[2]];
+    const boxPosition_1 = [-s[0], -s[1], s[2]];
+    const boxPosition_2 = [s[0], s[1], s[2]];
+    const boxPosition_3 = [s[0], -s[1], s[2]];
+    const boxPosition_4 = [s[0], s[1], -s[2]];
+    const boxPosition_5 = [s[0], -s[1], -s[2]];
+    const boxPosition_6 = [-s[0], s[1], -s[2]];
+    const boxPosition_7 = [-s[0], -s[1], -s[2]];
 
     const localPositions = [
         // front

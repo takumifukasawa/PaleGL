@@ -68,18 +68,16 @@ export function createVector2FromRaw(raw: RawVector2) {
     return createVector2(raw.x, raw.y);
 }
 
-export type Vector2 = {
-    e: Float32Array;
-};
+export type Vector2 = Float32Array;
 
 export function createVector2(x: number, y: number): Vector2 {
-    return { e: new Float32Array([x, y]) };
+    return new Float32Array([x, y]);
 }
 
-export const v2x = (v2: Vector2) => v2.e[0];
-export const v2y = (v2: Vector2) => v2.e[1];
-export const setV2x = (v2: Vector2, value: number) => (v2.e[0] = value);
-export const setV2y = (v2: Vector2, value: number) => (v2.e[1] = value);
+export const v2x = (v2: Vector2) => v2[0];
+export const v2y = (v2: Vector2) => v2[1];
+export const setV2x = (v2: Vector2, value: number) => (v2[0] = value);
+export const setV2y = (v2: Vector2, value: number) => (v2[1] = value);
 export const setV2 = (v2: Vector2, x: number, y: number) => {
     setV2x(v2, x);
     setV2y(v2, y);
@@ -121,8 +119,5 @@ ${v2x(v)}, ${v2y(v)}
 }
 
 export function isVector2(v: unknown) {
-    if (Object.hasOwn(v as object, 'e')) {
-        return (v as Vector2).e.length === 2;
-    }
-    return false;
+    return v instanceof Float32Array && v.length === 2;
 }

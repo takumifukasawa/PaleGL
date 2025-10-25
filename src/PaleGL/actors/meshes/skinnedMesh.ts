@@ -351,7 +351,7 @@ export function updateSkinnedMesh(actor: Actor, options: ActorUpdateArgs) {
         // console.log("--------")
         const boneLinePositions: number[][] = skinnedMesh.boneOrderedIndex.map((bone) => {
             // console.log(bone.jointMatrix.position.e)
-            return [...getMat4Position(bone.jointMatrix).e];
+            return [...getMat4Position(bone.jointMatrix)];
         });
         // this.boneLines.geometry.updateAttribute(ATTRIBUTE_NAME_POSITION, boneLinePositions.flat())
         // this.bonePoints.geometry.updateAttribute(ATTRIBUTE_NAME_POSITION, boneLinePositions.flat())
