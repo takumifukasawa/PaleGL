@@ -129,11 +129,15 @@ export const shaderIdentifierReplacementPlugin = (
                         savings: i.savings,
                         newName: identifierMap.get(i.name)
                     }));
+                const tmpDir = path.join(process.cwd(), 'tmp');
+                if (!fs.existsSync(tmpDir)) {
+                    fs.mkdirSync(tmpDir, { recursive: true });
+                }
                 fs.writeFileSync(
-                    path.join(process.cwd(), 'vite-plugin-uniforms.json'),
+                    path.join(tmpDir, 'vite-plugin-uniforms.json'),
                     JSON.stringify(uniformList, null, 2)
                 );
-                console.log(`[shader-identifier] Saved uniform list to vite-plugin-uniforms.json (${uniformList.length} uniforms)`);
+                console.log(`[shader-identifier] Saved uniform list to tmp/vite-plugin-uniforms.json (${uniformList.length} uniforms)`);
 
 
                 // 各GLSLファイルの置換済みコードをキャッシュに保存
