@@ -138,9 +138,12 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
     const co = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS];
     if (co) {
-        return (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
-              (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
-          ) as T) || null;
+        return (
+            // @ts-ignore
+            (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
+                (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
+            ) as T) || null
+        );
     } else {
         return null;
     }
@@ -448,6 +451,9 @@ export function buildMarionetterScene(
             setScaling(
                 actor.transform,
                 createVector3(
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][7],
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][8],
+                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][9]
                     obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].x,
                     obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].y,
                     obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].z
@@ -493,6 +499,10 @@ export function buildMarionetterScene(
                             obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
                                 MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
                             ].w
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][3],
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][4],
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][5],
+                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][6]
                         ),
                         actor,
                         needsFlip
@@ -503,6 +513,9 @@ export function buildMarionetterScene(
                 obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].x,
                 obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].y,
                 obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].z
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0],
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1],
+                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2]
             );
 
             generatedActorHook?.(gpu, actor);

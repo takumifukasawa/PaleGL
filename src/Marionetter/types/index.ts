@@ -123,6 +123,17 @@ export type MarionetterTransformInfo = {
     ls: { x: number; y: number; z: number };
 };
 
+// [
+//      lp.x, lp.y, lp.z, // 0,1,2
+//      lr.x, lr.y, lr.z, lr.w, // 3,4,5,6
+//      ls.x, ls.y, ls.z // 7,8,9
+// ]
+// export type MarionetterTransformInfo = number[];
+
+// export const MARIONETTER_TRANSFORM_LOCAL_POSITION_X_INDEX = 0;
+// export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Y_INDEX = 1;
+// export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Z_INDEX = 2;
+
 export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
 export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION = NeedsShorten ? 'lr' : 'localRotation';
 export const MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE = NeedsShorten ? 'ls' : 'localScale';
@@ -232,7 +243,9 @@ export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION = NeedsShorten ? 'd' :
 // NOTE: unity側に合わせる
 export const MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT = 0;
 export const MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL = 1;
-export type MarionetterAnimationClipType = typeof MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT | typeof MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL;
+export type MarionetterAnimationClipType =
+    | typeof MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT
+    | typeof MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL;
 
 export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
     animationClipType: MarionetterAnimationClipType;
@@ -274,12 +287,22 @@ export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase & {
     b: MarionetterClipBinding[];
 };
 
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten ? 'tn' : 'lookAtTargetName';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten
+    ? 'lp'
+    : 'localPosition';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten
+    ? 'tn'
+    : 'lookAtTargetName';
 export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X = NeedsShorten ? 'lp.x' : 'LocalPosition.x';
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y = NeedsShorten ? 'lp.y' : 'LocalPosition.y';
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z = NeedsShorten ? 'lp.z' : 'LocalPosition.z';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X = NeedsShorten
+    ? 'lp.x'
+    : 'LocalPosition.x';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y = NeedsShorten
+    ? 'lp.y'
+    : 'LocalPosition.y';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z = NeedsShorten
+    ? 'lp.z'
+    : 'LocalPosition.z';
 
 export type MarionetterObjectMoveAndLookAtClipInfoProperty =
     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION
@@ -833,7 +856,9 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
     gl_br: number;
 };
 
-export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten ? 'bl_a' : 'bloomAmount';
+export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten
+    ? 'bl_a'
+    : 'bloomAmount';
 
 // object move and look at controller component
 
@@ -845,8 +870,12 @@ export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterC
     tn: string;
 };
 
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten ? 'lp' : 'localPosition';
-export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten ? 'tn' : 'lookAtTargetName';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten
+    ? 'lp'
+    : 'localPosition';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten
+    ? 'tn'
+    : 'lookAtTargetName';
 
 // fbm noise texture controller component
 
@@ -858,10 +887,16 @@ export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterCompo
     factor: number;
 };
 
-export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_GRID_SIZE = NeedsShorten ? 'gs' : 'gridSize';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_GRID_SIZE = NeedsShorten
+    ? 'gs'
+    : 'gridSize';
 export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_OCTAVES = NeedsShorten ? 'o' : 'octaves';
-export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_AMPLITUDE = NeedsShorten ? 'a' : 'amplitude';
-export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FREQUENCY = NeedsShorten ? 'f' : 'frequency';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_AMPLITUDE = NeedsShorten
+    ? 'a'
+    : 'amplitude';
+export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FREQUENCY = NeedsShorten
+    ? 'f'
+    : 'frequency';
 export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FACTOR = NeedsShorten ? 'fa' : 'factor';
 
 // gbuffer material controller component
@@ -873,10 +908,18 @@ export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterCompo
     roughness: number;
 };
 
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR = NeedsShorten ? 'bc' : 'baseColor';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR = NeedsShorten ? 'ec' : 'emissiveColor';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_METALLIC = NeedsShorten ? 'ec' : 'metallic';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_ROUGHNESS = NeedsShorten ? 'r' : 'roughness';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR = NeedsShorten
+    ? 'bc'
+    : 'baseColor';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR = NeedsShorten
+    ? 'ec'
+    : 'emissiveColor';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_METALLIC = NeedsShorten
+    ? 'ec'
+    : 'metallic';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_ROUGHNESS = NeedsShorten
+    ? 'r'
+    : 'roughness';
 
 // //
 // // post process component properties
@@ -1023,7 +1066,12 @@ export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR2 = 1;
 export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR3 = 2;
 export const TIMELINE_PROPERTY_BINDER_TYPE_VECTOR4 = 3;
 export const TIMELINE_PROPERTY_BINDER_TYPE_COLOR = 4;
-export type TimelinePropertyBinderType = typeof TIMELINE_PROPERTY_BINDER_TYPE_FLOAT | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR2 | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR3 | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR4 | typeof TIMELINE_PROPERTY_BINDER_TYPE_COLOR;
+export type TimelinePropertyBinderType =
+    | typeof TIMELINE_PROPERTY_BINDER_TYPE_FLOAT
+    | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR2
+    | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR3
+    | typeof TIMELINE_PROPERTY_BINDER_TYPE_VECTOR4
+    | typeof TIMELINE_PROPERTY_BINDER_TYPE_COLOR;
 
 export const TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL = 0;
 export type TimelinePropertyBinderTarget = typeof TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL;
