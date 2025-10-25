@@ -15,7 +15,7 @@ out vec2 vUv;
 #include <shape_font_h>
 
 uniform vec2 uUICharRect;
-uniform vec2 uUIAnchor; // -1.0 ~ 1.0
+uniform vec2 uUIAnchor; // -1. ~ 1.
 uniform float uUIFontSize;
 
 void main() {

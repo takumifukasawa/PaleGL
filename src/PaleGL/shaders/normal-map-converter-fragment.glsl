@@ -32,7 +32,7 @@ void main() {
     // 
     // vec3 n = normalize(cross(du, dv));
     // 
-    // outColor = vec4(n, 1.0);
+    // outColor = vec4(n, 1.);
     // // outColor = vec4(du, 1.);
     // 
     // // debug
@@ -52,7 +52,7 @@ void main() {
     // 勾配から法線ベクトルを計算
     vec3 normal = normalize(vec3(hL - hR, hD - hU, uParallaxScale * uNormalScale));
     
-    outColor = vec4(normal * 0.5 + 0.5, 1.0);
+    outColor = vec4(normal * 0.5 + 0.5, 1.);
 
     // for debug
     // outColor = vec4(texture(uSrcMap, uv));

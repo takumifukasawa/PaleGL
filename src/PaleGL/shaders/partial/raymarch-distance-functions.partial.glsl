@@ -77,8 +77,8 @@ vec2 opFoldRotate(in vec2 p, float s) {
 
 float opSm( float d1, float d2, float k )
 {
-    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
-    return mix( d2, d1, h ) - k*h*(1.0-h);
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0., 1. );
+    return mix( d2, d1, h ) - k*h*(1.-h);
 }
 
 //
@@ -101,7 +101,7 @@ float dfRb(vec3 p, vec3 b, float r) {
 float dfBox(vec3 p, vec3 b)
 {
     vec3 q = abs(p) - b;
-    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.);
 }
 
 // box
@@ -114,7 +114,7 @@ float dfBoxt(vec3 p, vec3 b)
 float dfRBox(vec3 p, vec3 b, float r)
 {
     vec3 q = abs(p) - b + r;
-    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r;
+    return length(max(q,0.)) + min(max(q.x,max(q.y,q.z)),0.) - r;
 }
 
 float dfRBoxt(vec3 p, vec3 b, float r)
@@ -160,7 +160,7 @@ float dfCaa(vec3 p, vec3 c, float h, float r)
 
 // float dfCav(vec3 p, float h, float r)
 // {
-//     p.y -= clamp(p.y, 0.0, h);
+//     p.y -= clamp(p.y, 0., h);
 //     return length(p) - r;
 // }
 
@@ -188,8 +188,8 @@ float dfCaa(vec3 p, vec3 c, float h, float r)
 // h: 高さ
 float dfRoundedCylinder(vec3 p, float h, float ra, float rb)
 {
-    vec2 d = vec2(length(p.xz)-2.0*ra+rb, abs(p.y) - h);
-    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rb;
+    vec2 d = vec2(length(p.xz)-2.*ra+rb, abs(p.y) - h);
+    return min(max(d.x, d.y), 0.) + length(max(d, 0.)) - rb;
 }
 
 float dfCone(vec3 p, float h, vec2 c)
@@ -197,11 +197,11 @@ float dfCone(vec3 p, float h, vec2 c)
     // c is the sin/cos of the angle, h is height
     // Alternatively pass q instead of (c,h),
     // which is the point at the base in 2D
-    vec2 q = h*vec2(c.x/c.y, -1.0);
+    vec2 q = h*vec2(c.x/c.y, -1.);
 
     vec2 w = vec2(length(p.xz), p.y);
-    vec2 a = w - q*clamp(dot(w, q)/dot(q, q), 0.0, 1.0);
-    vec2 b = w - q*vec2(clamp(w.x/q.x, 0.0, 1.0), 1.0);
+    vec2 a = w - q*clamp(dot(w, q)/dot(q, q), 0., 1.);
+    vec2 b = w - q*vec2(clamp(w.x/q.x, 0., 1.), 1.);
     float k = sign(q.y);
     float d = min(dot(a, a), dot(b, b));
     float s = max(k*(w.x*q.y-w.y*q.x), k*(w.y-q.y));
@@ -216,12 +216,12 @@ float dfCone(vec3 p, float h, vec2 c)
 float dfRco(vec3 p, float h, float r1, float r2)
 {
     float b = (r1-r2)/h;
-    float a = sqrt(1.0-b*b);
+    float a = sqrt(1.-b*b);
     
     vec2 q = vec2( length(p.xz), p.y );
     float k = dot(q,vec2(-b,a));
-    if( k<0.0 ) return length(q) - r1;
-    if( k>a*h ) return length(q-vec2(0.0,h)) - r2;
+    if( k<0. ) return length(q) - r1;
+    if( k>a*h ) return length(q-vec2(0.,h)) - r2;
     return dot(q, vec2(a,b) ) - r1;
 }
 
@@ -240,7 +240,7 @@ float dfVes(vec3 p, vec3 a, vec3 b, float w)
     
     float r = 0.5*l;
     float d = 0.5*(r*r-w*w)/w;
-    vec3  h = (r*q.x<d*(q.y-r)) ? vec3(0.0,r,0.0) : vec3(-d,0.0,d+w);
+    vec3  h = (r*q.x<d*(q.y-r)) ? vec3(0.,r,0.) : vec3(-d,0.,d+w);
  
     return length(q-h.xy) - h.z;
 }

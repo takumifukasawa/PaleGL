@@ -33,7 +33,7 @@ void main() {
   
     // 6つの色の平均を取る
     // 輝度は考慮しない
-    vec4 c = (c0 + c1 + c2 + c3 + c4 + c5) / 6.0;
+    vec4 c = (c0 + c1 + c2 + c3 + c4 + c5) / 6.;
     
     outColor = vec4(c.xyz, 1.);
 }

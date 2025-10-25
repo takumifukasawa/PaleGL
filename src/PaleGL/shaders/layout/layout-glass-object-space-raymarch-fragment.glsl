@@ -59,9 +59,9 @@ mat2 rot2(float a) {
 float signedAngle(vec3 a, vec3 b, vec3 axis) {
     vec3 na = normalize(a);
     vec3 nb = normalize(b);
-    float angle = acos(clamp(dot(na, nb), -1.0, 1.0)); // 安全な内積
+    float angle = acos(clamp(dot(na, nb), -1., 1.)); // 安全な内積
     float sign = dot(axis, cross(na, nb));
-    return sign < 0.0 ? -angle : angle;
+    return sign < 0. ? -angle : angle;
 }
 
 vec2 shiftReflUv(

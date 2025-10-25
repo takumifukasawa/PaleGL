@@ -10,7 +10,7 @@ layout (location = 1) out vec3 outPosition;
 // uniform float uMaxRadius;
 
 void main(void) {
-  float maxRadius = 2.0; // Set a maximum radius for the sphere
+  float maxRadius = 2.; // Set a maximum radius for the sphere
   outVelocity = vec3(0.); // Initial velocity
   outPosition = randomInSphere(gl_FragCoord.x) * maxRadius;
 
