@@ -7,12 +7,14 @@ export interface ShaderIdentifierReplacementOptions {
     includeUniforms?: boolean;
     includeVaryings?: boolean;
     includeAttributes?: boolean;
+    includeStructs?: boolean;
+    includeFunctions?: boolean;
     verbose?: boolean;
 }
 
 interface IdentifierInfo {
     name: string;
-    type: 'uniform' | 'varying' | 'attribute';
+    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'function';
     count: number;
     length: number;
     savings: number;
@@ -36,6 +38,8 @@ export const shaderIdentifierReplacementPlugin = (
         includeUniforms = true,
         includeVaryings = false,
         includeAttributes = false,
+        includeStructs = false,
+        includeFunctions = false,
         verbose = false,
     } = options;
 
@@ -120,6 +124,18 @@ export const shaderIdentifierReplacementPlugin = (
 
                     identifiers.push(...attributes);
                     console.log(`[shader-identifier] Found ${attributes.length} attributes (${attributesFromGLSL.length} from GLSL, ${attributesFromStrings.length} from strings)`);
+                }
+
+                if (includeStructs) {
+                    const structs = collectIdentifiers(allContent, /struct\s+(s[A-Z]\w+)/g, 'struct');
+                    identifiers.push(...structs);
+                    console.log(`[shader-identifier] Found ${structs.length} structs`);
+                }
+
+                if (includeFunctions) {
+                    const functions = collectIdentifiers(allContent, /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+(f[A-Z]\w+)\s*\(/g, 'function');
+                    identifiers.push(...functions);
+                    console.log(`[shader-identifier] Found ${functions.length} functions`);
                 }
 
                 // 優先順位付け（削減効果の高い順）
@@ -220,7 +236,7 @@ function collectExistingIdentifiers(content: string, existing: Set<string>): voi
 function collectIdentifiers(
     content: string,
     pattern: RegExp,
-    type: 'uniform' | 'varying' | 'attribute'
+    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'function'
 ): IdentifierInfo[] {
     const counts = new Map<string, number>();
     const matches = content.matchAll(pattern);
@@ -283,6 +299,8 @@ function generateMappings(
     let uIndex = 1;
     let vIndex = 1;
     let aIndex = 1;
+    let sIndex = 1;
+    let fIndex = 1;
 
     for (const info of identifiers) {
         let candidate: string;
@@ -300,13 +318,25 @@ function generateMappings(
                 candidate = `v${index++}`;
             } while (existing.has(candidate));
             vIndex = index;
-        } else {
-            // attribute
+        } else if (info.type === 'attribute') {
             index = aIndex;
             do {
                 candidate = `a${index++}`;
             } while (existing.has(candidate));
             aIndex = index;
+        } else if (info.type === 'struct') {
+            index = sIndex;
+            do {
+                candidate = `s${index++}`;
+            } while (existing.has(candidate));
+            sIndex = index;
+        } else {
+            // function
+            index = fIndex;
+            do {
+                candidate = `f${index++}`;
+            } while (existing.has(candidate));
+            fIndex = index;
         }
 
         map.set(info.name, candidate);

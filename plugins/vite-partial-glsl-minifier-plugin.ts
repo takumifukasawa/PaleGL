@@ -142,10 +142,12 @@ export const partialGlslMinifierPlugin = (
 function collectVariables(content: string): VariableInfo[] {
     const counts = new Map<string, number>();
     const excludePatterns = [
-        // uniform/varying/attribute
+        // uniform/varying/attribute/struct/function
         /^u[A-Z]/,
         /^v[A-Z]/,
         /^a[A-Z]/,
+        /^s[A-Z]/,
+        /^f[A-Z]/,
         // 既に短い変数
         /^[a-zA-Z_]$/,
         /^[a-zA-Z_][0-9]$/,
