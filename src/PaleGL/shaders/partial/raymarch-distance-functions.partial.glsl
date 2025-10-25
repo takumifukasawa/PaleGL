@@ -16,66 +16,66 @@
 //
 
 // ref: https://www.shadertoy.com/view/ldlcRf
-vec2 minMat(vec2 d1, vec2 d2) {
+vec2 fMinMat(vec2 d1, vec2 d2) {
     return (d1.x < d2.x) ? d1 : d2;
 }
 
-mat2 rot(float a) {
+mat2 fRot(float a) {
     float s = sin(a), c = cos(a);
     return mat2(c, s, -s, c);
 }
 
-vec3 opRepeat(vec3 p, float s) {
+vec3 fOpRepeat(vec3 p, float s) {
     return p - s * round(p / s);
 }
 
-vec3 opLiRe(vec3 p, float s, vec3 l)
+vec3 fOpLiRe(vec3 p, float s, vec3 l)
 {
     return p - s * clamp(round(p / s), -l, l);
 }
 
-vec2 opRo(vec2 p, float a) {
-    return p * rot(-a);
+vec2 fOpRo(vec2 p, float a) {
+    return p * fRot(-a);
 }
 
 // p: 座標
 // xz: 前後回転: -で前
 // xy: 上下回転: -で上
 // yz: ひねり: +で[+z->-y]側へひねり
-vec3 opRot3(vec3 p, float xz, float xy, float yz) {
-    p.xz = opRo(p.xz, -xz);
-    p.xy = opRo(p.xy, -xy);
-    p.yz = opRo(p.yz, -yz);
+vec3 fOpRot3(vec3 p, float xz, float xy, float yz) {
+    p.xz = fOpRo(p.xz, -xz);
+    p.xy = fOpRo(p.xy, -xy);
+    p.yz = fOpRo(p.yz, -yz);
     return p;
 }
 
 
-vec3 opTr(vec3 p, vec3 t) {
+vec3 fOpTr(vec3 p, vec3 t) {
     return p - t;
 }
 
 // NOTE: sが1以下だとおかしくなることに注意
-vec3 opSc(vec3 p, vec3 s) {
+vec3 fOpSc(vec3 p, vec3 s) {
     return p * (1. / s);
 }
 
-vec3 opPrSc(vec3 p, vec3 s) {
+vec3 fOpPrSc(vec3 p, vec3 s) {
     return p / s;
 }
 
-float opPoSc(float d, vec3 s) {
+float fOpPoSc(float d, vec3 s) {
     return d * min(s.x, min(s.y, s.z));
 }
 
-vec2 opFoldRotate(in vec2 p, float s) {
+vec2 fOpFoldRotate(in vec2 p, float s) {
     float a = PI / s - atan(p.x, p.y);
     float n = PI * 2. / s;
     a = floor(a / n) * n;
-    p = opRo(p, -a);
+    p = fOpRo(p, -a);
     return p;
 }
 
-float opSm( float d1, float d2, float k )
+float fOpSm( float d1, float d2, float k )
 {
     float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0., 1. );
     return mix( d2, d1, h ) - k*h*(1.-h);
@@ -86,19 +86,19 @@ float opSm( float d1, float d2, float k )
 //
 
 // radius ... 半径
-float dfSp(vec3 p, float radius) {
+float fDfSp(vec3 p, float radius) {
     return length(p) - radius;
 }
 
 // round box
-float dfRb(vec3 p, vec3 b, float r) {
+float fDfRb(vec3 p, vec3 b, float r) {
     vec3 q = abs(p) - b;
     return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.) - r;
 }
 
 // box
 // b...辺の半分の長さ
-float dfBox(vec3 p, vec3 b)
+float fDfBox(vec3 p, vec3 b)
 {
     vec3 q = abs(p) - b;
     return length(max(q, 0.)) + min(max(q.x, max(q.y, q.z)), 0.);
@@ -106,27 +106,27 @@ float dfBox(vec3 p, vec3 b)
 
 // box
 // b...辺の長さ
-float dfBoxt(vec3 p, vec3 b)
+float fDfBoxt(vec3 p, vec3 b)
 {
-    return dfBox(p, b * .5);
+    return fDfBox(p, b * .5);
 }
 
-float dfRBox(vec3 p, vec3 b, float r)
+float fDfRBox(vec3 p, vec3 b, float r)
 {
     vec3 q = abs(p) - b + r;
     return length(max(q,0.)) + min(max(q.x,max(q.y,q.z)),0.) - r;
 }
 
-float dfRBoxt(vec3 p, vec3 b, float r)
+float fDfRBoxt(vec3 p, vec3 b, float r)
 {
-    return dfRBox(p, b * .5, r);
+    return fDfRBox(p, b * .5, r);
 }
 
 // capsule
 // a ... capsuleの下の球の中心
 // b ... capsuleの上の球の中心
 // r ... 大きさ
-float dfCa(vec3 p, vec3 a, vec3 b, float r)
+float fDfCa(vec3 p, vec3 a, vec3 b, float r)
 {
     vec3 pa = p - a, ba = b - a;
     float h = clamp(dot(pa, ba) / dot(ba, ba), 0., 1.);
@@ -138,12 +138,12 @@ float dfCa(vec3 p, vec3 a, vec3 b, float r)
 // h ... 高さ
 // r ... 球の大きさ
 // 合計の高さは h + r * 2
-float dfCac(vec3 p, vec3 c, float h, float r)
+float fDfCac(vec3 p, vec3 c, float h, float r)
 {
     float hh = h * .5;
     vec3 a = c - vec3(0., hh, 0.);
     vec3 b = c + vec3(0., hh, 0.);
-    return dfCa(p, a, b, r);
+    return fDfCa(p, a, b, r);
 }
 
 // capsule - 下の球がy=0に接地
@@ -151,11 +151,11 @@ float dfCac(vec3 p, vec3 c, float h, float r)
 // h ... 高さ
 // r ... 球の大きさ
 // 合計の高さは h + r * 2
-float dfCaa(vec3 p, vec3 c, float h, float r)
+float fDfCaa(vec3 p, vec3 c, float h, float r)
 {
     vec3 a = c;
     vec3 b = c + vec3(0., h, 0.);
-    return dfCa(p, a, b, r);
+    return fDfCa(p, a, b, r);
 }
 
 // float dfCav(vec3 p, float h, float r)
@@ -186,17 +186,17 @@ float dfCaa(vec3 p, vec3 c, float h, float r)
 // ra: 太さ
 // rb: R
 // h: 高さ
-float dfRoundedCylinder(vec3 p, float h, float ra, float rb)
+float fDfRoundedCylinder(vec3 p, float h, float ra, float rb)
 {
     vec2 d = vec2(length(p.xz)-2.*ra+rb, abs(p.y) - h);
     return min(max(d.x, d.y), 0.) + length(max(d, 0.)) - rb;
 }
 
-float dfCone(vec3 p, float h, vec2 c)
+float fDfCone(vec3 p, float h, vec2 c)
 {
     // c is the sin/cos of the angle, h is height
     // Alternatively pass q instead of (c,h),
-    // which is the point at the base in 2D
+    // which is the point at the fbase in 2D
     vec2 q = h*vec2(c.x/c.y, -1.);
 
     vec2 w = vec2(length(p.xz), p.y);
@@ -213,7 +213,7 @@ float dfCone(vec3 p, float h, vec2 c)
 // r2 ... top radius
 // h ... height
 // r2の中心が基準の位置
-float dfRco(vec3 p, float h, float r1, float r2)
+float fDfRco(vec3 p, float h, float r1, float r2)
 {
     float b = (r1-r2)/h;
     float a = sqrt(1.-b*b);
@@ -225,12 +225,12 @@ float dfRco(vec3 p, float h, float r1, float r2)
     return dot(q, vec2(a,b) ) - r1;
 }
 
-float dfRcot(vec3 p, float h, float r1, float r2) {
+float fDfRcot(vec3 p, float h, float r1, float r2) {
     p.y += h;
-    return dfRco(p, h, r1, r2);
+    return fDfRco(p, h, r1, r2);
 }
 
-float dfVes(vec3 p, vec3 a, vec3 b, float w)
+float fDfVes(vec3 p, vec3 a, vec3 b, float w)
 {
     vec3  c = (a+b)*0.5;
     float l = length(b-a);

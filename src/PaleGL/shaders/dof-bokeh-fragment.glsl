@@ -74,7 +74,7 @@ const vec2[22] kernel = vec2[](
 
 // #endif
 
-float weight(float coc, float radius) {
+float fWeight(float coc, float radius) {
     // return coc >= radius ? 1. : 0.;
     return clamp((coc - radius + 2.) / 2., 0., 1.);
 }
@@ -99,14 +99,14 @@ void main() {
       
         // 後ボケ抜き出し 
         // 後ボケが前にかぶらないように、現在ピクセルのcocと、kernel上のcoc の最大値を比較して使う 
-        float bgw = weight(max(0., min(s.a, coc)), radius);
-        // float bgw = weight(max(0., s.a), radius);
+        float bgw = fWeight(max(0., min(s.a, coc)), radius);
+        // float bgw = fWeight(max(0., s.a), radius);
         bgColor += s.rgb * bgw;
         bgWeight += bgw;
        
         // 前ボケ抜き出し 
         // 前ボケはcocがマイナス
-        float fgw = weight(-s.a, radius);
+        float fgw = fWeight(-s.a, radius);
         fgColor += s.rgb * fgw;
         fgWeight += fgw;
     }

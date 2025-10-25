@@ -1,14 +1,14 @@
 // uniform float uTiling;
 uniform float uIsImproved;
 
-float smooth5(float t) {
+float fSmooth5(float t) {
     float t3 = t * t * t;
     float t4 = t * t * t * t;
     float t5 = t * t * t * t * t;
     return 6. * t5 - 15. * t4 + 10. * t3;
 }
 
-float perlinNoise(vec2 p, float isImproved) {
+float fPerlinNoise(vec2 p, float isImproved) {
     vec2 i = floor(p);
     vec2 f = fract(p);
 
@@ -27,10 +27,10 @@ float perlinNoise(vec2 p, float isImproved) {
     
     // グリッドの格子の点のそれぞれの勾配
     // ランダムに決める
-    vec2 g00 = normalize(rand2(i00));
-    vec2 g10 = normalize(rand2(i10));
-    vec2 g01 = normalize(rand2(i01));
-    vec2 g11 = normalize(rand2(i11));
+    vec2 g00 = normalize(fRand2(i00));
+    vec2 g10 = normalize(fRand2(i10));
+    vec2 g01 = normalize(fRand2(i01));
+    vec2 g11 = normalize(fRand2(i11));
 
     // ランダムな勾配ベクトルと位置の差異ベクトルの内積
     float n00 = dot(g00, p00);
@@ -40,8 +40,8 @@ float perlinNoise(vec2 p, float isImproved) {
    
     // 補間 
     isImproved = step(.5, isImproved);
-    float sx = mix(smooth(f.x), smooth5(f.x), isImproved);
-    float sy = mix(smooth(f.y), smooth5(f.y), isImproved);
+    float sx = mix(smooth(f.x), fSmooth5(f.x), isImproved);
+    float sy = mix(smooth(f.y), fSmooth5(f.y), isImproved);
    
     // y=0でx間の補間 
     float mx0 = mix(n00, n10, sx);

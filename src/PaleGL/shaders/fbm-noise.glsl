@@ -6,15 +6,15 @@
 
 // ---------------------------------------------------------------------
 
-float noise(vec2 p) {
+float fNoise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
 
     // Four corners in 2D of a tile
-    float a = rand(i);
-    float b = rand(i + vec2(1., 0.));
-    float c = rand(i + vec2(0., 1.));
-    float d = rand(i + vec2(1., 1.));
+    float a = fRand(i);
+    float b = fRand(i + vec2(1., 0.));
+    float c = fRand(i + vec2(0., 1.));
+    float d = fRand(i + vec2(1., 1.));
 
     vec2 u = f * f * (3. - 2. * f);
 
@@ -30,14 +30,14 @@ uniform float uFactor;
 
 // https://iquilezles.org/articles/fbm/ 
 
-float fbmNoise(in vec2 p) {
+float fFbmNoise(in vec2 p) {
     float g = exp2(-uFactor);
     float f = uFrequency;
     float a = uAmplitude;
     float t = 0.;
     int octaves = int(uOctaves);
     for(int i = 0; i < octaves; i++) {
-        t += a * noise(p * f);
+        t += a * fNoise(p * f);
         f *= 2.;
         a *= g;
     }
@@ -49,7 +49,7 @@ void main() {
     vec2 gridSize = uGridSize;
     vec2 uv = vUv;
 
-    float result = fbmNoise(uv * gridSize + uTime * uSpeed);
+    float result = fFbmNoise(uv * gridSize + uTime * uSpeed);
 
     outColor = vec4(vec3(result), 1.);
    

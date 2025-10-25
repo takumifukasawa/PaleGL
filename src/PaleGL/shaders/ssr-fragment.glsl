@@ -47,9 +47,9 @@ void main() {
 
     vec2 uv = vUv;
    
-    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
-    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
-    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
+    sGBufferA gBufferA = fDecodeGBufferA(uGBufferATexture, uv);
+    sGBufferB gBufferB = fDecodeGBufferB(uGBufferBTexture, uv);
+    sGBufferC gBufferC = fDecodeGBufferC(uGBufferCTexture, uv);
 
     vec3 worldNormal = gBufferB.normal;
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
@@ -57,7 +57,7 @@ void main() {
     vec4 baseColor = texture(uSrcTexture, uv);
     vec4 reflectionColor = vec4(0., 0., 0., 1.);
 
-    vec3 viewPosition = reconstructViewPositionFromDepth(
+    vec3 viewPosition = fReconstructViewPositionFromDepth(
         vUv,
         texture(uDepthTexture, uv).r,
         uInverseProjectionMatrix
@@ -65,9 +65,9 @@ void main() {
    
     // TODO: noiseを計算せずにテクスチャで渡すなりした方がいいはず
     vec3 randomDir = normalize(vec3(
-        rand(uv + .1),
-        rand(uv + .2),
-        rand(uv + .3)
+        fRand(uv + .1),
+        fRand(uv + .2),
+        fRand(uv + .3)
     ) * 2. - 1.);
 
     vec3 incidentViewDir = normalize(viewPosition);
@@ -84,7 +84,7 @@ void main() {
 
     float fadeFactor = 1.;
 
-    float jitter = rand(uv + uTime) * 2. - 1.;
+    float jitter = fRand(uv + uTime) * 2. - 1.;
 
     vec2 jitterOffset = vec2(
         jitter * uReflectionRayJitterSizeX,
@@ -92,7 +92,7 @@ void main() {
     );
 
     float rawDepth = texture(uDepthTexture, uv).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     if (sceneDepth > 1. - eps) {
         outColor = baseColor;
         return;
@@ -102,13 +102,13 @@ void main() {
         float stepLength = rayDeltaStep * (float(i) + 1.) + uRayNearestDistance;
         currentRayInView = rayViewOrigin + vec3(jitterOffset, 0.) + rayViewDir * stepLength;
         // float sampledDepth = texture(uDepthTexture, currentRayInView.xy).r;
-        float sampledDepth = sampleRawDepthByViewPosition(
+        float sampledDepth = fSampleRawDepthByViewPosition(
             uDepthTexture,
             currentRayInView,
             uProjectionMatrix,
             vec3(0.)
         );
-        vec3 sampledViewPosition = reconstructViewPositionFromDepth(uv, sampledDepth, uInverseProjectionMatrix);
+        vec3 sampledViewPosition = fReconstructViewPositionFromDepth(uv, sampledDepth, uInverseProjectionMatrix);
 
         vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
         currentRayInClip.xyz = currentRayInClip.xyz / currentRayInClip.w;
@@ -117,9 +117,9 @@ void main() {
             break;
         }
 
-        float dist = sampledViewPosition.z - currentRayInView.z;
+        float fdist = sampledViewPosition.z - currentRayInView.z;
 
-        if (uRayDepthBias < dist && dist < uReflectionRayThickness) {
+        if (uRayDepthBias < fdist && fdist < uReflectionRayThickness) {
             isHit = true;
             break;
         }
@@ -135,19 +135,19 @@ void main() {
         for (int i = 0; i < binarySearchNum; i++) {
             rayBinaryStep *= .5 * stepSign;
             currentRayInView += rayViewDir * rayBinaryStep;
-            float sampledRawDepth = sampleRawDepthByViewPosition(
+            float sampledRawDepth = fSampleRawDepthByViewPosition(
                 uDepthTexture,
                 currentRayInView,
                 uProjectionMatrix,
                 vec3(0.)
             );
-            sampledViewPosition = reconstructViewPositionFromDepth(
+            sampledViewPosition = fReconstructViewPositionFromDepth(
                 uv,
                 sampledRawDepth,
                 uInverseProjectionMatrix
             );
-            float dist = sampledViewPosition.z - currentRayInView.z;
-            stepSign = uRayDepthBias < dist ? -1. : 1.;
+            float fdist = sampledViewPosition.z - currentRayInView.z;
+            stepSign = uRayDepthBias < fdist ? -1. : 1.;
         }
 
         vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);

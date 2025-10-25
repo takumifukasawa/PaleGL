@@ -72,9 +72,9 @@ void main() {
 
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
-    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
+    vec3 rayDirection = fGetOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
 
-    osRaymarch(
+    fOsRaymarch(
         wp,
         rayDirection,
         EPS,
@@ -89,7 +89,7 @@ void main() {
     );
    
     // TODO: unlitでもopaqueの場合は必要なので出し分けたい
-    // checkDiscardByCompareRayDepthAndSceneDepth(
+    // fCheckDiscardByCompareRayDepthAndSceneDepth(
     //     currentRayPosition,
     //     uDepthTexture,
     //     uNearClip,
@@ -106,7 +106,7 @@ void main() {
     float alpha = resultColor.a;
     #include <alpha_test_f>
 
-    resultColor.rgb = gamma(resultColor.rgb);
+    resultColor.rgb = fGamma(resultColor.rgb);
     
     #pragma BEFORE_OUT
     

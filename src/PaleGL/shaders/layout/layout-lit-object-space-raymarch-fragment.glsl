@@ -56,7 +56,7 @@ in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
 
 #ifdef USE_NORMAL_MAP
-vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
+vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
     vec3 n = normalize(normal);
     vec3 t = normalize(tangent);
     vec3 b = normalize(binormal);
@@ -109,9 +109,9 @@ void main() {
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
     mat4 inverseWorldMatrix = vInverseWorldMatrix;
-    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
+    vec3 rayDirection = fGetOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
 
-    vec2 result = osRaymarch(
+    vec2 result = fOsRaymarch(
         wp,
         rayDirection,
         EPS,
@@ -125,7 +125,7 @@ void main() {
         currentRayPosition
     );
 
-    checkDiscardByCompareRayDepthAndSceneDepth(
+    fCheckDiscardByCompareRayDepthAndSceneDepth(
         currentRayPosition,
         uDepthTexture,
         uNearClip,
@@ -134,7 +134,7 @@ void main() {
     );
 
     if(result.x > 0.) {
-        worldNormal = getNormalObjectSpaceDfScene(
+        worldNormal = fGetNormalObjectSpaceDfScene(
             currentRayPosition,
             inverseWorldMatrix,
             uBoundsScale,
@@ -151,7 +151,7 @@ void main() {
     float alpha = resultColor.a;
     #include <alpha_test_f>
 
-    resultColor.rgb = gamma(resultColor.rgb);
+    resultColor.rgb = fGamma(resultColor.rgb);
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
@@ -159,8 +159,8 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
 
-    outGBufferA = EncodeGBufferA(resultColor.rgb);
-    outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = EncodeGBufferC(metallic, roughness);
-    outGBufferD = EncodeGBufferD(emissiveColor.rgb);
+    outGBufferA = fEncodeGBufferA(resultColor.rgb);
+    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(metallic, roughness);
+    outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
 }

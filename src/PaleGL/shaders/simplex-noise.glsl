@@ -11,7 +11,7 @@ void main() {
     vec2 gridSize = uGridSize;
     vec2 uv = vUv;
 
-    float result = snoise(uv * gridSize + uTime);
+    float result = fSnoise(uv * gridSize + uTime);
 
     outColor = vec4(vec3(result), 1.);
 }

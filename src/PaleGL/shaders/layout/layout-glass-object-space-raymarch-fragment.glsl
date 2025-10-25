@@ -50,13 +50,13 @@ in mat4 vInverseWorldMatrix;
 
 out vec4 outColor;
 
-mat2 rot2(float a) {
+mat2 fRot2(float a) {
     float c = cos(a);
     float s = sin(a);
     return mat2(c, -s, s, c);
 }
 
-float signedAngle(vec3 a, vec3 b, vec3 axis) {
+float fSignedAngle(vec3 a, vec3 b, vec3 axis) {
     vec3 na = normalize(a);
     vec3 nb = normalize(b);
     float angle = acos(clamp(dot(na, nb), -1., 1.)); // 安全な内積
@@ -64,7 +64,7 @@ float signedAngle(vec3 a, vec3 b, vec3 axis) {
     return sign < 0. ? -angle : angle;
 }
 
-vec2 shiftReflUv(
+vec2 fShiftReflUv(
     vec2 uv,
     vec3 rdIn,
     vec3 rdOut,
@@ -74,12 +74,12 @@ vec2 shiftReflUv(
     float offsetBase
 ) {
     // float angleInOut = acos(dot(rdIn, rdOut));
-    float angleInOut = signedAngle(rdIn, rdOut, vec3(0., 0., 1.));
+    float angleInOut = fSignedAngle(rdIn, rdOut, vec3(0., 0., 1.));
     // float reflUvDir = sign(dot(rdIn, rdOut));
     // float reflUvDir = sign(rdOut.x);
     uv -= .5;
-    // uv *= rot2(offsetPower * ior * angleInOut * reflUvDir);
-    uv *= rot2(offsetPower * ior * angleInOut);
+    // uv *= fRot2(offsetPower * ior * angleInOut * reflUvDir);
+    uv *= fRot2(offsetPower * ior * angleInOut);
     uv += .5;
     uv += offsetBase;
     return uv;
@@ -108,9 +108,9 @@ void main() {
 
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
-    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
+    vec3 rayDirection = fGetOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
 
-    vec2 result = osRaymarch(
+    vec2 result = fOsRaymarch(
         wp,
         rayDirection,
         EPS,
@@ -125,7 +125,7 @@ void main() {
     );
    
     // TODO: unlitでもopaqueの場合は必要なので出し分けたい
-    // checkDiscardByCompareRayDepthAndSceneDepth(
+    // fCheckDiscardByCompareRayDepthAndSceneDepth(
     //     currentRayPosition,
     //     uDepthTexture,
     //     uNearClip,
@@ -151,7 +151,7 @@ void main() {
         // 物体表面の位置
         vec3 p = currentRayPosition;
         // 物体表面の法線
-        vec3 n = getNormalObjectSpaceDfScene(
+        vec3 n = fGetNormalObjectSpaceDfScene(
             p,
             vInverseWorldMatrix,
             uBoundsScale,
@@ -165,7 +165,7 @@ void main() {
         // 侵入位置を少しだけ物体内側から開始する
         vec3 pEnter = p - n * EPS * 3.;
         // 侵入位置からraymarchする
-        vec2 dIn = osRaymarch(
+        vec2 dIn = fOsRaymarch(
             pEnter,
             rdIn,
             EPS,
@@ -183,7 +183,7 @@ void main() {
         vec3 pExit = p;
         // vec3 pExit = pEnter + rdIn * dIn.y;
         // 衝突位置の法線: 物体の内側を向く
-        vec3 nExit = -getNormalObjectSpaceDfScene(
+        vec3 nExit = -fGetNormalObjectSpaceDfScene(
             pExit,
             vInverseWorldMatrix,
             uBoundsScale,
@@ -202,9 +202,9 @@ void main() {
             rdOut = reflect(rdIn, nExit);
         }
         // 1: backbuffer
-        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, -uvIORShiftBase);
+        reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, -uvIORShiftBase);
         // 2: skybox
-        envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.r = texture(uSceneTexture, reflUv).r;
         reflTex.r = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r;
 
@@ -216,9 +216,9 @@ void main() {
             rdOut = reflect(rdIn, nExit);
         }
         // 1: backbuffer
-        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, 0.);
+        reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, 0.);
         // 2: skybox
-        envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.g = texture(uSceneTexture, reflUv).g;
         reflTex.g = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g;
 
@@ -230,9 +230,9 @@ void main() {
             rdOut = reflect(rdIn, nExit);
         }
         // 1: backbuffer
-        reflUv = shiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, uvIORShiftBase);
+        reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, uvIORShiftBase);
         // 2: skybox
-        envSpecularDir = calcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
         resultBackBufferColor.b = texture(uSceneTexture, reflUv).b;
         reflTex.b = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b;
 
@@ -244,7 +244,7 @@ void main() {
 
     resultColor.rgb = mix(
         resultBackBufferColor,
-        gamma(reflTex),
+        fGamma(reflTex),
         specBlendRate
     );
     

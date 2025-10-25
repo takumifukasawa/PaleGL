@@ -1,31 +1,31 @@
-vec3 toLocal(vec3 p, mat4 WtoO, vec3 scale) {
+vec3 fToLocal(vec3 p, mat4 WtoO, vec3 scale) {
     // scale = vec3(1.);
     return (WtoO * vec4(p, 1.)).xyz * scale;
 }
 
-vec2 objectSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float useWorld) {
+vec2 fObjectSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float useWorld) {
     // scale = vec3(1.);
     vec3 p = mix(
-        toLocal(worldPos, WtoO, scale),
+        fToLocal(worldPos, WtoO, scale),
         worldPos,
         useWorld
     );
-    return dfScene(p);
+    return fdfScene(p);
 }
 
-vec2 blendSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float blendRate) {
-    vec3 localPos = toLocal(worldPos, WtoO, scale);
+vec2 fBlendSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float blendRate) {
+    vec3 localPos = fToLocal(worldPos, WtoO, scale);
     vec3 p = mix(localPos, worldPos, blendRate);
-    return dfScene(p);
+    return fdfScene(p);
 }
 
-vec3 getNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale, float useWorld) {
+vec3 fGetNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale, float useWorld) {
     // // tmp
     // const float eps = .0001;
     // vec3 n = vec3(
-    //     objectSpaceDfScene(p + vec3(eps, 0, 0), WtoO, scale, useWorld).x - objectSpaceDfScene(p + vec3(-eps, 0, 0), WtoO, scale, useWorld).x,
-    //     objectSpaceDfScene(p + vec3(0, eps, 0), WtoO, scale, useWorld).x - objectSpaceDfScene(p + vec3(0, -eps, 0), WtoO, scale, useWorld).x,
-    //     objectSpaceDfScene(p + vec3(0, 0, eps), WtoO, scale, useWorld).x - objectSpaceDfScene(p + vec3(0, 0, -eps), WtoO, scale, useWorld).x
+    //     fObjectSpaceDfScene(p + vec3(eps, 0, 0), WtoO, scale, useWorld).x - fObjectSpaceDfScene(p + vec3(-eps, 0, 0), WtoO, scale, useWorld).x,
+    //     fObjectSpaceDfScene(p + vec3(0, eps, 0), WtoO, scale, useWorld).x - fObjectSpaceDfScene(p + vec3(0, -eps, 0), WtoO, scale, useWorld).x,
+    //     fObjectSpaceDfScene(p + vec3(0, 0, eps), WtoO, scale, useWorld).x - fObjectSpaceDfScene(p + vec3(0, 0, -eps), WtoO, scale, useWorld).x
     // );
     // return normalize(n);
 
@@ -40,18 +40,18 @@ vec3 getNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale, float useWorld) 
             ((i >> 1) & 1),
             (i & 1)) - 1.
         );
-        n += e * objectSpaceDfScene(p + e * d, WtoO, scale, useWorld).x;
+        n += e * fObjectSpaceDfScene(p + e * d, WtoO, scale, useWorld).x;
     }
     return normalize(n);
 }
 
-vec3 getNormalDfScene(vec3 p) {
+vec3 fGetNormalDfScene(vec3 p) {
     // // tmp
     // const float eps = .0001;
     // vec3 n = vec3(
-    //     dfScene(p + vec3(eps, 0, 0)).x - dfScene(p + vec3(-eps, 0, 0)).x,
-    //     dfScene(p + vec3(0, eps, 0)).x - dfScene(p + vec3(0, -eps, 0)).x,
-    //     dfScene(p + vec3(0, 0, eps)).x - dfScene(p + vec3(0, 0, -eps)).x
+    //     fdfScene(p + vec3(eps, 0, 0)).x - fdfScene(p + vec3(-eps, 0, 0)).x,
+    //     fdfScene(p + vec3(0, eps, 0)).x - fdfScene(p + vec3(0, -eps, 0)).x,
+    //     fdfScene(p + vec3(0, 0, eps)).x - fdfScene(p + vec3(0, 0, -eps)).x
     // );
     // return normalize(n); 
 
@@ -66,12 +66,12 @@ vec3 getNormalDfScene(vec3 p) {
         ((i >> 1) & 1),
         (i & 1)) - 1.
         );
-        n += e * dfScene(p + e * d).x;
+        n += e * fdfScene(p + e * d).x;
     }
     return normalize(n);   
 }
 
-bool isDfInnerBox(vec3 p, vec3 scale) {
+bool fIsDfInnerBox(vec3 p, vec3 scale) {
     // scale = vec3(1.);
     // 0 だとマッハバンドっぽい境目が出るのでちょっと余裕を持たせる
     const float eps = .0001;
@@ -81,7 +81,7 @@ bool isDfInnerBox(vec3 p, vec3 scale) {
         abs(p.z) < scale.z * .5 + eps;
 }
 
-mat3 getCameraRayCoordinate(vec3 origin, vec3 lookAt, vec3 up) {
+mat3 fGetCameraRayCoordinate(vec3 origin, vec3 lookAt, vec3 up) {
     vec3 f = normalize(lookAt - origin);
     vec3 r = cross(f, up);
     vec3 u = cross(r, f);
@@ -89,7 +89,7 @@ mat3 getCameraRayCoordinate(vec3 origin, vec3 lookAt, vec3 up) {
 }
 
 // aspect ... w / h
-vec3 getPerspectiveCameraRayDir(vec2 uv, vec3 forward, float fov, float aspect) {
+vec3 fGetPerspectiveCameraRayDir(vec2 uv, vec3 forward, float fov, float aspect) {
     vec2 st = uv * 2. - 1.;
     float fovRad = fov * 3.141592 / 180.;
     float hh = tan(fovRad * .5);

@@ -42,12 +42,12 @@ struct sMaterial {
 // -------------------------------------------------------------------------------
 
 // 光源からの光が届くかどうかを判定
-bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
+bool fTestLightInRange(const in float lightDistance, const in float cutoffDistance) {
     return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
 }
 
 // 光源からの減衰率計算
-float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
+float fPunctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
     if (attenuationComponent > 0.) {
         return pow(saturate(-lightDistance / cutoffDistance + 1.), attenuationComponent);
     }
@@ -59,7 +59,7 @@ float punctualLightIntensityToIrradianceFactor(const in float lightDistance, con
 // directional light
 //
 
-void getsDirectionalLightIrradiance(const in sDirectionalLight directionalLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
+void fGetsDirectionalLightIrradiance(const in sDirectionalLight directionalLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     directLight.color = directionalLight.color.xyz;
     directLight.direction = -directionalLight.direction; // 光源への方向にするので反転
     directLight.visible = true;
@@ -70,7 +70,7 @@ void getsDirectionalLightIrradiance(const in sDirectionalLight directionalLight,
 // spot light
 //
 
-void getSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
+void fGetSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     // vec3 L = spotLight.position - geometry.position;
     vec3 surfaceToLight = spotLight.position - geometry.position;
     vec3 PtoL = normalize(surfaceToLight);
@@ -93,12 +93,12 @@ void getSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricCo
     if (all(
     bvec2(
     angleCos > coneCos,
-    testLightInRange(lightDistance, spotLight.distance)
+    fTestLightInRange(lightDistance, spotLight.distance)
     )
     )) {
         float spotEffect = smoothstep(coneCos, penumbraCos, angleCos);
         directLight.color = spotLight.color.xyz;
-        directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+        directLight.color *= spotEffect * fPunctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
         directLight.visible = true;
     } else {
         directLight.color = vec3(0.);
@@ -110,7 +110,7 @@ void getSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricCo
 // point light
 //
 
-void getPointLightIrradiance(const in sPointLight pointLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
+void fGetPointLightIrradiance(const in sPointLight pointLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
     vec3 surfaceToLight = pointLight.position - geometry.position;
     float lightDistance = length(surfaceToLight);
     vec3 L = normalize(surfaceToLight);
@@ -118,16 +118,16 @@ void getPointLightIrradiance(const in sPointLight pointLight, const in sGeometri
     directLight.direction = L;
     directLight.intensity = pointLight.intensity;
 
-    if (testLightInRange(lightDistance, pointLight.distance)) {
+    if (fTestLightInRange(lightDistance, pointLight.distance)) {
         directLight.color = pointLight.color.xyz;
-        directLight.color *= punctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.attenuation);
+        directLight.color *= fPunctualLightIntensityToIrradianceFactor(lightDistance, pointLight.distance, pointLight.attenuation);
         directLight.visible = true;
     } else {
         directLight.color = vec3(0.);
         directLight.visible = false;
     }
 
-    // directLight.color = vec3(testLightInRange(lightDistance, pointLight.distance) ? 1. : 0.);
+    // directLight.color = vec3(fTestLightInRange(lightDistance, pointLight.distance) ? 1. : 0.);
 
     // for debug
     // directLight.color = vec3(1.);
@@ -142,29 +142,29 @@ void getPointLightIrradiance(const in sPointLight pointLight, const in sGeometri
 
 // normalized lambert
 
-vec3 BaseBRDF(vec3 baseColor) {
+vec3 fBaseBRDF(vec3 baseColor) {
     return baseColor / PI;
 }
 
 // TODO: schlickの公式まとめる
 
-vec3 F_Shhlick(vec3 specularColor, vec3 H, vec3 V) {
+vec3 fF_Shhlick(vec3 specularColor, vec3 H, vec3 V) {
     return (specularColor + (1. - specularColor) * pow(1. - saturate(dot(V, H)), 5.));
 }
 
 // ref: http://d.hatena.ne.jp/hanecci/20130525/p3
-vec3 schlick(vec3 f0, float product) {
+vec3 fSchlick(vec3 f0, float product) {
     return f0 + (1. - f0) * pow((1. - product), 5.);
 }
 
-float D_GGX(float a, float dotNH) {
+float fD_GGX(float a, float dotNH) {
     float a2 = a * a;
     float dotNH2 = dotNH * dotNH;
     float d = dotNH2 * (a2 - 1.) + 1.;
     return a2 / max((PI * d * d), EPSILON);
 }
 
-float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
+float fG_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
     float k = a * a * .5 + EPSILON;
     float gl = dotNL / (dotNL * (1. - k) + k);
     float gv = dotNV / (dotNV * (1. - k) + k);
@@ -173,8 +173,8 @@ float G_Smith_Schlick_GGX(float a, float dotNV, float dotNL) {
 
 // cook-torrance
 
-// vec3 SpecularBRDF(const in sIncidentLight directLight, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
-vec3 SpecularBRDF(const vec3 lightDirection, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+// vec3 fSpecularBRDF(const in sIncidentLight directLight, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
+vec3 fSpecularBRDF(const vec3 lightDirection, const in sGeometricContext geometry, vec3 specularColor, float roughnessFactor) {
     vec3 N = normalize(geometry.normal);
     vec3 V = normalize(geometry.viewDir);
     vec3 L = normalize(lightDirection);
@@ -188,9 +188,9 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in sGeometricContext geometry
 
     float a = roughnessFactor * roughnessFactor;
 
-    float D = D_GGX(a, dotNH);
-    float G = G_Smith_Schlick_GGX(a, dotNV, dotNL);
-    vec3 F = F_Shhlick(specularColor, V, H);
+    float D = fD_GGX(a, dotNH);
+    float G = fG_Smith_Schlick_GGX(a, dotNV, dotNL);
+    vec3 F = fF_Shhlick(specularColor, V, H);
 
     return (F * (G * D)) / (4. * dotNL * dotNV + EPSILON);
 }
@@ -199,7 +199,7 @@ vec3 SpecularBRDF(const vec3 lightDirection, const in sGeometricContext geometry
 // render equations
 // -------------------------------------------------------------------------------
 
-void RE_Direct(
+void fRE_Direct(
     const in sIncidentLight directLight,
     const in sGeometricContext geometry,
     const in sMaterial material,
@@ -215,20 +215,20 @@ void RE_Direct(
     irradiance *= directLight.intensity;
     irradiance *= (1. - shadow);
 
-    // base
+    // fbase
     reflectedLight.directBase +=
         irradiance *
         clamp(
-            BaseBRDF(material.baseColor),
+            fBaseBRDF(material.baseColor),
             -10.,
             10.
         ); // overflow fallback
     // specular
-    // reflectedLight.directSpecular += irradiance * SpecularBRDF(directLight, geometry, material.specularColor, material.roughness);
+    // reflectedLight.directSpecular += irradiance * fSpecularBRDF(directLight, geometry, material.specularColor, material.roughness);
     reflectedLight.directSpecular +=
         irradiance *
         clamp(
-            SpecularBRDF(
+            fSpecularBRDF(
                 directLight.direction,
                 geometry,
                 material.specularColor,
@@ -239,8 +239,8 @@ void RE_Direct(
     ); // overflow fallback
 }
 
-// base: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
-void RE_DirectSkyboxFakeIBL(
+// fbase: https://qiita.com/kaneta1992/items/df1ae53e352f6813e0cd
+void fRE_DirectSkyboxFakeIBL(
     samplerCube cubeMap,
     const in sIncidentSkyboxLight skyboxLight,
     const in sGeometricContext geometry,
@@ -248,7 +248,7 @@ void RE_DirectSkyboxFakeIBL(
     inout sReflectedLight reflectedLight
 ) {
     //
-    // base
+    // fbase
     //
 
     vec3 envDiffuseColor = textureLod(
@@ -278,7 +278,7 @@ void RE_DirectSkyboxFakeIBL(
 
     // vec3 f0 = mix(vec3(.04), material.baseColor, material.metallic);
 
-    vec3 fresnel = schlick(material.specularColor, max(0., dot(geometry.viewDir, geometry.normal)));
+    vec3 fresnel = fSchlick(material.specularColor, max(0., dot(geometry.viewDir, geometry.normal)));
 
     //
     // result
@@ -311,7 +311,7 @@ const vec2 poissonDisk[4] = vec2[](
 );
 
 
-float calcDirectionalLightShadowAttenuation(
+float fCalcDirectionalLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
@@ -369,7 +369,7 @@ float calcDirectionalLightShadowAttenuation(
     return clamp(shadow, 0., 1.);
 }
 
-float calcsSpotLightShadowAttenuation(
+float fCalcsSpotLightShadowAttenuation(
     vec3 worldPosition,
     vec3 worldNormal,
     vec3 lightDirection, // 光源自体の向き
@@ -474,10 +474,10 @@ void main() {
 
     vec2 uv = vUv;
 
-    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
-    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, uv);
-    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, uv);
-    sGBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, uv);
+    sGBufferA gBufferA = fDecodeGBufferA(uGBufferATexture, uv);
+    sGBufferB gBufferB = fDecodeGBufferB(uGBufferBTexture, uv);
+    sGBufferC gBufferC = fDecodeGBufferC(uGBufferCTexture, uv);
+    sGBufferD gBufferD = fDecodeGBufferD(uGBufferDTexture, uv);
 
     // TODO: use encode func
     // surface
@@ -490,17 +490,17 @@ void main() {
 
     // depth
     float rawDepth = texture(uDepthTexture, uv).r;
-    float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float depth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
 
     // geometry
-    vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    vec3 worldPosition = fReconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
 
     // depth guard
     if (step(rawDepth, 1. - .00001) < .5) {
         outColor = vec4(baseColor, 1.); 
         // outColor = vec4(1., 0., 0., 1.); // TODO: 本当はこっちを使いたい: skyboxを後合成にしたい
         // 疑似HDRする場合
-        // outColor = encodePseudoHDR(baseColor);
+        // outColor = fEncodePseudoHDR(baseColor);
         return;
     }
 
@@ -581,8 +581,8 @@ void main() {
     directionalLight.direction = uDirectionalLight.direction;
     directionalLight.color = uDirectionalLight.color;
     directionalLight.intensity = uDirectionalLight.intensity;
-    getsDirectionalLightIrradiance(directionalLight, geometry, directLight);
-    shadow = calcDirectionalLightShadowAttenuation(
+    fGetsDirectionalLightIrradiance(directionalLight, geometry, directLight);
+    shadow = fCalcDirectionalLightShadowAttenuation(
         worldPosition,
         surface.worldNormal,
         uDirectionalLight.direction,
@@ -592,7 +592,7 @@ void main() {
         vec4(vec3(.02), 1.), // TODO: pass color
         .5 // TODO: pass parameter
     );
-    RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+    fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
     
     //
     // spot light
@@ -601,8 +601,8 @@ void main() {
     // TODO: shadow blend rate は light か何かに持たせたい
     // for(int i = 0; i < MAX_SPOT_LIGHT_COUNT; i++) {
     #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
-        getSpotLightIrradiance(uSpotLight[UNROLL_N], geometry, directLight);
-        shadow = calcsSpotLightShadowAttenuation(
+        fGetSpotLightIrradiance(uSpotLight[UNROLL_N], geometry, directLight);
+        shadow = fCalcsSpotLightShadowAttenuation(
             worldPosition,
             surface.worldNormal,
             uSpotLight[UNROLL_N].direction,
@@ -612,7 +612,7 @@ void main() {
             vec4(vec3(.02), 1.), // TODO: pass color
             .65 // TODO: pass parameter
         );
-        RE_Direct(directLight, geometry, material, reflectedLight, shadow);
+        fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
     #pragma UNROLL_END
     // }
  
@@ -624,8 +624,8 @@ void main() {
 
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
     #pragma UNROLL_START MAX_POINT_LIGHT_COUNT
-       getPointLightIrradiance(uPointLight[UNROLL_N], geometry, directLight);
-       RE_Direct(directLight, geometry, material, reflectedLight, sssRate * .25); // TODO: pass parameter
+       fGetPointLightIrradiance(uPointLight[UNROLL_N], geometry, directLight);
+       fRE_Direct(directLight, geometry, material, reflectedLight, sssRate * .25); // TODO: pass parameter
     #pragma UNROLL_END
     // }
 
@@ -641,8 +641,8 @@ void main() {
     skyboxLight.maxLodLevel = uSkybox.maxLodLevel;
     sIncidentSkyboxLight directSkyboxLight;
     directSkyboxLight.diffuseDirection = vec3(0.); // minifierでdirectSkyboxLightを消さないtrick
-    getSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
-    RE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
+    fGetSkyboxLightIrradiance(skyboxLight, geometry, directSkyboxLight);
+    fRE_DirectSkyboxFakeIBL(uSkybox.cubeMap, directSkyboxLight, geometry, material, reflectedLight);
 #endif
 
     //
@@ -677,8 +677,8 @@ void main() {
     // float shadingModelId = gBufferB.shadingModelId;
     // vec3 worldNormal = gBufferB.normal * 2. - 1.;
     // float rawDepth = texture(uDepthTexture, uv).r;
-    // float depth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    // float depth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    // vec3 worldPosition = fReconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
     // vec4 sssRate = texture(uScreenSpaceShadowTexture, uv);
     // outColor = sssRate;
 }

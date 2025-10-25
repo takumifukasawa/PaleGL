@@ -36,7 +36,7 @@ in vec3 vNormal;
 in vec3 vWorldPosition;
 
 #ifdef USE_NORMAL_MAP
-vec3 calcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
+vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
     vec3 n = normalize(normal);
     vec3 t = normalize(tangent);
     vec3 b = normalize(binormal);
@@ -88,7 +88,7 @@ void main() {
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl
 
-    baseColor.rgb = gamma(baseColor.rgb);
+    baseColor.rgb = fGamma(baseColor.rgb);
    
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
@@ -96,26 +96,26 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
-    emissiveColor.rgb = gamma(emissiveColor.rgb);
+    emissiveColor.rgb = fGamma(emissiveColor.rgb);
     
     #pragma BEFORE_OUT
 
-    outGBufferA = EncodeGBufferA(baseColor.rgb);
-    outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = EncodeGBufferC(metallic, roughness);
-    outGBufferD = EncodeGBufferD(emissiveColor.rgb);
+    outGBufferA = fEncodeGBufferA(baseColor.rgb);
+    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(metallic, roughness);
+    outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
    
 // #ifdef USE_NORMAL_MAP
-//     // outGBufferA = EncodeGBufferA(texture(uNormalMap, uv).xyz);
+//     // outGBufferA = fEncodeGBufferA(texture(uNormalMap, uv).xyz);
 // #endif
 //     outGBufferA = vec4(uv, 1., 1.);
     
     // #ifdef USE_HEIGHT_MAP
-    // // outGBufferD = EncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);
-    // // outGBufferD = EncodeGBufferD(texture(uHeightMap, uv * .5).rgb);
-    // outGBufferD = EncodeGBufferD(texture(uNormalMap, uv * 1.).rgb);
-    // outGBufferD = EncodeGBufferD(-vBinormal);
-    // // outGBufferD = EncodeGBufferD(vec3(uv * .1, 1.));
+    // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);
+    // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * .5).rgb);
+    // outGBufferD = fEncodeGBufferD(texture(uNormalMap, uv * 1.).rgb);
+    // outGBufferD = fEncodeGBufferD(-vBinormal);
+    // // outGBufferD = fEncodeGBufferD(vec3(uv * .1, 1.));
     // #endif
     
     #pragma AFTER_OUT

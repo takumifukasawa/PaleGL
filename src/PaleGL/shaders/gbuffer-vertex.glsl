@@ -48,7 +48,7 @@ uniform float uHeightScale;
 
 #pragma APPEND_UNIFORMS
 
-mat4 getRotationXMat(float rad) {
+mat4 fGetRotationXMat(float rad) {
     float c = cos(rad);
     float s = sin(rad);
     return mat4(
@@ -65,7 +65,7 @@ mat4 getRotationXMat(float rad) {
     );
 }
 
-mat4 getRotationYMat(float rad) {
+mat4 fGetRotationYMat(float rad) {
     float c = cos(rad);
     float s = sin(rad);
     return mat4(
@@ -82,7 +82,7 @@ mat4 getRotationYMat(float rad) {
     );
 }
 
-mat4 getRotationZMat(float rad) {
+mat4 fGetRotationZMat(float rad) {
     float c = cos(rad);
     float s = sin(rad);
     return mat4(
@@ -99,7 +99,7 @@ mat4 getRotationZMat(float rad) {
     );
 }
 
-mat4 getTranslationMat(vec3 p) {
+mat4 fGetTranslationMat(vec3 p) {
     return mat4(
         // 行オーダー
         // 1., 0., 0., p.x,
@@ -114,7 +114,7 @@ mat4 getTranslationMat(vec3 p) {
     );
 }
 
-mat4 getScalingMat(vec3 s) {
+mat4 fGetScalingMat(vec3 s) {
     return mat4(
         // 行オーダー / 列オーダー
         s.x, 0., 0., 0.,
@@ -124,7 +124,7 @@ mat4 getScalingMat(vec3 s) {
     );
 }
 
-mat4 getLookMat(vec3 front, vec3 up) {
+mat4 fGetLookMat(vec3 front, vec3 up) {
     // vec3 z = -normalize(front);
     vec3 z = normalize(front); // こっちでいいはず？
     vec3 y = up;
@@ -137,7 +137,7 @@ mat4 getLookMat(vec3 front, vec3 up) {
     );
 }
 
-mat4 getLookAtPMat(vec3 lookAt, vec3 p) {
+mat4 fGetLookAtPMat(vec3 lookAt, vec3 p) {
     vec3 f = mix(
         vec3(0., 1., 0.),// fallback
         normalize(lookAt - p),
@@ -153,7 +153,7 @@ mat4 getLookAtPMat(vec3 lookAt, vec3 p) {
     );
 }
 
-mat4 getIdentityMat() {
+mat4 fGetIdentityMat() {
     return mat4(
         1., 0., 0., 0.,
         0., 1., 0., 0.,
@@ -174,7 +174,7 @@ uniform int uBoneCount;
 uniform int uJointTextureColNum;
 uniform int uTotalFrameCount;
 
-mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
+mat4 fCalcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 jointMat3, vec4 boneWeights) {
     mat4 skinMatrix =
     jointMat0 * aBoneWeights.x +
     jointMat1 * aBoneWeights.y +
@@ -187,7 +187,7 @@ mat4 calcSkinningMatrix(mat4 jointMat0, mat4 jointMat1, mat4 jointMat2, mat4 joi
 //     int beginIndex; 
 //     int frameCount;
 // };
-mat4 getJointMatrix(sampler2D jointTexture, uint jointIndex, int colNum) {
+mat4 fGetJointMatrix(sampler2D jointTexture, uint jointIndex, int colNum) {
     // horizontal
     int colIndex = int(mod(float(jointIndex), float(colNum)));
     // vertical
@@ -206,7 +206,7 @@ mat4 getJointMatrix(sampler2D jointTexture, uint jointIndex, int colNum) {
     );
     return jointMatrix;
 }
-mat4 getJointMatrixGPUSkinning(
+mat4 fGetJointMatrixGPUSkinning(
     sampler2D jointTexture,
     uint jointIndex,
     int jointNum,
@@ -256,11 +256,11 @@ void main() {
         );
         #ifdef USE_SKINNING_GPU
             float fps = 30.;
-            mat4 jointMatrix0 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[0], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-            mat4 jointMatrix1 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[1], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-            mat4 jointMatrix2 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[2], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-            mat4 jointMatrix3 = getJointMatrixGPUSkinning(uJointTexture, aBoneIndices[3], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
-            skinMatrix = calcSkinningMatrix(
+            mat4 jointMatrix0 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[0], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+            mat4 jointMatrix1 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[1], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+            mat4 jointMatrix2 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[2], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+            mat4 jointMatrix3 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[3], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
+            skinMatrix = fCalcSkinningMatrix(
                 jointMatrix0,
                 jointMatrix1,
                 jointMatrix2,
@@ -269,11 +269,11 @@ void main() {
             );
         #endif
         #ifdef USE_SKINNING_CPU
-            mat4 jointMatrix0 = getJointMatrix(uJointTexture, aBoneIndices[0], uJointTextureColNum);
-            mat4 jointMatrix1 = getJointMatrix(uJointTexture, aBoneIndices[1], uJointTextureColNum);
-            mat4 jointMatrix2 = getJointMatrix(uJointTexture, aBoneIndices[2], uJointTextureColNum);
-            mat4 jointMatrix3 = getJointMatrix(uJointTexture, aBoneIndices[3], uJointTextureColNum);
-            skinMatrix = calcSkinningMatrix(
+            mat4 jointMatrix0 = fGetJointMatrix(uJointTexture, aBoneIndices[0], uJointTextureColNum);
+            mat4 jointMatrix1 = fGetJointMatrix(uJointTexture, aBoneIndices[1], uJointTextureColNum);
+            mat4 jointMatrix2 = fGetJointMatrix(uJointTexture, aBoneIndices[2], uJointTextureColNum);
+            mat4 jointMatrix3 = fGetJointMatrix(uJointTexture, aBoneIndices[3], uJointTextureColNum);
+            skinMatrix = fCalcSkinningMatrix(
                 jointMatrix0,
                 jointMatrix1,
                 jointMatrix2,
@@ -297,13 +297,13 @@ void main() {
     float fid = float(gl_InstanceID);
     vInstanceId = fid;
     
-    mat4 instanceTranslation = getIdentityMat();
-    // mat4 instanceRotation = getIdentityMat();
+    mat4 instanceTranslation = fGetIdentityMat();
+    // mat4 instanceRotation = fGetIdentityMat();
 
-    mat4 instanceScaling = getScalingMat(aInstanceScale.xyz);
-    mat4 instanceRotationX = getRotationXMat(aInstanceRotation.x);
-    mat4 instanceRotationY = getRotationYMat(aInstanceRotation.y);
-    mat4 instanceRotationZ = getRotationZMat(aInstanceRotation.z);
+    mat4 instanceScaling = fGetScalingMat(aInstanceScale.xyz);
+    mat4 instanceRotationX = fGetRotationXMat(aInstanceRotation.x);
+    mat4 instanceRotationY = fGetRotationYMat(aInstanceRotation.y);
+    mat4 instanceRotationZ = fGetRotationZMat(aInstanceRotation.z);
     mat4 instanceRotation =
         instanceRotationY *
         instanceRotationX *
@@ -321,18 +321,18 @@ void main() {
             vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
             vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
-            instanceTranslation = getTranslationMat(vatPosition);
-            instanceRotation = getLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
+            instanceTranslation = fGetTranslationMat(vatPosition);
+            instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
         #else
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),
                 int(floor(fid / uVATResolution.y))
             );
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
-            instanceTranslation = getTranslationMat(vatPosition);
+            instanceTranslation = fGetTranslationMat(vatPosition);
         #endif
     #else
-        instanceTranslation = getTranslationMat(aInstancePosition);
+        instanceTranslation = fGetTranslationMat(aInstancePosition);
     #endif
 
     // --- instance look direction
@@ -342,14 +342,14 @@ void main() {
     // TODO: 追従率をuniformで渡したい
     #ifdef USE_INSTANCE_LOOK_DIRECTION
         // pattern_1: 速度ベクトルを使って回転
-        instanceRotation = getLookAtPMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
+        instanceRotation = fGetLookAtPMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
         // pattern_2: 速度ベクトルをnormalizeして使って回転
-        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
+        // instanceRotation = fGetLookAtPMat(aInstancePosition + normalize(aInstanceVelocity.xyz) * 1000., aInstancePosition);
         // pattern_3: look direction
-        // instanceRotation = getLookAtPMat(aInstancePosition + aLookDirection, aInstancePosition);
+        // instanceRotation = fGetLookAtPMat(aInstancePosition + aLookDirection, aInstancePosition);
         // pattern_4: blend
         // vec3 lookDir = mix(normalize(aInstanceVelocity.xyz), normalize(aLookDirection), uRotMode);
-        // instanceRotation = getLookAtPMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
+        // instanceRotation = fGetLookAtPMat(aInstancePosition + normalize(lookDir) * 1000., aInstancePosition);
         // // for debug: 回転させない
         // instanceRotation = mat4(
         //     1., 0., 0., 0.,

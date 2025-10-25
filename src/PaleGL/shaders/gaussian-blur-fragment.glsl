@@ -17,7 +17,7 @@ void main() {
     float width = floor(float(pixelNum) / 2.);
     for(int i = 0; i < pixelNum; i++) {
         float index = float(i) - width;
-        float weight = uBlurWeights[i];
+        float fWeight = uBlurWeights[i];
         // sampleColor += texture(uSrcTexture, vUv + vec2(${isHorizontal ? 'index' : '0.'}, ${
         sampleColor += texture(
             uSrcTexture,
@@ -25,7 +25,7 @@ void main() {
                 step(.5, uIsHorizontal) > .5 ? index : 0.,
                 step(.5, uIsHorizontal) > .5 ? 0. : index
             ) * texelSize
-        ) * weight;
+        ) * fWeight;
     }
     
     outColor = sampleColor;

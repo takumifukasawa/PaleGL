@@ -18,9 +18,9 @@ void main() {
     // vec2 uv = vUv;
     // uv = uv * uFontTiling.xy + uFontTiling.zw;
     // resultColor *= texture(uFontMap, uv);
-    // resultColor.a *= shapeFontAlpha(resultColor.r);
+    // resultColor.a *= fShapeFontAlpha(resultColor.r);
     
-    vec4 resultColor = calcShapeFont(vUv) * uColor;
+    vec4 resultColor = fCalcShapeFont(vUv) * uColor;
 
     outColor = resultColor;
 }

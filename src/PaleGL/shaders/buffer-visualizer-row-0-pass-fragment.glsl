@@ -34,21 +34,21 @@ void main() {
     
     // vec2 worldPositionUv = vUv * tiling + vec2(-1., 0.);
 
-    float rawDepth = texture(uTextureCol0, depthUv).x * isArea(depthUv);
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float rawDepth = texture(uTextureCol0, depthUv).x * fIsArea(depthUv);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
-    vec3 worldPosition = reconstructWorldPositionFromDepth(
+    vec3 worldPosition = fReconstructWorldPositionFromDepth(
         worldPositionUv,
         texture(uTextureCol0, worldPositionUv).x,
         uInverseViewProjectionMatrix
     );
 
-    vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, vec2(0., 0.));
-    vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, vec2(-1., 0.));
-    vec4 color2 = calcTextureAreaColor(uTextureCol2, vUv, tiling, uTextureCol2UvOffset);
-    vec4 color3 = calcTextureAreaColor(uTextureCol3, vUv, tiling, uTextureCol3UvOffset);
-    vec4 color4 = calcTextureAreaColor(uTextureCol4, vUv, tiling, uTextureCol4UvOffset);
-    vec4 color5 = calcTextureAreaColor(uTextureCol5, vUv, tiling, uTextureCol5UvOffset);
+    vec4 depthColor = fCalcAreaColor(vec4(sceneDepth), vUv, tiling, vec2(0., 0.));
+    vec4 worldPositionColor = fCalcAreaColor(vec4(worldPosition, 1.), vUv, tiling, vec2(-1., 0.));
+    vec4 color2 = fCalcTextureAreaColor(uTextureCol2, vUv, tiling, uTextureCol2UvOffset);
+    vec4 color3 = fCalcTextureAreaColor(uTextureCol3, vUv, tiling, uTextureCol3UvOffset);
+    vec4 color4 = fCalcTextureAreaColor(uTextureCol4, vUv, tiling, uTextureCol4UvOffset);
+    vec4 color5 = fCalcTextureAreaColor(uTextureCol5, vUv, tiling, uTextureCol5UvOffset);
 
     outColor = depthColor + worldPositionColor + color2 + color3 + color4 + color5;
 }

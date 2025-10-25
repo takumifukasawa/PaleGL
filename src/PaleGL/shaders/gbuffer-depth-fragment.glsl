@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-uniform vec4 uColor; // TODO: base color
+uniform vec4 uColor; // TODO: fbase color
 uniform sampler2D uBaseMap; 
 uniform vec4 uBaseMapTiling;
 
@@ -21,7 +21,7 @@ out vec4 outColor;
 void main() {
     vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
   
-    // TODO: multiply base color
+    // TODO: multiply fbase color
     vec4 baseMapColor = texture(uBaseMap, uv);
     
     vec4 baseColor = vec4(0.);
@@ -32,7 +32,7 @@ void main() {
     baseColor = uColor * baseMapColor;
 #endif   
 
-    // TODO: base color を渡して alpha をかける
+    // TODO: fbase color を渡して alpha をかける
     vec4 resultColor = baseColor;
 
     // #include <alpha_test_f>

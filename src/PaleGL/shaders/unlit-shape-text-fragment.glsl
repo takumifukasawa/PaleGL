@@ -20,7 +20,7 @@ void main() {
 
     // #include <shape_font_f>
     
-    vec4 resultColor = calcShapeFont(vUv) * uColor;
+    vec4 resultColor = fCalcShapeFont(vUv) * uColor;
  
     vec3 worldNormal = normalize(vNormal);
   
@@ -28,13 +28,13 @@ void main() {
     // #include <alpha_test_f>
 // result color がなぜか minify されちゃうので一旦明示的に
 #ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor, uAlphaTestThreshold);
+    fCheckAlphaTest(resultColor, uAlphaTestThreshold);
 #endif
 
-    resultColor.rgb = gamma(resultColor.rgb);
+    resultColor.rgb = fGamma(resultColor.rgb);
     
-    outGBufferA = EncodeGBufferA(vec3(0.));
-    outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(resultColor.rgb);
+    outGBufferA = fEncodeGBufferA(vec3(0.));
+    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(0., 0.);
+    outGBufferD = fEncodeGBufferD(resultColor.rgb);
 }

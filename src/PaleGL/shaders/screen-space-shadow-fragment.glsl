@@ -21,7 +21,7 @@ uniform float uSharpness;
 uniform float uStrength;
 uniform float uRayStepMultiplier;
 
-void calcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
+void fCalcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
     vec3 rawLightPos = pointLight.position;
     vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.position, 1.)).xyz;
 
@@ -65,13 +65,13 @@ void calcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPosition
         vec3 currentRayInView = rayOriginInView + rayDirInView * currentStepLength;
         vec4 currentRayInClip = uProjectionMatrix * vec4(currentRayInView, 1.);
         currentRayInClip /= currentRayInClip.w;
-        float currentRayRawDepth = ndcZToRawDepth(currentRayInClip.z);
+        float currentRayRawDepth = fNdcZToRawDepth(currentRayInClip.z);
 
         // rayのピクセルの深度をdepth_textureから取得
         vec2 rayUv = currentRayInClip.xy * .5 + .5;
         // float currentRawDepthInPixel = texture(uDepthTexture, rayUv).x;
         float currentRawDepthInPixel = textureLod(uDepthTexture, rayUv, 0.).x;
-        vec3 currentViewPositionInPixel = reconstructViewPositionFromDepth(
+        vec3 currentViewPositionInPixel = fReconstructViewPositionFromDepth(
             rayUv,
             currentRawDepthInPixel,
             uInverseProjectionMatrix
@@ -103,20 +103,20 @@ void main() {
     vec2 uv = vUv;
 
     float rawDepth = texture(uDepthTexture, uv).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
     if(sceneDepth > .9999) {
         outColor = vec4(0., 0., 0., 1.);
         return;
     }
     
-    vec3 worldPosition = reconstructWorldPositionFromDepth(
+    vec3 worldPosition = fReconstructWorldPositionFromDepth(
         uv,
         texture(uDepthTexture, uv).x,
         uInverseViewProjectionMatrix
     );
     vec3 viewPosition = (uViewMatrix * vec4(worldPosition, 1.)).xyz;
-    viewPosition = reconstructViewPositionFromDepth(
+    viewPosition = fReconstructViewPositionFromDepth(
         uv,
         texture(uDepthTexture, uv).x,
         uInverseProjectionMatrix
@@ -124,10 +124,10 @@ void main() {
 
     float jitterSpeed = 1.;
     vec3 jitterOffset = normalize(vec3(
-        rand(uv + uTime * jitterSpeed + .1),
-        rand(uv + uTime * jitterSpeed + .2),
+        fRand(uv + uTime * jitterSpeed + .1),
+        fRand(uv + uTime * jitterSpeed + .2),
         // 0.
-        rand(uv + uTime * jitterSpeed + .3)
+        fRand(uv + uTime * jitterSpeed + .3)
     ) * 2. - 1.);
 
     float occlusion = 0.;
@@ -135,7 +135,7 @@ void main() {
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
     // TODO: point light count
     #pragma UNROLL_START 1
-        calcOcclusion(usPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
+        fCalcOcclusion(usPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
     #pragma UNROLL_END
 
     occlusion *= uStrength;

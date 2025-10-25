@@ -36,62 +36,62 @@ struct sLuminanceData {
     float contrast;
 };
 
-// vec4 sampleTexture(sampler2D tex, ivec2 coord) {
+// vec4 fSampleTexture(sampler2D tex, ivec2 coord) {
 //     return texelFetch(tex, coord, 0);
 // }
 
 // 1: use texel fetch function
 // 
-// vec4 sampleTexture(sampler2D tex, ivec2 coord) {
+// vec4 fSampleTexture(sampler2D tex, ivec2 coord) {
 //     return texelFetch(tex, coord, 0);
 // }
 // 
-// vec4 sampleTextureOffset(sampler2D tex, ivec2 coord, int offsetX, int offsetY) {
-//     return sampleTexture(tex, coord + ivec2(offsetX, offsetY));
+// vec4 fSampleTextureOffset(sampler2D tex, ivec2 coord, int offsetX, int offsetY) {
+//     return fSampleTexture(tex, coord + ivec2(offsetX, offsetY));
 // }
 
 // 2: use texture function
 
-float rgbToLuma(vec3 rgb) {
+float fRgbToLuma(vec3 rgb) {
     return dot(rgb, vec3(.299, .587, .114));
 }
 
-vec4 sampleTexture(sampler2D tex, vec2 coord) {
+vec4 fSampleTexture(sampler2D tex, vec2 coord) {
     return texture(tex, coord);
 }
 
-vec4 sampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY) {
-    return sampleTexture(tex, coord + vec2(offsetX, offsetY));
+vec4 fSampleTextureOffset(sampler2D tex, vec2 coord, float offsetX, float offsetY) {
+    return fSampleTexture(tex, coord + vec2(offsetX, offsetY));
 }
 
-sLuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
+sLuminanceData fsampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     sLuminanceData l;
 
     // get nearest side pixels
-    vec3 rgbTop = sampleTextureOffset(uSrcTexture, uv, 0., texelSize.y).xyz;
-    vec3 rgbRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, 0.).xyz;
-    vec3 rgbBottom = sampleTextureOffset(uSrcTexture, uv, 0., -texelSize.y).xyz;
-    vec3 rgbLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, 0.).xyz;
-    vec3 rgbCenter = sampleTextureOffset(uSrcTexture, uv, 0., 0.).xyz;
+    vec3 rgbTop = fSampleTextureOffset(uSrcTexture, uv, 0., texelSize.y).xyz;
+    vec3 rgbRight = fSampleTextureOffset(uSrcTexture, uv, texelSize.x, 0.).xyz;
+    vec3 rgbBottom = fSampleTextureOffset(uSrcTexture, uv, 0., -texelSize.y).xyz;
+    vec3 rgbLeft = fSampleTextureOffset(uSrcTexture, uv, -texelSize.x, 0.).xyz;
+    vec3 rgbCenter = fSampleTextureOffset(uSrcTexture, uv, 0., 0.).xyz;
 
     // get nearest corner pixels
-    vec3 rgbTopRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, texelSize.y).xyz;
-    vec3 rgbTopLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, texelSize.y).xyz;
-    vec3 rgbBottomRight = sampleTextureOffset(uSrcTexture, uv, texelSize.x, -texelSize.y).xyz;
-    vec3 rgbBottomLeft = sampleTextureOffset(uSrcTexture, uv, -texelSize.x, -texelSize.y).xyz;
+    vec3 rgbTopRight = fSampleTextureOffset(uSrcTexture, uv, texelSize.x, texelSize.y).xyz;
+    vec3 rgbTopLeft = fSampleTextureOffset(uSrcTexture, uv, -texelSize.x, texelSize.y).xyz;
+    vec3 rgbBottomRight = fSampleTextureOffset(uSrcTexture, uv, texelSize.x, -texelSize.y).xyz;
+    vec3 rgbBottomLeft = fSampleTextureOffset(uSrcTexture, uv, -texelSize.x, -texelSize.y).xyz;
 
     // get nearest side pixels luma
-    float lumaTop = rgbToLuma(rgbTop);
-    float lumaLeft = rgbToLuma(rgbLeft);
-    float lumaCenter = rgbToLuma(rgbCenter);
-    float lumaRight = rgbToLuma(rgbRight);
-    float lumaBottom = rgbToLuma(rgbBottom);
+    float lumaTop = fRgbToLuma(rgbTop);
+    float lumaLeft = fRgbToLuma(rgbLeft);
+    float lumaCenter = fRgbToLuma(rgbCenter);
+    float lumaRight = fRgbToLuma(rgbRight);
+    float lumaBottom = fRgbToLuma(rgbBottom);
 
     // get nearest corner pixels luma
-    float lumaTopLeft = rgbToLuma(rgbTopLeft);
-    float lumaTopRight = rgbToLuma(rgbTopRight);
-    float lumaBottomLeft = rgbToLuma(rgbBottomLeft);
-    float lumaBottomRight = rgbToLuma(rgbBottomRight);
+    float lumaTopLeft = fRgbToLuma(rgbTopLeft);
+    float lumaTopRight = fRgbToLuma(rgbTopRight);
+    float lumaBottomLeft = fRgbToLuma(rgbBottomLeft);
+    float lumaBottomRight = fRgbToLuma(rgbBottomRight);
 
     // get nearest side pixels contrast
     float lumaHighest = max(lumaCenter, max(max(lumaTop, lumaLeft), max(lumaBottom, lumaRight)));
@@ -116,11 +116,11 @@ sLuminanceData sampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     return l;
 }
 
-bool shouldSkipPixel(sLuminanceData l) {
+bool fShouldSkipPixel(sLuminanceData l) {
     return l.contrast < max(uContrastThreshold, l.highest * uRelativeThreshold);
 }
 
-float determinePixelBlendFactor(sLuminanceData l) {
+float fDeterminePixelBlendFactor(sLuminanceData l) {
     // sub-pixel blend 用のカーネル
     // | 1 | 2 | 1 | 
     // | 2 | 0 | 2 |
@@ -150,7 +150,7 @@ float determinePixelBlendFactor(sLuminanceData l) {
     return pixelBlendFactor;
 }
 
-sEdgeData determineEdge(sLuminanceData l, vec2 texelSize) {
+sEdgeData fdetermineEdge(sLuminanceData l, vec2 texelSize) {
     sEdgeData e;
     
     // # エッジの方向検出
@@ -244,7 +244,7 @@ sEdgeData determineEdge(sLuminanceData l, vec2 texelSize) {
     return e;
 }
 
-float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texelSize) {
+float fDetermineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texelSize) {
 
     // # high quality
     // const edgeStepsArray = [1, 1.5, 2, 2, 2, 2, 2, 2, 2, 4];
@@ -281,14 +281,14 @@ float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texe
 
     // vec2 puv = uvEdge + edgeStep * vec2(${edgeStepsArray[0]});
     vec2 puv = uvEdge + edgeStep * vec2(edgeStepsArray[0]);
-    float pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
+    float pLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
     bool pAtEnd = abs(pLumaDelta) >= gradientThreshold;
 
     // tmp
     // for(int i = 1; i < edgeStepCount && !pAtEnd; i++) {
     //     if(!pAtEnd) {
     //         puv += edgeStep * vec2(edgeStepsArray[i]);
-    //         pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
+    //         pLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
     //         pAtEnd = abs(pLumaDelta) >= gradientThreshold;
     //     }
     // }
@@ -298,7 +298,7 @@ float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texe
         if(!pAtEnd) {
             int index = UNROLL_N + 1;
             puv += edgeStep * vec2(edgeStepsArray[index]);
-            pLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
+            pLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, puv).xyz) - edgeLuma;
             pAtEnd = abs(pLumaDelta) >= gradientThreshold;
         }
     #pragma UNROLL_END
@@ -313,14 +313,14 @@ float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texe
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
    
     vec2 nuv = uvEdge - edgeStep * vec2(edgeStepsArray[0]);
-    float nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
+    float nLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
     bool nAtEnd = abs(nLumaDelta) >= gradientThreshold;
 
     // tmp
     // for(int i = 1; i < edgeStepCount && !nAtEnd; i++) {
     //     if(!nAtEnd) {
     //         nuv -= edgeStep * vec2(edgeStepsArray[i]);
-    //         nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
+    //         nLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
     //         nAtEnd = abs(nLumaDelta) >= gradientThreshold;
     //     }
     // }
@@ -330,7 +330,7 @@ float determineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 texe
         if(!nAtEnd) {
             int index = UNROLL_N + 1;
             nuv -= edgeStep * vec2(edgeStepsArray[index]);
-            nLumaDelta = rgbToLuma(sampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
+            nLumaDelta = fRgbToLuma(fSampleTexture(uSrcTexture, nuv).xyz) - edgeLuma;
             nAtEnd = abs(nLumaDelta) >= gradientThreshold;
         }
     #pragma UNROLL_END
@@ -382,16 +382,16 @@ void main() {
     
     vec2 texelSize = vec2(1. / uTargetWidth, 1. / uTargetHeight);
     
-    sLuminanceData l = sampleLuminanceNeighborhood(uv, texelSize);   
+    sLuminanceData l = fsampleLuminanceNeighborhood(uv, texelSize);   
 
-    if(shouldSkipPixel(l)) {
-        outColor = sampleTexture(uSrcTexture, uv);
+    if(fShouldSkipPixel(l)) {
+        outColor = fSampleTexture(uSrcTexture, uv);
         return;
     }
     
-    sEdgeData e = determineEdge(l, texelSize);
-    float pixelBlend = determinePixelBlendFactor(l); 
-    float edgeBlend = determineEdgeBlendFactor(l, e, uv, texelSize);
+    sEdgeData e = fdetermineEdge(l, texelSize);
+    float pixelBlend = fDeterminePixelBlendFactor(l); 
+    float edgeBlend = fDetermineEdgeBlendFactor(l, e, uv, texelSize);
     
     float finalBlend = max(pixelBlend, edgeBlend);
 
@@ -401,6 +401,6 @@ void main() {
         uv.x += e.pixelStep * finalBlend;
     }
 
-    outColor = sampleTexture(uSrcTexture, uv);
-    // outColor = sampleTexture(${UniformNames.SrcTexture}, vUv);
+    outColor = fSampleTexture(uSrcTexture, uv);
+    // outColor = fSampleTexture(${UniformNames.SrcTexture}, vUv);
 }

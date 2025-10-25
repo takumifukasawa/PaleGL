@@ -32,16 +32,16 @@ void main() {
         
     for(int i = 0; i <= sampleCount; i++) {
         float fi = float(i);
-        float weight = (float(sampleCount) - float(i)) / float(sampleCount);
+        float fWeight = (float(sampleCount) - float(i)) / float(sampleCount);
         vec2 currentStep = currentToCenterStep * fi;
         vec2 uv = vUv + currentStep;
         uv = vec2(
             clamp(uv.x, 0., 1.),
             clamp(uv.y, 0., 1.)
         );
-        // use weight
-        // destColor += texture(uSrcTexture, uv) * weight;
-        // totalWeight += weight;
+        // use fWeight
+        // destColor += texture(uSrcTexture, uv) * fWeight;
+        // totalWeight += fWeight;
         // simple convolution
         destColor += texture(uSrcTexture, uv);
         totalWeight += 1.;

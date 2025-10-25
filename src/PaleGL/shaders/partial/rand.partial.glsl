@@ -1,31 +1,31 @@
-float rand(float x){
+float fRand(float x){
   return fract(sin(x * 12.9898) * 43758.5453);
 }
 
 // 0 - 1
-// ref: https://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-rand-one-liner
-float rand(vec2 co){
+// ref: https://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-fRand-one-liner
+float fRand(vec2 co){
     // return fract(sin(dot(co.xy ,vec2(12.98, 78.23))) * 43.75);
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 // ref: https://thebookofshaders.com/edit.php#11/2d-gnoise.frag
-vec2 rand2(vec2 st){
+vec2 fRand2(vec2 st){
     st = vec2( dot(st,vec2(127.1,311.7)),
     dot(st,vec2(269.5,183.3)) );
     return -1. + 2.*fract(sin(st)*43758.5453123);
 }
 
 // Some useful functions
-vec2 mod289(vec2 x) { return x - floor(x * (1. / 289.)) * 289.; }
-vec3 mod289(vec3 x) { return x - floor(x * (1. / 289.)) * 289.; }
-vec4 mod289(vec4 x) { return x - floor(x * (1. / 289.)) * 289.; }
-vec3 permute(vec3 x) { return mod289(((x*34.)+1.)*x); }
-vec4 permute(vec4 x) { return mod289(((x*34.)+10.)*x); }
+vec2 fMod289(vec2 x) { return x - floor(x * (1. / 289.)) * 289.; }
+vec3 fMod289(vec3 x) { return x - floor(x * (1. / 289.)) * 289.; }
+vec4 fMod289(vec4 x) { return x - floor(x * (1. / 289.)) * 289.; }
+vec3 fPermute(vec3 x) { return fMod289(((x*34.)+1.)*x); }
+vec4 fPermute(vec4 x) { return fMod289(((x*34.)+10.)*x); }
 
-vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+vec4 fTaylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
-vec3 hash3(vec3 p) {
+vec3 fHash3(vec3 p) {
     vec3 q = vec3(
     dot(p, vec3(127.1, 311.7, 114.5)),
     dot(p, vec3(269.5, 183.3, 191.9)),
@@ -35,16 +35,16 @@ vec3 hash3(vec3 p) {
 }
 
 //
-// Description : GLSL 2D simplex noise function
+// Description : GLSL 2D simplex fNoise function
 //      Author : Ian McEwan, Ashima Arts
 //  Maintainer : ijm
 //     Lastmod : 20110822 (ijm)
 //     License :
 //  Copyright (C) 2011 Ashima Arts. All rights reserved.
 //  Distributed under the MIT License. See LICENSE file.
-//  https://github.com/ashima/webgl-noise
+//  https://github.com/ashima/webgl-fNoise
 //
-float snoise(vec2 v) {
+float fSnoise(vec2 v) {
 
     // Precompute values for skewed triangular grid
     const vec4 C = vec4(
@@ -70,9 +70,9 @@ float snoise(vec2 v) {
 
     // Do some permutations to avoid
     // truncation effects in permutation
-    i = mod289(i);
-    vec3 p = permute(
-        permute( i.y + vec3(0., i1.y, 1.))
+    i = fMod289(i);
+    vec3 p = fPermute(
+        fPermute( i.y + vec3(0., i1.y, 1.))
         + i.x + vec3(0., i1.x, 1.)
     );
 
@@ -102,7 +102,7 @@ float snoise(vec2 v) {
     // Approximation of: m *= inversesqrt(a0*a0 + h*h);
     m *= 1.79284291400159 - 0.85373472095314 * (a0*a0+h*h);
 
-    // Compute final noise value at P
+    // Compute final fNoise value at P
     vec3 g = vec3(0.);
     g.x  = a0.x * x0.x + h.x * x0.y;
     g.yz = a0.yz * vec2(x1.x, x2.x) + h.yz * vec2(x1.y, x2.y);
@@ -112,16 +112,16 @@ float snoise(vec2 v) {
 
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex 
-//               noise functions.
+//               fNoise functions.
 //      Author : Ian McEwan, Ashima Arts.
 //  Maintainer : stegu
 //     Lastmod : 20201014 (stegu)
 //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
 //               Distributed under the MIT License. See LICENSE file.
-//               https://github.com/ashima/webgl-noise
-//               https://github.com/stegu/webgl-noise
+//               https://github.com/ashima/webgl-fNoise
+//               https://github.com/stegu/webgl-fNoise
 // 
-float snoise(vec3 v)
+float fSnoise(vec3 v)
   { 
   const vec2  C = vec2(1./6., 1./3.) ;
   const vec4  D = vec4(0., 0.5, 1., 2.);
@@ -145,13 +145,13 @@ float snoise(vec3 v)
   vec3 x3 = x0 - D.yyy;      // -1.+3.*C.x = -0.5 = -D.y
 
 // Permutations
-  i = mod289(i); 
-  vec4 p = permute( permute( permute( 
+  i = fMod289(i); 
+  vec4 p = fPermute( fPermute( fPermute( 
              i.z + vec4(0., i1.z, i2.z, 1. ))
            + i.y + vec4(0., i1.y, i2.y, 1. )) 
            + i.x + vec4(0., i1.x, i2.x, 1. ));
 
-// Gradients: 7x7 points over a square, mapped onto an octahedron.
+// Gradients: 7x7 points over a fsquare, mapped onto an octahedron.
 // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
   float n_ = 0.142857142857; // 1./7.
   vec3  ns = n_ * D.wyz - D.xzx;
@@ -183,32 +183,32 @@ float snoise(vec3 v)
   vec3 p3 = vec3(a1.zw,h.w);
 
 //Normalise gradients
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  vec4 norm = fTaylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
   p0 *= norm.x;
   p1 *= norm.y;
   p2 *= norm.z;
   p3 *= norm.w;
 
-// Mix final noise value
+// Mix final fNoise value
   vec4 m = max(0.5 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.);
   m = m * m;
   return 105. * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
-vec3 snoise3(vec3 v) {
+vec3 fSnoise3(vec3 v) {
     return vec3(
-        snoise(v),
-        snoise(v + vec3(100., 200., 300.)),
-        snoise(v + vec3(400., 500., 600.))
+        fSnoise(v),
+        fSnoise(v + vec3(100., 200., 300.)),
+        fSnoise(v + vec3(400., 500., 600.))
     );
 }
 
 
-vec3 randomOnSphere(float v) {
-  float z = rand(v * 0.12 + 583.13) * 2. - 1.;
-  // float phi = rand(v * 0.49 + 213.85) * 3.14 * 2.;
-  float phi = rand(v * 0.49 + 213.85) * PI * 2.;
+vec3 fRandomOnSphere(float v) {
+  float z = fRand(v * 0.12 + 583.13) * 2. - 1.;
+  // float phi = fRand(v * 0.49 + 213.85) * 3.14 * 2.;
+  float phi = fRand(v * 0.49 + 213.85) * PI * 2.;
 
   float b = sqrt(1. - z * z);
 
@@ -216,11 +216,11 @@ vec3 randomOnSphere(float v) {
 }
 
 
-vec3 randomInSphere(float v) {
-  float z = rand(v * 0.42 + 213.23) * 2. - 1.;
-  float phi = rand(v * 0.19 + 313.98) * 3.14 * 2.;
-  // float phi = rand(v * 0.19 + 313.98) * PI * 2.;
-  float r = rand(v * 0.35 + 192.75);
+vec3 fRandomInSphere(float v) {
+  float z = fRand(v * 0.42 + 213.23) * 2. - 1.;
+  float phi = fRand(v * 0.19 + 313.98) * 3.14 * 2.;
+  // float phi = fRand(v * 0.19 + 313.98) * PI * 2.;
+  float r = fRand(v * 0.35 + 192.75);
 
   float a = pow(r, 1. / 3.);
   float b = sqrt(1. - z * z);

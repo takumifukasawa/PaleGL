@@ -27,19 +27,19 @@ void main() {
     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
     
     // USE_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
-    vec3 skyboxSampleDir = calcEnvMapSampleDir(reflectDir, uRotationOffset);
+    vec3 skyboxSampleDir = fCalcEnvMapSampleDir(reflectDir, uRotationOffset);
     // vec3 envMapColor = calcEnvMap(uCubeTexture);
     // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;
     vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
   
     // NOTE: テクスチャはhdrじゃなくてsrgb想定 
-    envMapColor = gamma(envMapColor); 
+    envMapColor = fGamma(envMapColor); 
         
-    outGBufferA = EncodeGBufferA(envMapColor);
-    outGBufferB = EncodeGBufferB(vec3(0.), uShadingModelId);
-    outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(vec3(0.));
+    outGBufferA = fEncodeGBufferA(envMapColor);
+    outGBufferB = fEncodeGBufferB(vec3(0.), uShadingModelId);
+    outGBufferC = fEncodeGBufferC(0., 0.);
+    outGBufferD = fEncodeGBufferD(vec3(0.));
     
     // for debug
-    // outGBufferA = EncodeGBufferD(N);
+    // outGBufferA = fEncodeGBufferD(N);
 }

@@ -12,12 +12,12 @@ uniform sampler2D uSrcTexture;
 uniform sampler2D uCocTexture;
 uniform vec2 uTexelSize;
 
-float weight(vec3 c) {
+float fWeight(vec3 c) {
     return 1. / (1. + max(max(c.r, c.g), c.b));
     // return 1. / max((1. + max(max(c.r, c.g), c.b)), .01);
 }
 
-float maxV3(vec3 c) {
+float fMaxV3(vec3 c) {
     return max(max(c.r, c.g), c.b);
 }
 
@@ -34,10 +34,10 @@ void main() {
     vec3 s2 = texture(uSrcTexture, vUv + kernel.xw).rgb;
     vec3 s3 = texture(uSrcTexture, vUv + kernel.zw).rgb;
     
-    float w0 = weight(s0);
-    float w1 = weight(s1);
-    float w2 = weight(s2);
-    float w3 = weight(s3);
+    float w0 = fWeight(s0);
+    float w1 = fWeight(s1);
+    float w2 = fWeight(s2);
+    float w3 = fWeight(s3);
     
     float coc0 = texture(uCocTexture, vUv + kernel.xy).r;
     float coc1 = texture(uCocTexture, vUv + kernel.zy).r;
@@ -57,15 +57,15 @@ void main() {
     vec4 weights = vec4(w0, w1, w2, w3);
 
     // for luma
-    // w0 *= 1. / (maxV3(rawCoc0) + 1.);
-    // w1 *= 1. / (maxV3(rawCoc1) + 1.);
-    // w2 *= 1. / (maxV3(rawCoc2) + 1.);
-    // w3 *= 1. / (maxV3(rawCoc3) + 1.);
+    // w0 *= 1. / (fMaxV3(rawCoc0) + 1.);
+    // w1 *= 1. / (fMaxV3(rawCoc1) + 1.);
+    // w2 *= 1. / (fMaxV3(rawCoc2) + 1.);
+    // w3 *= 1. / (fMaxV3(rawCoc3) + 1.);
     // TODO: flickerを軽減したいがこのあたりがうまくいってないような気がする
-    w0 *= 1. / (maxV3(s0) + 1.);
-    w1 *= 1. / (maxV3(s1) + 1.);
-    w2 *= 1. / (maxV3(s2) + 1.);
-    w3 *= 1. / (maxV3(s3) + 1.);
+    w0 *= 1. / (fMaxV3(s0) + 1.);
+    w1 *= 1. / (fMaxV3(s1) + 1.);
+    w2 *= 1. / (fMaxV3(s2) + 1.);
+    w3 *= 1. / (fMaxV3(s3) + 1.);
 
     // tmp
     // w0 *= 1. / (cocMax + 1.);

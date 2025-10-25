@@ -3,26 +3,26 @@
 // ref: https://game.watch.impress.co.jp/docs/20081203/3dmg4.htm
 
 // hdr rgb -> 8bit color
-vec4 encodePseudoHDR(vec3 color) {
-    float base = .25;
-    float l = max(max(color.r, color.g), max(color.b, base));
+vec4 fEncodePseudoHDR(vec3 color) {
+    float fbase = .25;
+    float l = max(max(color.r, color.g), max(color.b, fbase));
     return vec4(
         color.r / l,
         color.g / l,
         color.b / l,
-        base / l
+        fbase / l
     );
 }
 
 // rgb: hdr color, alpha: luma
-vec4 decodePseudoHDR(vec4 encodedColor) {
-    float base = .25;
+vec4 fDecodePseudoHDR(vec4 encodedColor) {
+    float fbase = .25;
     float rl = encodedColor.a;
     return vec4(
-        (encodedColor.r / rl) * base,
-        (encodedColor.g / rl) * base,
-        (encodedColor.b / rl) * base,
-        rl * base
+        (encodedColor.r / rl) * fbase,
+        (encodedColor.g / rl) * fbase,
+        (encodedColor.b / rl) * fbase,
+        rl * fbase
     );
 }
 
@@ -35,18 +35,18 @@ uniform sampler2D uSrcTexture;
 void main() {
     // 疑似HDRする場合
     // vec4 textureColor = texture(uSrcTexture, vUv);
-    // vec4 color = decodePseudoHDR(textureColor);
+    // vec4 color = fDecodePseudoHDR(textureColor);
     // outColor = vec4(color.xyz, 1.);
 
     vec3 resultColor = texture(uSrcTexture, vUv).xyz;
 
     // some tone mappings
-    // resultColor = reinhardExposure(resultColor, 1000000000.);
+    // resultColor = fReinhardExposure(resultColor, 1000000000.);
     // resultColor = reinhard(resultColor);
-    resultColor = aces(resultColor);
+    resultColor = fAces(resultColor);
     
-    // linear で作業してるのでスクリーン向けに degamma
-    resultColor = degamma(resultColor);
+    // linear で作業してるのでスクリーン向けに fDegamma
+    resultColor = fDegamma(resultColor);
 
     // 露出オーバー確認
     if(

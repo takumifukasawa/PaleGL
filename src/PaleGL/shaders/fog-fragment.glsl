@@ -33,7 +33,7 @@ uniform float uBlendRate;
 uniform float uTexelSize;
 
 // 1に近いほどfogが強い
-float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float densityY0, float densityAttenuation) {
+float fCalcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float densityY0, float densityAttenuation) {
     vec3 v = cameraPositionInWorld - objectPositionInWorld;
     float l = length(v);
     float ret;
@@ -49,7 +49,7 @@ float calcFogHeightExp(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, f
 }
 
 // 1に近いほどfogが強い
-float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float fogDensity, float fogEndHeight) {
+float fCalcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float fogDensity, float fogEndHeight) {
     vec3 v = cameraPositionInWorld - objectPositionInWorld;
     float t;
     if(objectPositionInWorld.y < fogEndHeight) {
@@ -65,16 +65,16 @@ float calcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWorl
             t = 0.;
         }
     }
-    float dist = length(v) * t;
-    float fog = exp(-dist * fogDensity);
+    float fdist = length(v) * t;
+    float fog = exp(-fdist * fogDensity);
     return 1. - fog;
 }
 
 // 1に近いほどfogが強い
-float calcDistanceFog(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float expStart, float fogEnd, float expPower) {
-    float dist = length(cameraPositionInWorld - objectPositionInWorld);
-    dist = max(0., dist - expStart);
-    return max(0., 1. - exp(-dist * expPower)) * smoothstep(expStart, fogEnd, dist);
+float fCalcDistanceFog(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float expStart, float fogEnd, float expPower) {
+    float fdist = length(cameraPositionInWorld - objectPositionInWorld);
+    fdist = max(0., fdist - expStart);
+    return max(0., 1. - exp(-fdist * expPower)) * smoothstep(expStart, fogEnd, fdist);
 }
 
 void main() {
@@ -99,9 +99,9 @@ void main() {
     float occlusion = saturate(lightShaftColor.x);
 
     float rawDepth = texture(uDepthTexture, uv).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    vec3 viewPositionFromDepth = reconstructViewPositionFromDepth(uv, rawDepth, uInverseProjectionMatrix);
-    vec3 worldPositionFromDepth = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    vec3 viewPositionFromDepth = fReconstructViewPositionFromDepth(uv, rawDepth, uInverseProjectionMatrix);
+    vec3 worldPositionFromDepth = fReconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
  
     float constantFogScale = .1;
   
@@ -112,10 +112,10 @@ void main() {
     float rate = constantFogScale * max(0., 1. - exp(-uFogStrength * -viewPositionFromDepth.z));
    
     // height fog
-    float fogRate = calcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
+    float fogRate = fCalcFogHeightExp(worldPositionFromDepth, uViewPosition, uFogDensity, uFogDensityAttenuation);
     fogRate *= 1. - step(1. - .0001, rawDepth);
     // distance fog
-    fogRate += calcDistanceFog(worldPositionFromDepth, uViewPosition, uDistanceFogStart, uDistanceFogEnd, uDistanceFogPower);
+    fogRate += fCalcDistanceFog(worldPositionFromDepth, uViewPosition, uDistanceFogStart, uDistanceFogEnd, uDistanceFogPower);
     // clamp
     fogRate = saturate(fogRate) * noiseRate;
 

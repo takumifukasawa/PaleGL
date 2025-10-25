@@ -21,7 +21,7 @@ uniform float uBokehRadius;
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
     float rawDepth = texture(uDepthTexture, vUv).r;
-    float eyeDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
+    float eyeDepth = fPerspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
     
     // float coc = (depth - uFocusDistance) / uFocusRange;
     float coc = (eyeDepth - uFocusDistance) / uFocusRange;

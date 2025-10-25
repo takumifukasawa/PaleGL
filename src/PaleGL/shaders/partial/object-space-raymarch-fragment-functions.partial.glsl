@@ -1,4 +1,4 @@
-vec2 osRaymarch(
+vec2 fOsRaymarch(
     vec3 rayOrigin,
     vec3 rayDirection,
     float minDistance,
@@ -18,9 +18,9 @@ vec2 osRaymarch(
 
     for (int i = 0; i < OI; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        result = objectSpaceDfScene(currentRayPosition, inverseWorldMatrix, boundsScale, useWorld) * side;
+        result = fObjectSpaceDfScene(currentRayPosition, inverseWorldMatrix, boundsScale, useWorld) * side;
         accLen += result.x;
-        if (!isDfInnerBox(toLocal(currentRayPosition, inverseWorldMatrix, boundsScale), boundsScale)) {
+        if (!fIsDfInnerBox(fToLocal(currentRayPosition, inverseWorldMatrix, boundsScale), boundsScale)) {
             break;
         }
         if (result.x <= minDistance) {
@@ -41,7 +41,7 @@ vec2 osRaymarch(
 }
 
 // 既存の深度値と比較して、奥にある場合は破棄する
-void checkDiscardByCompareRayDepthAndSceneDepth(
+void fCheckDiscardByCompareRayDepthAndSceneDepth(
     vec3 currentRayPosition,
     sampler2D depthTexture,
     float nearClip,
@@ -50,15 +50,15 @@ void checkDiscardByCompareRayDepthAndSceneDepth(
 ) {
     // 既存の深度値と比較して、奥にある場合は破棄する
     float rawDepth = texelFetch(depthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, nearClip, farClip);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, nearClip, farClip);
     vec4 currentRayViewPosition = (viewMatrix * vec4(currentRayPosition, 1.));
-    float currentDepth = viewZToLinearDepth(currentRayViewPosition.z, nearClip, farClip);
+    float currentDepth = fViewZToLinearDepth(currentRayViewPosition.z, nearClip, farClip);
     if(currentDepth >= sceneDepth) {
         discard;
     }
 }
 
-vec3 getOSRaymarchViewRayDirection(vec3 origin, vec3 viewPosition, float isPerspective) {
+vec3 fGetOSRaymarchViewRayDirection(vec3 origin, vec3 viewPosition, float isPerspective) {
     return isPerspective > .5
         ? normalize(origin - viewPosition)
         : normalize(-viewPosition);

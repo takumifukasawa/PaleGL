@@ -354,6 +354,17 @@ function generateMappings(
 function replaceInGlsl(code: string, map: Map<string, string>): string {
     let result = code;
 
+    // #includeディレクティブを一時的に保護
+    const includePattern = /#include\s*[<"]([^>"]+)[>"]/g;
+    const includes: string[] = [];
+    const includeMarker = '___INCLUDE_MARKER_';
+
+    result = result.replace(includePattern, (match) => {
+        const index = includes.length;
+        includes.push(match);
+        return `${includeMarker}${index}___`;
+    });
+
     // 長い名前から順に置換（部分一致を避けるため）
     const sortedEntries = Array.from(map.entries()).sort((a, b) => b[0].length - a[0].length);
 
@@ -362,6 +373,11 @@ function replaceInGlsl(code: string, map: Map<string, string>): string {
         const regex = new RegExp(`\\b${oldName}\\b`, 'g');
         result = result.replace(regex, newName);
     }
+
+    // #includeディレクティブを復元
+    result = result.replace(new RegExp(`${includeMarker}(\\d+)___`, 'g'), (_, index) => {
+        return includes[parseInt(index)];
+    });
 
     return result;
 }

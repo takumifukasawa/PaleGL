@@ -26,9 +26,9 @@ void main() {
     // calc soft fade
     
     float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
 
-    float currentDepth = viewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
+    float currentDepth = fViewZToLinearDepth(vViewPosition.z, uNearClip, uFarClip);
 
     float diffDepth = abs(sceneDepth) - abs(currentDepth);
     float softFade = smoothstep(0., .01, diffDepth);

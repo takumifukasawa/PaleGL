@@ -22,7 +22,7 @@ uniform float uOcclusionPower;
 uniform float uOcclusionStrength;
 uniform float uBlendRate;
 
-mat2 getRotationMatrix(float rad) {
+mat2 fGetRotationMatrix(float rad) {
     float c = cos(rad);
     float s = sin(rad);
     return mat2(
@@ -47,19 +47,19 @@ void main() {
     // return;
 
     float rawDepth = texture(uDepthTexture, uv).x;
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
     
     vec3 worldNormal = normalize(texture(uGBufferBTexture, uv).xyz * 2. - 1.);
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
-    vec3 viewPosition = reconstructViewPositionFromDepth(
+    vec3 viewPosition = fReconstructViewPositionFromDepth(
         uv,
         texture(uDepthTexture, uv).x,
         uInverseProjectionMatrix
     );
    
     // for debug
-    // vec3 worldPosition = reconstructWorldPositionFromDepth(
+    // vec3 worldPosition = fReconstructWorldPositionFromDepth(
     //     uv,
     //     texture(uDepthTexture, uv).x,
     //     uInverseViewProjectionMatrix
@@ -88,24 +88,24 @@ void main() {
     }
 
     for (int i = 0; i < samplingCount; i++) {
-        mat2 rot = getRotationMatrix(uSamplingRotations[i] + samplingOffsetRad);
+        mat2 fRot = fGetRotationMatrix(uSamplingRotations[i] + samplingOffsetRad);
 
         float offsetLen = uSamplingDistances[i] * samplingOffsetLen * uOcclusionSampleLength;
-        vec3 offsetA = vec3(rot * vec2(1., 0.), 0.) * offsetLen;
+        vec3 offsetA = vec3(fRot * vec2(1., 0.), 0.) * offsetLen;
         vec3 offsetB = -offsetA;
     
-        float rawDepthA = sampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetA);
-        float rawDepthB = sampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetB);
+        float rawDepthA = fSampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetA);
+        float rawDepthB = fSampleRawDepthByViewPosition(uDepthTexture, viewPosition, uProjectionMatrix, offsetB);
 
-        float depthA = perspectiveDepthToLinearDepth(rawDepthA, uNearClip, uFarClip);
-        float depthB = perspectiveDepthToLinearDepth(rawDepthB, uNearClip, uFarClip);
+        float depthA = fPerspectiveDepthToLinearDepth(rawDepthA, uNearClip, uFarClip);
+        float depthB = fPerspectiveDepthToLinearDepth(rawDepthB, uNearClip, uFarClip);
 
-        vec3 viewPositionA = reconstructViewPositionFromDepth(
+        vec3 viewPositionA = fReconstructViewPositionFromDepth(
             uv,
             rawDepthA,
             uInverseProjectionMatrix
         );
-        vec3 viewPositionB = reconstructViewPositionFromDepth(
+        vec3 viewPositionB = fReconstructViewPositionFromDepth(
             uv,
             rawDepthB,
             uInverseProjectionMatrix

@@ -16,7 +16,7 @@ out vec4 outColor;
 const float threshold = .5;
 const float smoothRange = .01;
 
-float sdf2alpha(float sdf) {
+float fSdf2alpha(float sdf) {
     float alpha = smoothstep(
         threshold - smoothRange,
         threshold + smoothRange,
@@ -25,7 +25,7 @@ float sdf2alpha(float sdf) {
     return alpha;
 }
 
-float median(vec3 msdf) {
+float fMedian(vec3 msdf) {
     return max(
         min(msdf.r, msdf.g),
         min(
@@ -41,9 +41,9 @@ void main() {
     vec2 uv = vUv;
     uv = uv * uFontTiling.xy + uFontTiling.zw;
 
-    float sdf = median(texture(uFontMap, uv).rgb);
+    float sdf = fMedian(texture(uFontMap, uv).rgb);
 
-    float alpha = sdf2alpha(sdf);
+    float alpha = fSdf2alpha(sdf);
     resultColor.a = alpha;
     
     // #include <alpha_test_f>

@@ -48,7 +48,7 @@ uniform float uShowGBuffer;
 uniform mat4 uInverseViewProjectionMatrix;
 uniform vec2 uTiling;
 
-int bitShift(int data, int order) {
+int fBitShift(int data, int order) {
     return data >> order;
 }
 
@@ -62,38 +62,38 @@ void main() {
     vec2 depthUv = vUv * tiling + uDepthTextureUvOffset;
     vec2 worldPositionUv = vUv * tiling + uWorldPositionUvOffset;
   
-    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, gBufferAUv);
-    sGBufferB gBufferB = DecodeGBufferB(uGBufferBTexture, gBufferBUv);
-    sGBufferC gBufferC = DecodeGBufferC(uGBufferCTexture, gBufferCUv);
-    sGBufferD gBufferD = DecodeGBufferD(uGBufferDTexture, gBufferDUv);
+    sGBufferA gBufferA = fDecodeGBufferA(uGBufferATexture, gBufferAUv);
+    sGBufferB gBufferB = fDecodeGBufferB(uGBufferBTexture, gBufferBUv);
+    sGBufferC gBufferC = fDecodeGBufferC(uGBufferCTexture, gBufferCUv);
+    sGBufferD gBufferD = fDecodeGBufferD(uGBufferDTexture, gBufferDUv);
 
-    float rawDepth = texture(uDepthTexture, depthUv).x * isArea(depthUv);
-    float sceneDepth = perspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    float rawDepth = texture(uDepthTexture, depthUv).x * fIsArea(depthUv);
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
 
-    vec3 worldPosition = reconstructWorldPositionFromDepth(
+    vec3 worldPosition = fReconstructWorldPositionFromDepth(
         worldPositionUv,
         texture(uDepthTexture, worldPositionUv).x,
         uInverseViewProjectionMatrix
     );
 
-    vec4 gBufferAColor = calcAreaColor(vec4(gBufferA.baseColor, 1.), vUv, tiling, uGBufferATextureUvOffset);
-    vec4 gBufferBColor = calcAreaColor(vec4(gBufferB.normal, 1.), vUv, tiling, uGBufferBTextureUvOffset);
-    vec4 gBufferCColor = calcAreaColor(vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.), vUv, tiling, uGBufferCTextureUvOffset);
-    vec4 gBufferDColor = calcAreaColor(vec4(gBufferD.emissiveColor, 1.), vUv, tiling, uGBufferDTextureUvOffset);
-    vec4 depthColor = calcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
-    vec4 worldPositionColor = calcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);
-    vec4 directionalShadowMapColor = calcTextureAreaColor(uDirectionalLightShadowMap, vUv, tiling, uDirectionalLightShadowMapUvOffset);
-    vec4 spotLight0ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap0, vUv, tiling, uSpotLightShadowMap0UvOffset);
-    vec4 spotLight1ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap1, vUv, tiling, uSpotLightShadowMap1UvOffset);
-    vec4 spotLight2ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap2, vUv, tiling, uSpotLightShadowMap2UvOffset);
-    vec4 spotLight3ShadowMapColor = calcTextureAreaColor(uSpotLightShadowMap3, vUv, tiling, uSpotLightShadowMap3UvOffset);
-    vec4 aoColor = calcTextureAreaColor(uAmbientOcclusionTexture, vUv, tiling, uAmbientOcclusionTextureUvOffset);
-    vec4 deferredShadingColor = calcTextureAreaColor(uDeferredShadingTexture, vUv, tiling, uDeferredShadingTextureUvOffset);
-    vec4 lightShaftColor = calcTextureAreaColor(uLightShaftTexture, vUv, tiling, uLightShaftTextureUvOffset);
-    vec4 volumetricLightColor = calcTextureAreaColor(uVolumetricLightTexture, vUv, tiling, uVolumetricLightTextureUvOffset);
-    vec4 fogColor = calcTextureAreaColor(uFogTexture, vUv, tiling, uFogTextureUvOffset);
-    vec4 dofColor = calcTextureAreaColor(uDepthOfFieldTexture, vUv, tiling, uDepthOfFieldTextureUvOffset);
-    vec4 bloomColor = calcTextureAreaColor(uBloomTexture, vUv, tiling, uBloomTextureUvOffset);
+    vec4 gBufferAColor = fCalcAreaColor(vec4(gBufferA.baseColor, 1.), vUv, tiling, uGBufferATextureUvOffset);
+    vec4 gBufferBColor = fCalcAreaColor(vec4(gBufferB.normal, 1.), vUv, tiling, uGBufferBTextureUvOffset);
+    vec4 gBufferCColor = fCalcAreaColor(vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.), vUv, tiling, uGBufferCTextureUvOffset);
+    vec4 gBufferDColor = fCalcAreaColor(vec4(gBufferD.emissiveColor, 1.), vUv, tiling, uGBufferDTextureUvOffset);
+    vec4 depthColor = fCalcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
+    vec4 worldPositionColor = fCalcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);
+    vec4 directionalShadowMapColor = fCalcTextureAreaColor(uDirectionalLightShadowMap, vUv, tiling, uDirectionalLightShadowMapUvOffset);
+    vec4 spotLight0ShadowMapColor = fCalcTextureAreaColor(uSpotLightShadowMap0, vUv, tiling, uSpotLightShadowMap0UvOffset);
+    vec4 spotLight1ShadowMapColor = fCalcTextureAreaColor(uSpotLightShadowMap1, vUv, tiling, uSpotLightShadowMap1UvOffset);
+    vec4 spotLight2ShadowMapColor = fCalcTextureAreaColor(uSpotLightShadowMap2, vUv, tiling, uSpotLightShadowMap2UvOffset);
+    vec4 spotLight3ShadowMapColor = fCalcTextureAreaColor(uSpotLightShadowMap3, vUv, tiling, uSpotLightShadowMap3UvOffset);
+    vec4 aoColor = fCalcTextureAreaColor(uAmbientOcclusionTexture, vUv, tiling, uAmbientOcclusionTextureUvOffset);
+    vec4 deferredShadingColor = fCalcTextureAreaColor(uDeferredShadingTexture, vUv, tiling, uDeferredShadingTextureUvOffset);
+    vec4 lightShaftColor = fCalcTextureAreaColor(uLightShaftTexture, vUv, tiling, uLightShaftTextureUvOffset);
+    vec4 volumetricLightColor = fCalcTextureAreaColor(uVolumetricLightTexture, vUv, tiling, uVolumetricLightTextureUvOffset);
+    vec4 fogColor = fCalcTextureAreaColor(uFogTexture, vUv, tiling, uFogTextureUvOffset);
+    vec4 dofColor = fCalcTextureAreaColor(uDepthOfFieldTexture, vUv, tiling, uDepthOfFieldTextureUvOffset);
+    vec4 bloomColor = fCalcTextureAreaColor(uBloomTexture, vUv, tiling, uBloomTextureUvOffset);
     
     outColor =
         gBufferAColor

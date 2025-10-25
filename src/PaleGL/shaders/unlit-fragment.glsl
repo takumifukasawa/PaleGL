@@ -36,7 +36,7 @@ void main() {
     vec3 worldNormal = vNormal;
 
 #ifdef USE_NORMAL_MAP
-    worldNormal = calcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
+    worldNormal = fCalcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
 #else
     worldNormal = normalize(vNormal);
 #endif
@@ -49,15 +49,15 @@ void main() {
 
     #include <alpha_test_f>
 
-    baseColor = gamma(baseColor); 
+    baseColor = fGamma(baseColor); 
 
-    outGBufferA = EncodeGBufferA(vec3(0.));
-    outGBufferB = EncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = EncodeGBufferC(0., 0.);
-    outGBufferD = EncodeGBufferD(baseColor.rgb);
+    outGBufferA = fEncodeGBufferA(vec3(0.));
+    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(0., 0.);
+    outGBufferD = fEncodeGBufferD(baseColor.rgb);
     
     // for debug 
-    // outGBufferD = EncodeGBufferD(worldNormal.rgb);
+    // outGBufferD = fEncodeGBufferD(worldNormal.rgb);
     // outGBufferD = vec4(step(.5, uv.x), 0., 0., 1.);
 
     #pragma AFTER_OUT

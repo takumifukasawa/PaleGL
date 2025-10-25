@@ -14,10 +14,10 @@ void main(void) {
   float maxRadius = 2.; // Set a maximum radius for the sphere
   outVelocity = vec3(0.); // Initial velocity
   vec2 coord = vec2(float(gl_FragCoord.x), float(gl_FragCoord.y));
-  float seed = rand(coord);
-  outPosition = randomInSphere(rand(coord)) * maxRadius;
-  // outUp = normalize(randomOnSphere(seed * 0.21 + rand(3424.34)));
-  outUp = normalize(randomOnSphere(seed));
+  float seed = fRand(coord);
+  outPosition = fRandomInSphere(fRand(coord)) * maxRadius;
+  // outUp = normalize(fRandomOnSphere(seed * 0.21 + fRand(3424.34)));
+  outUp = normalize(fRandomOnSphere(seed));
   
   // for debug
   // ivec2 coord = ivec2(gl_FragCoord.xy);

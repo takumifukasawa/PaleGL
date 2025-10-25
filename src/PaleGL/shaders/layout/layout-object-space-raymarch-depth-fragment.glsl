@@ -55,9 +55,9 @@ void main() {
 
     vec3 wp = vWorldPosition;
     vec3 currentRayPosition = wp;
-    vec3 rayDirection = getOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
+    vec3 rayDirection = fGetOSRaymarchViewRayDirection(currentRayPosition, uViewPosition, uIsPerspective);
     
-    osRaymarch(
+    fOsRaymarch(
         wp,
         rayDirection,
         EPS,
@@ -74,7 +74,7 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    float alpha = baseColor.a; // TODO: base color を渡して alpha をかける
+    float alpha = baseColor.a; // TODO: fbase color を渡して alpha をかける
     #include <alpha_test_f>
 
     outColor = vec4(1., 1., 1., 1.);

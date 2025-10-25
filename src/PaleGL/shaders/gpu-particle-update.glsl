@@ -18,7 +18,7 @@ layout (location = 0) out vec3 outVelocity;
 layout (location = 1) out vec3 outPosition;
 layout (location = 2) out vec3 outUp;
 
-vec3 curlNoise(vec3 position) {
+vec3 fCurlNoise(vec3 position) {
     float eps = .0001;
     float eps2 = 2. * eps;
     float invEps2 = 1. / eps2;
@@ -26,12 +26,12 @@ vec3 curlNoise(vec3 position) {
     vec3 dy = vec3(0., eps, 0.);
     vec3 dz = vec3(0., 0., eps);
     // 勾配検出のためにepsだけずらした地点のnoiseを参照
-    vec3 px0 = snoise3(position - dx);
-    vec3 px1 = snoise3(position + dx);
-    vec3 py0 = snoise3(position - dy);
-    vec3 py1 = snoise3(position + dy);
-    vec3 pz0 = snoise3(position - dz);
-    vec3 pz1 = snoise3(position + dz);
+    vec3 px0 = fSnoise3(position - dx);
+    vec3 px1 = fSnoise3(position + dx);
+    vec3 py0 = fSnoise3(position - dy);
+    vec3 py1 = fSnoise3(position + dy);
+    vec3 pz0 = fSnoise3(position - dz);
+    vec3 pz1 = fSnoise3(position + dz);
     // 回転
     float x = (py1.z - py0.z) - (pz1.y - pz0.y);
     float y = (pz1.x - pz0.x) - (px1.z - px0.z);
@@ -54,7 +54,7 @@ void main() {
     vec3 prevPosition = texelFetch(uPositionMap, coord, 0).xyz;
     vec3 prevUp = texelFetch(uUpMap, coord, 0).xyz;
 
-    vec3 force = curlNoise(prevPosition * .1) - prevVelocity;
+    vec3 force = fCurlNoise(prevPosition * .1) - prevVelocity;
     float dt = min(max(uDeltaTime, 1. / 120.), 1. / 60.); // fallbackdt
     vec3 newVelocity = force * 1. * dt;
     

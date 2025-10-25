@@ -16,12 +16,12 @@ void main() {
 
     // #include <shape_font_f>
     
-    vec4 resultColor = calcShapeFont(vUv);
+    vec4 resultColor = fCalcShapeFont(vUv);
    
     // #include <alpha_test_f>
 // result color がなぜか minify されちゃうので一旦明示的に
 #ifdef USE_ALPHA_TEST
-    checkAlphaTest(resultColor, uAlphaTestThreshold);
+    fCheckAlphaTest(resultColor, uAlphaTestThreshold);
 #endif
 
     // outColor = vec4(1., 1., 1., 1.);

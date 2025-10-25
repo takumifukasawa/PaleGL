@@ -10,11 +10,11 @@ out vec4 outColor;
 
 const float EPS = .001;
 
-// mat2 rot2(float rad) {
+// mat2 fRot2(float rad) {
 //     return mat2(cos(rad), -sin(rad), sin(rad), cos(rad));
 // }
 
-float circularMask(in vec2 uv, in float scale) {
+float fCircularMask(in vec2 uv, in float scale) {
     // vec2 p = abs(fract(uv) - vec2(0.5)) * 2.;
     // return max(1. - dot(p, p), EPS);
     
@@ -25,7 +25,7 @@ float circularMask(in vec2 uv, in float scale) {
     // return smoothstep(0., 1., max(1. - dot(p, p), EPS));
 }
 
-float edgeMask(in vec2 uv, float band, float rate) {
+float fEdgeMask(in vec2 uv, float band, float rate) {
     vec2 p = abs(fract(uv) - vec2(0.5)) * 2.;
     float e = max(1. - max(p.x, p.y), EPS);
     return e;
@@ -59,23 +59,23 @@ void main() {
     float topBottomCircularMaskRate = .25;
     float leftRightCircularMaskRate = .25;
     
-    float centerMask = circularMask(uv, centerCircularScale) * centerCircularMaskRate;
-    float leftTopEdgeCircularMask = circularMask(uv + vec2(.5, -.5), edgeCircularScale) * edgeCircularMaskRate;
-    float leftBottomEdgeCircularMask = circularMask(uv + vec2(.5, .5), edgeCircularScale) * edgeCircularMaskRate;
-    float rightTopEdgeCircularMask = circularMask(uv + vec2(-.5, -.5), edgeCircularScale) * edgeCircularMaskRate;
-    float rightBottomEdgeCircularMask = circularMask(uv + vec2(-.5, .5), edgeCircularScale) * edgeCircularMaskRate;
-    float topCircularMask = circularMask(uv + vec2(0., -.5), topBottomCircularScale) * topBottomCircularMaskRate;
-    float bottomCircularMask = circularMask(uv + vec2(0., .5), topBottomCircularScale) * topBottomCircularMaskRate;
-    float leftCircularMask = circularMask(uv + vec2(.5, 0.), leftRightCircularScale) * leftRightCircularMaskRate;
-    float rightCircularMask = circularMask(uv + vec2(-.5, 0.), leftRightCircularScale) * leftRightCircularMaskRate;
+    float centerMask = fCircularMask(uv, centerCircularScale) * centerCircularMaskRate;
+    float leftTopEdgeCircularMask = fCircularMask(uv + vec2(.5, -.5), edgeCircularScale) * edgeCircularMaskRate;
+    float leftBottomEdgeCircularMask = fCircularMask(uv + vec2(.5, .5), edgeCircularScale) * edgeCircularMaskRate;
+    float rightTopEdgeCircularMask = fCircularMask(uv + vec2(-.5, -.5), edgeCircularScale) * edgeCircularMaskRate;
+    float rightBottomEdgeCircularMask = fCircularMask(uv + vec2(-.5, .5), edgeCircularScale) * edgeCircularMaskRate;
+    float topCircularMask = fCircularMask(uv + vec2(0., -.5), topBottomCircularScale) * topBottomCircularMaskRate;
+    float bottomCircularMask = fCircularMask(uv + vec2(0., .5), topBottomCircularScale) * topBottomCircularMaskRate;
+    float leftCircularMask = fCircularMask(uv + vec2(.5, 0.), leftRightCircularScale) * leftRightCircularMaskRate;
+    float rightCircularMask = fCircularMask(uv + vec2(-.5, 0.), leftRightCircularScale) * leftRightCircularMaskRate;
 
-    float edgeMask = edgeMask(uv, .1, .1);
+    float fEdgeMask = fEdgeMask(uv, .1, .1);
 
     float accCenterMask = centerMask;
 
     float accEdgeMask =
         mix(
-            edgeMask,
+            fEdgeMask,
             leftTopEdgeCircularMask
             + leftBottomEdgeCircularMask
             + rightTopEdgeCircularMask
@@ -85,14 +85,14 @@ void main() {
     
     float accTopBottomMask =
         mix(
-            edgeMask,
+            fEdgeMask,
             topCircularMask + bottomCircularMask,
             uEdgeMaskMix
         );
     
     float accLeftRightMask =
         mix(
-            edgeMask,
+            fEdgeMask,
             leftCircularMask + rightCircularMask,
             uEdgeMaskMix
         );

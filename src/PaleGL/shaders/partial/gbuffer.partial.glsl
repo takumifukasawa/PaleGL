@@ -21,32 +21,32 @@ struct sGBufferD {
     // a
 };
 
-vec4 EncodeGBufferA(vec3 baseColor) {
+vec4 fEncodeGBufferA(vec3 baseColor) {
     return vec4(baseColor, 1.);
 }
 
-vec4 EncodeGBufferB(vec3 normal, int shadingModelId) {
+vec4 fEncodeGBufferB(vec3 normal, int shadingModelId) {
     // shading model の数で clampする
     float id = float(shadingModelId) / SHADING_MODEL_NUM;
     return vec4(normal * .5 + .5, id);
 }
 
-vec4 EncodeGBufferC(float metallic, float roughness) {
+vec4 fEncodeGBufferC(float metallic, float roughness) {
     return vec4(metallic, roughness, 0., 1.);
 }
 
-vec4 EncodeGBufferD(vec3 emissiveColor) {
+vec4 fEncodeGBufferD(vec3 emissiveColor) {
     return vec4(emissiveColor, 1.);
 }
 
-sGBufferA DecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {
+sGBufferA fDecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {
     vec4 color = texture(gBufferATexture, uv);
     sGBufferA gBufferA;
     gBufferA.baseColor = color.rgb;
     return gBufferA;
 }
 
-sGBufferB DecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
+sGBufferB fDecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
     vec4 color = texture(gBufferBTexture, uv);
     sGBufferB gBufferB;
     gBufferB.normal = normalize(color.rgb * 2. - 1.);
@@ -54,7 +54,7 @@ sGBufferB DecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
     return gBufferB;
 }
 
-sGBufferC DecodeGBufferC(sampler2D gBufferCTexture, vec2 uv) {
+sGBufferC fDecodeGBufferC(sampler2D gBufferCTexture, vec2 uv) {
     vec4 color = texture(gBufferCTexture, uv);
     sGBufferC gBufferC;
     gBufferC.metallic = color.x;
@@ -62,7 +62,7 @@ sGBufferC DecodeGBufferC(sampler2D gBufferCTexture, vec2 uv) {
     return gBufferC;
 }
 
-sGBufferD DecodeGBufferD(sampler2D gBufferDTexture, vec2 uv) {
+sGBufferD fDecodeGBufferD(sampler2D gBufferDTexture, vec2 uv) {
     vec4 color = texture(gBufferDTexture, uv);
     sGBufferD gBufferD;
     gBufferD.emissiveColor = color.rgb;

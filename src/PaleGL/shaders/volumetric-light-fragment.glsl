@@ -11,12 +11,12 @@
 #define MARCH_COUNT_F 64.
 
 // 光源からの光が届くかどうかを判定
-bool testLightInRange(const in float lightDistance, const in float cutoffDistance) {
+bool fTestLightInRange(const in float lightDistance, const in float cutoffDistance) {
     return any(bvec2(cutoffDistance == 0., lightDistance < cutoffDistance));
 }
 
 // 光源からの減衰率計算
-float punctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
+float fPunctualLightIntensityToIrradianceFactor(const in float lightDistance, const in float cutoffDistance, const in float attenuationComponent) {
     if (attenuationComponent > 0.) {
         return pow(saturate(-lightDistance / cutoffDistance + 1.), attenuationComponent);
     }
@@ -41,7 +41,7 @@ uniform float uRayStep;
 uniform vec3 uRayJitterSize;
 
 // voidでもいいが手動unrollの関係でバグるのでfloatで返す
-float calcTransmittance(
+float fCalcTransmittance(
     sSpotLight spotLight,
     sampler2D spotLightShadowMap,
     vec3 rayPosInWorld,
@@ -67,14 +67,14 @@ float calcTransmittance(
     float angleCos = dot(normalize(LtoP), spotLight.direction);
 
     float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-    float attenuation = punctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+    float attenuation = fPunctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
    
     if(abs(rayPosInView.z) < viewZFromDepth) {
         // tmp
         // if(all(
         //     bvec4(
         //         angleCos > spotLight.coneCos,
-        //         testLightInRange(lightDistance, spotLight.distance),
+        //         fTestLightInRange(lightDistance, spotLight.distance),
         //         spotLightShadowDepth > rayDepthInProjection, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
         //         spotLightShadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
         //     )
@@ -85,7 +85,7 @@ float calcTransmittance(
         
         if(all(bvec2(
             angleCos > spotLight.coneCos,
-            testLightInRange(lightDistance, spotLight.distance)
+            fTestLightInRange(lightDistance, spotLight.distance)
         ))) {
             if(all(bvec2(
                 spotLightShadowDepth < rayDepthInProjection, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
@@ -104,10 +104,10 @@ float calcTransmittance(
 void main() {
     vec2 uv = vUv;
 
-    sGBufferA gBufferA = DecodeGBufferA(uGBufferATexture, uv);
+    sGBufferA gBufferA = fDecodeGBufferA(uGBufferATexture, uv);
     float rawDepth = texture(uDepthTexture, uv).r;
 
-    float jitter = rand(uv + uTime) * 2. - 1.;
+    float jitter = fRand(uv + uTime) * 2. - 1.;
     // vec3 jitterOffset = vec3(
     //     jitter * uRayJitterSize.x,
     //     jitter * uRayJitterSize.y * uViewport.z,
@@ -117,11 +117,11 @@ void main() {
     vec3 jitterOffset = uRayJitterSize * jitter * vec3(1., 1., 1.);
 
     // // pattern_1: geometry from gbuffer
-    // vec3 worldPosition = reconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
+    // vec3 worldPosition = fReconstructWorldPositionFromDepth(uv, rawDepth, uInverseViewProjectionMatrix);
     // pattern_2: geometry from frustum
     float rawDepthFrustum = texture(uVolumetricDepthTexture, vUv).r;
-    float sceneDepthFrustum = perspectiveDepthToLinearDepth(rawDepthFrustum, uNearClip, uFarClip);
-    vec3 worldPositionFrustum = reconstructWorldPositionFromDepth(
+    float sceneDepthFrustum = fPerspectiveDepthToLinearDepth(rawDepthFrustum, uNearClip, uFarClip);
+    vec3 worldPositionFrustum = fReconstructWorldPositionFromDepth(
         vUv,
         texture(uVolumetricDepthTexture, vUv).x,
         uInverseViewProjectionMatrix
@@ -157,14 +157,14 @@ void main() {
 
     vec3 rayPosInWorld;
     vec3 rayPosInView;
-    float viewZFromDepth = perspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
+    float viewZFromDepth = fPerspectiveDepthToEyeDepth(rawDepth, uNearClip, uFarClip);
  
     for(int i = 0; i < MARCH_COUNT; i++) {
         rayStep = uRayStep * float(i);
         rayPosInWorld = rayOrigin + rayDir * rayStep;
         rayPosInView = (uViewMatrix * vec4(rayPosInWorld, 1.)).xyz;
         #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
-            fogRateArray[UNROLL_N] += calcTransmittance(
+            fogRateArray[UNROLL_N] += fCalcTransmittance(
                 uSpotLight[UNROLL_N],
                 uSpotLightShadowMap[UNROLL_N],
                 rayPosInWorld,

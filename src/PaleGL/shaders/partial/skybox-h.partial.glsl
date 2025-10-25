@@ -27,7 +27,7 @@ struct sIncidentSkyboxLight {
     float maxLodLevel;
 };
 
-vec3 calcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
+vec3 fCalcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
     reflectDir.x *= -1.;
     float c = cos(3.14 + rotationOffset);
     float s = sin(3.14 + rotationOffset);
@@ -35,7 +35,7 @@ vec3 calcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
     return reflectDir;
 }
 
-void getSkyboxLightIrradiance(
+void fGetSkyboxLightIrradiance(
     const in sSkyboxLight skyboxLight,
     const in sGeometricContext geometry,
     out sIncidentSkyboxLight directLight
@@ -45,8 +45,8 @@ void getSkyboxLightIrradiance(
         normalize(geometry.normal)
     );
 
-    vec3 envDiffuseDir = calcEnvMapSampleDir(geometry.normal, skyboxLight.rotationOffset);
-    vec3 envSpecularDir = calcEnvMapSampleDir(envDir, skyboxLight.rotationOffset);
+    vec3 envDiffuseDir = fCalcEnvMapSampleDir(geometry.normal, skyboxLight.rotationOffset);
+    vec3 envSpecularDir = fCalcEnvMapSampleDir(envDir, skyboxLight.rotationOffset);
 
     // directLight.cubeMap = skyboxLight.cubeMap;
     directLight.diffuseDirection = envDiffuseDir;
