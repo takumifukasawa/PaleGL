@@ -2,10 +2,12 @@ import { exec } from 'child_process';
 import { glob } from 'glob';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
+import fs from 'fs';
 
 const args = process.argv.slice(2);
 
-const useHash = args[0] === '--hash';
+const useHash = args.includes('--hash');
+const showReport = !args.includes('--no-report');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -61,10 +63,82 @@ const pack = async (filePath) => {
                 return;
             }
             console.log(`stdout: ${stdout}`);
-            resolve();
+            resolve(distPath);
         });
     });
 };
+
+const HISTORY_FILE = path.join(__dirname, '../../.build-size-history.json');
+const SIZE_LIMIT_64KB = 65536;
+
+function formatBytes(bytes) {
+    return bytes.toLocaleString('en-US');
+}
+
+function formatKB(bytes) {
+    return (bytes / 1024).toFixed(2);
+}
+
+function loadSizeHistory() {
+    try {
+        if (fs.existsSync(HISTORY_FILE)) {
+            const data = fs.readFileSync(HISTORY_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        console.warn('Failed to load size history:', error.message);
+    }
+    return {};
+}
+
+function saveSizeHistory(history) {
+    try {
+        fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2), 'utf8');
+    } catch (error) {
+        console.warn('Failed to save size history:', error.message);
+    }
+}
+
+function reportFileSize(filePath) {
+    if (!fs.existsSync(filePath)) {
+        console.log(`❌ File not found: ${filePath}`);
+        return;
+    }
+
+    const stats = fs.statSync(filePath);
+    const currentSize = stats.size;
+    const history = loadSizeHistory();
+    const previousSize = history.packedSize;
+
+    console.log('\n' + '='.repeat(60));
+    console.log(`✓ Packed file created: ${path.relative(process.cwd(), filePath)}`);
+    console.log(`📦 File size: ${formatBytes(currentSize)} bytes (${formatKB(currentSize)} KB)`);
+
+    if (previousSize !== undefined) {
+        const diff = currentSize - previousSize;
+        const diffKB = diff / 1024;
+        const diffPercent = ((diff / previousSize) * 100).toFixed(2);
+        const diffSign = diff > 0 ? '+' : '';
+        const diffIcon = diff > 0 ? '📈' : diff < 0 ? '📉' : '➡️';
+
+        console.log(`📊 Previous size: ${formatBytes(previousSize)} bytes (${formatKB(previousSize)} KB)`);
+        console.log(`${diffIcon} Difference: ${diffSign}${formatBytes(diff)} bytes (${diffSign}${diffKB.toFixed(2)} KB) [${diffSign}${diffPercent}%]`);
+    }
+
+    if (currentSize <= SIZE_LIMIT_64KB) {
+        const remaining = SIZE_LIMIT_64KB - currentSize;
+        console.log(`✅ Under 64KB limit! Remaining: ${formatBytes(remaining)} bytes (${formatKB(remaining)} KB)`);
+    } else {
+        const exceeded = currentSize - SIZE_LIMIT_64KB;
+        console.log(`⚠️  OVER 64KB limit! Exceeded by: ${formatBytes(exceeded)} bytes (${formatKB(exceeded)} KB)`);
+    }
+    console.log('='.repeat(60) + '\n');
+
+    // 履歴を保存
+    history.packedSize = currentSize;
+    history.lastBuild = new Date().toISOString();
+    saveSizeHistory(history);
+}
 
 const main = async () => {
     const res = await glob(findPattern);
@@ -72,8 +146,17 @@ const main = async () => {
         console.log('target file not found');
         return;
     }
+    let packedPath;
     for (let i = 0; i < res.length; i++) {
-        await pack(res[i]);
+        packedPath = await pack(res[i]);
+    }
+
+    // パックされたファイルのサイズをレポート
+    if (packedPath && showReport) {
+        // 少し待ってからファイルサイズを確認（ファイル書き込み完了を待つ）
+        setTimeout(() => {
+            reportFileSize(packedPath);
+        }, 100);
     }
 };
 
