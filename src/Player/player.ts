@@ -66,6 +66,7 @@ import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
 import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
 import { createVector3 } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 // const HOT_REBUILD_SCENE = false;
 
@@ -137,13 +138,15 @@ export function createPlayer(
 
     setSceneToEngine(engine, scene);
 
+    let marionetter: Marionetter | null = null;
+
     const player: Player = {
         gpu,
         engine,
         scene,
         renderer,
         camera: null,
-        marionetter: null,
+        marionetter,
         marionetterSceneStructure: null,
         isPlaying: false,
         loop: !!loop,
@@ -157,59 +160,61 @@ export function createPlayer(
         onHotReload,
     };
 
-    const marionetter = createMarionetter({
-        showLog: false,
-        onPlay: (time: number) => {
-            console.log(`[marionetter.onPlay] time: ${time}`);
-            playMarionetter(player, time);
-        },
-        onSeek: (time: number) => {
-            seekMarionetter(player, time);
-        },
-        onStop: () => {
-            console.log(`[marionetter.onStop]`);
-            stopMarionetter(player);
-        },
-        onSceneViewEnabled: (data: MarionetterReceiveSceneViewEnabledData) => {
-            isSceneViewCameraEnabled = data.enabled;
-            if (sceneViewCameraEntity && cachedPlayerCamera) {
-                setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
-            }
-        },
-        onSetSceneViewData: (data: MarionetterReceiveSceneViewData) => {
-            if (sceneViewCameraEntity) {
-                sceneViewCameraEntity.near = data.cameraNear;
-                sceneViewCameraEntity.far = data.cameraFar;
-                if (sceneViewCameraEntity.type === CAMERA_TYPE_PERSPECTIVE) {
-                    (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
+    if (isDevelopment()) {
+        marionetter = createMarionetter({
+            showLog: false,
+            onPlay: (time: number) => {
+                console.log(`[marionetter.onPlay] time: ${time}`);
+                playMarionetter(player, time);
+            },
+            onSeek: (time: number) => {
+                seekMarionetter(player, time);
+            },
+            onStop: () => {
+                console.log(`[marionetter.onStop]`);
+                stopMarionetter(player);
+            },
+            onSceneViewEnabled: (data: MarionetterReceiveSceneViewEnabledData) => {
+                isSceneViewCameraEnabled = data.enabled;
+                if (sceneViewCameraEntity && cachedPlayerCamera) {
+                    setPlayerCamera(player, isSceneViewCameraEnabled ? sceneViewCameraEntity : cachedPlayerCamera);
                 }
-                setTranslation(
-                    sceneViewCameraEntity.transform,
-                    createVector3(data.cameraPosition.x, data.cameraPosition.y, data.cameraPosition.z)
-                );
-                setRotation(
-                    sceneViewCameraEntity.transform,
-                    createRotatorFromQuaternion(
-                        resolveInvertRotationLeftHandAxisToRightHandAxis(
-                            createQuaternion(
-                                data.cameraRotation.x,
-                                data.cameraRotation.y,
-                                data.cameraRotation.z,
-                                data.cameraRotation.w
-                            ),
-                            sceneViewCameraEntity,
-                            true
+            },
+            onSetSceneViewData: (data: MarionetterReceiveSceneViewData) => {
+                if (sceneViewCameraEntity) {
+                    sceneViewCameraEntity.near = data.cameraNear;
+                    sceneViewCameraEntity.far = data.cameraFar;
+                    if (sceneViewCameraEntity.type === CAMERA_TYPE_PERSPECTIVE) {
+                        (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
+                    }
+                    setTranslation(
+                        sceneViewCameraEntity.transform,
+                        createVector3(data.cameraPosition.x, data.cameraPosition.y, data.cameraPosition.z)
+                    );
+                    setRotation(
+                        sceneViewCameraEntity.transform,
+                        createRotatorFromQuaternion(
+                            resolveInvertRotationLeftHandAxisToRightHandAxis(
+                                createQuaternion(
+                                    data.cameraRotation.x,
+                                    data.cameraRotation.y,
+                                    data.cameraRotation.z,
+                                    data.cameraRotation.w
+                                ),
+                                sceneViewCameraEntity,
+                                true
+                            )
                         )
-                    )
-                );
-            }
-        },
-        onBeginPlayer: () => {
-            if (onBeginPlayer) {
-                onBeginPlayer();
-            }
-        },
-    });
+                    );
+                }
+            },
+            onBeginPlayer: () => {
+                if (onBeginPlayer) {
+                    onBeginPlayer();
+                }
+            },
+        });
+    }
 
     const marionetterSceneStructure = buildScene(
         // prettier-ignore
@@ -238,24 +243,26 @@ export function createPlayer(
         }
     }
 
-    if (import.meta.env.VITE_HOT_RELOAD === 'true') {
-        marionetter.connect();
-        initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, (sceneJson) => {
-            buildScene(
-                // prettier-ignore
-                gpu,
-                player,
-                marionetter,
-                sceneJson,
-                // inputController,
-                cameraPostProcess,
-                false,
-                fallbackGenerateActorHook,
-                generatedActorHook
-                // false,
-            );
-            onHotReload(true);
-        });
+    if (import.meta.env.VITE_HOT_RELOAD === 'true' && isDevelopment()) {
+        if (marionetter) {
+            marionetter.connect();
+            initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, (sceneJson) => {
+                buildScene(
+                    // prettier-ignore
+                    gpu,
+                    player,
+                    marionetter,
+                    sceneJson,
+                    // inputController,
+                    cameraPostProcess,
+                    false,
+                    fallbackGenerateActorHook,
+                    generatedActorHook
+                    // false,
+                );
+                onHotReload(true);
+            });
+        }
     }
 
     setOnBeforeUpdateEngine(engine, ({ time, deltaTime }) => {
@@ -293,7 +300,7 @@ export function createPlayer(
 function buildScene(
     gpu: Gpu,
     player: Player,
-    marionetter: Marionetter,
+    marionetter: Marionetter | null,
     sceneJson: MarionetterScene,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
@@ -310,7 +317,13 @@ function buildScene(
     }
 
     // marionetterを構築
-    const structure = buildMarionetterScene(gpu, player.renderer, sceneJson, fallbackGenerateActorHook, generatedActorHook);
+    const structure = buildMarionetterScene(
+        gpu,
+        player.renderer,
+        sceneJson,
+        fallbackGenerateActorHook,
+        generatedActorHook
+    );
 
     console.log('structure', structure, initialBuild);
 
