@@ -9,6 +9,7 @@ export interface ShaderIdentifierReplacementOptions {
     includeAttributes?: boolean;
     includeStructs?: boolean;
     includeFunctions?: boolean;
+    includeOutputs?: boolean;
     includeStructMembers?: boolean;
     structMemberIncludePattern?: RegExp;
     structMemberExcludePattern?: RegExp;
@@ -17,7 +18,7 @@ export interface ShaderIdentifierReplacementOptions {
 
 interface IdentifierInfo {
     name: string;
-    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'struct-member' | 'function';
+    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'struct-member' | 'function' | 'output';
     count: number;
     length: number;
     savings: number;
@@ -43,6 +44,7 @@ export const shaderIdentifierReplacementPlugin = (
         includeAttributes = false,
         includeStructs = false,
         includeFunctions = false,
+        includeOutputs = false,
         includeStructMembers = false,
         structMemberIncludePattern,
         structMemberExcludePattern,
@@ -139,7 +141,8 @@ export const shaderIdentifierReplacementPlugin = (
                 }
 
                 if (includeFunctions) {
-                    const functions = collectIdentifiers(allContent, /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+(f[A-Z]\w+)\s*\(/g, 'function');
+                    // 組み込み型とカスタム構造体（s[A-Z]\w+）を返す関数を検出
+                    const functions = collectIdentifiers(allContent, /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void|s[A-Z]\w+)\s+(f[A-Z]\w+)\s*\(/g, 'function');
                     identifiers.push(...functions);
                     console.log(`[shader-identifier] Found ${functions.length} functions`);
                 }
@@ -152,6 +155,13 @@ export const shaderIdentifierReplacementPlugin = (
                     );
                     identifiers.push(...structMembers);
                     console.log(`[shader-identifier] Found ${structMembers.length} struct members`);
+                }
+
+                if (includeOutputs) {
+                    // GLSL output変数を検出（layout (location = N) out 型 out[A-Z]\w+）
+                    const outputs = collectIdentifiers(allContent, /layout\s*\([^)]*\)\s*out\s+\w+\s+(out[A-Z]\w+)/g, 'output');
+                    identifiers.push(...outputs);
+                    console.log(`[shader-identifier] Found ${outputs.length} output variables`);
                 }
 
                 // 優先順位付け（削減効果の高い順）
@@ -252,7 +262,7 @@ function collectExistingIdentifiers(content: string, existing: Set<string>): voi
 function collectIdentifiers(
     content: string,
     pattern: RegExp,
-    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'function'
+    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'function' | 'output'
 ): IdentifierInfo[] {
     const counts = new Map<string, number>();
     const matches = content.matchAll(pattern);
@@ -391,6 +401,7 @@ function generateMappings(
     let sIndex = 1;
     let mIndex = 1; // struct member用
     let fIndex = 1;
+    let oIndex = 1; // output変数用
 
     for (const info of identifiers) {
         let candidate: string;
@@ -426,13 +437,20 @@ function generateMappings(
                 candidate = `m${index++}`;
             } while (existing.has(candidate));
             mIndex = index;
-        } else {
-            // function
+        } else if (info.type === 'output') {
+            index = oIndex;
+            do {
+                candidate = `o${index++}`;
+            } while (existing.has(candidate));
+            oIndex = index;
+        } else if (info.type === 'function') {
             index = fIndex;
             do {
                 candidate = `f${index++}`;
             } while (existing.has(candidate));
             fIndex = index;
+        } else {
+            throw new Error(`Unknown identifier type: ${info.type}`);
         }
 
         map.set(info.name, candidate);

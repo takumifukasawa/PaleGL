@@ -57,6 +57,7 @@
     "demos",
     "node_modules",
     "dist",
-    "bin/**/*.js"
+    "bin/**/*.js",
+    "src/Marionetter/**/*"
   ],
 }

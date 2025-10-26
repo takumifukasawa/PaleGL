@@ -73,7 +73,7 @@ export const partialGlslMinifierPlugin = (
             variableMap.clear();
 
             // 変数を収集
-            const variables = collectVariables(glslContent);
+            const variables = collectVariables(glslContent, verbose);
 
             if (variables.length === 0) {
                 if (verbose) {
@@ -139,7 +139,7 @@ export const partialGlslMinifierPlugin = (
 /**
  * ローカル変数と関数引数を収集
  */
-function collectVariables(content: string): VariableInfo[] {
+function collectVariables(content: string, verbose: boolean = false): VariableInfo[] {
     const counts = new Map<string, number>();
     const excludePatterns = [
         // uniform/varying/attribute/struct/function
@@ -159,7 +159,7 @@ function collectVariables(content: string): VariableInfo[] {
     const structMatches = content.matchAll(structPattern);
     for (const match of structMatches) {
         const structBody = match[1];
-        const fieldPattern = /\b(vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool)\s+([a-zA-Z_]\w+)/g;
+        const fieldPattern = /\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)/g;
         const fieldMatches = structBody.matchAll(fieldPattern);
         for (const fieldMatch of fieldMatches) {
             const fieldName = fieldMatch[2];
@@ -169,7 +169,7 @@ function collectVariables(content: string): VariableInfo[] {
 
     // 関数名を収集（除外用）
     const functionNames = new Set<string>();
-    const functionDefPattern = /\b(float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+([a-zA-Z_]\w+)\s*\(/g;
+    const functionDefPattern = /\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|void|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)\s*\(/g;
     const functionDefMatches = content.matchAll(functionDefPattern);
     for (const match of functionDefMatches) {
         const functionName = match[2];
@@ -178,7 +178,7 @@ function collectVariables(content: string): VariableInfo[] {
 
     // 関数本体を抽出（グローバル変数を除外するため）
     let functionBodiesContent = '';
-    const functionBodyPattern = /\b(float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+([a-zA-Z_]\w+)\s*\([^)]*\)\s*\{/g;
+    const functionBodyPattern = /\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|void|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)\s*\([^)]*\)\s*\{/g;
 
     // 各関数の開始位置を見つける
     const functionStarts: { index: number, matchLength: number }[] = [];
@@ -205,7 +205,7 @@ function collectVariables(content: string): VariableInfo[] {
     }
 
     // 関数本体内のローカル変数を検出
-    const localVarPattern = /\b(vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool)\s+([a-zA-Z_]\w+)\b/g;
+    const localVarPattern = /\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)\b/g;
     const localVarMatches = functionBodiesContent.matchAll(localVarPattern);
 
     for (const match of localVarMatches) {
@@ -235,10 +235,11 @@ function collectVariables(content: string): VariableInfo[] {
     }
 
     // 関数引数の検出
-    const functionPattern = /\b(float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+([a-zA-Z_]\w+)\s*\(([^)]*)\)/g;
-    const functionMatches = content.matchAll(functionPattern);
+    const functionPattern = /\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|void|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)\s*\(([^)]*)\)/g;
+    const functionMatchesArray = Array.from(content.matchAll(functionPattern));
 
-    for (const match of functionMatches) {
+
+    for (const match of functionMatchesArray) {
         const params = match[3]; // 関数名のキャプチャグループが追加されたため3番目
         if (!params || params.trim() === '') continue;
 
@@ -247,7 +248,7 @@ function collectVariables(content: string): VariableInfo[] {
         for (const param of paramList) {
             const trimmed = param.trim();
             // "vec3 pSpine2" から "pSpine2" を抽出
-            const paramMatch = trimmed.match(/\b(vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool)\s+([a-zA-Z_]\w+)\b/);
+            const paramMatch = trimmed.match(/\b(sampler2D|samplerCube|vec3|vec2|vec4|mat2|mat3|mat4|float|int|bool|s[A-Z0-9]\w*)\s+([a-zA-Z_]\w+)\b/);
             if (paramMatch) {
                 const name = paramMatch[2];
 
