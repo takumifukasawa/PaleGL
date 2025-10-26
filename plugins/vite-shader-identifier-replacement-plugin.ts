@@ -9,12 +9,15 @@ export interface ShaderIdentifierReplacementOptions {
     includeAttributes?: boolean;
     includeStructs?: boolean;
     includeFunctions?: boolean;
+    includeStructMembers?: boolean;
+    structMemberIncludePattern?: RegExp;
+    structMemberExcludePattern?: RegExp;
     verbose?: boolean;
 }
 
 interface IdentifierInfo {
     name: string;
-    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'function';
+    type: 'uniform' | 'varying' | 'attribute' | 'struct' | 'struct-member' | 'function';
     count: number;
     length: number;
     savings: number;
@@ -40,6 +43,9 @@ export const shaderIdentifierReplacementPlugin = (
         includeAttributes = false,
         includeStructs = false,
         includeFunctions = false,
+        includeStructMembers = false,
+        structMemberIncludePattern,
+        structMemberExcludePattern,
         verbose = false,
     } = options;
 
@@ -136,6 +142,16 @@ export const shaderIdentifierReplacementPlugin = (
                     const functions = collectIdentifiers(allContent, /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void)\s+(f[A-Z]\w+)\s*\(/g, 'function');
                     identifiers.push(...functions);
                     console.log(`[shader-identifier] Found ${functions.length} functions`);
+                }
+
+                if (includeStructMembers) {
+                    const structMembers = collectStructMembers(
+                        allContent,
+                        structMemberIncludePattern,
+                        structMemberExcludePattern
+                    );
+                    identifiers.push(...structMembers);
+                    console.log(`[shader-identifier] Found ${structMembers.length} struct members`);
                 }
 
                 // 優先順位付け（削減効果の高い順）
@@ -288,6 +304,79 @@ function collectUBOIdentifiers(content: string): IdentifierInfo[] {
 }
 
 /**
+ * struct メンバー変数を収集してカウント
+ *
+ * @param content GLSLコード
+ * @param includePattern 対象とするメンバー名パターン（例: /^sp[A-Z]/ で spXxx のみ対象）
+ * @param excludePattern 除外するメンバー名パターン
+ */
+function collectStructMembers(
+    content: string,
+    includePattern?: RegExp,
+    excludePattern?: RegExp
+): IdentifierInfo[] {
+    const counts = new Map<string, number>();
+
+    // GLSL組み込み関数・キーワードを除外（これらは置換してはいけない）
+    const glslBuiltins = new Set([
+        // 組み込み関数
+        'distance', 'dot', 'cross', 'normalize', 'length', 'reflect', 'refract',
+        'min', 'max', 'clamp', 'mix', 'step', 'smoothstep',
+        'abs', 'sign', 'floor', 'ceil', 'fract', 'mod',
+        'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
+        'pow', 'exp', 'log', 'exp2', 'log2', 'sqrt', 'inversesqrt',
+        'texture', 'textureLod', 'textureProj', 'textureGrad',
+        // 型名
+        'float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4',
+        'int', 'ivec2', 'ivec3', 'ivec4', 'uint', 'uvec2', 'uvec3', 'uvec4',
+        'bool', 'bvec2', 'bvec3', 'bvec4',
+        'sampler2D', 'samplerCube', 'sampler3D',
+        // キーワード
+        'const', 'uniform', 'in', 'out', 'inout', 'attribute', 'varying',
+    ]);
+
+    // struct 定義全体を検出（struct sXxx { ... }）
+    const structPattern = /struct\s+\w+\s*\{([^}]+)\}/gs;
+    const structMatches = content.matchAll(structPattern);
+
+    for (const structMatch of structMatches) {
+        const structBody = structMatch[1];
+
+        // struct内のメンバー変数を抽出（型 名前; または 型 名前[サイズ]; の形式）
+        // samplerCube cubeMap; float diffuseIntensity; など
+        const memberPattern = /\s+\w+\s+(\w+)(?:\[[^\]]*\])?\s*;/g;
+        const memberMatches = structBody.matchAll(memberPattern);
+
+        for (const memberMatch of memberMatches) {
+            const memberName = memberMatch[1];
+
+            // GLSLビルトインは除外
+            if (glslBuiltins.has(memberName)) {
+                continue;
+            }
+
+            // include/exclude pattern でフィルタリング
+            if (includePattern && !includePattern.test(memberName)) {
+                continue;
+            }
+            if (excludePattern && excludePattern.test(memberName)) {
+                continue;
+            }
+
+            counts.set(memberName, (counts.get(memberName) || 0) + 1);
+        }
+    }
+
+    return Array.from(counts.entries()).map(([name, count]) => ({
+        name,
+        type: 'struct-member' as const,
+        count,
+        length: name.length,
+        savings: count * (name.length - 2), // 最短2文字（m1, m2など）と仮定
+    }));
+}
+
+/**
  * マッピングを生成（衝突回避）
  */
 function generateMappings(
@@ -300,6 +389,7 @@ function generateMappings(
     let vIndex = 1;
     let aIndex = 1;
     let sIndex = 1;
+    let mIndex = 1; // struct member用
     let fIndex = 1;
 
     for (const info of identifiers) {
@@ -330,6 +420,12 @@ function generateMappings(
                 candidate = `s${index++}`;
             } while (existing.has(candidate));
             sIndex = index;
+        } else if (info.type === 'struct-member') {
+            index = mIndex;
+            do {
+                candidate = `m${index++}`;
+            } while (existing.has(candidate));
+            mIndex = index;
         } else {
             // function
             index = fIndex;
@@ -384,6 +480,9 @@ function replaceInGlsl(code: string, map: Map<string, string>): string {
 
 /**
  * TypeScript/JavaScriptファイル内の文字列リテラルを置換
+ *
+ * NOTE: TypeScriptのプロパティアクセス（例: skybox.specularIntensity）は置換しません。
+ * これらはterserによって自動的にマングルされるため、プラグインで触る必要はありません。
  */
 function replaceInTypeScript(code: string, map: Map<string, string>): string {
     let result = code;
@@ -391,21 +490,60 @@ function replaceInTypeScript(code: string, map: Map<string, string>): string {
     // 長い名前から順に置換
     const sortedEntries = Array.from(map.entries()).sort((a, b) => b[0].length - a[0].length);
 
+    // 1. 文字列リテラルのみを置換（単一の識別子が引用符で囲まれている場合）
     for (const [oldName, newName] of sortedEntries) {
-        // 1. 完全な文字列リテラルとしての置換（安全）
         const singleQuoteRegex = new RegExp(`'${oldName}'`, 'g');
         const doubleQuoteRegex = new RegExp(`"${oldName}"`, 'g');
         const backQuoteRegex = new RegExp(`\`${oldName}\``, 'g');
 
-result = result.replace(singleQuoteRegex, `'${newName}'`);
+        result = result.replace(singleQuoteRegex, `'${newName}'`);
         result = result.replace(doubleQuoteRegex, `"${newName}"`);
         result = result.replace(backQuoteRegex, `\`${newName}\``);
-
-        // 2. 文字列内のword boundaryでの置換（シェーダーソース内のuniform名用）
-        // uniform名は特殊なパターン（u[A-Z]で始まる）なので比較的安全
-        const wordBoundaryRegex = new RegExp(`\\b${oldName}\\b`, 'g');
-        result = result.replace(wordBoundaryRegex, newName);
     }
+
+    // 2. テンプレートリテラル内のGLSLコードを置換
+    // バッククォートで囲まれた複数行文字列（GLSLコード）を検出して置換
+    const templateLiteralRegex = /`([^`]*)`/gs;
+    result = result.replace(templateLiteralRegex, (match, content) => {
+        // GLSLコードっぽいかどうかを判定
+        if (
+            content.includes('uniform') ||
+            content.includes('vec') ||
+            content.includes('float') ||
+            content.includes('sampler') ||
+            content.includes('out ') ||
+            content.includes('in ') ||
+            content.includes('varying') ||
+            content.includes('attribute')
+        ) {
+            let replacedContent = content;
+
+            // 式補間 ${...} の部分を一時的に保護
+            const placeholders = new Map<string, string>();
+            let placeholderIndex = 0;
+            replacedContent = replacedContent.replace(/\$\{[^}]+\}/g, (expr: string) => {
+                const placeholder = `__PLACEHOLDER_${placeholderIndex++}__`;
+                placeholders.set(placeholder, expr);
+                return placeholder;
+            });
+
+            // 単語境界で置換（GLSLコードとして扱う）
+            for (const [oldName, newName] of sortedEntries) {
+                // 正規表現の特殊文字をエスケープ
+                const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`\\b${escapedOldName}\\b`, 'g');
+                replacedContent = replacedContent.replace(regex, newName);
+            }
+
+            // プレースホルダーを元に戻す
+            for (const [placeholder, expr] of placeholders) {
+                replacedContent = replacedContent.replace(placeholder, expr);
+            }
+
+            return `\`${replacedContent}\``;
+        }
+        return match;
+    });
 
     return result;
 }
