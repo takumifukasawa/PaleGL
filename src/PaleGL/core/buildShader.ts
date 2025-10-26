@@ -5,66 +5,67 @@
 // - modifierを使っているときはshader_minifierを使うとバグになる。変数名が変わるので
 // -----------------------------------------------
 
-import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import {
-    VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
-    VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
-    VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
-    VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
-    VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,
-    VERTEX_SHADER_MODIFIER_PRAGMA_OUT_CLIP_POSITION_PRE_PROCESS,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_END_MAIN,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    FragmentShaderModifiers,
+    SHADER_PRAGMA_ATTRIBUTES,
+    SHADER_PRAGMA_DEFINES,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
     VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
+    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
     VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
     VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
     VERTEX_SHADER_MODIFIER_PRAGMA_END_MAIN,
-    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
-    VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_OUT_CLIP_POSITION_PRE_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_AFTER_OUT,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_VARYINGS,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_END_MAIN,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_APPEND_UNIFORMS,
-    FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-    SHADER_PRAGMA_DEFINES,
-    SHADER_PRAGMA_ATTRIBUTES,
+    VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,
+    VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
     VertexShaderModifiers,
-    FragmentShaderModifiers,
 } from '@/PaleGL/constants.ts';
+import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 // import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
 // import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
 // import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-cameras.glsl';
 
-import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
-import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
-import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
-import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
-import randPartialContent from '@/PaleGL/shaders/partial/rand.partial.glsl';
-import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.partial.glsl';
-import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
-import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
-import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
-import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
-import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-distance-functions.partial.glsl';
-import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-scene-functions.partial.glsl';
-import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
 import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
-import shapeFontHeaderPartialContent from '@/PaleGL/shaders/partial/shape-font-h.partial.glsl';
-import shapeFontFragmentPartialContent from '@/PaleGL/shaders/partial/shape-font-fragment.partial.glsl';
-import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
-import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
+import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
+import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
+import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
+import curlNoisePartialContent from '@/PaleGL/shaders/partial/curl-noise.partial.glsl';
+import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
+import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
+import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
+import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
+import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
+import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
+import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
-import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
-import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
-import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
 import perlinPartialContent from '@/PaleGL/shaders/partial/perlin.partial.glsl';
+import randPartialContent from '@/PaleGL/shaders/partial/rand.partial.glsl';
+import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-distance-functions.partial.glsl';
+import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-scene-functions.partial.glsl';
+import shapeFontFragmentPartialContent from '@/PaleGL/shaders/partial/shape-font-fragment.partial.glsl';
+import shapeFontHeaderPartialContent from '@/PaleGL/shaders/partial/shape-font-h.partial.glsl';
+import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
+import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.partial.glsl';
+import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
+import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
+import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type ShaderDefines = {
@@ -118,10 +119,17 @@ const includesDict = new Map<string, string>([
     ['geometry_h', geometryHeaderPartialContent],
     ['os_raymarch_f', objectSpaceRaymarchFunctionsPartialContent],
     ['perlin', perlinPartialContent],
+    ['curl_noise', curlNoisePartialContent],
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
+    // TODO: include先もreplace対象にし、ネスト状態も対応
+    // const expandedIncludes = new Set<string>();
     src = src.replaceAll(/#include\s?<([a-zA-Z_]*)>/g, (_, p1: string) => {
+        // if (expandedIncludes.has(p1)) {
+        //     return '';
+        // }
+        // expandedIncludes.add(p1);
         return includesDict.get(p1) || '';
     });
     return src;
@@ -391,7 +399,7 @@ export const buildFragmentShader = (
         console.error('[buildFragmentShader] Invalid shader type:', typeof shader, shader);
         throw new Error(`Expected string shader, got ${typeof shader}`);
     }
-    
+
     let replacedShader: string = shader;
 
     // replace shader block
