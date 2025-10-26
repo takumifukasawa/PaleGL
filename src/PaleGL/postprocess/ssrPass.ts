@@ -4,6 +4,7 @@ import {
     POST_PROCESS_PASS_TYPE_SSR,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_NAME_BLEND_RATE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_NAME_GBUFFER_A_TEXTURE,
@@ -154,7 +155,7 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
         ['uReflectionScreenEdgeFadeFactorMinY', UNIFORM_TYPE_FLOAT, 0],
         ['uReflectionScreenEdgeFadeFactorMaxY', UNIFORM_TYPE_FLOAT, 0],
         ['uReflectionRoughnessPower', UNIFORM_TYPE_FLOAT, 0],
-        ['uBlendRate', UNIFORM_TYPE_FLOAT, 1],
+        [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 1],
     ];
 
     return {
@@ -230,7 +231,7 @@ export function renderSSRPass(postProcessPass: PostProcessPassBase, options: Pos
 
     setMaterialUniformValue(ssrPass.material, 'uReflectionAdditionalRate', ssrPass.reflectionAdditionalRate);
     setMaterialUniformValue(ssrPass.material, 'uReflectionRoughnessPower', ssrPass.reflectionRoughnessPower);
-    setMaterialUniformValue(ssrPass.material, 'uBlendRate', ssrPass.blendRate);
+    setMaterialUniformValue(ssrPass.material, UNIFORM_NAME_BLEND_RATE, ssrPass.blendRate);
 
     renderPostProcessSinglePassBehaviour(ssrPass, options);
 }

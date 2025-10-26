@@ -1,5 +1,10 @@
 import {
     TEXTURE_FILTER_TYPE_NEAREST,
+    UNIFORM_NAME_AMPLITUDE,
+    UNIFORM_NAME_FACTOR,
+    UNIFORM_NAME_FREQUENCY,
+    UNIFORM_NAME_GRID_SIZE,
+    UNIFORM_NAME_OCTAVES,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
 
@@ -18,7 +23,7 @@ import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
 import simplexNoiseFragment from '@/PaleGL/shaders/simplex-noise.glsl';
 
-const gridUniformName = 'uGridSize';
+const gridUniformName = UNIFORM_NAME_GRID_SIZE;
 
 const TEXTURE_SIZE = 1024;
 
@@ -50,10 +55,10 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             //     value: 0,
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4.4, 4.4)],
-            ['uOctaves', UNIFORM_TYPE_FLOAT, 8],
-            ['uAmplitude', UNIFORM_TYPE_FLOAT, 0.307],
-            ['uFrequency', UNIFORM_TYPE_FLOAT, 1.357],
-            ['uFactor', UNIFORM_TYPE_FLOAT, 0.597],
+            [UNIFORM_NAME_OCTAVES, UNIFORM_TYPE_FLOAT, 8],
+            [UNIFORM_NAME_AMPLITUDE, UNIFORM_TYPE_FLOAT, 0.307],
+            [UNIFORM_NAME_FREQUENCY, UNIFORM_TYPE_FLOAT, 1.357],
+            [UNIFORM_NAME_FACTOR, UNIFORM_TYPE_FLOAT, 0.597],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,

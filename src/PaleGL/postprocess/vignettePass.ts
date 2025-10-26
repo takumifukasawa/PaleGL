@@ -1,6 +1,11 @@
 ﻿import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { POST_PROCESS_PASS_TYPE_VIGNETTE, UNIFORM_TYPE_FLOAT, UNIFORM_NAME_ASPECT } from '@/PaleGL/constants';
+import {
+    POST_PROCESS_PASS_TYPE_VIGNETTE,
+    UNIFORM_NAME_ASPECT,
+    UNIFORM_NAME_BLEND_RATE,
+    UNIFORM_TYPE_FLOAT,
+} from '@/PaleGL/constants';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import {
     createPostProcessSinglePass,
@@ -20,7 +25,6 @@ const UNIFORM_VALUE_VIGNETTE_RADIUS_FROM = 1.77;
 const UNIFORM_VALUE_VIGNETTE_RADIUS_TO = 4.484;
 const UNIFORM_NAME_VIGNETTE_POWER = 'uVignettePower';
 const UNIFORM_VALUE_VIGNETTE_POWER = 1.345;
-const UNIFORM_NAME_BLEND_RATE = 'uBlendRate';
 const UNIFORM_VALUE_BLEND_RATE = 0.73;
 
 // ---

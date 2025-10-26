@@ -4,6 +4,7 @@
     TEXTURE_WRAP_TYPE_REPEAT,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
+    UNIFORM_NAME_BLEND_RATE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_FLOAT_ARRAY,
@@ -183,7 +184,7 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
                 ['uOcclusionColor', UNIFORM_TYPE_COLOR, createColorBlack()],
                 ['uOcclusionPower', UNIFORM_TYPE_FLOAT, 1],
                 ['uOcclusionStrength', UNIFORM_TYPE_FLOAT, 1],
-                ['uBlendRate', UNIFORM_TYPE_FLOAT, 1],
+                [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 1],
             ],
             uniformBlockNames: [UNIFORM_BLOCK_NAME_TRANSFORMATIONS, UNIFORM_BLOCK_NAME_CAMERA],
         }),
@@ -217,7 +218,7 @@ export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: Po
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionColor', ssaoPass.occlusionColor);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionPower', ssaoPass.occlusionPower);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionStrength', ssaoPass.occlusionStrength);
-    setMaterialUniformValue(ssaoPass.material, 'uBlendRate', ssaoPass.blendRate);
+    setMaterialUniformValue(ssaoPass.material, UNIFORM_NAME_BLEND_RATE, ssaoPass.blendRate);
     setMaterialUniformValue(ssaoPass.material, 'uSamplingTexture', ssaoPass.samplingTexture);
 
     renderPostProcessSinglePassBehaviour(ssaoPass, options);

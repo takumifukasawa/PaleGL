@@ -181,7 +181,7 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: 1,
             // },
-            ['uTexelSize', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
             ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
         ],
     });
@@ -197,7 +197,7 @@ export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
         // renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         renderTargetType: RENDER_TARGET_TYPE_RGBA16F,
         uniforms: [
-            ['uTexelSize', UNIFORM_TYPE_VECTOR2, createVector2Zero()],
+            [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
             ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
         ],
     });
@@ -362,7 +362,7 @@ export function renderDepthOfFieldPass(
     // this.dofBokehPass.material.uniforms.setValue('uCocTexture', this.circleOfConfusionPass.renderTarget.$getTexture());
     setMaterialUniformValue(
         depthOfFieldPass.dofBokehPass.material,
-        'uTexelSize',
+        UNIFORM_NAME_TEXEL_SIZE,
         createVector2(1 / depthOfFieldPass.preFilterPass.width, 1 / depthOfFieldPass.preFilterPass.height)
     );
     setMaterialUniformValue(depthOfFieldPass.dofBokehPass.material, 'uBokehRadius', depthOfFieldPass.bokehRadius);
@@ -385,7 +385,7 @@ export function renderDepthOfFieldPass(
 
     setMaterialUniformValue(
         depthOfFieldPass.bokehBlurPass.material,
-        'uTexelSize',
+        UNIFORM_NAME_TEXEL_SIZE,
         // new Vector2(1 / this.bokehBlurPass.width, 1 / this.bokehBlurPass.height)
         createVector2(1 / depthOfFieldPass.dofBokehPass.width, 1 / depthOfFieldPass.dofBokehPass.height)
     );

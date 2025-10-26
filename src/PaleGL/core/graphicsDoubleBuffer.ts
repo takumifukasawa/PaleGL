@@ -1,6 +1,9 @@
 import {
     UniformBlockName,
     UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_NAME_TARGET_HEIGHT,
+    UNIFORM_NAME_TARGET_WIDTH,
+    UNIFORM_NAME_TEXEL_SIZE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
 
@@ -10,9 +13,9 @@ import { createMaterial } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import baseVertexShader from '@/PaleGL/shaders/postprocess-pass-vertex.glsl';
 
-const targetWidthUniformName = 'uTargetWidth';
-const targetHeightUniformName = 'uTargetHeight';
-const texelSizeUniformName = 'uTexelSize';
+const targetWidthUniformName = UNIFORM_NAME_TARGET_WIDTH;
+const targetHeightUniformName = UNIFORM_NAME_TARGET_HEIGHT;
+const texelSizeUniformName = UNIFORM_NAME_TEXEL_SIZE;
 
 export const createGraphicsDoubleBufferMaterial = (
     fragmentShader: string,

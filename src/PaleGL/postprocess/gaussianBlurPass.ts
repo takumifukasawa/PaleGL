@@ -1,4 +1,10 @@
-﻿import { POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_FLOAT_ARRAY } from '@/PaleGL/constants';
+﻿import {
+    POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR,
+    UNIFORM_NAME_TARGET_HEIGHT,
+    UNIFORM_NAME_TARGET_WIDTH,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_FLOAT_ARRAY,
+} from '@/PaleGL/constants';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import { getGaussianBlurWeights } from '@/PaleGL/utilities/gaussialBlurUtilities';
 import gaussianBlurFragmentShader from '@/PaleGL/shaders/gaussian-blur-fragment.glsl';
@@ -44,8 +50,8 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE
         // }),
         uniforms: [
-            ['uTargetWidth', UNIFORM_TYPE_FLOAT, 1],
-            ['uTargetHeight', UNIFORM_TYPE_FLOAT, 1],
+            [UNIFORM_NAME_TARGET_WIDTH, UNIFORM_TYPE_FLOAT, 1],
+            [UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_TYPE_FLOAT, 1],
             ['uBlurWeights', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
             ['uIsHorizontal', UNIFORM_TYPE_FLOAT, 1],
         ],
@@ -63,8 +69,8 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
         //     srcTextureUniformName: UNIFORM_NAME_SRC_TEXTURE,
         // }),
         uniforms: [
-            ['uTargetWidth', UNIFORM_TYPE_FLOAT, 1],
-            ['uTargetHeight', UNIFORM_TYPE_FLOAT, 1],
+            [UNIFORM_NAME_TARGET_WIDTH, UNIFORM_TYPE_FLOAT, 1],
+            [UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_TYPE_FLOAT, 1],
             ['uBlurWeights', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(blurWeights)],
             ['uIsHorizontal', UNIFORM_TYPE_FLOAT, 0],
         ],
@@ -94,11 +100,11 @@ export function getGaussianBlurPassRenderTarget(gaussianBlurPass: GaussianBlurPa
 export function setGaussianBlurPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
     const gaussianBlurPass = postProcessPass as GaussianBlurPass;
     setPostProcessPassSize(gaussianBlurPass.horizontalBlurPass, width, height);
-    setMaterialUniformValue(gaussianBlurPass.horizontalBlurPass.material, 'uTargetWidth', width);
-    setMaterialUniformValue(gaussianBlurPass.horizontalBlurPass.material, 'uTargetHeight', height);
+    setMaterialUniformValue(gaussianBlurPass.horizontalBlurPass.material, UNIFORM_NAME_TARGET_WIDTH, width);
+    setMaterialUniformValue(gaussianBlurPass.horizontalBlurPass.material, UNIFORM_NAME_TARGET_HEIGHT, height);
     setPostProcessPassSize(gaussianBlurPass.verticalBlurPass, width, height);
-    setMaterialUniformValue(gaussianBlurPass.verticalBlurPass.material, 'uTargetWidth', width);
-    setMaterialUniformValue(gaussianBlurPass.verticalBlurPass.material, 'uTargetHeight', height);
+    setMaterialUniformValue(gaussianBlurPass.verticalBlurPass.material, UNIFORM_NAME_TARGET_WIDTH, width);
+    setMaterialUniformValue(gaussianBlurPass.verticalBlurPass.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 }
 
 export function renderGaussianBlurPass(

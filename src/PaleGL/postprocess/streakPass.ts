@@ -279,7 +279,7 @@ export function renderStreakPass(
 
     setMaterialUniformValue(
         streakPass.prefilterPass.material,
-        'uTexelSize',
+        UNIFORM_NAME_TEXEL_SIZE,
         createVector2(1 / streakPass.width, 1 / streakPass.height)
     );
     setMaterialUniformValue(streakPass.prefilterPass.material, 'uThreshold', streakPass.threshold);
