@@ -144,6 +144,7 @@ export default defineConfig((config) => {
                         // 'resultColor'
                     ],
                 },
+                verbose: false
             }),
             // importJsonAsStringPlugin(),
             visualizer({

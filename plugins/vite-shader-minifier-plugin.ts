@@ -16,16 +16,16 @@
 
 // Disclaimer: I'm pretty sure this published version will not be updated frequently
 
-import { Plugin } from 'vite';
-import { promisify } from 'util';
 import * as cp from 'child_process';
-import * as path from 'path';
 import * as crypto from 'crypto';
-import { rimraf } from 'rimraf';
-import { wait } from '../node-libs/wait';
-import { readFileAysnc, createDirectoryAsync, writeFileAsync } from '../node-libs/file-io';
-import { isMac } from '../node-libs/env';
 import * as process from 'node:process';
+import * as path from 'path';
+import { rimraf } from 'rimraf';
+import { promisify } from 'util';
+import { Plugin } from 'vite';
+import { isMac } from '../node-libs/env';
+import { createDirectoryAsync, readFileAysnc, writeFileAsync } from '../node-libs/file-io';
+import { wait } from '../node-libs/wait';
 
 export interface ShaderMinifierOptions {
     hlsl?: boolean;
@@ -96,9 +96,14 @@ function buildMinifierOptionsString(options: ShaderMinifierOptions): string {
 export interface ShaderMinifierPluginOptions {
     minify: boolean;
     minifierOptions: ShaderMinifierOptions;
+    verbose: boolean;
 }
 
-export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({ minify, minifierOptions }) => {
+export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plugin = ({
+    minify,
+    minifierOptions,
+    verbose
+}) => {
     return {
         name: 'shader-minifier',
         enforce: 'pre',
@@ -125,7 +130,9 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // rename list の生成
                 //
 
-                const noRenamingList: string[] = minifierOptions.noRenamingList ? [...minifierOptions.noRenamingList] : [];
+                const noRenamingList: string[] = minifierOptions.noRenamingList
+                    ? [...minifierOptions.noRenamingList]
+                    : [];
                 // const noRenamingList: string[] = [...options.noRenamingList];
 
                 const functionPattern = /(float|vec2|vec3|vec4|mat2|mat3|mat4|void)\s*(\w+)\s*\(/gm;
@@ -248,7 +255,9 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
 
                 // minify
                 const minifyCommand = `${isMac(process) ? 'mono ' : ''}${path.resolve(__dirname, '../', 'libs/shader_minifier.exe')} ${tmpCopiedFilePath} ${minifierOptionsString}-o ${tmpTransformedFilePath}`;
-                console.log('command: ', minifyCommand);
+                if (verbose) {
+                    console.log('run command: ', minifyCommand);
+                }
                 await exec(minifyCommand).catch((error) => {
                     console.log('error: ', error);
                     throw new Error(
