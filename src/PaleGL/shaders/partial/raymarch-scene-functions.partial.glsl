@@ -10,13 +10,13 @@ vec2 fObjectSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float useWorld) {
         worldPos,
         useWorld
     );
-    return fdfScene(p);
+    return fDfScene(p);
 }
 
 vec2 fBlendSpaceDfScene(vec3 worldPos, mat4 WtoO, vec3 scale, float blendRate) {
     vec3 localPos = fToLocal(worldPos, WtoO, scale);
     vec3 p = mix(localPos, worldPos, blendRate);
-    return fdfScene(p);
+    return fDfScene(p);
 }
 
 vec3 fGetNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale, float useWorld) {
@@ -49,9 +49,9 @@ vec3 fGetNormalDfScene(vec3 p) {
     // // tmp
     // const float eps = .0001;
     // vec3 n = vec3(
-    //     fdfScene(p + vec3(eps, 0, 0)).x - fdfScene(p + vec3(-eps, 0, 0)).x,
-    //     fdfScene(p + vec3(0, eps, 0)).x - fdfScene(p + vec3(0, -eps, 0)).x,
-    //     fdfScene(p + vec3(0, 0, eps)).x - fdfScene(p + vec3(0, 0, -eps)).x
+    //     fDfScene(p + vec3(eps, 0, 0)).x - fDfScene(p + vec3(-eps, 0, 0)).x,
+    //     fDfScene(p + vec3(0, eps, 0)).x - fDfScene(p + vec3(0, -eps, 0)).x,
+    //     fDfScene(p + vec3(0, 0, eps)).x - fDfScene(p + vec3(0, 0, -eps)).x
     // );
     // return normalize(n); 
 
@@ -66,7 +66,7 @@ vec3 fGetNormalDfScene(vec3 p) {
         ((i >> 1) & 1),
         (i & 1)) - 1.
         );
-        n += e * fdfScene(p + e * d).x;
+        n += e * fDfScene(p + e * d).x;
     }
     return normalize(n);   
 }

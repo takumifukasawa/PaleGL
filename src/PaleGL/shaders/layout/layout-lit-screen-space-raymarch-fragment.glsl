@@ -66,7 +66,7 @@ void main() {
     float minDistance = EPS;
     for (int i = 0; i < SI; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
-        result = fdfScene(currentRayPosition);
+        result = fDfScene(currentRayPosition);
         accLen += result.x;
         if (accLen > uFarClip || result.x <= minDistance) {
             break;
