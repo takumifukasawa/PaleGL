@@ -59,7 +59,7 @@ import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/a
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
+import { createSpotLight, getSpotLightConeCos } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
@@ -79,6 +79,7 @@ import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quat
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
 import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
+import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 // import { createHuman } from '../../../src/pages/scripts/createHuman.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
@@ -346,9 +347,10 @@ export function buildMarionetterScene(
                 // TODO: near, far を受け取りたい
                 actor = createPerspectiveCamera(
                     camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV],
+                    // rad2Deg(Math.acos(camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV])) * 2,
                     1,
                     0.1,
-                    1000,
+                    100,
                     name
                 );
             } else {

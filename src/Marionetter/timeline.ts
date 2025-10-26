@@ -78,6 +78,8 @@ import {
     // MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES,
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
+    MARIONETTER_ANIMATION_CLIP_START_INDEX,
+    MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -431,8 +433,8 @@ function createMarionetterAnimationClip(
 
         // const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
-        const start = animationClip[0];
-        const bindings = animationClip[3];
+        const start = animationClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+        const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
         // // for debug
         // // for debug
@@ -685,8 +687,8 @@ function createMarionetterLightControlClip(
         // // const { start, bindings } = lightControlClip;
         // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
-        const start = lightControlClip[0];
-        const bindings = lightControlClip[3];
+        const start = lightControlClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+        const bindings = lightControlClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -812,8 +814,8 @@ function createMarionetterObjectMoveAndLookAtClip(
 
             // const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
             // const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
-            const start = objectMoveAndLookAtClip[0];
-            const bindings = objectMoveAndLookAtClip[3];
+            const start = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+            const bindings = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {

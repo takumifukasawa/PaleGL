@@ -243,6 +243,10 @@ export type MarionetterClipInfoType =
 //     d: number;
 // };
 
+export const MARIONETTER_ANIMATION_CLIP_START_INDEX = 1;
+export const MARIONETTER_ANIMATION_CLIP_DURATION_INDEX = 2;
+export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 3;
+
 // [clipInfoType, start, duration]
 export type MarionetterClipInfoBase = [MarionetterClipInfoType, number, number];
 
