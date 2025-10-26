@@ -245,14 +245,27 @@ export type MarionetterClipInfoType =
 
 export const MARIONETTER_ANIMATION_CLIP_START_INDEX = 1;
 export const MARIONETTER_ANIMATION_CLIP_DURATION_INDEX = 2;
-export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 3;
+export const MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX = 3;
+export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 4;
 
-// [clipInfoType, start, duration]
-export type MarionetterClipInfoBase = [MarionetterClipInfoType, number, number];
+// [clipInfoType, start, duration, post-extraporation]
+export type MarionetterClipInfoBase = [MarionetterClipInfoType, number, number, MARIONETTER_CLIP_POST_EXTRAPORATION_MODE];
 
-export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
-export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
-export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
+// export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
+// export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
+// export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
+
+export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_NONE = 0;
+export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD = 1;
+export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP = 2;
+export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_PINGPONG = 3;
+export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_CONTINUE = 4;
+export type MARIONETTER_CLIP_POST_EXTRAPORATION_MODE = 
+    | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_NONE
+    | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD
+    | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP
+    | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_PINGPONG
+    | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_CONTINUE;
 
 // NOTE: unity側に合わせる
 export const MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT = 0;
