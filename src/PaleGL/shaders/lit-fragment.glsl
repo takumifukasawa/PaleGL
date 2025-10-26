@@ -78,12 +78,12 @@ void main() {
     emissiveColor = uEmissiveColor;
 #endif
 
-    // surface.specularAmount = uSpecularAmount;
+    // surface.smSpecularAmount = uSpecularAmount;
 
     sSurface surface;
-    surface.worldPosition = vWorldPosition;
-    surface.worldNormal = worldNormal;
-    surface.baseColor = baseColor;
+    surface.smWorldPosition = vWorldPosition;
+    surface.smWorldNormal = worldNormal;
+    surface.smBaseColor = baseColor;
     
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl

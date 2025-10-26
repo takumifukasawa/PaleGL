@@ -13,27 +13,27 @@ uniform float uRelativeThreshold;
 uniform float uSubpixelBlending;
        
 struct sEdgeData {
-    bool isHorizontal;
-    float pixelStep;
-    float oppositeLuma;
-    float gradient;
+    bool smIsHorizontal;
+    float smPixelStep;
+    float smOppositeLuma;
+    float smGradient;
 };
 
 struct sLuminanceData {
-    float center;
-    float top;
-    float right;
-    float bottom;
-    float left;
+    float smCenter;
+    float smTop;
+    float smRight;
+    float smBottom;
+    float smLeft;
     
-    float topLeft;
-    float topRight;
-    float bottomLeft;
-    float bottomRight;
+    float smTopLeft;
+    float smTopRight;
+    float smBottomLeft;
+    float smBottomRight;
     
-    float highest;
-    float lowest;
-    float contrast;
+    float smHighest;
+    float smLowest;
+    float smContrast;
 };
 
 // vec4 fSampleTexture(sampler2D tex, ivec2 coord) {
@@ -98,26 +98,26 @@ sLuminanceData fsampleLuminanceNeighborhood(vec2 uv, vec2 texelSize) {
     float lumaLowest = min(lumaCenter, min(min(lumaTop, lumaLeft), min(lumaBottom, lumaRight)));
     float lumaContrast = lumaHighest - lumaLowest;
  
-    l.top = lumaTop;
-    l.left = lumaLeft;
-    l.center = lumaCenter;
-    l.right = lumaRight;
-    l.bottom = lumaBottom;
+    l.smTop = lumaTop;
+    l.smLeft = lumaLeft;
+    l.smCenter = lumaCenter;
+    l.smRight = lumaRight;
+    l.smBottom = lumaBottom;
     
-    l.topLeft = lumaTopLeft;
-    l.topRight = lumaTopRight;
-    l.bottomLeft = lumaBottomLeft;
-    l.bottomRight = lumaBottomRight;
+    l.smTopLeft = lumaTopLeft;
+    l.smTopRight = lumaTopRight;
+    l.smBottomLeft = lumaBottomLeft;
+    l.smBottomRight = lumaBottomRight;
     
-    l.highest = lumaHighest;
-    l.lowest = lumaLowest;
-    l.contrast = lumaContrast;
+    l.smHighest = lumaHighest;
+    l.smLowest = lumaLowest;
+    l.smContrast = lumaContrast;
     
     return l;
 }
 
 bool fShouldSkipPixel(sLuminanceData l) {
-    return l.contrast < max(uContrastThreshold, l.highest * uRelativeThreshold);
+    return l.smContrast < max(uContrastThreshold, l.smHighest * uRelativeThreshold);
 }
 
 float fDeterminePixelBlendFactor(sLuminanceData l) {
@@ -126,17 +126,17 @@ float fDeterminePixelBlendFactor(sLuminanceData l) {
     // | 2 | 0 | 2 |
     // | 1 | 2 | 1 |
  
-    float determineEdgeFilter = 2. * (l.top + l.right + l.bottom + l.left);
-    determineEdgeFilter += l.topLeft + l.topRight + l.bottomLeft + l.bottomRight;
+    float determineEdgeFilter = 2. * (l.smTop + l.smRight + l.smBottom + l.smLeft);
+    determineEdgeFilter += l.smTopLeft + l.smTopRight + l.smBottomLeft + l.smBottomRight;
     
     // to low-pass filter
     determineEdgeFilter *= 1. / 12.; 
     
     // to high-pass filter
-    determineEdgeFilter = abs(determineEdgeFilter - l.center); 
+    determineEdgeFilter = abs(determineEdgeFilter - l.smCenter); 
     
     // to normalized filter
-    determineEdgeFilter = clamp(determineEdgeFilter / l.contrast, 0., 1.); 
+    determineEdgeFilter = clamp(determineEdgeFilter / l.smContrast, 0., 1.); 
     
     // linear to smoothstep
     float pixelBlendFactor = smoothstep(0., 1., determineEdgeFilter); 
@@ -177,9 +177,9 @@ sEdgeData fdetermineEdge(sLuminanceData l, vec2 texelSize) {
     // ----------------------------------------------------------------------- 
     
     float horizontal =
-        abs(l.top + l.bottom - 2. * l.center) * 2. +
-        abs(l.topRight + l.bottomRight - 2. * l.right) + 
-        abs(l.topLeft + l.bottomLeft - 2. * l.left);
+        abs(l.smTop + l.smBottom - 2. * l.smCenter) * 2. +
+        abs(l.smTopRight + l.smBottomRight - 2. * l.smRight) + 
+        abs(l.smTopLeft + l.smBottomLeft - 2. * l.smLeft);
         
     // ----------------------------------------------------------------------- 
     // ## 横の勾配を計算
@@ -203,42 +203,42 @@ sEdgeData fdetermineEdge(sLuminanceData l, vec2 texelSize) {
     // ----------------------------------------------------------------------- 
         
     float vertical = 
-        abs(l.right + l.left - 2. * l.center) * 2. +
-        abs(l.topRight + l.topLeft - 2. * l.top) +
-        abs(l.bottomRight + l.bottomLeft - 2. * l.bottom);
+        abs(l.smRight + l.smLeft - 2. * l.smCenter) * 2. +
+        abs(l.smTopRight + l.smTopLeft - 2. * l.smTop) +
+        abs(l.smBottomRight + l.smBottomLeft - 2. * l.smBottom);
        
     // 縦の勾配と横の勾配を比較して水平線と垂直線のどちらになっているかを決める
     // 勾配が大きい方がより強い境界になっているみなす 
         
-    e.isHorizontal = horizontal >= vertical;
+    e.smIsHorizontal = horizontal >= vertical;
     
     // 境界の方向が決まったら + - 方向を決める 
     // 水平線 ... 上が+,下が-
     // 垂直線 ... 右が+,左が-
     
-    float positiveLuma = e.isHorizontal ? l.top : l.right;
-    float negativeLuma = e.isHorizontal ? l.bottom : l.left;
+    float positiveLuma = e.smIsHorizontal ? l.smTop : l.smRight;
+    float negativeLuma = e.smIsHorizontal ? l.smBottom : l.smLeft;
     
     // +方向と-方向それぞれと自身のピクセルの輝度差を計算
 
-    float positiveGradient = abs(positiveLuma - l.center);
-    float negativeGradient = abs(negativeLuma - l.center);
+    float positiveGradient = abs(positiveLuma - l.smCenter);
+    float negativeGradient = abs(negativeLuma - l.smCenter);
     
     // 境界の方向に応じて、隣接ピクセルへのuv差分値を決める
   
-    e.pixelStep = e.isHorizontal ? texelSize.y : texelSize.x;
+    e.smPixelStep = e.smIsHorizontal ? texelSize.y : texelSize.x;
 
     // 隣接ピクセルの輝度差が大きい方の情報を取得
 
     if(positiveGradient < negativeGradient) {
         // -方向の方が輝度差が大きい場合
-        e.pixelStep = -e.pixelStep;
-        e.oppositeLuma = negativeLuma;
-        e.gradient = negativeGradient;
+        e.smPixelStep = -e.smPixelStep;
+        e.smOppositeLuma = negativeLuma;
+        e.smGradient = negativeGradient;
     } else {
         // +方向の方が輝度差が大きい場合
-        e.oppositeLuma = positiveLuma;
-        e.gradient = positiveGradient;
+        e.smOppositeLuma = positiveLuma;
+        e.smGradient = positiveGradient;
     }
     
     return e;
@@ -265,16 +265,16 @@ float fDetermineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 tex
 
     // uvを半ピクセル分オフセット
     // 境界に沿った位置で計算していくため
-    if(e.isHorizontal) {
-        uvEdge.y += e.pixelStep * .5; // offset half pixel
+    if(e.smIsHorizontal) {
+        uvEdge.y += e.smPixelStep * .5; // offset half pixel
         edgeStep = vec2(texelSize.x, 0.);
     } else {
-        uvEdge.x += e.pixelStep * .5; // offset half pixel
+        uvEdge.x += e.smPixelStep * .5; // offset half pixel
         edgeStep = vec2(0., texelSize.y);
     }
 
-    float edgeLuma = (l.center + e.oppositeLuma) * .5;
-    float gradientThreshold = e.gradient * .25;
+    float edgeLuma = (l.smCenter + e.smOppositeLuma) * .5;
+    float gradientThreshold = e.smGradient * .25;
     
     // +方向に一定回数edgeStepずらしながら輝度差,uv値を計算
     // 閾値（gradientThreshold）以下になったら端点とみなして打ち切り
@@ -344,7 +344,7 @@ float fDetermineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 tex
     // 距離なのでabsしてもよいはず
    
     float pDistance, nDistance;
-    if(e.isHorizontal) {
+    if(e.smIsHorizontal) {
         pDistance = puv.x - uv.x;
         nDistance = uv.x - nuv.x;
     } else {
@@ -366,7 +366,7 @@ float fDetermineEdgeBlendFactor(sLuminanceData l, sEdgeData e, vec2 uv, vec2 tex
    
     float edgeBlendFactor;
     
-    if(deltaSign == (l.center - edgeLuma >= 0.)) {
+    if(deltaSign == (l.smCenter - edgeLuma >= 0.)) {
         // エッジから遠ざかっている場合ブレンド係数を0にしてスキップすることで、エッジの片側にあるピクセルだけをブレンド
         edgeBlendFactor = 0.;
     } else {
@@ -395,10 +395,10 @@ void main() {
     
     float finalBlend = max(pixelBlend, edgeBlend);
 
-    if(e.isHorizontal) {
-        uv.y += e.pixelStep * finalBlend;
+    if(e.smIsHorizontal) {
+        uv.y += e.smPixelStep * finalBlend;
     } else {
-        uv.x += e.pixelStep * finalBlend;
+        uv.x += e.smPixelStep * finalBlend;
     }
 
     outColor = fSampleTexture(uSrcTexture, uv);

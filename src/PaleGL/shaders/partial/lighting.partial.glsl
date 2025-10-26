@@ -3,36 +3,36 @@
 #define MAX_POINT_LIGHT_COUNT 1
 
 struct sSurface {
-    vec3 worldNormal;
-    vec3 worldPosition;
-    vec4 baseColor;
-    float specularAmount;
+    vec3 smWorldNormal;
+    vec3 smWorldPosition;
+    vec4 smBaseColor;
+    float smSpecularAmount;
 };
 
 
 struct sDirectionalLight {
-    vec3 direction; // 光源自体の向く方向
-    float intensity;
-    vec4 color;
-    mat4 shadowMapProjectionMatrix;
+    vec3 smDirection; // 光源自体の向く方向
+    float smIntensity;
+    vec4 smColor;
+    mat4 smShadowMapProjectionMatrix;
 };
 
 struct sSpotLight {
-    vec4 color;
-    vec3 position;
-    vec3 direction; // spotlightの向き先
-    float intensity;
-    float distance;
-    float attenuation;
-    float coneCos;
-    float penumbraCos;
-    mat4 shadowMapProjectionMatrix;
+    vec4 smColor;
+    vec3 smPosition;
+    vec3 smDirection; // spotlightの向き先
+    float smIntensity;
+    float smDistance;
+    float smAttenuation;
+    float smConeCos;
+    float smPenumbraCos;
+    mat4 smShadowMapProjectionMatrix;
 };
 
 struct sPointLight {
-    vec4 color;
-    vec3 position;
-    float intensity;
-    float distance;
-    float attenuation;
+    vec4 smColor;
+    vec3 smPosition;
+    float smIntensity;
+    float smDistance;
+    float smAttenuation;
 };

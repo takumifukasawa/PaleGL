@@ -76,10 +76,10 @@ void main() {
         uInverseViewProjectionMatrix
     );
 
-    vec4 gBufferAColor = fCalcAreaColor(vec4(gBufferA.baseColor, 1.), vUv, tiling, uGBufferATextureUvOffset);
-    vec4 gBufferBColor = fCalcAreaColor(vec4(gBufferB.normal, 1.), vUv, tiling, uGBufferBTextureUvOffset);
-    vec4 gBufferCColor = fCalcAreaColor(vec4(gBufferC.metallic, gBufferC.roughness, 0., 1.), vUv, tiling, uGBufferCTextureUvOffset);
-    vec4 gBufferDColor = fCalcAreaColor(vec4(gBufferD.emissiveColor, 1.), vUv, tiling, uGBufferDTextureUvOffset);
+    vec4 gBufferAColor = fCalcAreaColor(vec4(gBufferA.smBaseColor, 1.), vUv, tiling, uGBufferATextureUvOffset);
+    vec4 gBufferBColor = fCalcAreaColor(vec4(gBufferB.smNormal, 1.), vUv, tiling, uGBufferBTextureUvOffset);
+    vec4 gBufferCColor = fCalcAreaColor(vec4(gBufferC.smMetallic, gBufferC.smRoughness, 0., 1.), vUv, tiling, uGBufferCTextureUvOffset);
+    vec4 gBufferDColor = fCalcAreaColor(vec4(gBufferD.smEmissiveColor, 1.), vUv, tiling, uGBufferDTextureUvOffset);
     vec4 depthColor = fCalcAreaColor(vec4(sceneDepth), vUv, tiling, uDepthTextureUvOffset);
     vec4 worldPositionColor = fCalcAreaColor(vec4(worldPosition, 1.), vUv, tiling, uWorldPositionUvOffset);
     vec4 directionalShadowMapColor = fCalcTextureAreaColor(uDirectionalLightShadowMap, vUv, tiling, uDirectionalLightShadowMapUvOffset);

@@ -204,9 +204,9 @@ void main() {
         // 1: backbuffer
         reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, -uvIORShiftBase);
         // 2: skybox
-        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.smRotationOffset);
         resultBackBufferColor.r = texture(uSceneTexture, reflUv).r;
-        reflTex.r = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).r;
+        reflTex.r = textureLod(uSkybox.smCubeMap, envSpecularDir, 0.).r;
 
         // green
         // 物体内側から屈折して外側に出るベクトル
@@ -218,9 +218,9 @@ void main() {
         // 1: backbuffer
         reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, 0.);
         // 2: skybox
-        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.smRotationOffset);
         resultBackBufferColor.g = texture(uSceneTexture, reflUv).g;
-        reflTex.g = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).g;
+        reflTex.g = textureLod(uSkybox.smCubeMap, envSpecularDir, 0.).g;
 
         // blue
         // 物体内側から屈折して外側に出るベクトル
@@ -232,9 +232,9 @@ void main() {
         // 1: backbuffer
         reflUv = fShiftReflUv(screenUv, rdIn, rdOut, n, ior, uvIORShiftPower, uvIORShiftBase);
         // 2: skybox
-        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.rotationOffset);
+        envSpecularDir = fCalcEnvMapSampleDir(rdOut, uSkybox.smRotationOffset);
         resultBackBufferColor.b = texture(uSceneTexture, reflUv).b;
-        reflTex.b = textureLod(uSkybox.cubeMap, envSpecularDir, 0.).b;
+        reflTex.b = textureLod(uSkybox.smCubeMap, envSpecularDir, 0.).b;
 
         resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
     }

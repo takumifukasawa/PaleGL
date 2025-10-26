@@ -1,30 +1,30 @@
 
 struct sSkybox {
-    samplerCube cubeMap;
-    float diffuseIntensity;
-    float specularIntensity;
-    float rotationOffset;
-    float maxLodLevel;
+    samplerCube smCubeMap;
+    float smDiffuseIntensity;
+    float smSpecularIntensity;
+    float smRotationOffset;
+    float smMaxLodLevel;
 };
 
 uniform sSkybox uSkybox;
 
 struct sSkyboxLight {
-    float diffuseIntensity;
-    float specularIntensity;
-    float rotationOffset;
-    float maxLodLevel;
+    float smDiffuseIntensity;
+    float smSpecularIntensity;
+    float smRotationOffset;
+    float smMaxLodLevel;
 };
 
 struct sIncidentSkyboxLight {
     // samplerCube cubeMap;
     // vec3 baseColor;
-    vec3 diffuseDirection;
-    float diffuseIntensity;
+    vec3 smDiffuseDirection;
+    float smDiffuseIntensity;
     // vec3 specularColor;
-    vec3 specularDirection;
-    float specularIntensity;
-    float maxLodLevel;
+    vec3 smSpecularDirection;
+    float smSpecularIntensity;
+    float smMaxLodLevel;
 };
 
 vec3 fCalcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
@@ -41,17 +41,17 @@ void fGetSkyboxLightIrradiance(
     out sIncidentSkyboxLight directLight
 ) {
     vec3 envDir = reflect(
-        -geometry.viewDir,
-        normalize(geometry.normal)
+        -geometry.smViewDir,
+        normalize(geometry.smNormal)
     );
 
-    vec3 envDiffuseDir = fCalcEnvMapSampleDir(geometry.normal, skyboxLight.rotationOffset);
-    vec3 envSpecularDir = fCalcEnvMapSampleDir(envDir, skyboxLight.rotationOffset);
+    vec3 envDiffuseDir = fCalcEnvMapSampleDir(geometry.smNormal, skyboxLight.smRotationOffset);
+    vec3 envSpecularDir = fCalcEnvMapSampleDir(envDir, skyboxLight.smRotationOffset);
 
-    // directLight.cubeMap = skyboxLight.cubeMap;
-    directLight.diffuseDirection = envDiffuseDir;
-    directLight.diffuseIntensity = skyboxLight.diffuseIntensity;
-    directLight.specularDirection = envSpecularDir;
-    directLight.specularIntensity = skyboxLight.specularIntensity;
-    directLight.maxLodLevel = skyboxLight.maxLodLevel;
+    // directLight.smCubeMap = skyboxLight.smCubeMap;
+    directLight.smDiffuseDirection = envDiffuseDir;
+    directLight.smDiffuseIntensity = skyboxLight.smDiffuseIntensity;
+    directLight.smSpecularDirection = envSpecularDir;
+    directLight.smSpecularIntensity = skyboxLight.smSpecularIntensity;
+    directLight.smMaxLodLevel = skyboxLight.smMaxLodLevel;
 }

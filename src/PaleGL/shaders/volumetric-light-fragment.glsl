@@ -50,7 +50,7 @@ float fCalcTransmittance(
 ) {
     float rate = 0.;
     
-    vec4 rayPosInProjectionTexture = spotLight.shadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
+    vec4 rayPosInProjectionTexture = spotLight.smShadowMapProjectionMatrix * vec4(rayPosInWorld, 1.);
     vec3 projectionCoord = rayPosInProjectionTexture.xyz / rayPosInProjectionTexture.w;
     vec3 shadowUv = projectionCoord;
     float rayDepthInProjection = rayPosInProjectionTexture.z / rayPosInProjectionTexture.w;
@@ -60,21 +60,21 @@ float fCalcTransmittance(
         step(0., shadowUv.y) * (1. - step(1., shadowUv.y)) *
         step(0., shadowUv.z) * (1. - step(1., shadowUv.z));
 
-    vec3 rayToLight = spotLight.position - rayPosInWorld;
+    vec3 rayToLight = spotLight.smPosition - rayPosInWorld;
     vec3 PtoL = normalize(rayToLight);
     vec3 LtoP = -PtoL;
     float lightDistance = length(rayToLight);
-    float angleCos = dot(normalize(LtoP), spotLight.direction);
+    float angleCos = dot(normalize(LtoP), spotLight.smDirection);
 
-    float spotEffect = smoothstep(spotLight.coneCos, spotLight.penumbraCos, angleCos);
-    float attenuation = fPunctualLightIntensityToIrradianceFactor(lightDistance, spotLight.distance, spotLight.attenuation);
+    float spotEffect = smoothstep(spotLight.smConeCos, spotLight.smPenumbraCos, angleCos);
+    float attenuation = fPunctualLightIntensityToIrradianceFactor(lightDistance, spotLight.smDistance, spotLight.smAttenuation);
    
     if(abs(rayPosInView.z) < viewZFromDepth) {
         // tmp
         // if(all(
         //     bvec4(
-        //         angleCos > spotLight.coneCos,
-        //         fTestLightInRange(lightDistance, spotLight.distance),
+        //         angleCos > spotLight.smConeCos,
+        //         fTestLightInRange(lightDistance, spotLight.smDistance),
         //         spotLightShadowDepth > rayDepthInProjection, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
         //         spotLightShadowDepth < 1. // 1の時は影の影響を受けていないとみなす. ただし、床もcastshadowしておいた方がよい
         //     )
@@ -84,8 +84,8 @@ float fCalcTransmittance(
         // }
         
         if(all(bvec2(
-            angleCos > spotLight.coneCos,
-            fTestLightInRange(lightDistance, spotLight.distance)
+            angleCos > spotLight.smConeCos,
+            fTestLightInRange(lightDistance, spotLight.smDistance)
         ))) {
             if(all(bvec2(
                 spotLightShadowDepth < rayDepthInProjection, // 深度がray.zよりも近い場合は光の影響を受けているとみなす
@@ -186,18 +186,18 @@ void main() {
     
         // TODO: intensityそのままかけるのよくない気がする
         // // accColor.xyz +=
-        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
-        //     // fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color.xyz);
+        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].smIntensity * uBlendRate) *
+        //     // fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].smColor.xyz);
         // accColor +=
-        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate) *
-        //     fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].intensity * uBlendRate *
-        //     fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].color);
+        //     // saturate(fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].smIntensity * uBlendRate) *
+        //     fogColorArray[UNROLL_i] * uSpotLight[UNROLL_i].smIntensity * uBlendRate *
+        //     fogColorArray[UNROLL_i] * saturate(uSpotLight[UNROLL_i].smColor);
 
     #pragma UNROLL_START MAX_SPOT_LIGHT_COUNT
-        currentFogRate = fogRateArray[UNROLL_N] * uSpotLight[UNROLL_N].intensity * uBlendRate;
+        currentFogRate = fogRateArray[UNROLL_N] * uSpotLight[UNROLL_N].smIntensity * uBlendRate;
         fogRate += currentFogRate;
 
-        currentFogColor = currentFogRate * uSpotLight[UNROLL_N].color;
+        currentFogColor = currentFogRate * uSpotLight[UNROLL_N].smColor;
         fogColor += currentFogColor;
     #pragma UNROLL_END
 

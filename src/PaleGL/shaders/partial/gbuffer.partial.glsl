@@ -2,22 +2,22 @@
 #define SHADING_MODEL_NUM 3.
 
 struct sGBufferA {
-    vec3 baseColor; // rgb
+    vec3 smBaseColor; // rgb
     // a
 };
 
 struct sGBufferB {
-    vec3 normal; // rgb
-    float shadingModelId; // a
+    vec3 smNormal; // rgb
+    float smShadingModelId; // a
 };
 
 struct sGBufferC {
-    float metallic; // x
-    float roughness; // y
+    float smMetallic; // x
+    float smRoughness; // y
 };
 
 struct sGBufferD {
-    vec3 emissiveColor; // rga
+    vec3 smEmissiveColor; // rga
     // a
 };
 
@@ -42,29 +42,29 @@ vec4 fEncodeGBufferD(vec3 emissiveColor) {
 sGBufferA fDecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {
     vec4 color = texture(gBufferATexture, uv);
     sGBufferA gBufferA;
-    gBufferA.baseColor = color.rgb;
+    gBufferA.smBaseColor = color.rgb;
     return gBufferA;
 }
 
 sGBufferB fDecodeGBufferB(sampler2D gBufferBTexture, vec2 uv) {
     vec4 color = texture(gBufferBTexture, uv);
     sGBufferB gBufferB;
-    gBufferB.normal = normalize(color.rgb * 2. - 1.);
-    gBufferB.shadingModelId = color.a * SHADING_MODEL_NUM;
+    gBufferB.smNormal = normalize(color.rgb * 2. - 1.);
+    gBufferB.smShadingModelId = color.a * SHADING_MODEL_NUM;
     return gBufferB;
 }
 
 sGBufferC fDecodeGBufferC(sampler2D gBufferCTexture, vec2 uv) {
     vec4 color = texture(gBufferCTexture, uv);
     sGBufferC gBufferC;
-    gBufferC.metallic = color.x;
-    gBufferC.roughness = color.y;
+    gBufferC.smMetallic = color.x;
+    gBufferC.smRoughness = color.y;
     return gBufferC;
 }
 
 sGBufferD fDecodeGBufferD(sampler2D gBufferDTexture, vec2 uv) {
     vec4 color = texture(gBufferDTexture, uv);
     sGBufferD gBufferD;
-    gBufferD.emissiveColor = color.rgb;
+    gBufferD.smEmissiveColor = color.rgb;
     return gBufferD;
 }

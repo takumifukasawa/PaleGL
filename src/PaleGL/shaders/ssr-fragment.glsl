@@ -51,7 +51,7 @@ void main() {
     sGBufferB gBufferB = fDecodeGBufferB(uGBufferBTexture, uv);
     sGBufferC gBufferC = fDecodeGBufferC(uGBufferCTexture, uv);
 
-    vec3 worldNormal = gBufferB.normal;
+    vec3 worldNormal = gBufferB.smNormal;
     vec3 viewNormal = normalize((uTransposeInverseViewMatrix * vec4(worldNormal, 1.)).xyz);
     
     vec4 baseColor = texture(uSrcTexture, uv);
@@ -72,7 +72,7 @@ void main() {
 
     vec3 incidentViewDir = normalize(viewPosition);
     vec3 reflectViewDir = reflect(incidentViewDir, viewNormal);
-    vec3 rayViewDir = reflectViewDir + randomDir * gBufferC.roughness * uReflectionRoughnessPower;
+    vec3 rayViewDir = reflectViewDir + randomDir * gBufferC.smRoughness * uReflectionRoughnessPower;
 
     vec3 rayViewOrigin = viewPosition;
 
@@ -170,8 +170,8 @@ void main() {
         vec4 surfaceCoefficient = vec4(
             mix(
                 vec3(.04),
-                gBufferA.baseColor * gBufferC.metallic,
-                gBufferC.metallic
+                gBufferA.smBaseColor * gBufferC.smMetallic,
+                gBufferC.smMetallic
             ),
             1.
         );

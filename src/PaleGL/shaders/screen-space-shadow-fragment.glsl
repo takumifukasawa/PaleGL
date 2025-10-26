@@ -22,8 +22,8 @@ uniform float uStrength;
 uniform float uRayStepMultiplier;
 
 void fCalcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPosition, vec3 jitterOffset, out float occlusion) {
-    vec3 rawLightPos = pointLight.position;
-    vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.position, 1.)).xyz;
+    vec3 rawLightPos = pointLight.smPosition;
+    vec3 rawLightPosInView = (uViewMatrix * vec4(pointLight.smPosition, 1.)).xyz;
 
     // TODO: jitterはviewかclipでやるべきかも
     //
@@ -82,7 +82,7 @@ void fCalcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPositio
         // rayの深度がピクセルの深度より大きい場合、遮蔽されてるとみなす
         //
         // if(currentRayRawDepth > currentRawDepthInPixel + uBias) {
-        //     occlusion += sharpness * saturate(pointLight.intensity);
+        //     occlusion += sharpness * saturate(pointLight.smIntensity);
         // }
 
         //
@@ -92,9 +92,9 @@ void fCalcOcclusion(sPointLight pointLight, vec3 worldPosition, vec3 viewPositio
         if(
             dz > abs(currentViewPositionInPixel.z)
         ) {
-            // occlusion += sharpness * saturate(pointLight.intensity);
+            // occlusion += sharpness * saturate(pointLight.smIntensity);
             // test fade
-            occlusion += sharpness * saturate(pointLight.intensity) * (1. - smoothstep(60., 80., dz));
+            occlusion += sharpness * saturate(pointLight.smIntensity) * (1. - smoothstep(60., 80., dz));
         }
     }
 }

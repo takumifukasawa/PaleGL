@@ -95,7 +95,7 @@ void main() {
     
     // baseColor = vec4(1.);
 
-    // surface.specularAmount = uSpecularAmount;
+    // surface.smSpecularAmount = uSpecularAmount;
 
     vec3 emissiveColor = uEmissiveColor.rgb;
 #ifdef USE_INSTANCING

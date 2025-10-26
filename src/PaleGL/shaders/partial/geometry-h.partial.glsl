@@ -1,5 +1,5 @@
 struct sGeometricContext {
-    vec3 position;
-    vec3 normal;
-    vec3 viewDir;
+    vec3 smPosition;
+    vec3 smNormal;
+    vec3 smViewDir;
 };

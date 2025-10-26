@@ -23,6 +23,11 @@ import {
     UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
     UNIFORM_NAME_SKYBOX,
     UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
+    UNIFORM_NAME_STRUCT_MEMBER_CUBE_MAP,
+    UNIFORM_NAME_STRUCT_MEMBER_DIFFUSE_INTENSITY,
+    UNIFORM_NAME_STRUCT_MEMBER_MAX_LOD_LEVEL,
+    UNIFORM_NAME_STRUCT_MEMBER_ROTATION_OFFSET,
+    UNIFORM_NAME_STRUCT_MEMBER_SPECULAR_INTENSITY,
     UNIFORM_TYPE_CUBE_MAP,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_STRUCT,
@@ -33,12 +38,6 @@ import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-
-const CUBE_MAP_UNIFORM_NAME = 'cubeMap';
-const DIFFUSE_INTENSITY_UNIFORM_NAME = 'diffuseIntensity';
-const SPECULAR_INTENSITY_UNIFORM_NAME = 'specularIntensity';
-const ROTATION_OFFSET_UNIFORM_NAME = 'rotationOffset';
-const MAX_LOD_LEVEL_UNIFORM_NAME = 'maxLodLevel';
 
 export type DeferredShadingPassArgs = PostProcessPassParametersBaseArgs;
 
@@ -95,11 +94,11 @@ export function createSkyboxUniforms(): UniformsData {
             UNIFORM_NAME_SKYBOX,
             UNIFORM_TYPE_STRUCT,
             [
-                [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, null],
-                [DIFFUSE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
-                [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
-                [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
-                [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_STRUCT_MEMBER_CUBE_MAP, UNIFORM_TYPE_CUBE_MAP, null],
+                [UNIFORM_NAME_STRUCT_MEMBER_DIFFUSE_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_STRUCT_MEMBER_SPECULAR_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_STRUCT_MEMBER_ROTATION_OFFSET, UNIFORM_TYPE_FLOAT, 0],
+                [UNIFORM_NAME_STRUCT_MEMBER_MAX_LOD_LEVEL, UNIFORM_TYPE_FLOAT, 0],
             ],
         ],
     ];
@@ -107,10 +106,10 @@ export function createSkyboxUniforms(): UniformsData {
 
 export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
     setMaterialUniformValue(material, UNIFORM_NAME_SKYBOX, [
-        [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, skybox.cubeMap],
-        [DIFFUSE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],
-        [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.specularIntensity],
-        [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.rotationOffset],
-        [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.cubeMap.maxLodLevel],
+        [UNIFORM_NAME_STRUCT_MEMBER_CUBE_MAP, UNIFORM_TYPE_CUBE_MAP, skybox.cubeMap],
+        [UNIFORM_NAME_STRUCT_MEMBER_DIFFUSE_INTENSITY, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],
+        [UNIFORM_NAME_STRUCT_MEMBER_SPECULAR_INTENSITY, UNIFORM_TYPE_FLOAT, skybox.specularIntensity],
+        [UNIFORM_NAME_STRUCT_MEMBER_ROTATION_OFFSET, UNIFORM_TYPE_FLOAT, skybox.rotationOffset],
+        [UNIFORM_NAME_STRUCT_MEMBER_MAX_LOD_LEVEL, UNIFORM_TYPE_FLOAT, skybox.cubeMap.maxLodLevel],
     ]);
 }
