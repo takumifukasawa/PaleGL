@@ -17,7 +17,7 @@ out vec4 outColor;
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
 uniform sampler2D uVolumetricLightTexture;
-uniform sampler2D uSSSTexture;
+uniform sampler2D uScreenSpaceShadowTexture;
 uniform sampler2D uNoiseTexture;
 uniform vec4 uFogColor;
 uniform float uFogStrength;
@@ -84,7 +84,7 @@ void main() {
     vec4 destColor = sceneColor;
     vec4 lightShaftColor = texture(uLightShaftTexture, uv);
     vec4 volumetricLightColor = texture(uVolumetricLightTexture, uv);
-    float sssRate = texture(uSSSTexture, uv).r;
+    float sssRate = texture(uScreenSpaceShadowTexture, uv).r;
 
     vec2 aspect = vec2(uAspect, 1.);
   

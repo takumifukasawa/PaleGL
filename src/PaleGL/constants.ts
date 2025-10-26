@@ -408,6 +408,9 @@ export const UNIFORM_NAME_OCTAVES = 'uOctaves';
 export const UNIFORM_NAME_AMPLITUDE = 'uAmplitude';
 export const UNIFORM_NAME_FREQUENCY = 'uFrequency';
 export const UNIFORM_NAME_FACTOR = 'uFactor';
+export const UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE = 'uScreenSpaceShadowTexture';
+export const UNIFORM_NAME_AMBIENT_OCCLUSION_TEXTURE = 'uAmbientOcclusionTexture';
+export const UNIFORM_NAME_LIGHT_SHAFT_TEXTURE = 'uLightShaftTexture';
 
 export type UniformName =
     | typeof UNIFORM_NAME_WORLD_MATRIX
@@ -503,7 +506,10 @@ export type UniformName =
     | typeof UNIFORM_NAME_OCTAVES
     | typeof UNIFORM_NAME_AMPLITUDE
     | typeof UNIFORM_NAME_FREQUENCY
-    | typeof UNIFORM_NAME_FACTOR;
+    | typeof UNIFORM_NAME_FACTOR
+    | typeof UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE
+    | typeof UNIFORM_NAME_AMBIENT_OCCLUSION_TEXTURE
+    | typeof UNIFORM_NAME_LIGHT_SHAFT_TEXTURE;
 
 export const UNIFORM_BLOCK_NAME_COMMON = 'ubCommon';
 export const UNIFORM_BLOCK_NAME_TRANSFORMATIONS = 'ubTransformations';

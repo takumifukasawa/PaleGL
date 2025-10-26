@@ -106,7 +106,6 @@ import {
     UNIFORM_NAME_VIEW_PROJECTION_MATRIX,
     UNIFORM_NAME_WORLD_MATRIX,
     UNIFORM_NAME_WVP_MATRIX,
-
     UNIFORM_TYPE_INT,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_BOOL,
@@ -121,6 +120,7 @@ import {
     UNIFORM_INDEX_TYPE,
     UNIFORM_INDEX_VALUE,
     UniformTypes,
+    UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
 } from '@/PaleGL/constants';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
@@ -1103,7 +1103,7 @@ export function renderRenderer(
     // set sss texture
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
-        'uScreenSpaceShadowTexture',
+        UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
         renderer.screenSpaceShadowPass.enabled
             ? renderer.screenSpaceShadowPass.renderTarget.texture
             : renderer.gpu.dummyBlackTextures[0]
@@ -1112,7 +1112,7 @@ export function renderRenderer(
     // set ao texture
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
-        'uAmbientOcclusionTexture',
+        UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
         renderer.ambientOcclusionPass.enabled
             ? renderer.ambientOcclusionPass.renderTarget.texture
             : getDummyWhiteTexture(renderer.gpu)

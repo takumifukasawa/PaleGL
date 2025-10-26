@@ -10,6 +10,8 @@ import {
     UNIFORM_TYPE_COLOR,
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_NAME_BLEND_RATE,
+    UNIFORM_NAME_LIGHT_SHAFT_TEXTURE,
+    UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
 } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -36,9 +38,7 @@ const UNIFORM_SSS_FOG_RATE = 'uSSSFogRate';
 const UNIFORM_SSS_FOG_COLOR = 'uSSSFogColor';
 const UNIFORM_NOISE_TEXTURE = 'uNoiseTexture';
 
-const lightShaftTextureUniformName = 'uLightShaftTexture';
 const volumetricLightTextureUniformName = 'uVolumetricLightTexture';
-const screenSpaceShadowTextureUniformName = 'uSSSTexture';
 
 // ---
 
@@ -120,9 +120,9 @@ export function createFogPass(args: FogPassArgs) {
                 [UNIFORM_FOG_COLOR, UNIFORM_TYPE_COLOR, createColorWhite()],
                 // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
                 [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [lightShaftTextureUniformName, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
                 [volumetricLightTextureUniformName, UNIFORM_TYPE_TEXTURE, null],
-                [screenSpaceShadowTextureUniformName, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
                 [UNIFORM_FOG_STRENGTH, UNIFORM_TYPE_FLOAT, fogStrength],
                 [UNIFORM_FOG_DENSITY, UNIFORM_TYPE_FLOAT, fogDensity],
                 [UNIFORM_FOG_DENSITY_ATTENUATION, UNIFORM_TYPE_FLOAT, fogDensityAttenuation],
@@ -161,9 +161,9 @@ export function setFogPassTextures(
     screenSpaceShadowRtTexture: Texture,
     noiseTexture: Texture
 ) {
-    setMaterialUniformValue(fogPass.material, lightShaftTextureUniformName, lightShaftRtTexture);
+    setMaterialUniformValue(fogPass.material, UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, lightShaftRtTexture);
     setMaterialUniformValue(fogPass.material, volumetricLightTextureUniformName, volumetricLightRtTexture);
-    setMaterialUniformValue(fogPass.material, screenSpaceShadowTextureUniformName, screenSpaceShadowRtTexture);
+    setMaterialUniformValue(fogPass.material, UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE, screenSpaceShadowRtTexture);
     setMaterialUniformValue(fogPass.material, UNIFORM_NOISE_TEXTURE, noiseTexture);
 }
 
