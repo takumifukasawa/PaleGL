@@ -14,6 +14,13 @@ export type NeedsShorten = true;
 export const NeedsShorten = true;
 
 //
+// utilities
+//
+
+type Append<T extends unknown[], U> = [...T, U];
+type AppendMany<T extends unknown[], U extends unknown[]> = [...T, ...U];
+
+//
 // marionetter
 //
 
@@ -226,15 +233,18 @@ export type MarionetterClipInfoType =
     | typeof MARIONETTER_CLIP_INFO_TYPE_SIGNAL_EMITTER
     | typeof MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP;
 
-export type MarionetterClipInfoBase = {
-    type: MarionetterClipInfoType;
-    start: number;
-    duration: number;
-    // shorten
-    t: MarionetterClipInfoType;
-    s: number;
-    d: number;
-};
+// export type MarionetterClipInfoBase = {
+//     type: MarionetterClipInfoType;
+//     start: number;
+//     duration: number;
+//     // shorten
+//     t: MarionetterClipInfoType;
+//     s: number;
+//     d: number;
+// };
+
+// [clipInfoType, start, duration]
+export type MarionetterClipInfoBase = [MarionetterClipInfoType, number, number];
 
 export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
@@ -247,29 +257,49 @@ export type MarionetterAnimationClipType =
     | typeof MARIONETTER_ANIMATION_CLIP_TYPE_DEFAULT
     | typeof MARIONETTER_ANIMATION_CLIP_TYPE_GBUFFER_MATERIAL;
 
-export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
-    animationClipType: MarionetterAnimationClipType;
-    offsetPosition: { x: number; y: number; z: number };
-    offsetRotation: { x: number; y: number; z: number };
-    bindings: MarionetterClipBinding[];
-    // shorten
-    act: MarionetterAnimationClipType;
-    op: { x: number; y: number; z: number };
-    or: { x: number; y: number; z: number };
-    b: MarionetterClipBinding[];
-};
+// export type MarionetterAnimationClipInfo = MarionetterClipInfoBase & {
+//     animationClipType: MarionetterAnimationClipType;
+//     offsetPosition: { x: number; y: number; z: number };
+//     offsetRotation: { x: number; y: number; z: number };
+//     bindings: MarionetterClipBinding[];
+//     // shorten
+//     act: MarionetterAnimationClipType;
+//     op: { x: number; y: number; z: number };
+//     or: { x: number; y: number; z: number };
+//     b: MarionetterClipBinding[];
+// };
 
-// offset周りは一旦使わない
-// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_ANIMATION_CLIP_TYPE = NeedsShorten ? 'act' : 'animationClipType';
-// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_POSITION = NeedsShorten ? 'op' : 'offsetPosition';
-// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_ROTATION = NeedsShorten ? 'or' : 'offsetRotation';
-export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
+// [..., bindings, animation clip type, op?, or?]
+export type MarionetterAnimationClipInfo = AppendMany<
+    // prettier-ignore
+    MarionetterClipInfoBase,
+    [
+        MarionetterClipBinding[], // bindings
+        MarionetterAnimationClipType,
+        { x: number; y: number; z: number }?, // offset position (possibly null)
+        { x: number; y: number; z: number }?, // offset rotation (possibly null
+    ]
+>;
 
-export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
-    bindings: MarionetterClipBinding[];
-    // shorten
-    b: MarionetterClipBinding[];
-};
+// // offset周りは一旦使わない
+// // export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_ANIMATION_CLIP_TYPE = NeedsShorten ? 'act' : 'animationClipType';
+// // export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_POSITION = NeedsShorten ? 'op' : 'offsetPosition';
+// // export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_OFFSET_ROTATION = NeedsShorten ? 'or' : 'offsetRotation';
+// export const MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
+
+// // [clipInfoType, start, duration, bindings, op?, or?]
+// export type MarionetterLightControlClipInfo = MarionetterClipInfoBase & {
+//     bindings: MarionetterClipBinding[];
+//     // shorten
+//     b: MarionetterClipBinding[];
+// };
+
+// [..., bindings]
+export type MarionetterLightControlClipInfo = AppendMany<
+    // prettier-ignore
+    MarionetterClipInfoBase,
+    [MarionetterClipBinding[]]
+>;
 
 export const MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS = NeedsShorten ? 'b' : 'bindings';
 
@@ -277,15 +307,22 @@ export type MarionetterActivationControlClipInfo = MarionetterClipInfoBase;
 
 // TODO: signal emitter
 
-export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase & {
-    localPosition: RawVector3;
-    lookAtTargetName: string;
-    bindings: MarionetterClipBinding[];
-    // shorten
-    lp: RawVector3;
-    tn: string;
-    b: MarionetterClipBinding[];
-};
+// export type MarionetterObjectMoveAndLookAtClipInfo = MarionetterClipInfoBase & {
+//     localPosition: RawVector3;
+//     lookAtTargetName: string;
+//     bindings: MarionetterClipBinding[];
+//     // shorten
+//     lp: RawVector3;
+//     tn: string;
+//     b: MarionetterClipBinding[];
+// };
+
+// [..., bindings, target name, local position
+export type MarionetterObjectMoveAndLookAtClipInfo = AppendMany<
+    // prettier-ignore
+    MarionetterClipInfoBase,
+    [MarionetterClipBinding[], string, RawVector3]
+>;
 
 export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION = NeedsShorten
     ? 'lp'
@@ -304,13 +341,13 @@ export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITI
     ? 'lp.z'
     : 'LocalPosition.z';
 
-export type MarionetterObjectMoveAndLookAtClipInfoProperty =
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y
-    | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z;
+// export type MarionetterObjectMoveAndLookAtClipInfoProperty =
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOOK_AT_TARGET_NAME
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y
+//     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z;
 
 // export type MarionetterHumanClipInfo = MarionetterClipInfoBase & {
 //     leftShoulderRotation: RawVector3;
@@ -335,7 +372,7 @@ export type MarionetterObjectMoveAndLookAtClipInfoProperty =
 // };
 
 // [name, keyframes]
-export type MarionetterClipBinding = [string,  MarionetterAnimationClipKeyframe[]];
+export type MarionetterClipBinding = [string, MarionetterAnimationClipKeyframe[]];
 
 // export const MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME = NeedsShorten ? 'n' : 'propertyName';
 // export const MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES = NeedsShorten ? 'k' : 'keyframes';

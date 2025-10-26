@@ -68,9 +68,9 @@ import {
     MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE,
     MARIONETTER_CLIP_INFO_BASE_PROPERTY_START,
     MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION,
-    MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS,
+    // MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS,
     MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS,
+    // MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
@@ -235,13 +235,17 @@ export function buildMarionetterTimeline(
                     const { time, scene } = args;
                     const clipAtTime = marionetterClips.find(
                         // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
-                        (clip) =>
-                            isTimeInClip(
-                                time,
-                                clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START],
-                                clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START] +
-                                    clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION]
-                            )
+                        ({ clipInfo }) => {
+                            // return isTimeInClip(
+                            //     time,
+                            //     clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START],
+                            //     clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START] +
+                            //         clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION]
+                            // );}
+                            const start = clipInfo[1];
+                            const duration = clipInfo[2];
+                            return isTimeInClip(time, start, start + duration);
+                        }
                     );
 
                     // NOTE: 渡されるtimeそのものがframeTimeになった
@@ -347,7 +351,9 @@ function createMarionetterClips(
 
     for (let i = 0; i < clips.length; i++) {
         const clip = clips[i];
-        switch (clip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE]) {
+        const clipType = clip[0];
+        // switch (clip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE]) {
+        switch (clipType) {
             case MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP:
                 marionetterClips.push(
                     createMarionetterAnimationClip(
@@ -403,6 +409,8 @@ function createMarionetterAnimationClip(
     const localRotationEulerDegree: Vector3 = createVector3Zero();
     const localScale: Vector3 = createVector3One();
 
+    // console.log('hogehoge - clip', animationClip);
+
     // actorに直接valueを割り当てる関数
     const execute = (args: MarionetterClipArgs) => {
         const { actor, time } = args;
@@ -421,8 +429,10 @@ function createMarionetterAnimationClip(
         setV3(localRotationEulerDegree, 0, 0, 0);
         setV3(localScale, 1, 1, 1);
 
-        const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
-        const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
+        // const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+        // const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
+        const start = animationClip[0];
+        const bindings = animationClip[3];
 
         // // for debug
         // // for debug
@@ -672,9 +682,11 @@ function createMarionetterLightControlClip(
         // let range = 0;
         let spotLightRange = 0;
 
-        // const { start, bindings } = lightControlClip;
-        const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
-        const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
+        // // const { start, bindings } = lightControlClip;
+        // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+        // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
+        const start = lightControlClip[0];
+        const bindings = lightControlClip[3];
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -798,8 +810,10 @@ function createMarionetterObjectMoveAndLookAtClip(
 
             const localPosition: Vector3 = createVector3Zero();
 
-            const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
-            const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
+            // const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
+            // const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
+            const start = objectMoveAndLookAtClip[0];
+            const bindings = objectMoveAndLookAtClip[3];
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {
