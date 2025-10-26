@@ -9,82 +9,86 @@ export type StartupLayer = {
 };
 
 export function createStartupLayer(onClickPlayButton: () => void): StartupLayer {
-    const stylesText = `
-body {
-  overflow: hidden;
-}
+    //     const stylesText = `
+    // body {
+    //   overflow: hidden;
+    // }
+    //
+    // * {
+    //   margin: 0;
+    //   padding: 0;
+    //   font-family: sans-serif;
+    // }
+    //
+    // #wrapper {
+    //   position: fixed;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    // }
+    //
+    // canvas {
+    //   display: block;
+    //   width: 100%;
+    //   height: 100%;
+    //   background-color: black;
+    // }
+    //
+    // #w {
+    //   position: fixed;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   background-color: black;
+    //   z-index: 9999;
+    // }
+    // #o {
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   margin: auto;
+    //   width: 200px;
+    //   height: 20px;
+    //   box-sizing: border-box;
+    //   border: 5px solid white;
+    // }
+    // #i {
+    //   width: 0;
+    //   height: 100%;
+    //   box-sizing: border-box;
+    //   background-color: white;
+    //   position: absolute;
+    //   border: 1px solid black;
+    //   transition: width 1s ease-out;
+    // }
+    // #c {
+    //   display: none;
+    //   justify-content: center;
+    //   align-items: center;
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   margin: auto;
+    //   flex-direction: column;
+    // }
+    // #c button {
+    //   display: block;
+    // }
+    // #p {
+    //   margin-top: 1em;
+    // }
+    //
+    // `;
 
-* {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-} 
+    // inline
+    const stylesText = `body{overflow:hidden}*{margin:0;padding:0;font-family:sans-serif}#wrapper{position:fixed;top:0;left:0;width:100%;height:100%}canvas{display:block;width:100%;height:100%;background:#000}#w{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999}#o{position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;width:200px;height:20px;box-sizing:border-box;border:5px solid #fff}#i{width:0;height:100%;box-sizing:border-box;background:#fff;position:absolute;border:1px solid #000;transition:width 1s ease-out}#c{display:none;justify-content:center;align-items:center;position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;flex-direction:column}#c button{display:block}#p{margin-top:1em}`;
 
-#wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background-color: black;
-}
-
-#w {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: black;
-  z-index: 9999;
-}
-#o {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 200px;
-  height: 20px;
-  box-sizing: border-box;
-  border: 5px solid white;
-}
-#i {
-  width: 0;
-  height: 100%;
-  box-sizing: border-box;
-  background-color: white;
-  position: absolute;
-  border: 1px solid black;
-  transition: width 1s ease-out;
-}
-#c {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  flex-direction: column;
-}
-#c button {
-  display: block;
-}
-#p {
-  margin-top: 1em;
-}
-
-`;
     const styleElement = document.createElement('style');
     styleElement.innerText = stylesText;
     document.head.appendChild(styleElement);
