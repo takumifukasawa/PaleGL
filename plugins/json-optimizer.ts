@@ -4,7 +4,8 @@ export function optimizeJsonData(
     obj: objType,
     decimalPlaces: number = 3,
     filePath?: string,
-    currentPath: string = ''
+    currentPath: string = '',
+    verbose: boolean = false,
 ): unknown {
     const optimizeNumber = (num: number, path: string): number => {
         // 整数に変換できる値は整数にする
@@ -18,7 +19,7 @@ export function optimizeJsonData(
             const isRoundedToZero = rounded === 0;
             const changePercent = Math.abs((num - rounded) / num) * 100;
 
-            if (isRoundedToZero || changePercent >= 50) {
+            if (verbose && (isRoundedToZero || changePercent >= 50)) {
                 console.warn(
                     `[JSON Optimizer Warning] Significant value change detected:` +
                         (filePath ? `\n  File: ${filePath}` : '') +
