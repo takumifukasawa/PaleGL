@@ -35,7 +35,7 @@ import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fra
 import { maton } from '@/PaleGL/utilities/maton.ts';
 
 const CUBE_MAP_UNIFORM_NAME = 'cubeMap';
-const BASE_INTENSITY_UNIFORM_NAME = 'baseIntensity';
+const DIFFUSE_INTENSITY_UNIFORM_NAME = 'diffuseIntensity';
 const SPECULAR_INTENSITY_UNIFORM_NAME = 'specularIntensity';
 const ROTATION_OFFSET_UNIFORM_NAME = 'rotationOffset';
 const MAX_LOD_LEVEL_UNIFORM_NAME = 'maxLodLevel';
@@ -96,7 +96,7 @@ export function createSkyboxUniforms(): UniformsData {
             UNIFORM_TYPE_STRUCT,
             [
                 [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, null],
-                [BASE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
+                [DIFFUSE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
                 [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
                 [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
                 [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, 0],
@@ -108,7 +108,7 @@ export function createSkyboxUniforms(): UniformsData {
 export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
     setMaterialUniformValue(material, UNIFORM_NAME_SKYBOX, [
         [CUBE_MAP_UNIFORM_NAME, UNIFORM_TYPE_CUBE_MAP, skybox.cubeMap],
-        [BASE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],
+        [DIFFUSE_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],
         [SPECULAR_INTENSITY_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.specularIntensity],
         [ROTATION_OFFSET_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.rotationOffset],
         [MAX_LOD_LEVEL_UNIFORM_NAME, UNIFORM_TYPE_FLOAT, skybox.cubeMap.maxLodLevel],
