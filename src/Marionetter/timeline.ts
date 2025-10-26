@@ -80,6 +80,9 @@ import {
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
     MARIONETTER_ANIMATION_CLIP_START_INDEX,
     MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
+    MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX,
+    MarionetterClipInfoBase,
+    MARIONETTER_ANIMATION_CLIP_DURATION_INDEX,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -135,6 +138,13 @@ import {
 import { createVector4zero, setVector4Component, v4x, v4y, v4z, Vector4 } from '@/PaleGL/math/vector4.ts';
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
+
+export const destructureClipInfoBase = (clipInfoBase: MarionetterClipInfoBase) => {
+    const start = clipInfoBase[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = clipInfoBase[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const postExtrapolation = clipInfoBase[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+    return [start, duration, postExtrapolation];
+};
 
 /**
  *
@@ -227,25 +237,15 @@ export function buildMarionetterTimeline(
 
             const data = {
                 targetName,
-                // targetActors,
                 targetActor,
                 clips: marionetterClips,
-                // exec track
                 // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
                 execute: (args: MarionetterTimelineTrackExecuteArgs) => {
-                    // targetActors.forEach((targetActor) => {
                     const { time, scene } = args;
                     const clipAtTime = marionetterClips.find(
-                        // (clip) => clip.clipInfo.s <= time && time < clip.clipInfo.s + clip.clipInfo.d
                         ({ clipInfo }) => {
-                            // return isTimeInClip(
-                            //     time,
-                            //     clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START],
-                            //     clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START] +
-                            //         clip.clipInfo[MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION]
-                            // );}
-                            const start = clipInfo[1];
-                            const duration = clipInfo[2];
+                            const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+                            const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
                             return isTimeInClip(time, start, start + duration);
                         }
                     );
@@ -263,9 +263,6 @@ export function buildMarionetterTimeline(
                         MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
                     ) {
                         if (targetActor != null) {
-                            // const clipAtTime = marionetterClips.find(
-                            //     (clip) => clip.clipInfo.s < time && time < clip.clipInfo.s + clip.clipInfo.d
-                            // );
                             if (clipAtTime) {
                                 targetActor.enabled = true;
                             } else {
@@ -274,10 +271,6 @@ export function buildMarionetterTimeline(
                         }
                     } else {
                         if (targetActor != null) {
-                            // // tmp
-                            // for (let j = 0; j < marionetterClips.length; j++) {
-                            //     marionetterClips[j].execute({ actor: targetActor, time, scene });
-                            // }
                             clipAtTime?.execute({ actor: targetActor, time, scene });
                         }
                     }
@@ -434,6 +427,8 @@ function createMarionetterAnimationClip(
         // const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
         const start = animationClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+        const duration = animationClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+        const postExtrapolation = animationClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
         const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
         // // for debug
@@ -446,7 +441,7 @@ function createMarionetterAnimationClip(
             // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
             // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const [propertyName, keyframes] = binding;
-            const value = curveUtilityEvaluateCurve(time - start, keyframes);
+            const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
                 case PROPERTY_LOCAL_POSITION_X:
@@ -688,14 +683,16 @@ function createMarionetterLightControlClip(
         // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
         const start = lightControlClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+        const duration = lightControlClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
         const bindings = lightControlClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+        const postExtrapolation = lightControlClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
             // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
             // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const [propertyName, keyframes] = binding;
-            const value = curveUtilityEvaluateCurve(time - start, keyframes);
+            const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
                 case PROPERTY_COLOR_R:
@@ -815,14 +812,16 @@ function createMarionetterObjectMoveAndLookAtClip(
             // const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
             // const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
             const start = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+            const duration = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
             const bindings = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+            const postExtrapolation = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {
                 // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
                 // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
                 const [propertyName, keyframes] = binding;
-                const value = curveUtilityEvaluateCurve(time - start, keyframes);
+                const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
 
                 switch (propertyName) {
                     case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X:

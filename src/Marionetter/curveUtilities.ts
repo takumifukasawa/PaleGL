@@ -1,10 +1,12 @@
 import {
-    MarionetterAnimationClipKeyframe,
-    MarionetterCurveKeyframe,
-    MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME,
-    MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME,
+    MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE,
+    MarionetterAnimationClipKeyframe,
+    MarionetterCurveKeyframe,
 } from '@/Marionetter/types';
 
 /**
@@ -71,29 +73,29 @@ export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): Mario
         // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT]: keyframe[2],
         // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT]: keyframe[3],
         // // TODO: うまいことproperty名をまとめられるはず
-        ["time"]: keyframe[0],
-        ["value"]: keyframe[1],
-        ["inTangent"]: keyframe[2],
-        ["outTangent"]: keyframe[3],
+        ['time']: keyframe[0],
+        ['value']: keyframe[1],
+        ['inTangent']: keyframe[2],
+        ['outTangent']: keyframe[3],
         // shorten
-        ["t"]: keyframe[0],
-        ["v"]: keyframe[1],
-        ["i"]: keyframe[2],
-        ["o"]: keyframe[3],
+        ['t']: keyframe[0],
+        ['v']: keyframe[1],
+        ['i']: keyframe[2],
+        ['o']: keyframe[3],
     } as MarionetterCurveKeyframe;
 }
 
-/**
- *
- * @param t
- * @param keys
- */
-export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationClipKeyframe[]): number {
+export function curveUtilityEvaluateCurve(
+    t: number, // local t
+    duration: number,
+    keys: MarionetterAnimationClipKeyframe[],
+    postExtrapolation: MARIONETTER_CLIP_POST_EXTRAPORATION_MODE
+): number {
     // TODO: infinite前提の場合はt自体をclampしてもよいかもしれない
 
     const firstK = buildKeyframe(keys[0]);
     const lastK = buildKeyframe(keys[keys.length - 1]);
-    
+
     // for debug
     // console.log(`[curveUtilityEvaluateCurve] debug - keys.length: ${keys.length}, firstK.v: ${firstK["v"]}, lastK.v: ${lastK["v"]}, t: ${t}`, keys, firstK, lastK, MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE);
 
@@ -113,11 +115,17 @@ export function curveUtilityEvaluateCurve(t: number, keys: MarionetterAnimationC
         return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
 
+    // clip が最後のkeyを越していたとき
     if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
-        // console.log("hogehoge", t, lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]);
-        return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
+        // クリップ内でループ
+        if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
+            t = t % lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]
+        } else {
+            // デフォルト
+            return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
+        }
     }
-    
+
     // TODO: keyframeが多いとループ数が増えるのでtimeをbinarysearchかけるとよい
     for (let i = 0; i < keys.length - 1; i++) {
         const k0 = buildKeyframe(keys[i]);
