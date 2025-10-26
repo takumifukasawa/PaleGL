@@ -1,4 +1,5 @@
 import {
+    FragmentShaderModifiers,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_NAME_TARGET_HEIGHT,
     UNIFORM_NAME_TARGET_WIDTH,
@@ -6,7 +7,6 @@ import {
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
     UniformBlockName,
-
 } from '@/PaleGL/constants.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
@@ -22,7 +22,8 @@ export const createGraphicsDoubleBufferMaterial = (
     width: number,
     height: number,
     uniforms: UniformsData = [],
-    uniformBlockNames: UniformBlockName[] = []
+    uniformBlockNames: UniformBlockName[] = [],
+    fragmentShaderModifiers: FragmentShaderModifiers = []
 ) => {
     const appendUniforms: UniformsData = [
         [targetWidthUniformName, UNIFORM_TYPE_FLOAT, width],
@@ -58,5 +59,6 @@ export const createGraphicsDoubleBufferMaterial = (
             // },
         ],
         uniformBlockNames: [...uniformBlockNames, UNIFORM_BLOCK_NAME_COMMON],
+        fragmentShaderModifiers
     });
 };

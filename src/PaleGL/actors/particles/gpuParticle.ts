@@ -1,5 +1,8 @@
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
+    FragmentShaderModifiers,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
     UNIFORM_NAME_POSITION_MAP,
@@ -8,17 +11,14 @@ import {
     UNIFORM_NAME_VELOCITY_MAP,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2,
-
 } from '@/PaleGL/constants.ts';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
+import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
-import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 // import {
 //     createGraphicsDoubleBuffer,
 //     GraphicsDoubleBuffer,
 // } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
+import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
@@ -26,10 +26,9 @@ import {
     updateMRTDoubleBufferAndSwap,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 
 export type GPUParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
@@ -37,6 +36,8 @@ export type GPUParticleArgs = InstancingParticleArgs & {
     vatHeight: number;
     initializeFragmentShader: string;
     updateFragmentShader: string;
+    initializeFragmentModifiers?: FragmentShaderModifiers;
+    updateFragmentModifiers?: FragmentShaderModifiers;
 };
 
 export type GpuParticle = Mesh & { mrtDoubleBuffer: MRTDoubleBuffer };
@@ -82,6 +83,8 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         vatHeight,
         initializeFragmentShader,
         updateFragmentShader,
+        initializeFragmentModifiers,
+        updateFragmentModifiers,
     } = args;
 
     const gpuParticle = createInstancingParticle(args);
@@ -106,13 +109,17 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         initializeFragmentShader,
         vatWidth,
         vatHeight,
-        createUniforms()
+        createUniforms(),
+        [],
+        initializeFragmentModifiers
     );
     const materialForUpdate = createGraphicsDoubleBufferMaterial(
         updateFragmentShader,
         vatWidth,
         vatHeight,
-        createUniforms()
+        createUniforms(),
+        [],
+        updateFragmentModifiers
     );
 
     iterateAllMeshMaterials(gpuParticle, (mat) => {

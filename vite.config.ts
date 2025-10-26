@@ -141,6 +141,8 @@ export default defineConfig((config) => {
                         'uv',
                         'baseColor',
                         'emissiveColor',
+                        'outVelocity',
+                        'outPosition'
                         // 'resultColor'
                     ],
                 },

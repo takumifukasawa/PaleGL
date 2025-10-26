@@ -58,6 +58,11 @@ void main() {
         float dt = min(max(uDeltaTime, 1. / 120.), 1. / 60.);
         float speed = 2.;
         nextVelocity = force * speed * dt; // fallback time step
+
+        outVelocity = nextVelocity;
+        
+        #pragma GPU_PARTICLE_MODIFY_UPDATE
+        
         nextPosition = prevPosition + nextVelocity;
         vec3 front = normalize(nextVelocity);
         vec3 right = cross(front, normalize(prevUp));

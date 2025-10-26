@@ -18,6 +18,8 @@ void main(void) {
   outPosition = fRandomInSphere(fRand(coord)) * maxRadius;
   outUp = normalize(fRandomOnSphere(seed));
 
+  #pragma GPU_PARTICLE_MODIFY_INITIALIZE
+
   // for debug
   // ivec2 coord = ivec2(gl_FragCoord.xy);
   // outPosition = vec3(float(coord.y) * .2, 1., 0.);

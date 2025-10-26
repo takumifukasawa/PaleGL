@@ -37,14 +37,18 @@ void main() {
 
     vec3 force = fCurlNoise(prevPosition * .1) - prevVelocity;
     float dt = min(max(uDeltaTime, 1. / 120.), 1. / 60.); // fallbackdt
-    vec3 newVelocity = force * 1. * dt;
+    vec3 nextVelocity = force * 1. * dt;
     
-    vec3 newPosition = prevPosition + newVelocity;
+    outVelocity = nextVelocity;
+    
+    #pragma GPU_PARTICLE_MODIFY_UPDATE
+    
+    outPosition = prevPosition + outVelocity;
 
-    vec3 front = normalize(nextVelocity);
-    vec3 right = cross(front, normalize(prevUp));
-    vec3 nextUp = normalize(cross(right, front));
-    
-    outVelocity = newVelocity;
-    outPosition = newPosition;
+    // tmp
+    // vec3 front = normalize(outVelocity);
+    // vec3 right = cross(front, normalize(prevUp));
+    // vec3 nextUp = normalize(cross(right, front));
+    // outVelocity = nextVelocity;
+    // outPosition = nextPosition;
 }
