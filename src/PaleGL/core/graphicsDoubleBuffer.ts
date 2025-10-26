@@ -1,11 +1,11 @@
 import {
-    UniformBlockName,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_NAME_TARGET_HEIGHT,
     UNIFORM_NAME_TARGET_WIDTH,
     UNIFORM_NAME_TEXEL_SIZE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
+    UniformBlockName,
 
 } from '@/PaleGL/constants.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -24,6 +24,12 @@ export const createGraphicsDoubleBufferMaterial = (
     uniforms: UniformsData = [],
     uniformBlockNames: UniformBlockName[] = []
 ) => {
+    const appendUniforms: UniformsData = [
+        [targetWidthUniformName, UNIFORM_TYPE_FLOAT, width],
+        [targetHeightUniformName, UNIFORM_TYPE_FLOAT, height],
+        [texelSizeUniformName, UNIFORM_TYPE_VECTOR2, createVector2(1 / width, 1 / height)],
+    ];
+
     return createMaterial({
         vertexShader: baseVertexShader,
         fragmentShader,
@@ -34,22 +40,23 @@ export const createGraphicsDoubleBufferMaterial = (
             //     type: UNIFORM_TYPE_TEXTURE,
             //     value: null,
             // },
-            {
-                name: targetWidthUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: width,
-            },
-            {
-                name: targetHeightUniformName,
-                type: UNIFORM_TYPE_FLOAT,
-                value: height,
-            },
-            {
-                name: texelSizeUniformName,
-                type: UNIFORM_TYPE_VECTOR2,
-                value: createVector2(1 / width, 1 / height),
-            },
-        ] as UniformsData,
+            ...appendUniforms
+            // {
+            //     name: targetWidthUniformName,
+            //     type: UNIFORM_TYPE_FLOAT,
+            //     value: width,
+            // },
+            // {
+            //     name: targetHeightUniformName,
+            //     type: UNIFORM_TYPE_FLOAT,
+            //     value: height,
+            // },
+            // {
+            //     name: texelSizeUniformName,
+            //     type: UNIFORM_TYPE_VECTOR2,
+            //     value: createVector2(1 / width, 1 / height),
+            // },
+        ],
         uniformBlockNames: [...uniformBlockNames, UNIFORM_BLOCK_NAME_COMMON],
     });
 };

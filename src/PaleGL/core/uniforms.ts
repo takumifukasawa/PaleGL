@@ -1,27 +1,23 @@
+import {
+    UNIFORM_INDEX_VALUE,
+    UNIFORM_TYPE_STRUCT,
+    UNIFORM_TYPE_STRUCT_ARRAY,
+    UniformTypes,
+} from '@/PaleGL/constants.ts';
+import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
+import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
+import { Color } from '@/PaleGL/math/color.ts';
+import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
 import { Vector2 } from '@/PaleGL/math/vector2.ts';
 import { Vector3 } from '@/PaleGL/math/vector3.ts';
 import { Vector4 } from '@/PaleGL/math/vector4.ts';
-import { Matrix4 } from '@/PaleGL/math/matrix4.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
-import { CubeMap } from '@/PaleGL/core/cubeMap.ts';
-import { Color } from '@/PaleGL/math/color.ts';
-import {
-    UNIFORM_TYPE_STRUCT,
-    UNIFORM_TYPE_STRUCT_ARRAY,
-    UNIFORM_INDEX_VALUE,
-    UniformTypes
-} from '@/PaleGL/constants.ts';
-import { UniformBufferObject } from '@/PaleGL/core/uniformBufferObject.ts';
 
 //
 // uniform values
 //
 
-type UniformData = [
-    name: string,
-    type: UniformTypes,
-    value: UniformValue
-];
+type UniformData = [name: string, type: UniformTypes, value: UniformValue];
 
 export type UniformStructValue = UniformData[];
 
@@ -58,11 +54,7 @@ export type UniformsData = UniformData[];
 // uniform buffer object values
 //
 
-type UniformBufferObjectData = [
-    name: string,
-    type: UniformTypes,
-    value: UniformBufferObjectValue
-];
+type UniformBufferObjectData = [name: string, type: UniformTypes, value: UniformBufferObjectValue];
 
 export type UniformBufferObjectStructValue = UniformBufferObjectData[];
 
