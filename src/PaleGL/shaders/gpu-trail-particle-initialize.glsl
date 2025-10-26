@@ -11,7 +11,7 @@ layout (location = 2) out vec3 outUp;
 // uniform float uMaxRadius;
 
 void main(void) {
-  float maxRadius = 2.; // Set a maximum radius for the sphere
+  float maxRadius = 2.;
   outVelocity = vec3(0.); // Initial velocity
   vec2 coord = vec2(float(gl_FragCoord.x), float(gl_FragCoord.y));
   float seed = fRand(coord);

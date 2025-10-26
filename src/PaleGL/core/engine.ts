@@ -63,6 +63,7 @@ export type EngineOnBeforeFixedUpdateCallback = (args: EngineOnBeforeFixedUpdate
 export type EngineOnBeforeUpdateCallback = (args: EngineOnBeforeUpdateCallbackArgs) => void;
 export type EngineOnLastUpdateCallback = (args: EngineOnLastUpdateCallbackArgs) => void;
 
+export type EngineOnBeforeRender = (time: number, deltaTime: number) => void;
 export type EngineOnRenderCallback = (time: number, deltaTime: number) => void;
 
 export type EngineBase = {
@@ -76,6 +77,7 @@ export type EngineBase = {
     onBeforeUpdate: EngineOnBeforeUpdateCallback[];
     onBeforeFixedUpdate: EngineOnBeforeFixedUpdateCallback[];
     onLastUpdate: EngineOnLastUpdateCallback[];
+    onBeforeRender: EngineOnBeforeRender[];
     onRender: EngineOnRenderCallback[];
     // uiCamera: OrthographicCamera | null;
 };
@@ -117,6 +119,7 @@ export function createEngine({
         onBeforeUpdate: [],
         onBeforeFixedUpdate: [],
         onLastUpdate: [],
+        onBeforeRender: [],
         onRender: [],
         // uiCamera: null,
     };
@@ -311,10 +314,15 @@ function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
         clearStats(engine.stats);
     }
 
+    for (let i = 0; i < engine.onBeforeRender.length; i++) {
+        engine.onBeforeRender[i](time, deltaTime);
+    }
+
     beforeRenderRenderer(engine.renderer, time, deltaTime);
 
     renderSharedTextures(engine.renderer, engine.sharedTextures);
 
+    // 実際にrenderされる場所。rendererのrender自体は親から登録して呼ぶ
     for (let i = 0; i < engine.onRender.length; i++) {
         engine.onRender[i](time, deltaTime);
     }

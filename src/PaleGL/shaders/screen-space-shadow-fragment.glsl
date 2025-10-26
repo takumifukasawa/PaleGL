@@ -135,7 +135,7 @@ void main() {
     // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
     // TODO: point light count
     #pragma UNROLL_START 1
-        fCalcOcclusion(usPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
+        fCalcOcclusion(uPointLight[UNROLL_N], worldPosition, viewPosition, jitterOffset, occlusion);
     #pragma UNROLL_END
 
     occlusion *= uStrength;
