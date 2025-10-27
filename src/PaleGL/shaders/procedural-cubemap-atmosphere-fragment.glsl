@@ -10,6 +10,14 @@ out vec4 outColor;
 uniform int uFaceIndex;
 uniform vec3 uSunPosition;
 uniform float uSunIntensity;
+uniform float uPlanetRadius;
+uniform float uAtmosphereRadius;
+uniform vec3 uRayleighCoefficient;
+uniform float uMieCoefficient;
+uniform float uRayleighScaleHeight;
+uniform float uMieScaleHeight;
+uniform float uMieScatteringDirection;
+uniform float uCameraAltitude;
 
 layout (std140) uniform ubCommon {
     float uTime;
@@ -156,31 +164,22 @@ vec3 atmosphere(vec3 r, vec3 r0, vec3 pSun, float iSun, float rPlanet, float rAt
 void main() {
     vec3 dir = getCubemapDirection(vUv, uFaceIndex);
 
-    // Earth parameters
-    float rPlanet = 6371e3;      // Planet radius (meters)
-    float rAtmos = 6471e3;       // Atmosphere radius (meters)
-    vec3 kRlh = vec3(5.5e-6, 13.0e-6, 22.4e-6); // Rayleigh scattering coefficient
-    float kMie = 21e-6;          // Mie scattering coefficient
-    float shRlh = 8e3;           // Rayleigh scale height (meters)
-    float shMie = 1.2e3;         // Mie scale height (meters)
-    float g = 0.758;             // Mie preferred scattering direction
-
-    // Camera position (on surface + 100m)
-    vec3 r0 = vec3(0.0, rPlanet + 100.0, 0.0);
+    // Camera position (on surface + altitude)
+    vec3 r0 = vec3(0.0, uPlanetRadius + uCameraAltitude, 0.0);
 
     // Calculate atmospheric color
     vec3 color = atmosphere(
-        dir,                     // ray direction
-        r0,                      // ray origin
-        uSunPosition,            // sun position
-        uSunIntensity,           // sun intensity
-        rPlanet,                 // planet radius
-        rAtmos,                  // atmosphere radius
-        kRlh,                    // Rayleigh coefficient
-        kMie,                    // Mie coefficient
-        shRlh,                   // Rayleigh scale height
-        shMie,                   // Mie scale height
-        g                        // Mie scattering direction
+        dir,                        // ray direction
+        r0,                         // ray origin
+        uSunPosition,               // sun position
+        uSunIntensity,              // sun intensity
+        uPlanetRadius,              // planet radius
+        uAtmosphereRadius,          // atmosphere radius
+        uRayleighCoefficient,       // Rayleigh coefficient
+        uMieCoefficient,            // Mie coefficient
+        uRayleighScaleHeight,       // Rayleigh scale height
+        uMieScaleHeight,            // Mie scale height
+        uMieScatteringDirection     // Mie scattering direction
     );
 
     outColor = vec4(color, 1.0);
