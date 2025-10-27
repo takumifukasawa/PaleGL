@@ -8,8 +8,9 @@ import {
     type CubeMapUpdateContext,
 } from '@/PaleGL/core/proceduralCubeMap.ts';
 import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
-import { UNIFORM_NAME_CUBE_TEXTURE } from '@/PaleGL/constants.ts';
+import { setUniformValue, type UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_VECTOR3, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
+import proceduralCubeMapAtmosphereFragmentShader from '@/PaleGL/shaders/procedural-cubemap-atmosphere-fragment.glsl';
 
 export type ProceduralSkyboxOptions = {
     gpu: Gpu;
@@ -19,6 +20,8 @@ export type ProceduralSkyboxOptions = {
     specularIntensity?: number;
     rotationOffset?: number;
     fragmentShader?: string;
+    sunPosition?: [number, number, number];
+    sunIntensity?: number;
 };
 
 export function createProceduralSkybox({
@@ -28,7 +31,9 @@ export function createProceduralSkybox({
     baseIntensity = 0.2,
     specularIntensity = 0.2,
     rotationOffset = 0,
-    fragmentShader,
+    fragmentShader = proceduralCubeMapAtmosphereFragmentShader,
+    sunPosition = [1, 1, 0],
+    sunIntensity = 22.0,
 }: ProceduralSkyboxOptions): Skybox {
     let cubeMap: CubeMap;
     let cubeMapUpdateContext: CubeMapUpdateContext | null = null;
@@ -45,12 +50,19 @@ export function createProceduralSkybox({
 
     // onStartでcubemapを生成
     subscribeActorOnStart(skyboxMesh, ({ renderer }) => {
-        const result = createProceduralCubeMap(renderer, size, updateInterval, fragmentShader);
+        // Prepare additional uniforms for atmosphere shader
+        const additionalUniforms: UniformsData = [
+            ['uSunPosition', UNIFORM_TYPE_VECTOR3, sunPosition],
+            ['uSunIntensity', UNIFORM_TYPE_FLOAT, sunIntensity],
+        ];
+
+        const result = createProceduralCubeMap(renderer, size, updateInterval, fragmentShader, additionalUniforms);
         cubeMap = result.cubeMap;
         cubeMapUpdateContext = result.updateContext;
 
         skyboxMesh.cubeMap = cubeMap;
 
+        // Set cubemap uniform
         setUniformValue(skyboxMesh.materials[0].uniforms, UNIFORM_NAME_CUBE_TEXTURE, cubeMap);
 
         tryStartMaterial(gpu, renderer, skyboxMesh.geometry, skyboxMesh.materials[0]);

@@ -39,7 +39,8 @@ export function createProceduralCubeMap(
     renderer: Renderer,
     size: number = 256,
     updateInterval: number = 2,
-    fragmentShader: string = proceduralCubeMapFragmentShader
+    fragmentShader: string = proceduralCubeMapFragmentShader,
+    additionalUniforms: UniformsData = []
 ): CubeMapWithUpdateContext {
     const { gpu } = renderer;
     const gl = gpu.gl;
@@ -50,7 +51,7 @@ export function createProceduralCubeMap(
 
     const planeGeometry = createPlaneGeometry({ gpu });
 
-    const uniforms: UniformsData = [['uFaceIndex', UNIFORM_TYPE_INT, 0]];
+    const uniforms: UniformsData = [['uFaceIndex', UNIFORM_TYPE_INT, 0], ...additionalUniforms];
 
     const material = createMaterial({
         vertexShader: proceduralCubeMapVertexShader,
