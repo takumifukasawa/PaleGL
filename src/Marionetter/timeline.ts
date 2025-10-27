@@ -23,11 +23,38 @@ import {
 import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
 import {
+    MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
+    MARIONETTER_ANIMATION_CLIP_DURATION_INDEX,
+    MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX,
+    MARIONETTER_ANIMATION_CLIP_START_INDEX,
+    MARIONETTER_CLIP_INFO_TYPE_ACTIVATION_CONTROL_CLIP,
+    MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP,
+    MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP,
+    MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
+    MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
+    MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
+    MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
+    MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS,
+    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME,
+    MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
+    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
+    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
+    MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME,
+    MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME,
+    MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE,
+    MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK,
+    MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK,
     MarionetterActivationControlClip,
     MarionetterActivationControlClipInfo,
     MarionetterAnimationClip,
     MarionetterAnimationClipInfo,
     MarionetterClipArgs,
+    MarionetterClipInfoBase,
     MarionetterClipInfoKinds,
     MarionetterClipKinds,
     MarionetterDefaultTrackInfo,
@@ -37,10 +64,6 @@ import {
     MarionetterObjectMoveAndLookAtClip,
     MarionetterObjectMoveAndLookAtClipInfo,
     MarionetterPlayableDirectorComponentInfo,
-    // MarionetterPostProcessBloom,
-    // MarionetterPostProcessDepthOfField,
-    // MarionetterPostProcessVignette,
-    // MarionetterPostProcessVolumetricLight,
     MarionetterSignalEmitter,
     MarionetterTimeline,
     MarionetterTimelineDefaultTrack,
@@ -48,41 +71,6 @@ import {
     MarionetterTimelineSignalEmitter,
     MarionetterTimelineTrackExecuteArgs,
     MarionetterTimelineTrackKinds,
-    // MarionetterAnimationClipType,
-    MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK,
-    MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK,
-    MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP,
-    MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP,
-    MARIONETTER_CLIP_INFO_TYPE_ACTIVATION_CONTROL_CLIP,
-    MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
-    MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
-    MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
-    MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
-    MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
-    MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE,
-    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME,
-    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS,
-    MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS,
-    MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME,
-    MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME,
-    // MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE,
-    // MARIONETTER_CLIP_INFO_BASE_PROPERTY_START,
-    // MARIONETTER_CLIP_INFO_BASE_PROPERTY_DURATION,
-    // MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS,
-    // MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS,
-    // MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
-    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
-    // MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME,
-    // MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES,
-    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
-    MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
-    MARIONETTER_ANIMATION_CLIP_START_INDEX,
-    MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
-    MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX,
-    MarionetterClipInfoBase,
-    MARIONETTER_ANIMATION_CLIP_DURATION_INDEX,
 } from '@/Marionetter/types';
 import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
@@ -242,13 +230,36 @@ export function buildMarionetterTimeline(
                 // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
                 execute: (args: MarionetterTimelineTrackExecuteArgs) => {
                     const { time, scene } = args;
-                    const clipAtTime = marionetterClips.find(
-                        ({ clipInfo }) => {
-                            const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-                            const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-                            return isTimeInClip(time, start, start + duration);
+                    let beforeClipAtTime: MarionetterClipKinds | null = null;
+                    let clipAtTime: MarionetterClipKinds | null = null;
+                    for (let i = 0; i < marionetterClips.length; i++) {
+                        const { clipInfo } = marionetterClips[i];
+                        const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+                        const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+                        // その時間再生すべきclipがあったら
+                        if (isTimeInClip(time, start, start + duration)) {
+                            clipAtTime = marionetterClips[i];
+                            break;
                         }
-                    );
+
+                        if (time > start + duration) {
+                            beforeClipAtTime = marionetterClips[i];
+                        }
+                    }
+
+                    // 現在時刻にclipはないが直前にclipがある場合
+                    // 直前のclipが終了後にloopだったら直前のclipを再生
+                    if (beforeClipAtTime && !clipAtTime && isLoopClipPostExtrapolate(beforeClipAtTime)) {
+                        clipAtTime = beforeClipAtTime;
+                    }
+
+                    // const clipAtTime = marionetterClips.find(
+                    //     ({ clipInfo }) => {
+                    //         const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+                    //         const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+                    //         return isTimeInClip(time, start, start + duration);
+                    //     }
+                    // );
 
                     // NOTE: 渡されるtimeそのものがframeTimeになった
                     // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
@@ -262,7 +273,7 @@ export function buildMarionetterTimeline(
                         track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
                         MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
                     ) {
-                        if (targetActor != null) {
+                        if (targetActor) {
                             if (clipAtTime) {
                                 targetActor.enabled = true;
                             } else {
@@ -270,8 +281,10 @@ export function buildMarionetterTimeline(
                             }
                         }
                     } else {
-                        if (targetActor != null) {
-                            clipAtTime?.execute({ actor: targetActor, time, scene });
+                        if (targetActor && clipAtTime) {
+                            const clipTime = isLoopClipPostExtrapolate(clipAtTime) ? time : time;
+                            // clipAtTime.execute({ actor: targetActor, time: clipTime, scene });
+                            clipAtTime.execute({ actor: targetActor, time, scene });
                         }
                     }
 
@@ -333,6 +346,13 @@ export function buildMarionetterTimeline(
     // return { tracks, execute, bindActor };
     return { tracks, execute, bindActors, duration: d };
 }
+
+const isLoopClipPostExtrapolate = (clip: MarionetterClipKinds) => {
+    return (
+        clip.clipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX] ===
+        MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP
+    );
+};
 
 /**
  *
@@ -856,28 +876,28 @@ function createMarionetterObjectMoveAndLookAtClip(
 //         clipInfo: humanClip,
 //         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
 //             const { actor, time, scene } = args;
-// 
+//
 //             // let hasLocalPosition: boolean = false;
 //             // let hasLocalRotationEuler: boolean = false;
 //             // let hasLocalScale: boolean = false;
 //             // const localPosition: Vector3 = Vector3.zero;
 //             // const localRotationEulerDegree: Vector3 = Vector3.zero;
 //             // const localScale: Vector3 = Vector3.one;
-// 
+//
 //             // const start = animationClip.s;
 //             // const bindings = animationClip.b;
-// 
+//
 //             const leftShoulderRotationEulerDegree: Vector3 = createVector3Zero();
-// 
+//
 //             const start = humanClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
 //             const bindings = humanClip[MarionetterHumanClipInfoProperty.bindings];
-//             
+//
 //             // TODO: typeがあった方がよい. ex) animation clip, light control clip
 //             bindings.forEach((binding) => {
 //                 const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
 //                 const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
 //                 const value = curveUtilityEvaluateCurve(time - start, keyframes);
-// 
+//
 //                 switch (propertyName) {
 //                     case MarionetterHumanClipInfoProperty.leftShoulderRotationX:
 //                         setV3x(leftShoulderRotationEulerDegree, value);
@@ -893,7 +913,7 @@ function createMarionetterObjectMoveAndLookAtClip(
 //                         console.error(`[createMarionetterHumanClip] invalid declared property: ${propertyName}`);
 //                 }
 //             });
-// 
+//
 //             const component = getActorComponent<HumanController>(actor);
 //             if (component) {
 //                 const [, behaviour] = component;
