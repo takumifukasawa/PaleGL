@@ -53,13 +53,25 @@ export const shaderIdentifierReplacementPlugin = (
 
     const identifierMap = new Map<string, string>(); // 元の名前 → 短縮名
     const existingIdentifiers = new Set<string>(); // 既存の識別子（衝突回避用）
+    let isDevMode = false; // 開発モードかどうか
 
     return {
         name: 'shader-identifier-replacement',
         // enforceを指定しない（デフォルトのタイミングで実行）
         // transform()はnormalタイミングで実行され、HMR時も正しく動作する
 
+        configResolved(config) {
+            isDevMode = config.command === 'serve';
+            if (isDevMode) {
+                console.log('[shader-identifier] Dev mode: per-file analysis enabled (no global cache)');
+            }
+        },
+
         async buildStart() {
+            if (isDevMode) {
+                console.log('[shader-identifier] Dev mode: skipping global buildStart analysis');
+                return;
+            }
             console.log('[shader-identifier] Starting identifier collection...');
 
             try {
@@ -204,35 +216,13 @@ export const shaderIdentifierReplacementPlugin = (
         },
 
         transform(code: string, id: string) {
-            if (identifierMap.size === 0) {
+            if (isDevMode) {
+                // 開発時: 識別子置換を無効化（ファイル単位では #include 後の衝突を防げないため）
                 return null;
+            } else {
+                // ビルド時: グローバルマッピング使用（既存の処理）
+                return transformInBuildMode(code, id, identifierMap, verbose);
             }
-
-            // GLSLファイル: vite-plugin-glslが#includeを処理した後に置換
-            if (id.endsWith('.glsl')) {
-                const result = replaceInGlsl(code, identifierMap);
-                if (result !== code) {
-                    if (verbose) {
-                        console.log(`[shader-identifier] Replaced uniforms in GLSL (transform): ${path.basename(id)}`);
-                    }
-                    return { code: result, map: null };
-                }
-                return null;
-            }
-
-            // TypeScript/JavaScriptファイル: 文字列リテラルのみ置換
-            if (id.endsWith('.ts') || id.endsWith('.js')) {
-                const result = replaceInTypeScript(code, identifierMap);
-                if (result !== code) {
-                    if (verbose) {
-                        console.log(`[shader-identifier] Replaced string literals in ${path.basename(id)}`);
-                    }
-                    return { code: result, map: null };
-                }
-                return null;
-            }
-
-            return null;
         },
     };
 };
@@ -564,4 +554,233 @@ function replaceInTypeScript(code: string, map: Map<string, string>): string {
     });
 
     return result;
+}
+
+/**
+ * ビルド時: グローバルマッピング使用（既存の処理）
+ */
+function transformInBuildMode(
+    code: string,
+    id: string,
+    identifierMap: Map<string, string>,
+    verbose: boolean
+): { code: string; map: null } | null {
+    if (identifierMap.size === 0) {
+        return null;
+    }
+
+    // GLSLファイル: vite-plugin-glslが#includeを処理した後に置換
+    if (id.endsWith('.glsl')) {
+        const result = replaceInGlsl(code, identifierMap);
+        if (result !== code) {
+            if (verbose) {
+                console.log(`[shader-identifier] Replaced uniforms in GLSL (transform): ${path.basename(id)}`);
+            }
+            return { code: result, map: null };
+        }
+        return null;
+    }
+
+    // TypeScript/JavaScriptファイル: 文字列リテラルのみ置換
+    if (id.endsWith('.ts') || id.endsWith('.js')) {
+        const result = replaceInTypeScript(code, identifierMap);
+        if (result !== code) {
+            if (verbose) {
+                console.log(`[shader-identifier] Replaced string literals in ${path.basename(id)}`);
+            }
+            return { code: result, map: null };
+        }
+        return null;
+    }
+
+    return null;
+}
+
+/**
+ * 開発時: ファイル単位で独立して識別子を収集・置換（キャッシュなし）
+ */
+function transformInDevMode(
+    code: string,
+    id: string,
+    options: ShaderIdentifierReplacementOptions
+): { code: string; map: null } | null {
+    const {
+        includeUniforms = true,
+        includeVaryings = false,
+        includeAttributes = false,
+        includeStructs = false,
+        includeFunctions = false,
+        includeOutputs = false,
+        includeStructMembers = false,
+        structMemberIncludePattern,
+        structMemberExcludePattern,
+    } = options;
+
+    // GLSLファイル
+    if (id.endsWith('.glsl')) {
+        const localMap = new Map<string, string>();
+        const localExisting = new Set<string>();
+
+        // このファイル内の識別子を収集
+        const identifiers: IdentifierInfo[] = [];
+
+        if (includeUniforms) {
+            const uniforms = collectIdentifiers(
+                code,
+                /\buniform\s+\w+(?:\[[^\]]*\])?\s+(u[A-Z]\w+)\b/g,
+                'uniform'
+            );
+            const uboUniforms = collectUBOIdentifiers(code);
+            identifiers.push(...uniforms, ...uboUniforms);
+        }
+
+        if (includeVaryings) {
+            const varyings = collectIdentifiers(code, /\b(?:varying|in|out)\s+\w+\s+(v[A-Z]\w+)\b/g, 'varying');
+            identifiers.push(...varyings);
+        }
+
+        if (includeAttributes) {
+            const attributesFromGLSL = collectIdentifiers(code, /\b(?:attribute|in)\s+\w+\s+(a[A-Z]\w+)\b/g, 'attribute');
+            identifiers.push(...attributesFromGLSL);
+        }
+
+        // 開発時は struct/function の置換をスキップ（型参照の追跡が複雑なため）
+        // if (includeStructs) {
+        //     const structs = collectIdentifiers(code, /struct\s+(s[A-Z]\w+)/g, 'struct');
+        //     identifiers.push(...structs);
+        // }
+
+        // if (includeFunctions) {
+        //     const functions = collectIdentifiers(
+        //         code,
+        //         /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void|s[A-Z]\w+)\s+(f[A-Z]\w+)\s*\(/g,
+        //         'function'
+        //     );
+        //     identifiers.push(...functions);
+        // }
+
+        // if (includeStructMembers) {
+        //     const structMembers = collectStructMembers(code, structMemberIncludePattern, structMemberExcludePattern);
+        //     identifiers.push(...structMembers);
+        // }
+
+        // if (includeOutputs) {
+        //     const outputs = collectIdentifiers(
+        //         code,
+        //         /layout\s*\([^)]*\)\s*out\s+\w+\s+(out[A-Z]\w+)/g,
+        //         'output'
+        //     );
+        //     identifiers.push(...outputs);
+        // }
+
+        if (identifiers.length === 0) {
+            return null;
+        }
+
+        // ローカルマッピング生成（衝突チェック最小限）
+        collectExistingIdentifiers(code, localExisting);
+        generateMappings(identifiers, localMap, localExisting, false);
+
+        // 置換
+        const result = replaceInGlsl(code, localMap);
+        return result !== code ? { code: result, map: null } : null;
+    }
+
+    // TypeScript/JavaScriptファイル
+    if (id.endsWith('.ts') || id.endsWith('.js')) {
+        // 文字列リテラル内のGLSLコードから識別子を収集
+        const glslBlocks = extractGlslFromTemplateStrings(code);
+        if (glslBlocks.length === 0) {
+            return null;
+        }
+
+        const localMap = new Map<string, string>();
+        const localExisting = new Set<string>();
+        const identifiers: IdentifierInfo[] = [];
+
+        // 各GLSLブロックから識別子を収集
+        for (const glslCode of glslBlocks) {
+            if (includeUniforms) {
+                const uniforms = collectIdentifiers(
+                    glslCode,
+                    /\buniform\s+\w+(?:\[[^\]]*\])?\s+(u[A-Z]\w+)\b/g,
+                    'uniform'
+                );
+                const uboUniforms = collectUBOIdentifiers(glslCode);
+                identifiers.push(...uniforms, ...uboUniforms);
+            }
+
+            if (includeVaryings) {
+                const varyings = collectIdentifiers(
+                    glslCode,
+                    /\b(?:varying|in|out)\s+\w+\s+(v[A-Z]\w+)\b/g,
+                    'varying'
+                );
+                identifiers.push(...varyings);
+            }
+
+            // 開発時は struct/function の置換をスキップ（型参照の追跡が複雑なため）
+            // if (includeStructs) {
+            //     const structs = collectIdentifiers(glslCode, /struct\s+(s[A-Z]\w+)/g, 'struct');
+            //     identifiers.push(...structs);
+            // }
+
+            // if (includeFunctions) {
+            //     const functions = collectIdentifiers(
+            //         glslCode,
+            //         /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void|s[A-Z]\w+)\s+(f[A-Z]\w+)\s*\(/g,
+            //         'function'
+            //     );
+            //     identifiers.push(...functions);
+            // }
+
+            // if (includeStructMembers) {
+            //     const structMembers = collectStructMembers(
+            //         glslCode,
+            //         structMemberIncludePattern,
+            //         structMemberExcludePattern
+            //     );
+            //     identifiers.push(...structMembers);
+            // }
+        }
+
+        if (identifiers.length === 0) {
+            return null;
+        }
+
+        collectExistingIdentifiers(code, localExisting);
+        generateMappings(identifiers, localMap, localExisting, false);
+
+        const result = replaceInTypeScript(code, localMap);
+        return result !== code ? { code: result, map: null } : null;
+    }
+
+    return null;
+}
+
+/**
+ * テンプレート文字列からGLSLコードっぽいブロックを抽出
+ */
+function extractGlslFromTemplateStrings(code: string): string[] {
+    const results: string[] = [];
+    const templateLiteralRegex = /`([^`]*)`/gs;
+
+    for (const match of code.matchAll(templateLiteralRegex)) {
+        const content = match[1];
+        // GLSLコードっぽいかチェック
+        if (
+            content.includes('uniform') ||
+            content.includes('vec') ||
+            content.includes('float') ||
+            content.includes('sampler') ||
+            content.includes('out ') ||
+            content.includes('in ') ||
+            content.includes('varying') ||
+            content.includes('attribute')
+        ) {
+            results.push(content);
+        }
+    }
+
+    return results;
 }
