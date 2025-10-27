@@ -69,160 +69,51 @@ export const shaderIdentifierReplacementPlugin = (
 
         async buildStart() {
             if (isDevMode) {
-                console.log('[shader-identifier] Dev mode: skipping global buildStart analysis');
+                console.log('[shader-identifier] Dev mode: building initial identifier map (will rebuild on file changes)');
+            } else {
+                console.log('[shader-identifier] Build mode: starting identifier collection...');
+            }
+
+            await buildIdentifierMap(identifierMap, existingIdentifiers, options, verbose);
+        },
+
+        configureServer(server) {
+            if (!isDevMode) {
                 return;
             }
-            console.log('[shader-identifier] Starting identifier collection...');
 
-            try {
-                // 全GLSLファイルのパスを取得（PaleGLとsrc/pages両方）
-                const glslFiles = await glob('{PaleGL/src,src}/**/*.glsl', {
-                    cwd: process.cwd(),
-                    absolute: true,
-                });
+            let rebuildTimer: NodeJS.Timeout | null = null;
 
-                // TypeScriptファイルも取得（シェーダーソースが直接埋め込まれている可能性）
-                const tsFiles = await glob('{PaleGL/src,src}/**/*.ts', {
-                    cwd: process.cwd(),
-                    absolute: true,
-                });
-
-                console.log(`[shader-identifier] Found ${glslFiles.length} GLSL files`);
-                console.log(`[shader-identifier] Found ${tsFiles.length} TypeScript files`);
-
-                // 既存の識別子を収集（衝突回避用）
-                const allContent = [...glslFiles, ...tsFiles]
-                    .map((file) => fs.readFileSync(file, 'utf-8'))
-                    .join('\n');
-
-                collectExistingIdentifiers(allContent, existingIdentifiers);
-                console.log(`[shader-identifier] Collected ${existingIdentifiers.size} existing identifiers`);
-
-                // uniform/varying/attributeを収集
-                const identifiers: IdentifierInfo[] = [];
-
-                if (includeUniforms) {
-                    // 通常のuniform宣言（uniform 型 名前 および uniform 型[サイズ] 名前 の両方に対応）
-                    const uniforms = collectIdentifiers(allContent, /\buniform\s+\w+(?:\[[^\]]*\])?\s+(u[A-Z]\w+)\b/g, 'uniform');
-                    identifiers.push(...uniforms);
-                    console.log(`[shader-identifier] Found ${uniforms.length} regular uniforms`);
-
-                    // UBO内のuniform
-                    const uboUniforms = collectUBOIdentifiers(allContent);
-                    identifiers.push(...uboUniforms);
-                    console.log(`[shader-identifier] Found ${uboUniforms.length} UBO uniforms`);
-
-                    console.log(`[shader-identifier] Total uniforms: ${uniforms.length + uboUniforms.length}`);
+            server.watcher.on('change', async (filePath) => {
+                // .glsl または .ts/.js ファイルの変更を検知
+                if (!filePath.endsWith('.glsl') && !filePath.endsWith('.ts') && !filePath.endsWith('.js')) {
+                    return;
                 }
 
-                if (includeVaryings) {
-                    const varyings = collectIdentifiers(allContent, /\b(?:varying|in|out)\s+\w+\s+(v[A-Z]\w+)\b/g, 'varying');
-                    identifiers.push(...varyings);
-                    console.log(`[shader-identifier] Found ${varyings.length} varyings`);
+                // デバウンス（100ms以内の連続変更は1回にまとめる）
+                if (rebuildTimer) {
+                    clearTimeout(rebuildTimer);
                 }
 
-                if (includeAttributes) {
-                    // GLSL定義から検出（念のため残す）
-                    const attributesFromGLSL = collectIdentifiers(allContent, /\b(?:attribute|in)\s+\w+\s+(a[A-Z]\w+)\b/g, 'attribute');
+                rebuildTimer = setTimeout(async () => {
+                    console.log('[shader-identifier] File changed, rebuilding identifier map...');
+                    await buildIdentifierMap(identifierMap, existingIdentifiers, options, verbose);
+                    console.log(`[shader-identifier] Rebuilt: ${identifierMap.size} mappings`);
 
-                    // TypeScript文字列リテラルから検出
-                    const attributesFromStrings = collectIdentifiers(allContent, /['"`](a[A-Z]\w+)['"`]/g, 'attribute');
-
-                    // 重複を除いてマージ
-                    const attributeMap = new Map<string, IdentifierInfo>();
-                    for (const attr of [...attributesFromGLSL, ...attributesFromStrings]) {
-                        if (attributeMap.has(attr.name)) {
-                            // 既存のcountに加算
-                            const existing = attributeMap.get(attr.name)!;
-                            existing.count += attr.count;
-                            existing.savings = existing.count * (existing.length - 2);
-                        } else {
-                            attributeMap.set(attr.name, attr);
+                    // モジュールグラフを無効化して再ロードを促す
+                    const modules = server.moduleGraph.getModulesByFile(filePath);
+                    if (modules) {
+                        for (const mod of modules) {
+                            server.moduleGraph.invalidateModule(mod);
                         }
                     }
-                    const attributes = Array.from(attributeMap.values());
-
-                    identifiers.push(...attributes);
-                    console.log(`[shader-identifier] Found ${attributes.length} attributes (${attributesFromGLSL.length} from GLSL, ${attributesFromStrings.length} from strings)`);
-                }
-
-                if (includeStructs) {
-                    const structs = collectIdentifiers(allContent, /struct\s+(s[A-Z]\w+)/g, 'struct');
-                    identifiers.push(...structs);
-                    console.log(`[shader-identifier] Found ${structs.length} structs`);
-                }
-
-                if (includeFunctions) {
-                    // 組み込み型とカスタム構造体（s[A-Z]\w+）を返す関数を検出
-                    const functions = collectIdentifiers(allContent, /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void|s[A-Z]\w+)\s+(f[A-Z]\w+)\s*\(/g, 'function');
-                    identifiers.push(...functions);
-                    console.log(`[shader-identifier] Found ${functions.length} functions`);
-                }
-
-                if (includeStructMembers) {
-                    const structMembers = collectStructMembers(
-                        allContent,
-                        structMemberIncludePattern,
-                        structMemberExcludePattern
-                    );
-                    identifiers.push(...structMembers);
-                    console.log(`[shader-identifier] Found ${structMembers.length} struct members`);
-                }
-
-                if (includeOutputs) {
-                    // GLSL output変数を検出（layout (location = N) out 型 out[A-Z]\w+）
-                    const outputs = collectIdentifiers(allContent, /layout\s*\([^)]*\)\s*out\s+\w+\s+(out[A-Z]\w+)/g, 'output');
-                    identifiers.push(...outputs);
-                    console.log(`[shader-identifier] Found ${outputs.length} output variables`);
-                }
-
-                // 優先順位付け（削減効果の高い順）
-                identifiers.sort((a, b) => b.savings - a.savings || b.length - a.length);
-
-                // マッピング生成（衝突回避）
-                generateMappings(identifiers, identifierMap, existingIdentifiers, verbose);
-
-                console.log(`[shader-identifier] Generated ${identifierMap.size} mappings`);
-
-                if (verbose && identifierMap.size > 0) {
-                    const totalSavings = Array.from(identifierMap.entries()).reduce((sum, [oldName]) => {
-                        const info = identifiers.find(i => i.name === oldName);
-                        return sum + (info?.savings || 0);
-                    }, 0);
-                    console.log(`[shader-identifier] Estimated savings: ${totalSavings} bytes`);
-                }
-
-                // デバッグ: 検出したuniformリストをファイルに保存
-                const uniformList = identifiers
-                    .filter(i => i.type === 'uniform')
-                    .map(i => ({
-                        name: i.name,
-                        count: i.count,
-                        savings: i.savings,
-                        newName: identifierMap.get(i.name)
-                    }));
-                const tmpDir = path.join(process.cwd(), 'tmp');
-                if (!fs.existsSync(tmpDir)) {
-                    fs.mkdirSync(tmpDir, { recursive: true });
-                }
-                fs.writeFileSync(
-                    path.join(tmpDir, 'vite-plugin-uniforms.json'),
-                    JSON.stringify(uniformList, null, 2)
-                );
-                console.log(`[shader-identifier] Saved uniform list to tmp/vite-plugin-uniforms.json (${uniformList.length} uniforms)`);
-            } catch (error) {
-                console.error('[shader-identifier] Error during buildStart:', error);
-            }
+                }, 100);
+            });
         },
 
         transform(code: string, id: string) {
-            if (isDevMode) {
-                // 開発時: 識別子置換を無効化（ファイル単位では #include 後の衝突を防げないため）
-                return null;
-            } else {
-                // ビルド時: グローバルマッピング使用（既存の処理）
-                return transformInBuildMode(code, id, identifierMap, verbose);
-            }
+            // 開発時もビルド時も同じ処理（グローバルマッピング使用）
+            return transformInBuildMode(code, id, identifierMap, verbose);
         },
     };
 };
@@ -783,4 +674,188 @@ function extractGlslFromTemplateStrings(code: string): string[] {
     }
 
     return results;
+}
+
+/**
+ * identifierMap を構築（全ファイルを走査して識別子を収集・マッピング生成）
+ */
+async function buildIdentifierMap(
+    identifierMap: Map<string, string>,
+    existingIdentifiers: Set<string>,
+    options: ShaderIdentifierReplacementOptions,
+    verbose: boolean
+): Promise<void> {
+    identifierMap.clear();
+    existingIdentifiers.clear();
+
+    const {
+        includeUniforms = true,
+        includeVaryings = false,
+        includeAttributes = false,
+        includeStructs = false,
+        includeFunctions = false,
+        includeOutputs = false,
+        includeStructMembers = false,
+        structMemberIncludePattern,
+        structMemberExcludePattern,
+    } = options;
+
+    try {
+        // 全GLSLファイルのパスを取得（PaleGLとsrc/pages両方）
+        const glslFiles = await glob('{PaleGL/src,src}/**/*.glsl', {
+            cwd: process.cwd(),
+            absolute: true,
+        });
+
+        // TypeScriptファイルも取得（シェーダーソースが直接埋め込まれている可能性）
+        const tsFiles = await glob('{PaleGL/src,src}/**/*.ts', {
+            cwd: process.cwd(),
+            absolute: true,
+        });
+
+        console.log(`[shader-identifier] Found ${glslFiles.length} GLSL files`);
+        console.log(`[shader-identifier] Found ${tsFiles.length} TypeScript files`);
+
+        // 既存の識別子を収集（衝突回避用）
+        const allContent = [...glslFiles, ...tsFiles].map((file) => fs.readFileSync(file, 'utf-8')).join('\n');
+
+        collectExistingIdentifiers(allContent, existingIdentifiers);
+        console.log(`[shader-identifier] Collected ${existingIdentifiers.size} existing identifiers`);
+
+        // uniform/varying/attributeを収集
+        const identifiers: IdentifierInfo[] = [];
+
+        if (includeUniforms) {
+            // 通常のuniform宣言（uniform 型 名前 および uniform 型[サイズ] 名前 の両方に対応）
+            const uniforms = collectIdentifiers(
+                allContent,
+                /\buniform\s+\w+(?:\[[^\]]*\])?\s+(u[A-Z]\w+)\b/g,
+                'uniform'
+            );
+            identifiers.push(...uniforms);
+            console.log(`[shader-identifier] Found ${uniforms.length} regular uniforms`);
+
+            // UBO内のuniform
+            const uboUniforms = collectUBOIdentifiers(allContent);
+            identifiers.push(...uboUniforms);
+            console.log(`[shader-identifier] Found ${uboUniforms.length} UBO uniforms`);
+
+            console.log(`[shader-identifier] Total uniforms: ${uniforms.length + uboUniforms.length}`);
+        }
+
+        if (includeVaryings) {
+            const varyings = collectIdentifiers(
+                allContent,
+                /\b(?:varying|in|out)\s+\w+\s+(v[A-Z]\w+)\b/g,
+                'varying'
+            );
+            identifiers.push(...varyings);
+            console.log(`[shader-identifier] Found ${varyings.length} varyings`);
+        }
+
+        if (includeAttributes) {
+            // GLSL定義から検出（念のため残す）
+            const attributesFromGLSL = collectIdentifiers(
+                allContent,
+                /\b(?:attribute|in)\s+\w+\s+(a[A-Z]\w+)\b/g,
+                'attribute'
+            );
+
+            // TypeScript文字列リテラルから検出
+            const attributesFromStrings = collectIdentifiers(allContent, /['"`](a[A-Z]\w+)['"`]/g, 'attribute');
+
+            // 重複を除いてマージ
+            const attributeMap = new Map<string, IdentifierInfo>();
+            for (const attr of [...attributesFromGLSL, ...attributesFromStrings]) {
+                if (attributeMap.has(attr.name)) {
+                    // 既存のcountに加算
+                    const existing = attributeMap.get(attr.name)!;
+                    existing.count += attr.count;
+                    existing.savings = existing.count * (existing.length - 2);
+                } else {
+                    attributeMap.set(attr.name, attr);
+                }
+            }
+            const attributes = Array.from(attributeMap.values());
+
+            identifiers.push(...attributes);
+            console.log(
+                `[shader-identifier] Found ${attributes.length} attributes (${attributesFromGLSL.length} from GLSL, ${attributesFromStrings.length} from strings)`
+            );
+        }
+
+        if (includeStructs) {
+            const structs = collectIdentifiers(allContent, /struct\s+(s[A-Z]\w+)/g, 'struct');
+            identifiers.push(...structs);
+            console.log(`[shader-identifier] Found ${structs.length} structs`);
+        }
+
+        if (includeFunctions) {
+            // 組み込み型とカスタム構造体（s[A-Z]\w+）を返す関数を検出
+            const functions = collectIdentifiers(
+                allContent,
+                /\b(?:float|vec2|vec3|vec4|mat2|mat3|mat4|int|bool|void|s[A-Z]\w+)\s+(f[A-Z]\w+)\s*\(/g,
+                'function'
+            );
+            identifiers.push(...functions);
+            console.log(`[shader-identifier] Found ${functions.length} functions`);
+        }
+
+        if (includeStructMembers) {
+            const structMembers = collectStructMembers(
+                allContent,
+                structMemberIncludePattern,
+                structMemberExcludePattern
+            );
+            identifiers.push(...structMembers);
+            console.log(`[shader-identifier] Found ${structMembers.length} struct members`);
+        }
+
+        if (includeOutputs) {
+            // GLSL output変数を検出（layout (location = N) out 型 out[A-Z]\w+）
+            const outputs = collectIdentifiers(
+                allContent,
+                /layout\s*\([^)]*\)\s*out\s+\w+\s+(out[A-Z]\w+)/g,
+                'output'
+            );
+            identifiers.push(...outputs);
+            console.log(`[shader-identifier] Found ${outputs.length} output variables`);
+        }
+
+        // 優先順位付け（削減効果の高い順）
+        identifiers.sort((a, b) => b.savings - a.savings || b.length - a.length);
+
+        // マッピング生成（衝突回避）
+        generateMappings(identifiers, identifierMap, existingIdentifiers, verbose);
+
+        console.log(`[shader-identifier] Generated ${identifierMap.size} mappings`);
+
+        if (verbose && identifierMap.size > 0) {
+            const totalSavings = Array.from(identifierMap.entries()).reduce((sum, [oldName]) => {
+                const info = identifiers.find((i) => i.name === oldName);
+                return sum + (info?.savings || 0);
+            }, 0);
+            console.log(`[shader-identifier] Estimated savings: ${totalSavings} bytes`);
+        }
+
+        // デバッグ: 検出したuniformリストをファイルに保存
+        const uniformList = identifiers
+            .filter((i) => i.type === 'uniform')
+            .map((i) => ({
+                name: i.name,
+                count: i.count,
+                savings: i.savings,
+                newName: identifierMap.get(i.name),
+            }));
+        const tmpDir = path.join(process.cwd(), 'tmp');
+        if (!fs.existsSync(tmpDir)) {
+            fs.mkdirSync(tmpDir, { recursive: true });
+        }
+        fs.writeFileSync(path.join(tmpDir, 'vite-plugin-uniforms.json'), JSON.stringify(uniformList, null, 2));
+        console.log(
+            `[shader-identifier] Saved uniform list to tmp/vite-plugin-uniforms.json (${uniformList.length} uniforms)`
+        );
+    } catch (error) {
+        console.error('[shader-identifier] Error during buildIdentifierMap:', error);
+    }
 }
