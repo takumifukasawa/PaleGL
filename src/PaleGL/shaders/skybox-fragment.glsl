@@ -21,25 +21,22 @@ void main() {
     // pattern_1: inverse normal. 法線が内側を向いた球体なので
     vec3 N = normalize(vNormal);
     vec3 reflectDir = -N;
-    
+
     // pattern_2: world position dir
     // skyboxの中心 = カメラの中心なので、こちらでもよい
     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
-    
+
     // USE_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
     vec3 skyboxSampleDir = fCalcEnvMapSampleDir(reflectDir, uRotationOffset);
     // vec3 envMapColor = calcEnvMap(uCubeTexture);
     // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;
     vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
-  
-    // NOTE: テクスチャはhdrじゃなくてsrgb想定 
-    envMapColor = fGamma(envMapColor); 
-        
+
+    // NOTE: テクスチャはhdrじゃなくてsrgb想定
+    envMapColor = fGamma(envMapColor);
+
     outGBufferA = fEncodeGBufferA(envMapColor);
     outGBufferB = fEncodeGBufferB(vec3(0.), uShadingModelId);
     outGBufferC = fEncodeGBufferC(0., 0.);
     outGBufferD = fEncodeGBufferD(vec3(0.));
-    
-    // for debug
-    // outGBufferA = fEncodeGBufferD(N);
 }

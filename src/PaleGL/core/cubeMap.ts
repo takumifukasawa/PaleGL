@@ -107,3 +107,43 @@ export function createCubeMap(
         negZImage
     );
 }
+
+export function createEmptyCubeMap(gpu: Gpu, width: number, height: number): CubeMap {
+    const gl = gpu.gl;
+
+    const maxLodLevel = Math.log2(Math.max(width, height));
+
+    const texture = gl.createTexture()!;
+
+    gl.bindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+    gl.pixelStorei(GL_UNPACK_FLIP_Y_WEBGL, false);
+
+    // 6面分の空のテクスチャを確保
+    const faces = [
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+    ];
+
+    for (let i = 0; i < 6; i++) {
+        gl.texImage2D(faces[i], 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+    }
+
+    gl.texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_FILTER_LINEAR);
+    gl.texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_CLAMP_TO_EDGE);
+    gl.texParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_CLAMP_TO_EDGE);
+
+    gl.bindTexture(GL_TEXTURE_CUBE_MAP, null);
+
+    return {
+        ...createGLObject(gpu, texture),
+        width,
+        height,
+        maxLodLevel,
+    };
+}
