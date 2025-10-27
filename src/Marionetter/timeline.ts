@@ -31,6 +31,7 @@ import {
     MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP,
     MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP,
     MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD,
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
     MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
     MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
@@ -248,9 +249,14 @@ export function buildMarionetterTimeline(
                     }
 
                     // 現在時刻にclipはないが直前にclipがある場合
-                    // 直前のclipが終了後にloopだったら直前のclipを再生
-                    if (beforeClipAtTime && !clipAtTime && isLoopClipPostExtrapolate(beforeClipAtTime)) {
-                        clipAtTime = beforeClipAtTime;
+                    // 直前のclipが終了後も再生すべきclipなら直前のclipを再生
+                    if (beforeClipAtTime && !clipAtTime) {
+                        if (
+                            isHoldClipPostExtrapolate(beforeClipAtTime) ||
+                            isLoopClipPostExtrapolate(beforeClipAtTime)
+                        ) {
+                            clipAtTime = beforeClipAtTime;
+                        }
                     }
 
                     // const clipAtTime = marionetterClips.find(
@@ -282,8 +288,6 @@ export function buildMarionetterTimeline(
                         }
                     } else {
                         if (targetActor && clipAtTime) {
-                            const clipTime = isLoopClipPostExtrapolate(clipAtTime) ? time : time;
-                            // clipAtTime.execute({ actor: targetActor, time: clipTime, scene });
                             clipAtTime.execute({ actor: targetActor, time, scene });
                         }
                     }
@@ -346,13 +350,6 @@ export function buildMarionetterTimeline(
     // return { tracks, execute, bindActor };
     return { tracks, execute, bindActors, duration: d };
 }
-
-const isLoopClipPostExtrapolate = (clip: MarionetterClipKinds) => {
-    return (
-        clip.clipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX] ===
-        MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP
-    );
-};
 
 /**
  *
@@ -922,3 +919,17 @@ function createMarionetterObjectMoveAndLookAtClip(
 //         },
 //     };
 // }
+
+const isLoopClipPostExtrapolate = (clip: MarionetterClipKinds) => {
+    return (
+        clip.clipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX] ===
+        MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP
+    );
+};
+
+const isHoldClipPostExtrapolate = (clip: MarionetterClipKinds) => {
+    return (
+        clip.clipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX] ===
+        MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD
+    );
+};

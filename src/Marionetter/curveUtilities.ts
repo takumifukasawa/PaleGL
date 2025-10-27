@@ -1,5 +1,6 @@
 import {
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD,
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT,
@@ -117,11 +118,15 @@ export function curveUtilityEvaluateCurve(
 
     // clip が最後のkeyを越していたとき
     if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
-        // クリップ内でループ
-        if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
-            t = t % lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]
+        if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD) {
+            // 最後の状態で止める（hold clip）
+            t = lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - 0.001; // 絶妙にoffset
+        } else if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
+            // クリップ内でループ
+            t = t % lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME];
         } else {
             // デフォルト
+            // 最後の状態で止める
             return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
         }
     }
