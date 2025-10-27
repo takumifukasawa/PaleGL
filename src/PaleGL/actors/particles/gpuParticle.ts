@@ -40,7 +40,11 @@ export type GPUParticleArgs = InstancingParticleArgs & {
     updateFragmentModifiers?: FragmentShaderModifiers;
 };
 
-export type GpuParticle = Mesh & { mrtDoubleBuffer: MRTDoubleBuffer };
+export type GpuParticle = Mesh & {
+    mrtDoubleBuffer: MRTDoubleBuffer;
+    materialForInitialize: Material;
+    materialForUpdate: Material;
+};
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
@@ -136,14 +140,13 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 
-    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtDoubleBuffer };
+    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtDoubleBuffer, materialForInitialize, materialForUpdate };
 
     subscribeActorOnStart(vatGPUParticle, ({ renderer }) => {
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
 
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+        resetGPUParticleByInitialize(renderer, vatGPUParticle);
     });
 
     let tmpReadVelocityMap;
@@ -162,4 +165,10 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     });
 
     return vatGPUParticle;
+};
+
+export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticle) => {
+    const { mrtDoubleBuffer, materialForInitialize } = gpuParticle;
+    renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+    renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
 };

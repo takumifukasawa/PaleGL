@@ -3,10 +3,10 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
-    ATTRIBUTE_NAME_POSITION,
-    ATTRIBUTE_NAME_UV,
     ATTRIBUTE_NAME_NORMAL,
+    ATTRIBUTE_NAME_POSITION,
     ATTRIBUTE_NAME_TRAIL_INDEX,
+    ATTRIBUTE_NAME_UV,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
     UNIFORM_NAME_POSITION_MAP,
@@ -15,9 +15,7 @@ import {
     UNIFORM_NAME_VELOCITY_MAP,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2,
-
 } from '@/PaleGL/constants.ts';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Attribute, createAttribute } from '@/PaleGL/core/attribute.ts';
 import {
     createMRTDoubleBuffer,
@@ -28,7 +26,7 @@ import {
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { addUniformValue } from '@/PaleGL/core/uniforms.ts';
+import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
@@ -44,7 +42,11 @@ export type GPUTrailParticleArgs = InstancingParticleArgs & {
 };
 
 // export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
-export type GPUTrailParticle = Mesh & { mrtDoubleBuffer: MRTDoubleBuffer };
+export type GPUTrailParticle = Mesh & {
+    mrtDoubleBuffer: MRTDoubleBuffer;
+    materialForInitialize: Material;
+    materialForUpdate: Material;
+};
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
@@ -118,26 +120,10 @@ export const createTrailPlaneGeometry = (gpu: Gpu, planeWidth: number, trailVert
     }
 
     const attributes: Attribute[] = [
-        createAttribute(
-            ATTRIBUTE_NAME_POSITION,
-            positions,
-            3
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_UV,
-            uvs,
-            2
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_NORMAL,
-            normals,
-            3
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_TRAIL_INDEX,
-            trailVertices,
-            1
-        ),
+        createAttribute(ATTRIBUTE_NAME_POSITION, positions, 3),
+        createAttribute(ATTRIBUTE_NAME_UV, uvs, 2),
+        createAttribute(ATTRIBUTE_NAME_NORMAL, normals, 3),
+        createAttribute(ATTRIBUTE_NAME_TRAIL_INDEX, trailVertices, 1),
     ];
 
     const geometry = createGeometry({
@@ -190,8 +176,11 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
             }
         }
     }
-    posCount = addVertex3(positions, posCount, 0.0, 0.0, 0.0);
-    normalCount = addVertex3(normals, normalCount, 0.0, 0.0, 1.0);
+
+    // tmp
+    // posCount = addVertex3(positions, posCount, 0.0, 0.0, 0.0);
+    // normalCount = addVertex3(normals, normalCount, 0.0, 0.0, 1.0);
+
     trailVertices[trailVertexCount++] = trailVertexNum - 1;
 
     let indexCount = 0;
@@ -221,26 +210,10 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
     }
 
     const attributes: Attribute[] = [
-        createAttribute(
-            ATTRIBUTE_NAME_POSITION,
-            positions,
-            3
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_UV,
-            uvs,
-            2
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_NORMAL,
-            normals,
-            3
-        ),
-        createAttribute(
-            ATTRIBUTE_NAME_TRAIL_INDEX,
-            trailVertices,
-            1
-        ),
+        createAttribute(ATTRIBUTE_NAME_POSITION, positions, 3),
+        createAttribute(ATTRIBUTE_NAME_UV, uvs, 2),
+        createAttribute(ATTRIBUTE_NAME_NORMAL, normals, 3),
+        createAttribute(ATTRIBUTE_NAME_TRAIL_INDEX, trailVertices, 1),
     ];
 
     const geometry = createGeometry({
@@ -331,7 +304,12 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 
-    const vatGPUParticle: GPUTrailParticle = { ...gpuParticle, mrtDoubleBuffer };
+    const vatGPUParticle: GPUTrailParticle = {
+        ...gpuParticle,
+        mrtDoubleBuffer,
+        materialForInitialize,
+        materialForUpdate,
+    };
 
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
@@ -341,8 +319,7 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
 
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-        renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+        resetGPUTrailParticleByInitialize(renderer, vatGPUParticle);
     });
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
@@ -357,4 +334,10 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     return vatGPUParticle;
+};
+
+export const resetGPUTrailParticleByInitialize = (renderer: Renderer, gpuTrailParticle: GPUTrailParticle) => {
+    const { mrtDoubleBuffer, materialForInitialize } = gpuTrailParticle;
+    renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+    renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
 };
