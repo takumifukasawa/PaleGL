@@ -85,8 +85,22 @@ const pack = async (filePath) => {
 
     // Create self-extracting HTML
     // Using the same approach as compeko: SVG with DecompressionStream
-    const header =
-        '<svg onload="fetch`#`.then(t=>t.blob()).then(t=>new Response(t.slice(156).stream().pipeThrough(new DecompressionStream(\'deflate-raw\'))).text()).then(eval)">';
+    const licenseComment = '<!-- License information: See ./LICENSES.txt | Copyright (c) 2025 takumifukasawa. All Rights Reserved. -->';
+    const svgTagBefore = '<svg onload="fetch`#`.then(t=>t.blob()).then(t=>new Response(t.slice(';
+    const svgTagAfter = ').stream().pipeThrough(new DecompressionStream(\'deflate-raw\'))).text()).then(eval)">';
+
+    // Calculate header size iteratively (since the size number itself affects the total length)
+    const basePart = licenseComment + svgTagBefore + svgTagAfter;
+    let headerSize = basePart.length + 3; // Start with assumption of 3-digit number
+    let headerSizeStr = headerSize.toString();
+
+    // Iterate until size converges
+    while (basePart.length + headerSizeStr.length !== headerSize) {
+        headerSize = basePart.length + headerSizeStr.length;
+        headerSizeStr = headerSize.toString();
+    }
+
+    const header = licenseComment + svgTagBefore + headerSizeStr + svgTagAfter;
     const headerBuffer = Buffer.alloc(header.length);
     headerBuffer.write(header);
 
