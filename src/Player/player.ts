@@ -393,11 +393,18 @@ export function resizePlayer(player: Player, width: number, height: number) {
 export async function loadPlayer(
     player: Player,
     beforeCb: () => Promise<void> | (() => void),
-    afterCb: () => Promise<void> | (() => void)
+    afterCb: () => Promise<void> | (() => void),
+    onProgress?: (percent: number) => void
 ) {
     // await player.engine.war
     await beforeCb();
-    warmRender(player.engine);
+    await warmRender(player.engine, 16, (actor, index, total) => {
+        if (onProgress) {
+            // 50%から100%の範囲で進捗を更新
+            const percent = 50 + ((index + 1) / total) * 50;
+            onProgress(Math.floor(percent));
+        }
+    });
     await afterCb();
 }
 
