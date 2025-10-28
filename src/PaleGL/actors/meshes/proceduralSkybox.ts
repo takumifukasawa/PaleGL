@@ -25,7 +25,7 @@ export type ProceduralSkyboxOptions = {
 };
 
 // TODO: wip - raw な procedural skyboにする
-export function createProceduralSkybox({
+export const createProceduralSkybox: (args: ProceduralSkyboxOptions) => Skybox = ({
     gpu,
     size = 256,
     updateInterval = 2,
@@ -35,7 +35,7 @@ export function createProceduralSkybox({
     fragmentShader = proceduralCubeMapAtmosphereFragmentShader,
     sunPosition = [1, 1, 0],
     sunIntensity = 22.0,
-}: ProceduralSkyboxOptions): Skybox {
+}: ProceduralSkyboxOptions) => {
     let cubeMap: CubeMap;
     let cubeMapUpdateContext: CubeMapUpdateContext | null = null;
     let frameCount = 0;
@@ -79,4 +79,4 @@ export function createProceduralSkybox({
     });
 
     return skyboxMesh;
-}
+};

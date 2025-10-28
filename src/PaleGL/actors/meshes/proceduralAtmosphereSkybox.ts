@@ -1,5 +1,6 @@
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { createSkybox, Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import { UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants.ts';
 import type { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import {
@@ -9,7 +10,6 @@ import {
 } from '@/PaleGL/core/proceduralCubeMap.ts';
 import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { setUniformValue, type UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_VECTOR3, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
 import proceduralCubeMapAtmosphereFragmentShader from '@/PaleGL/shaders/procedural-cubemap-atmosphere-fragment.glsl';
 
 export type ProceduralAtmosphereSkyboxOptions = {
@@ -32,7 +32,7 @@ export type ProceduralAtmosphereSkyboxOptions = {
     cameraAltitude?: number;
 };
 
-export function createProceduralAtmosphereSkybox({
+export const createProceduralAtmosphereSkybox: (args: ProceduralAtmosphereSkyboxOptions) => Skybox = ({
     gpu,
     size = 256,
     updateInterval = 2,
@@ -50,7 +50,7 @@ export function createProceduralAtmosphereSkybox({
     mieScaleHeight = 1.2e3,
     mieScatteringDirection = 0.758,
     cameraAltitude = 100.0,
-}: ProceduralAtmosphereSkyboxOptions): Skybox {
+}: ProceduralAtmosphereSkyboxOptions) => {
     let cubeMap: CubeMap;
     let cubeMapUpdateContext: CubeMapUpdateContext | null = null;
     let frameCount = 0;
@@ -104,4 +104,4 @@ export function createProceduralAtmosphereSkybox({
     });
 
     return skyboxMesh;
-}
+};
