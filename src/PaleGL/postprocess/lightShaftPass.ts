@@ -84,7 +84,7 @@ export type LightShaftPass = PostProcessPassBase &
 
 type LightShaftPassParametersArgs = PostProcessPassParametersBaseArgs & Partial<LightShaftPassParameters>;
 
-export function createLightShaftPass(args: LightShaftPassParametersArgs): LightShaftPass {
+export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightShaftPass => {
     const { gpu, enabled, ratio = 0.5 } = args;
 
     const blendRate = args.blendRate ?? 0.65;
@@ -356,7 +356,7 @@ export function renderLightShaftPass(
     });
 }
 
-export function setLightShaftPassDirectionalLight(lightShaftPass: LightShaftPass, light: DirectionalLight) {
+export const setLightShaftPassDirectionalLight = (lightShaftPass: LightShaftPass, light: DirectionalLight) => {
     // light.transform.position
     lightShaftPass.directionalLight = light;
 }

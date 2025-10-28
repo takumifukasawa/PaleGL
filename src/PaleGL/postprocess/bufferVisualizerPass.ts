@@ -125,7 +125,7 @@ export type BufferVisualizerPass = PostProcessPassBase &
 
 type BufferVisualizerPassArgs = PostProcessPassParametersBaseArgs & Partial<BufferVisualizerPassParameters>;
 
-export function createBufferVisualizerPass(args: BufferVisualizerPassArgs): BufferVisualizerPass {
+export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): BufferVisualizerPass => {
     const { gpu, enabled } = args;
 
     const fullViewTextureEnabled = args.fullViewTextureEnabled || false;
@@ -635,11 +635,11 @@ export function setBufferVisualizerPassSize(postProcessPass: PostProcessPassBase
     bufferVisualizerPass.height = height;
 }
 
-export function showBufferVisualizerPassDom(bufferVisualizerPass: BufferVisualizerPass) {
+export const showBufferVisualizerPassDom = (bufferVisualizerPass: BufferVisualizerPass) => {
     bufferVisualizerPass.dom.classList.remove('hidden');
 }
 
-export function hideBufferVisualizerPassDom(bufferVisualizerPass: BufferVisualizerPass) {
+export const hideBufferVisualizerPassDom = (bufferVisualizerPass: BufferVisualizerPass) => {
     bufferVisualizerPass.dom.classList.add('hidden');
 }
 
