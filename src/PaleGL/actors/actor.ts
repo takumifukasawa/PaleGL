@@ -151,7 +151,7 @@ export const addActorComponents = (actor: Actor, components: Component[]) => {
     actor.components.push(...components);
 };
 
-export function getActorComponent<T extends Component>(actor: Actor): T | null {
+export const getActorComponent = <T extends Component>(actor: Actor): T | null => {
     return actor.components.find((component) => component) as T;
 }
 

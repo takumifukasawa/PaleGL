@@ -93,7 +93,7 @@ export type ComponentArgs = {
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
 };
 
-export function createComponent(args: ComponentArgs): Component {
+export const createComponent = (args: ComponentArgs): Component => {
     const {
         name,
         onStartCallback,
@@ -123,6 +123,6 @@ export function createComponent(args: ComponentArgs): Component {
     return [model, behaviour];
 }
 
-export function setActorToComponent(componentModel: ComponentModel, actor: Actor) {
+export const setActorToComponent = (componentModel: ComponentModel, actor: Actor) => {
     componentModel.actor = actor;
 }

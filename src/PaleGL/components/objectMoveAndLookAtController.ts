@@ -12,10 +12,10 @@ export type ObjectMoveAndLookAtController = [
 ];
 
 // timeline から操作される
-export function createObjectMoveAndLookAtController(args: {
+export const createObjectMoveAndLookAtController = (args: {
     localPosition: Vector3;
     lookAtTargetName: string;
-}): ObjectMoveAndLookAtController {
+}): ObjectMoveAndLookAtController => {
     const initialLocalPosition = args.localPosition;
     const lookAtTargetName = args.lookAtTargetName;
     let lookAtTargetActor: Actor | null = null;

@@ -140,11 +140,11 @@ export type FragmentShaderGenerator = ({
 
 export type DepthFragmentShaderGenerator = () => string;
 
-export function setMaterialUniformValue(material: Material, name: string, value: UniformValue, log?: boolean) {
+export const setMaterialUniformValue = (material: Material, name: string, value: UniformValue, log?: boolean) => {
     setUniformValue(material.uniforms, name, value, log);
 }
 
-export function addMaterialUniformValue(material: Material, name: string, type: UniformTypes, value: UniformValue) {
+export const addMaterialUniformValue = (material: Material, name: string, type: UniformTypes, value: UniformValue) => {
     addUniformValue(material.uniforms, name, type, value);
 }
 

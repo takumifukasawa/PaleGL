@@ -5,10 +5,10 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 export type TimelinePropertyBinderController = Component;
 
 // timeline から操作される
-export function createTimelineMaterialPropertyBinderController(
+export const createTimelineMaterialPropertyBinderController = (
     uniformName: string,
     propertyName: string,
-): TimelinePropertyBinderController {
+): TimelinePropertyBinderController => {
     return createComponent({
         onProcessPropertyBinder: (actor, _, key, value) => {
             // // for debug

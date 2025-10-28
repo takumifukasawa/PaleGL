@@ -374,7 +374,7 @@ const setSizeCameraBehaviour: Partial<Record<CameraType, (camera: Camera, width:
     [CAMERA_TYPE_ORTHOGRAPHIC]: setSizeOrthographicCamera,
 };
 
-export function setSizeCamera(actor: Actor, width: number, height: number) {
+export const setSizeCamera = (actor: Actor, width: number, height: number) => {
     const camera = actor as Camera;
     setSizeCameraBehaviour[camera.cameraType]?.(camera, width, height);
 }

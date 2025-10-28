@@ -100,7 +100,7 @@ const createSetPostProcessPassSizeBehaviour = (): Partial<
 
 export const setPostProcessPassSizeBehaviour = createSetPostProcessPassSizeBehaviour();
 
-export function setPostProcessPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+export const setPostProcessPassSize = (postProcessPass: PostProcessPassBase, width: number, height: number) => {
     if (setPostProcessPassSizeBehaviour[postProcessPass.type]) {
         setPostProcessPassSizeBehaviour[postProcessPass.type]?.(postProcessPass, width, height);
         return;
@@ -108,12 +108,12 @@ export function setPostProcessPassSize(postProcessPass: PostProcessPassBase, wid
     setPostProcessSinglePassSizeBehaviour(postProcessPass as PostProcessSinglePass, width, height);
 }
 
-export function setPostProcessPassRenderTarget(
+export const setPostProcessPassRenderTarget = (
     postProcessPass: PostProcessPassBase,
     renderer: Renderer,
     camera: Camera,
     isLastPass: boolean
-) {
+) => {
     if (isLastPass) {
         setRenderTargetToRendererAndClear(renderer, camera.renderTarget, true);
     } else {
@@ -142,7 +142,7 @@ const updatePostProcessPassBehaviour = createUpdatePostProcessPassBehaviour();
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function updatePostProcessPass(postProcessPass: PostProcessPassBase) {
+export const updatePostProcessPass = (postProcessPass: PostProcessPassBase) => {
     updatePostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass);
 }
 
@@ -153,7 +153,7 @@ type BeforeRenderPostProcessPassBehaviour = (postProcessPass: PostProcessPassBas
 const beforeRenderPostProcessPassBehaviour: Partial<Record<PostProcessPassType, BeforeRenderPostProcessPassBehaviour>> =
     {};
 
-export function beforeRenderPostProcessPass(postProcessPass: PostProcessPassBase) {
+export const beforeRenderPostProcessPass = (postProcessPass: PostProcessPassBase) => {
     beforeRenderPostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass);
 }
 
@@ -228,7 +228,7 @@ const createRenderPostProcessPassBehaviour = (): Partial<
 
 const renderPostProcessPassBehaviour = createRenderPostProcessPassBehaviour();
 
-export function renderPostProcessPass(postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs): void {
+export const renderPostProcessPass = (postProcessPass: PostProcessPassBase, args: PostProcessPassRenderArgs): void => {
     if (renderPostProcessPassBehaviour[postProcessPass.type]) {
         renderPostProcessPassBehaviour[postProcessPass.type]?.(postProcessPass, args);
         return;
@@ -261,7 +261,7 @@ const createGetPostProcessPassRenderTargetBehaviour = (): Partial<
 
 const getPostProcessPassRenderTargetBehaviour = createGetPostProcessPassRenderTargetBehaviour();
 
-export function getPostProcessPassRenderTarget(postProcessPass: PostProcessPassBase): RenderTarget {
+export const getPostProcessPassRenderTarget = (postProcessPass: PostProcessPassBase): RenderTarget => {
     if (getPostProcessPassRenderTargetBehaviour[postProcessPass.type]) {
         const f = getPostProcessPassRenderTargetBehaviour[postProcessPass.type]!;
         return f(postProcessPass);
@@ -279,7 +279,7 @@ const getPostProcessPassRenderTargetTextureBehaviour: Partial<
     [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: getScreenSpaceShadowRenderTargetTexture,
 };
 
-export function getPostProcessPassRenderTargetTexture(postProcessPass: PostProcessPassBase): Texture | null {
+export const getPostProcessPassRenderTargetTexture = (postProcessPass: PostProcessPassBase): Texture | null => {
     if (getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]) {
         const f = getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]!;
         return f(postProcessPass);

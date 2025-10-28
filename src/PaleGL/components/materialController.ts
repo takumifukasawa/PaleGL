@@ -7,7 +7,7 @@ export type MaterialController = Component;
 type Bindings = Map<string, string>; // propertyName, uniformName
 
 // timeline から操作される
-export function createMaterialController(name: string, bindings: Bindings): MaterialController {
+export const createMaterialController = (name: string, bindings: Bindings): MaterialController => {
     return createComponent({
         name,
         onFilterPropertyBinder: (key: string) => bindings.has(key),

@@ -49,10 +49,10 @@ const assignProperty = (bindings: Map<string, PostProcessParameterBindingValue>,
 };
 
 // timeline から操作される
-export function createPostProcessController(
+export const createPostProcessController = (
     renderer: Renderer,
     postProcessControllerComponentInfo: MarionetterPostProcessControllerComponentInfo
-): PostProcessController {
+): PostProcessController => {
     const bindings = buildPostProcessControllerEntries(renderer);
     return createComponent({
         onStartCallback: () => {
