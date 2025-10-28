@@ -19,8 +19,9 @@ out mat4 vInverseWorldMatrix;
 
 #ifdef USE_INSTANCING
 out float vInstanceId;
-// TODO
-// out vec4 vInstanceState;
+out vec4 vInstanceColor;
+out vec4 vInstanceEmissiveColor;
+out vec4 vInstanceState;
 uniform float uRotMode; // 0: velocity, 1: look direction
 uniform vec4 uBaseColor;
 uniform float uBaseMixer;
