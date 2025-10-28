@@ -16,7 +16,7 @@
 
 export type RawVector3 = { x: number; y: number; z: number };
 
-export function createVector3FromRaw(raw: RawVector3) {
+export const createVector3FromRaw = (raw: RawVector3) => {
     return createVector3(raw.x, raw.y, raw.z);
 }
 
@@ -24,7 +24,7 @@ export function createVector3FromRaw(raw: RawVector3) {
 
 export type Vector3 = Float32Array;
 
-export function createVector3(x: number, y: number, z: number): Vector3 {
+export const createVector3 = (x: number, y: number, z: number): Vector3 => {
     return new Float32Array([x, y, z]);
 }
 
@@ -54,17 +54,17 @@ export const createRightV3 = () => createVector3(1, 0, 0);
 
 export const createUpV3 = () => createVector3(0, 1, 0);
 
-export function getVector3Magnitude(v: Vector3) {
+export const getVector3Magnitude = (v: Vector3) => {
     const eps = 0.0001;
     return Math.max(eps, Math.sqrt(v3x(v) * v3x(v) + v3y(v) * v3y(v) + v3z(v) * v3z(v)));
 }
 
-export function copyVector3(sv: Vector3, tv: Vector3) {
+export const copyVector3 = (sv: Vector3, tv: Vector3) => {
     setV3(sv, v3x(tv), v3y(tv), v3z(tv));
     return sv;
 }
 
-export function normalizeVector3(v: Vector3) {
+export const normalizeVector3 = (v: Vector3) => {
     // const eps = 0.0001;
     // const length = Math.max(eps, Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
     const mag = getVector3Magnitude(v);
@@ -72,31 +72,31 @@ export function normalizeVector3(v: Vector3) {
     return v;
 }
 
-export function addVector3Scalar(v: Vector3, s: number) {
+export const addVector3Scalar = (v: Vector3, s: number) => {
     setV3(v, v3x(v) + s, v3y(v) + s, v3z(v) + s);
     return v;
 }
 
-export function addVector3AndVector3(sv: Vector3, tv: Vector3) {
+export const addVector3AndVector3 = (sv: Vector3, tv: Vector3) => {
     setV3(sv, v3x(sv) + v3x(tv), v3y(sv) + v3y(tv), v3z(sv) + v3z(tv));
     return sv;
 }
 
-export function subVector3AndScalar(v: Vector3, s: number) {
+export const subVector3AndScalar = (v: Vector3, s: number) => {
     setV3(v, v3x(v) - s, v3y(v) - s, v3z(v) - s);
     return v;
 }
 
-export function subVector3AndVector3(sv: Vector3, tv: Vector3) {
+export const subVector3AndVector3 = (sv: Vector3, tv: Vector3) => {
     setV3(sv, v3x(sv) - v3x(tv), v3y(sv) - v3y(tv), v3z(sv) - v3z(tv));
     return sv;
 }
 
-export function subVectorsV3(v1: Vector3, v2: Vector3) {
+export const subVectorsV3 = (v1: Vector3, v2: Vector3) => {
     return createVector3(v3x(v1) - v3x(v2), v3y(v1) - v3y(v2), v3z(v1) - v3z(v2));
 }
 
-export function subVectorsV3Ref(refV: Vector3, v1: Vector3, v2: Vector3) {
+export const subVectorsV3Ref = (refV: Vector3, v1: Vector3, v2: Vector3) => {
     const x = v3x(v1) - v3x(v2);
     const y = v3y(v1) - v3y(v2);
     const z = v3z(v1) - v3z(v2);
@@ -106,26 +106,26 @@ export function subVectorsV3Ref(refV: Vector3, v1: Vector3, v2: Vector3) {
     return refV;
 }
 
-export function negateVector3(v: Vector3) {
+export const negateVector3 = (v: Vector3) => {
     setV3(v, -v3x(v), -v3y(v), -v3z(v));
     return v;
 }
 
-export function scaleVector3ByScalar(v: Vector3, s: number) {
+export const scaleVector3ByScalar = (v: Vector3, s: number) => {
     setV3(v, v3x(v) * s, v3y(v) * s, v3z(v) * s);
     return v;
 }
 
-export function scaleVector3ByVector3(sv: Vector3, tv: Vector3) {
+export const scaleVector3ByVector3 = (sv: Vector3, tv: Vector3) => {
     setV3(sv, v3x(sv) * v3x(tv), v3y(sv) * v3y(tv), v3z(sv) * v3z(tv));
     return sv;
 }
 
-export function cloneVector3(v: Vector3) {
+export const cloneVector3 = (v: Vector3) => {
     return createVector3(v3x(v), v3y(v), v3z(v));
 }
 
-export function multiplyVector3AndMatrix4(v: Vector3, m: Matrix4) {
+export const multiplyVector3AndMatrix4 = (v: Vector3, m: Matrix4) => {
     const tmpX = v3x(v);
     const tmpY = v3y(v);
     const tmpZ = v3z(v);
@@ -138,11 +138,11 @@ export function multiplyVector3AndMatrix4(v: Vector3, m: Matrix4) {
     return v;
 }
 
-export function multiplyVector3AndVector3(v1: Vector3, v2: Vector3) {
+export const multiplyVector3AndVector3 = (v1: Vector3, v2: Vector3) => {
     return createVector3(v3x(v1) * v3x(v2), v3y(v1) * v3y(v2), v3z(v1) * v3z(v2));
 }
 
-export function equalsVector3(sv: Vector3, tv: Vector3) {
+export const equalsVector3 = (sv: Vector3, tv: Vector3) => {
     const eps = 0.0000001;
     // const flag = Math.abs(this.x - v.x) < eps && Math.abs(this.y - v.y) < eps && Math.abs(this.z - v.z) < eps;
     const flag =
@@ -150,48 +150,48 @@ export function equalsVector3(sv: Vector3, tv: Vector3) {
     return flag;
 }
 
-export function dotVector3(sv: Vector3, tv: Vector3) {
+export const dotVector3 = (sv: Vector3, tv: Vector3) => {
     // return this.x * v.x + this.y * v.y + this.z * v.z;
     return v3x(sv) * v3x(tv) + v3y(sv) * v3y(tv) + v3z(sv) * v3z(tv);
 }
 
-export function createVector3Zero() {
+export const createVector3Zero = () => {
     return createVector3(0, 0, 0);
 }
 
-export function createVector3One() {
+export const createVector3One = () => {
     return createVector3(1, 1, 1);
 }
 
-export function createVector3Up() {
+export const createVector3Up = () => {
     return createVector3(0, 1, 0);
 }
 
-export function createVector3Down() {
+export const createVector3Down = () => {
     return createVector3(0, -1, 0);
 }
 
-export function createVector3Back() {
+export const createVector3Back = () => {
     return createVector3(0, 0, -1);
 }
 
-export function createVector3Forward() {
+export const createVector3Forward = () => {
     return createVector3(0, 0, 1);
 }
 
-export function createVector3Right() {
+export const createVector3Right = () => {
     return createVector3(1, 0, 0);
 }
 
-export function createVector3Left() {
+export const createVector3Left = () => {
     return createVector3(-1, 0, 0);
 }
 
-export function createVector3FromArray(arr: number[]) {
+export const createVector3FromArray = (arr: number[]) => {
     return createVector3(arr[0], arr[1], arr[2]);
 }
 
-export function addVector3Array(...vectors: Vector3[]) {
+export const addVector3Array = (...vectors: Vector3[]) => {
     const v = createVector3Zero();
     vectors.forEach((e) => {
         setV3(v, v3x(v) + v3x(e), v3y(v) + v3y(e), v3z(v) + v3z(e));
@@ -199,13 +199,13 @@ export function addVector3Array(...vectors: Vector3[]) {
     return v;
 }
 
-export function vector3SubVector3(v1: Vector3, v2: Vector3) {
+export const vector3SubVector3 = (v1: Vector3, v2: Vector3) => {
     // return new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     return createVector3(v3x(v1) - v3x(v2), v3y(v1) - v3y(v2), v3z(v1) - v3z(v2));
 }
 
 // v1 x v2
-export function crossVectorsV3(v1: Vector3, v2: Vector3) {
+export const crossVectorsV3 = (v1: Vector3, v2: Vector3) => {
     // return new Vector3(
     //   v1.y * v2.z - v1.z * v2.y,
     //   v1.z * v2.x - v1.x * v2.z,
@@ -218,7 +218,7 @@ export function crossVectorsV3(v1: Vector3, v2: Vector3) {
     );
 }
 
-export function createRotateVector3DegreeX(v: Vector3, degree: number) {
+export const createRotateVector3DegreeX = (v: Vector3, degree: number) => {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
@@ -231,7 +231,7 @@ export function createRotateVector3DegreeX(v: Vector3, degree: number) {
     return createVector3(rx, ry, rz);
 }
 
-export function createRotateVector3DegreeY(v: Vector3, degree: number) {
+export const createRotateVector3DegreeY = (v: Vector3, degree: number) => {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
@@ -244,7 +244,7 @@ export function createRotateVector3DegreeY(v: Vector3, degree: number) {
     return createVector3(rx, ry, rz);
 }
 
-export function createRotateVector3DegreeZ(v: Vector3, degree: number) {
+export const createRotateVector3DegreeZ = (v: Vector3, degree: number) => {
     const x = v3x(v);
     const y = v3y(v);
     const z = v3z(v);
@@ -258,7 +258,7 @@ export function createRotateVector3DegreeZ(v: Vector3, degree: number) {
 }
 
 // TODO: かなり簡易的なtangentで正確ではないのでちゃんと生成する
-export function getVector3Tangent(n: Vector3) {
+export const getVector3Tangent = (n: Vector3) => {
     if (equalsVector3(n, createVector3Up())) {
         return createVector3Right();
     }
@@ -268,15 +268,15 @@ export function getVector3Tangent(n: Vector3) {
     return crossVectorsV3(n, createVector3Down());
 }
 
-export function getBinormalFromTangent(t: Vector3, n: Vector3) {
+export const getBinormalFromTangent = (t: Vector3, n: Vector3) => {
     return crossVectorsV3(t, negateVector3(cloneVector3(n)));
 }
 
-export function createFillVector3(value: number) {
+export const createFillVector3 = (value: number) => {
     return createVector3(value, value, value);
 }
 
-export function lerpVector3(v1: Vector3, v2: Vector3, r: number) {
+export const lerpVector3 = (v1: Vector3, v2: Vector3, r: number) => {
     // return new Vector3(
     //   v1.x + (v2.x - v1.x) * r,
     //   v1.y + (v2.y - v1.y) * r,
@@ -289,7 +289,7 @@ export function lerpVector3(v1: Vector3, v2: Vector3, r: number) {
     );
 }
 
-export function averageVector3(...vectors: Vector3[]) {
+export const averageVector3 = (...vectors: Vector3[]) => {
     if (vectors.length === 0) {
         return createVector3Zero();
     }
@@ -297,15 +297,15 @@ export function averageVector3(...vectors: Vector3[]) {
     return scaleVector3ByScalar(sum, 1 / vectors.length);
 }
 
-export function eulerToRadianVector3(v: Vector3) {
+export const eulerToRadianVector3 = (v: Vector3) => {
     return createVector3((v3x(v) / 180) * Math.PI, (v3y(v) / 180) * Math.PI, (v3z(v) / 180) * Math.PI);
 }
 
-export function eulerToRawRadianVector3(v: Vector3) {
+export const eulerToRawRadianVector3 = (v: Vector3) => {
     return createVector3((v3x(v) / 180), (v3y(v) / 180), (v3z(v) / 180));
 }
 
-export function logVector3(v: Vector3) {
+export const logVector3 = (v: Vector3) => {
     console.log(`--------------------
 ${v3x(v)}, ${v3y(v)}, ${v3z(v)}
 --------------------`);

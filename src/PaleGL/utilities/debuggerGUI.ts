@@ -6,7 +6,7 @@ export type DebuggerGUI = {
     containerElement: HTMLElement;
 };
 
-export function createDebuggerGUI(isRoot = true) {
+export const createDebuggerGUI = (isRoot = true) => {
     const rootElement: HTMLElement = document.createElement('div');
     const containerElement: HTMLElement = document.createElement('div');
 

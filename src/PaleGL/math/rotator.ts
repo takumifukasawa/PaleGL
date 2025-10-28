@@ -279,7 +279,7 @@ export type Rotator = {
 };
 
 // TODO: quaternion対応
-export function createRotator(q: Quaternion) {
+export const createRotator = (q: Quaternion) => {
     // x, y, z axes
     // そのままdegreeが入る
     // elements: Float32Array = new Float32Array(3);
@@ -292,38 +292,38 @@ export function createRotator(q: Quaternion) {
     }
 }
 
-export function getRotatorRawMatrix(rotator: Rotator) {
+export const getRotatorRawMatrix = (rotator: Rotator) => {
     return rotator.rawMatrix;
 }
 
-export function setRotatorRawMatrix(rotator: Rotator, m: Matrix4 | null) {
+export const setRotatorRawMatrix = (rotator: Rotator, m: Matrix4 | null) => {
     rotator.rawMatrix = m;
 }
 
-export function getRotatorQuaternion(rotator: Rotator) {
+export const getRotatorQuaternion = (rotator: Rotator) => {
     return rotator.quaternion;
 }
 
 // degree
-export function getRotatorDegreeX(rotator: Rotator) {
+export const getRotatorDegreeX = (rotator: Rotator) => {
     // return this.elements[0];
     return toEulerDegreeFromQuaternion(rotator.quaternion).x;
 }
 
 // degree
-export function getRotatorDegreeY(rotator: Rotator) {
+export const getRotatorDegreeY = (rotator: Rotator) => {
     // return this.elements[1];
     return toEulerDegreeFromQuaternion(rotator.quaternion).y;
 }
 
 // degree
-export function getRotatorDegreeZ(rotator: Rotator) {
+export const getRotatorDegreeZ = (rotator: Rotator) => {
     // return this.elements[2];
     return toEulerDegreeFromQuaternion(rotator.quaternion).z;
 }
 
 // degree
-export function setRotatorDegreeX(rotator: Rotator, v: number) {
+export const setRotatorDegreeX = (rotator: Rotator, v: number) => {
     // this.elements[0] = v;
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     euler.x = v;
@@ -332,7 +332,7 @@ export function setRotatorDegreeX(rotator: Rotator, v: number) {
 }
 
 // degree
-export function setRotatorDegreeY(rotator: Rotator, v: number) {
+export const setRotatorDegreeY = (rotator: Rotator, v: number) => {
     // this.elements[1] = v;
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     euler.y = v;
@@ -341,7 +341,7 @@ export function setRotatorDegreeY(rotator: Rotator, v: number) {
 }
 
 // degree
-export function setRotatorDegreeZ(rotator: Rotator, v: number) {
+export const setRotatorDegreeZ = (rotator: Rotator, v: number) => {
     // this.elements[2] = v;
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     euler.z = v;
@@ -350,21 +350,21 @@ export function setRotatorDegreeZ(rotator: Rotator, v: number) {
 }
 
 // degree
-export function getRotatorDegreeRoll(rotator: Rotator) {
+export const getRotatorDegreeRoll = (rotator: Rotator) => {
     // return this.elements[2];
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     return euler.z;
 }
 
 // degree
-export function getRotatorDegreePitch(rotator: Rotator) {
+export const getRotatorDegreePitch = (rotator: Rotator) => {
     // return this.elements[0];
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     return euler.x;
 }
 
 // degree
-export function getRotatorDegreeYaw(rotator: Rotator) {
+export const getRotatorDegreeYaw = (rotator: Rotator) => {
     // return this.elements[1];
     const euler = toEulerDegreeFromQuaternion(rotator.quaternion);
     return euler.y;
@@ -379,7 +379,7 @@ export function getRotatorDegreeYaw(rotator: Rotator) {
 //     };
 // }
 
-export function getRotatorAxesRadians(rotator: Rotator) {
+export const getRotatorAxesRadians = (rotator: Rotator) => {
     // return {
     //     x: (this.elements[0] * Math.PI) / 180,
     //     y: (this.elements[1] * Math.PI) / 180,
@@ -399,7 +399,7 @@ export function getRotatorAxesRadians(rotator: Rotator) {
 //     this._updateQuaternionFromEulerDegrees();
 // }
 
-export function setRotatorEulerDegree(rotator: Rotator, x: number, y: number, z: number) {
+export const setRotatorEulerDegree = (rotator: Rotator, x: number, y: number, z: number) => {
     // const q = Quaternion.fromEulerDegrees(x, y, z);
     // this.elements = new Float32Array([x, y, z]);
     // this._updateQuaternionFromEulerDegrees();
@@ -411,7 +411,7 @@ export function setRotatorEulerDegree(rotator: Rotator, x: number, y: number, z:
     return rotator;
 }
 
-export function setRotatorEulerDegreesV(rotator: Rotator, v: Vector3) {
+export const setRotatorEulerDegreesV = (rotator: Rotator, v: Vector3) => {
     // this.elements = new Float32Array([v.x, v.y, v.z]);
     // this._updateQuaternionFromEulerDegrees();
     // return this;
@@ -422,7 +422,7 @@ export function setRotatorEulerDegreesV(rotator: Rotator, v: Vector3) {
     return rotator;
 }
 
-export function copyRotator(sr: Rotator, tr: Rotator) {
+export const copyRotator = (sr: Rotator, tr: Rotator) => {
     // this.set(r.x, r.y, r.z);
     // this._updateQuaternionFromEulerDegrees();
     // return this;
@@ -437,14 +437,14 @@ export function copyRotator(sr: Rotator, tr: Rotator) {
 //     return this.copy(r);
 // }
 
-export function createRotatorZero() {
+export const createRotatorZero = () => {
     // return new Rotator(0, 0, 0);
 
     const q = createQuaternionFromEulerDegrees(0, 0, 0);
     return createRotator(q);
 }
 
-export function setRotatorRotationDegreeX(rotator: Rotator, degree: number) {
+export const setRotatorRotationDegreeX = (rotator: Rotator, degree: number) => {
     //this.elements[0] = degree;
     //this._updateQuaternionFromEulerDegrees();
 
@@ -454,7 +454,7 @@ export function setRotatorRotationDegreeX(rotator: Rotator, degree: number) {
     rotator.quaternion = q;
 }
 
-export function setRotatorRotationDegreeY(rotator: Rotator, degree: number) {
+export const setRotatorRotationDegreeY = (rotator: Rotator, degree: number) => {
     // this.elements[1] = degree;
     // this._updateQuaternionFromEulerDegrees();
 
@@ -464,7 +464,7 @@ export function setRotatorRotationDegreeY(rotator: Rotator, degree: number) {
     rotator.quaternion = q;
 }
 
-export function setRotatorRotationDegreeZ(rotator:Rotator, degree: number) {
+export const setRotatorRotationDegreeZ = (rotator:Rotator, degree: number) => {
     // this.elements[2] = degree;
     // this._updateQuaternionFromEulerDegrees();
 
@@ -474,7 +474,7 @@ export function setRotatorRotationDegreeZ(rotator:Rotator, degree: number) {
     rotator.quaternion = q;
 }
 
-export function invertRotator(sr: Rotator) {
+export const invertRotator = (sr: Rotator) => {
     // const x = (this.x + 180) % 360;
     // const y = (this.y + 180) % 360;
     // const z = (this.z + 180) % 360;
@@ -498,7 +498,7 @@ export function invertRotator(sr: Rotator) {
 //     return new Rotator(x, y, z);
 // }
 
-export function createRotatorFromQuaternion(q: Quaternion) {
+export const createRotatorFromQuaternion = (q: Quaternion) => {
     // const euler = q.toEulerDegree();
     // return new Rotator(euler.x, euler.y, euler.z);
 
@@ -506,7 +506,7 @@ export function createRotatorFromQuaternion(q: Quaternion) {
 }
 
 // TODO: quaternion-bug: gltfのquaternionからdegreeを複合するところのバグの回避のため使ってる関数なので本当はよくない
-export function createRotatorFromMatrix4(m: Matrix4) {
+export const createRotatorFromMatrix4 = (m: Matrix4) => {
     // const r = new Rotator(0, 0, 0);
     // r.rawMatrix = m;
     // return r;
@@ -517,7 +517,7 @@ export function createRotatorFromMatrix4(m: Matrix4) {
     return r;
 }
 
-export function cloneRotator(rotator: Rotator) {
+export const cloneRotator = (rotator: Rotator) => {
     // return new Rotator(this.x, this.y, this.z);
     return createRotator(rotator.quaternion);
 }

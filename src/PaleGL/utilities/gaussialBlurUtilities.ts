@@ -1,7 +1,7 @@
 ﻿import { gaussCoefficient } from '@/PaleGL/utilities/mathUtilities';
 
 // pixelNumは奇数であるべき
-export function getGaussianBlurWeights(pixelNum: number, sigma: number) {
+export const getGaussianBlurWeights = (pixelNum: number, sigma: number) => {
     const halfWidth = Math.floor(pixelNum / 2);
 
     let sum = 0;

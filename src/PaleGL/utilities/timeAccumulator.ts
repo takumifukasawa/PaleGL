@@ -2,7 +2,7 @@ type Callback = (lastTime: number, interval: number) => void;
 
 export type TimeAccumulator = ReturnType<typeof createTimeAccumulator>;
 
-export function createTimeAccumulator(targetFPS: number, callback: Callback, maxChaseCount: number = 60) {
+export const createTimeAccumulator = (targetFPS: number, callback: Callback, maxChaseCount: number = 60) => {
     return {
         targetFPS,
         maxChaseCount,

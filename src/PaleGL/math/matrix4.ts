@@ -48,7 +48,7 @@ export type Matrix4 = { e: Float32Array };
 // }
 
 // prettier-ignore
-export function createMatrix4(
+export const createMatrix4 = (
     n00: number, n01: number, n02: number, n03: number,
     n10: number, n11: number, n12: number, n13: number,
     n20: number, n21: number, n22: number, n23: number,
@@ -57,7 +57,7 @@ export function createMatrix4(
     // m10 = 0, m11 = 0, m12 = 0, m13 = 0,
     // m20 = 0, m21 = 0, m22 = 0, m23 = 0,
     // m30 = 0, m31 = 0, m32 = 0, m33 = 0,
-) {
+) => {
     // // prettier-ignore
     const e = new Float32Array([
         n00, n10, n20, n30,
@@ -79,139 +79,139 @@ export function createMatrix4(
     // return sm;
 }
 
-export function mat4m00(m: Matrix4) {
+export const mat4m00 = (m: Matrix4) => {
     return m.e[0];
 }
 
-export function mat4m01(m: Matrix4) {
+export const mat4m01 = (m: Matrix4) => {
     return m.e[4];
 }
 
-export function mat4m02(m: Matrix4) {
+export const mat4m02 = (m: Matrix4) => {
     return m.e[8];
 }
 
-export function mat4m03(m: Matrix4) {
+export const mat4m03 = (m: Matrix4) => {
     return m.e[12];
 }
 
-export function mat4m10(m: Matrix4) {
+export const mat4m10 = (m: Matrix4) => {
     return m.e[1];
 }
 
-export function mat4m11(m: Matrix4) {
+export const mat4m11 = (m: Matrix4) => {
     return m.e[5];
 }
 
-export function mat4m12(m: Matrix4) {
+export const mat4m12 = (m: Matrix4) => {
     return m.e[9];
 }
 
-export function mat4m13(m: Matrix4) {
+export const mat4m13 = (m: Matrix4) => {
     return m.e[13];
 }
 
-export function mat4m20(m: Matrix4) {
+export const mat4m20 = (m: Matrix4) => {
     return m.e[2];
 }
 
-export function mat4m21(m: Matrix4) {
+export const mat4m21 = (m: Matrix4) => {
     return m.e[6];
 }
 
-export function mat4m22(m: Matrix4) {
+export const mat4m22 = (m: Matrix4) => {
     return m.e[10];
 }
 
-export function mat4m23(m: Matrix4) {
+export const mat4m23 = (m: Matrix4) => {
     return m.e[14];
 }
 
-export function mat4m30(m: Matrix4) {
+export const mat4m30 = (m: Matrix4) => {
     return m.e[3];
 }
 
-export function mat4m31(m: Matrix4) {
+export const mat4m31 = (m: Matrix4) => {
     return m.e[7];
 }
 
-export function mat4m32(m: Matrix4) {
+export const mat4m32 = (m: Matrix4) => {
     return m.e[11];
 }
 
-export function mat4m33(m: Matrix4) {
+export const mat4m33 = (m: Matrix4) => {
     return m.e[15];
 }
 
-export function setMat4m00(m: Matrix4, value: number) {
+export const setMat4m00 = (m: Matrix4, value: number) => {
     m.e[0] = value;
 }
 
-export function setMat4m01(m: Matrix4, value: number) {
+export const setMat4m01 = (m: Matrix4, value: number) => {
     m.e[4] = value;
 }
 
-export function setMat4m02(m: Matrix4, value: number) {
+export const setMat4m02 = (m: Matrix4, value: number) => {
     m.e[8] = value;
 }
 
-export function setMat4m03(m: Matrix4, value: number) {
+export const setMat4m03 = (m: Matrix4, value: number) => {
     m.e[12] = value;
 }
 
-export function setMat4m10(m: Matrix4, value: number) {
+export const setMat4m10 = (m: Matrix4, value: number) => {
     m.e[1] = value;
 }
 
-export function setMat4m11(m: Matrix4, value: number) {
+export const setMat4m11 = (m: Matrix4, value: number) => {
     m.e[5] = value;
 }
 
-export function setMat4m12(m: Matrix4, value: number) {
+export const setMat4m12 = (m: Matrix4, value: number) => {
     m.e[9] = value;
 }
 
-export function setMat4m13(m: Matrix4, value: number) {
+export const setMat4m13 = (m: Matrix4, value: number) => {
     m.e[13] = value;
 }
 
-export function setMat4m20(m: Matrix4, value: number) {
+export const setMat4m20 = (m: Matrix4, value: number) => {
     m.e[2] = value;
 }
 
-export function setMat4m21(m: Matrix4, value: number) {
+export const setMat4m21 = (m: Matrix4, value: number) => {
     m.e[6] = value;
 }
 
-export function setMat4m22(m: Matrix4, value: number) {
+export const setMat4m22 = (m: Matrix4, value: number) => {
     m.e[10] = value;
 }
 
-export function setMat4m23(m: Matrix4, value: number) {
+export const setMat4m23 = (m: Matrix4, value: number) => {
     m.e[14] = value;
 }
 
-export function setMat4m30(m: Matrix4, value: number) {
+export const setMat4m30 = (m: Matrix4, value: number) => {
     m.e[3] = value;
 }
 
-export function setMat4m31(m: Matrix4, value: number) {
+export const setMat4m31 = (m: Matrix4, value: number) => {
     m.e[7] = value;
 }
 
-export function setMat4m32(m: Matrix4, value: number) {
+export const setMat4m32 = (m: Matrix4, value: number) => {
     m.e[11] = value;
 }
 
-export function setMat4m33(m: Matrix4, value: number) {
+export const setMat4m33 = (m: Matrix4, value: number) => {
     m.e[15] = value;
 }
 
-export function getMat4Position(m: Matrix4) {
+export const getMat4Position = (m: Matrix4) => {
     return createVector3(mat4m03(m), mat4m13(m), mat4m23(m));
 }
 
-export function getMat4Scale(m: Matrix4) {
+export const getMat4Scale = (m: Matrix4) => {
     const m00 = mat4m00(m);
     const m01 = mat4m01(m);
     const m02 = mat4m02(m);
@@ -234,11 +234,11 @@ export function getMat4Scale(m: Matrix4) {
 //     return new Vector3(this.m03 / w, this.m13 / w, this.m23 / w);
 // }
 
-export function createMat4Identity() {
+export const createMat4Identity = () => {
     return createMatrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 
-export function assignMat4Identity(m: Matrix4) {
+export const assignMat4Identity = (m: Matrix4) => {
     setMat4m00(m, 1);
     setMat4m01(m, 0);
     setMat4m02(m, 0);
@@ -258,14 +258,14 @@ export function assignMat4Identity(m: Matrix4) {
     return m;
 }
 
-export function setMat4Translation(m: Matrix4, v: Vector3) {
+export const setMat4Translation = (m: Matrix4, v: Vector3) => {
     setMat4m03(m, v3x(v));
     setMat4m13(m, v3y(v));
     setMat4m23(m, v3z(v));
     return m;
 }
 
-export function createTranslationMatrix(v: Vector3) {
+export const createTranslationMatrix = (v: Vector3) => {
     // prettier-ignore
     return createMatrix4(
         1, 0, 0, v3x(v),
@@ -275,7 +275,7 @@ export function createTranslationMatrix(v: Vector3) {
     );
 }
 
-export function multiplyTranslationMatrix(refMat: Matrix4, v: Vector3) {
+export const multiplyTranslationMatrix = (refMat: Matrix4, v: Vector3) => {
     // prettier-ignore
     multiplyMat4Elem(
         refMat,
@@ -286,7 +286,7 @@ export function multiplyTranslationMatrix(refMat: Matrix4, v: Vector3) {
     );
 }
 
-export function createScalingMatrix(v: Vector3) {
+export const createScalingMatrix = (v: Vector3) => {
     // prettier-ignore
     return createMatrix4(
         v3x(v), 0, 0, 0,
@@ -296,7 +296,7 @@ export function createScalingMatrix(v: Vector3) {
     );
 }
 
-export function multiplyScalingMatrix(refMat: Matrix4, v: Vector3) {
+export const multiplyScalingMatrix = (refMat: Matrix4, v: Vector3) => {
     // prettier-ignore
     return multiplyMat4Elem(
         refMat,
@@ -307,7 +307,7 @@ export function multiplyScalingMatrix(refMat: Matrix4, v: Vector3) {
     );
 }
 
-export function createRotationXMatrix(rad: number) {
+export const createRotationXMatrix = (rad: number) => {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
@@ -319,7 +319,7 @@ export function createRotationXMatrix(rad: number) {
     );
 }
 
-export function createRotationYMatrix(rad: number) {
+export const createRotationYMatrix = (rad: number) => {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
@@ -331,7 +331,7 @@ export function createRotationYMatrix(rad: number) {
     );
 }
 
-export function createRotationZMatrix(rad: number) {
+export const createRotationZMatrix = (rad: number) => {
     const c = Math.cos(rad);
     const s = Math.sin(rad);
     // prettier-ignore
@@ -344,20 +344,20 @@ export function createRotationZMatrix(rad: number) {
 }
 
 // 配列の後ろほど、頭からかけることになる(ex. TRSの順番のまま渡す)
-export function multiplyMat4Array(...matrices: Matrix4[]) {
+export const multiplyMat4Array = (...matrices: Matrix4[]) => {
     const m = createMat4Identity();
     matrices.forEach((matrix) => multiplyMat4(m, matrix));
     return m;
 }
 
 // 配列の後ろほど、頭からかけることになる(ex. TRSの順番のまま渡す)
-export function multiplyMat4ArrayRef(refMat: Matrix4, ...matrices: Matrix4[]) {
+export const multiplyMat4ArrayRef = (refMat: Matrix4, ...matrices: Matrix4[]) => {
     refMat = assignMat4Identity(refMat);
     matrices.forEach((matrix) => multiplyMat4(refMat, matrix));
     return refMat;
 }
 
-export function multiplyMat4(m1: Matrix4, m2: Matrix4) {
+export const multiplyMat4 = (m1: Matrix4, m2: Matrix4) => {
     // const m1 = this;
 
     const e1 = m1.e;
@@ -445,13 +445,13 @@ export function multiplyMat4(m1: Matrix4, m2: Matrix4) {
 }
 
 // prettier-ignore
-export function multiplyMat4Elem(
+export const multiplyMat4Elem = (
     m1: Matrix4,
     mb00: number, mb01: number, mb02: number, mb03: number,
     mb10: number, mb11: number, mb12: number, mb13: number,
     mb20: number, mb21: number, mb22: number, mb23: number,
     mb30: number, mb31: number, mb32: number, mb33: number,
-) {
+) => {
     // const m1 = this;
 
     const e1 = m1.e;
@@ -521,7 +521,7 @@ export function multiplyMat4Elem(
 }
 
 // smの内容をtmで上書き
-export function copyMat4(sm: Matrix4, tm: Matrix4) {
+export const copyMat4 = (sm: Matrix4, tm: Matrix4) => {
     // tmp
     // sm.e = new Float32Array([...tm.e]);
 
@@ -546,13 +546,13 @@ export function copyMat4(sm: Matrix4, tm: Matrix4) {
 }
 
 // prettier-ignore
-export function copyMat4WithElem(
+export const copyMat4WithElem = (
     sm: Matrix4,
     n00: number, m01: number, m02: number, m03: number,
     n10: number, m11: number, m12: number, m13: number,
     n20: number, m21: number, m22: number, m23: number,
     n30: number, m31: number, m32: number, m33: number
-) {
+) => {
     setMat4m00(sm, n00);
     setMat4m01(sm, m01);
     setMat4m02(sm, m02);
@@ -572,7 +572,7 @@ export function copyMat4WithElem(
     return sm;
 }
 
-export function cloneMat4(sm: Matrix4) {
+export const cloneMat4 = (sm: Matrix4) => {
     const m = createMat4Identity();
     // m.m00 = mat4m00(sm);
     // m.m01 = mat4m01(sm);
@@ -609,7 +609,7 @@ export function cloneMat4(sm: Matrix4) {
     return m;
 }
 
-export function transposeMat4(m: Matrix4) {
+export const transposeMat4 = (m: Matrix4) => {
     const m01 = mat4m01(m);
     const m10 = mat4m10(m);
     setMat4m01(m, m10);
@@ -643,14 +643,14 @@ export function transposeMat4(m: Matrix4) {
     return m;
 }
 
-export function invertMat4Ref(refMat: Matrix4, m: Matrix4) {
+export const invertMat4Ref = (refMat: Matrix4, m: Matrix4) => {
     // refMatにmの内容をコピーしてから、refMatを逆行列化する
     copyMat4(refMat, m);
     return invertMat4(refMat);
 }
 
 // 逆行列計算 / 引数の行列を書き換える
-export function invertMat4(m: Matrix4) {
+export const invertMat4 = (m: Matrix4) => {
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     const te = m.e,
         n11 = te[0],
@@ -728,14 +728,14 @@ export function invertMat4(m: Matrix4) {
 }
 
 // ref: https://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20090829
-export function createOrthographicMatrix(
+export const createOrthographicMatrix = (
     left: number,
     right: number,
     bottom: number,
     top: number,
     near: number,
     far: number
-) {
+) => {
     const m00 = 2 / (right - left); // scale x
     const m11 = 2 / (top - bottom); // scale y
     const m22 = -2 / (far - near); // scale z
@@ -755,7 +755,7 @@ export function createOrthographicMatrix(
 // https://developer.mozilla.org/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection
 // fov ... rad
 // aspect ... w / h
-export function createPerspectiveMatrix(fov: number, aspect: number, near: number, far: number) {
+export const createPerspectiveMatrix = (fov: number, aspect: number, near: number, far: number) => {
     const f = 1 / Math.tan(fov / 2);
     // const nf = 1 / (near - far);
 
@@ -867,21 +867,21 @@ function createLookAtMatrixInternal(
     }
 }
 
-export function createLookAtMatrix(eye: Vector3, center: Vector3, up = createVector3Up(), inverseForward = false) {
+export const createLookAtMatrix = (eye: Vector3, center: Vector3, up = createVector3Up(), inverseForward = false) => {
     return createLookAtMatrixInternal(eye, center, up, inverseForward);
 }
 
-export function createLookAtMatrixRef(
+export const createLookAtMatrixRef = (
     refMat: Matrix4,
     eye: Vector3,
     center: Vector3,
     up = createVector3Up(),
     inverseForward = false
-) {
+) => {
     return createLookAtMatrixInternal(eye, center, up, inverseForward, refMat);
 }
 
-export function createMat4FromTRS(position: Vector3, rotation: Rotator, scaling: Vector3) {
+export const createMat4FromTRS = (position: Vector3, rotation: Rotator, scaling: Vector3) => {
     const rotationRadians = getRotatorAxesRadians(rotation);
     return multiplyMat4Array(
         createTranslationMatrix(position),
@@ -892,7 +892,7 @@ export function createMat4FromTRS(position: Vector3, rotation: Rotator, scaling:
     );
 }
 
-export function createMat4FromQuaternion(q: Quaternion) {
+export const createMat4FromQuaternion = (q: Quaternion) => {
     const eulerRadians = toEulerRadianFromQuaternion(q);
     return multiplyMat4Array(
         createRotationYMatrix(eulerRadians.y),
@@ -901,7 +901,7 @@ export function createMat4FromQuaternion(q: Quaternion) {
     );
 }
 
-export function mat4fromNumArray(arr: number[]) {
+export const mat4fromNumArray = (arr: number[]) => {
     return createMatrix4(
         arr[0],
         arr[1],
@@ -922,11 +922,11 @@ export function mat4fromNumArray(arr: number[]) {
     );
 }
 
-export function logMat4(m: Matrix4) {
+export const logMat4 = (m: Matrix4) => {
     console.log(getPrettyLine(m));
 }
 
-export function getPrettyLine(m: Matrix4) {
+export const getPrettyLine = (m: Matrix4) => {
     return `--------------------
 
 ${mat4m00(m)}, ${mat4m01(m)}, ${mat4m02(m)}, ${mat4m03(m)},

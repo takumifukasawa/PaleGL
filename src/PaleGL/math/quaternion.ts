@@ -14,7 +14,7 @@ import {createVector3, v3x, v3y, v3z, Vector3} from "@/PaleGL/math/vector3.ts";
 
 export type Quaternion = Float32Array;
 
-export function createQuaternion(x: number, y: number, z: number, w: number) {
+export const createQuaternion = (x: number, y: number, z: number, w: number) => {
     return new Float32Array([x, y, z, w]);
 }
 
@@ -23,7 +23,7 @@ export const qy = (q: Quaternion) => q[1];
 export const qz = (q: Quaternion) => q[2];
 export const qw = (q: Quaternion) => q[3];
 
-export function copyQuaternion(sq: Quaternion, tq: Quaternion) {
+export const copyQuaternion = (sq: Quaternion, tq: Quaternion) => {
     sq[0] = tq[0];
     sq[1] = tq[1];
     sq[2] = tq[2];
@@ -124,19 +124,19 @@ function createRotationMatrixFromQuaternionInternal(q: Quaternion, refMat?: Matr
     }
 }
 
-export function createRotationMatrixFromQuaternion(q: Quaternion) {
+export const createRotationMatrixFromQuaternion = (q: Quaternion) => {
     return createRotationMatrixFromQuaternionInternal(q);
 }
 
-export function createRotationMatrixFromQuaternionRef(refMat: Matrix4, q: Quaternion) {
+export const createRotationMatrixFromQuaternionRef = (refMat: Matrix4, q: Quaternion) => {
     return createRotationMatrixFromQuaternionInternal(q, refMat)
 }
 
-export function multiplyRotationMatrixFromQuaternion(srcMat: Matrix4, q: Quaternion) {
+export const multiplyRotationMatrixFromQuaternion = (srcMat: Matrix4, q: Quaternion) => {
     return createRotationMatrixFromQuaternionInternal(q, srcMat, true);
 }
 
-export function rotationMatrixToQuaternion(mat: Matrix4) {
+export const rotationMatrixToQuaternion = (mat: Matrix4) => {
     const m00 = mat4m00(mat);
     const m11 = mat4m11(mat);
     const m22 = mat4m22(mat);
@@ -181,7 +181,7 @@ export function rotationMatrixToQuaternion(mat: Matrix4) {
 // - https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
 // - https://github.com/infusion/Quaternion.js/blob/master/quaternion.js
 // - https://qiita.com/aa_debdeb/items/3d02e28fb9ebfa357eaf
-export function toEulerRadianFromQuaternion(q: Quaternion) {
+export const toEulerRadianFromQuaternion = (q: Quaternion) => {
     const x = qx(q);
     const y = qy(q);
     const z = qz(q);
@@ -220,7 +220,7 @@ export function toEulerRadianFromQuaternion(q: Quaternion) {
     };
 }
 
-export function toEulerDegreeFromQuaternion(q: Quaternion) {
+export const toEulerDegreeFromQuaternion = (q: Quaternion) => {
     const rad = toEulerRadianFromQuaternion(q);
     return {
         x: (rad.x * 180) / Math.PI,
@@ -230,7 +230,7 @@ export function toEulerDegreeFromQuaternion(q: Quaternion) {
 }
 
 // zxy
-export function createQuaternionFromEulerRadians(x: number, y: number, z: number) {
+export const createQuaternionFromEulerRadians = (x: number, y: number, z: number) => {
     const cx = Math.cos(x / 2);
     const sx = Math.sin(x / 2);
     const cy = Math.cos(y / 2);
@@ -253,11 +253,11 @@ export function createQuaternionFromEulerRadians(x: number, y: number, z: number
     return createQuaternion(qx, qy, qz, qw);
 }
 
-export function createQuaternionFromEulerDegrees(x: number, y: number, z: number) {
+export const createQuaternionFromEulerDegrees = (x: number, y: number, z: number) => {
     return createQuaternionFromEulerRadians((x * Math.PI) / 180, (y * Math.PI) / 180, (z * Math.PI) / 180);
 }
 
-export function createMatrix4FromQuaternion(q: Quaternion) {
+export const createMatrix4FromQuaternion = (q: Quaternion) => {
     const x = qx(q);
     const y = qy(q);
     const z = qz(q);
@@ -282,16 +282,16 @@ export function createMatrix4FromQuaternion(q: Quaternion) {
     );
 }
 
-export function createQuaternionInvertAxis(q: Quaternion) {
+export const createQuaternionInvertAxis = (q: Quaternion) => {
     return createQuaternion(-qx(q), -qy(q), -qz(q), qw(q));
 }
 
-export function createQuaternionIdentity() {
+export const createQuaternionIdentity = () => {
     return createQuaternion(0, 0, 0, 1);
 }
 
 // TODO: バグがあるかもしれない
-export function rotateVectorByQuaternion(v: Vector3, q: Quaternion) {
+export const rotateVectorByQuaternion = (v: Vector3, q: Quaternion) => {
     const x = qx(q);
     const y = qy(q);
     const z = qz(q);

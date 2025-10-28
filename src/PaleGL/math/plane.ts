@@ -10,14 +10,14 @@ import { Ray } from '@/PaleGL/math/ray.ts';
 
 export type Plane = ReturnType<typeof createPlane>;
 
-export function createPlane(point: Vector3, normal: Vector3) {
+export const createPlane = (point: Vector3, normal: Vector3) => {
     return {
         point,
         normal,
     };
 }
 
-export function intersectRayWithPlane(ray: Ray, plane: Plane): Vector3 | null {
+export const intersectRayWithPlane = (ray: Ray, plane: Plane): Vector3 | null => {
     const rayOrigin = ray.origin;
     const rayDir = ray.dir;
 

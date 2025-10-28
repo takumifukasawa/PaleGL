@@ -17,7 +17,7 @@ export type GLSLSoundWrapper = {
     // getCurrentTime: () => number | undefined;
 }
 
-export function createGLSLSoundWrapper(gpu: Gpu, shader: string, duration: number): GLSLSoundWrapper {
+export const createGLSLSoundWrapper = (gpu: Gpu, shader: string, duration: number): GLSLSoundWrapper => {
     const glslSound: GLSLSound = createGLSLSound(gpu, shader, duration);
     // let _isPlaying = false;
 
@@ -32,7 +32,7 @@ export function createGLSLSoundWrapper(gpu: Gpu, shader: string, duration: numbe
 
     // const play = ({ volume = 1, time = 0, reload = false }: { volume?: number; time?: number, reload?: boolean } = {}) => {
     //     console.log(`[glslSoundWrapper.play] play time: ${time}`);
-    //     if (reload) {
+    //     if (reload) => {
     //         stop();
     //         // 120BPM x 64measure = 128sec
     //         // 120BPM x 72measure = 144sec
@@ -45,7 +45,7 @@ export function createGLSLSoundWrapper(gpu: Gpu, shader: string, duration: numbe
     // };
 
     // const stop = () => {
-    //     if(!_isPlaying) {
+    //     if(!_isPlaying) => {
     //         return;
     //     }
     //     console.log('[glslSoundWrapper.stop]');
@@ -70,11 +70,11 @@ export function createGLSLSoundWrapper(gpu: Gpu, shader: string, duration: numbe
     };
 }
 
-export function loadSound(glslSoundWrapper: GLSLSoundWrapper) {
+export const loadSound = (glslSoundWrapper: GLSLSoundWrapper) => {
     loadGLSLSound(glslSoundWrapper.glslSound);
 }
 
-export function playSound(glslSoundWrapper: GLSLSoundWrapper, args: { volume?: number; time?: number; reload?: boolean } = {}) {
+export const playSound = (glslSoundWrapper: GLSLSoundWrapper, args: { volume?: number; time?: number; reload?: boolean } = {}) => {
     const { volume = 1, time = 0, reload = false } = args;
     console.log(`[glslSoundWrapper.play] args - volume: ${volume}, time: ${time}, reload: ${reload}`);
     if (reload) {
@@ -87,7 +87,7 @@ export function playSound(glslSoundWrapper: GLSLSoundWrapper, args: { volume?: n
     setGLSLSoundVolume(glslSoundWrapper.glslSound, volume);
 }
 
-export function stopSound(glslSoundWrapper: GLSLSoundWrapper) {
+export const stopSound = (glslSoundWrapper: GLSLSoundWrapper) => {
     if (!glslSoundWrapper.isPlaying) {
         return;
     }
@@ -96,6 +96,6 @@ export function stopSound(glslSoundWrapper: GLSLSoundWrapper) {
     stopGLSLSound(glslSoundWrapper.glslSound);
 }
 
-export function getSoundCurrentTime(glslSoundWrapper: GLSLSoundWrapper) {
+export const getSoundCurrentTime = (glslSoundWrapper: GLSLSoundWrapper) => {
     return getGLSLSoundCurrentTime(glslSoundWrapper.glslSound);
 }

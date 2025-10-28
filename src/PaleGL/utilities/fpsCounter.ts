@@ -5,7 +5,7 @@
     currentFPS: number;
 };
 
-export function createFPSCounter(calculateInterval = 1) {
+export const createFPSCounter = (calculateInterval = 1) => {
     const renderCount = 0;
     const startCountTime = -Infinity;
     const currentFPS = 0;

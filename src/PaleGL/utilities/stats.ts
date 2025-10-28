@@ -169,7 +169,7 @@ type StatsArgs = {
 
 export type Stats = ReturnType<typeof createStats>;
 
-export function createStats(args: StatsArgs = {}) {
+export const createStats = (args: StatsArgs = {}) => {
     const { wrapperElement, showStats = true, showPipeline = true, showPassDetails = true } = args;
 
     const domElement = document.createElement('div');

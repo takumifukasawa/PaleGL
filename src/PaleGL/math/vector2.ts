@@ -64,13 +64,13 @@
 
 export type RawVector2 = { x: number; y: number; };
 
-export function createVector2FromRaw(raw: RawVector2) {
+export const createVector2FromRaw = (raw: RawVector2) => {
     return createVector2(raw.x, raw.y);
 }
 
 export type Vector2 = Float32Array;
 
-export function createVector2(x: number, y: number): Vector2 {
+export const createVector2 = (x: number, y: number): Vector2 => {
     return new Float32Array([x, y]);
 }
 
@@ -84,40 +84,40 @@ export const setV2 = (v2: Vector2, x: number, y: number) => {
 };
 export const v2o = (v2: Vector2) => ({ x: v2x(v2), y: v2y(v2) });
 
-export function createVector2Identity() {
+export const createVector2Identity = () => {
     return createVector2(0, 0);
 }
 
-export function createVector2One() {
+export const createVector2One = () => {
     return createVector2(1, 1);
 }
 
-export function createVector2Zero() {
+export const createVector2Zero = () => {
     return createVector2(0, 0);
 }
 
-export function subVectorsV2(v1: Vector2, v2: Vector2) {
+export const subVectorsV2 = (v1: Vector2, v2: Vector2) => {
     return createVector2(v2x(v1) - v2x(v2), v2y(v1) - v2y(v2));
 }
 
-export function copyVector2(sv: Vector2, tv: Vector2) {
+export const copyVector2 = (sv: Vector2, tv: Vector2) => {
     setV2x(sv, v2x(tv));
     setV2y(sv, v2y(tv));
     return sv;
 }
 
-export function divVector2(sv: Vector2, tv: Vector2) {
+export const divVector2 = (sv: Vector2, tv: Vector2) => {
     setV2x(sv, v2x(sv) / v2x(tv));
     setV2y(sv, v2y(sv) / v2y(tv));
     return sv;
 }
 
-export function logVector2(v: Vector2) {
+export const logVector2 = (v: Vector2) => {
     console.log(`--------------------
 ${v2x(v)}, ${v2y(v)}
 --------------------`);
 }
 
-export function isVector2(v: unknown) {
+export const isVector2 = (v: unknown) => {
     return v instanceof Float32Array && v.length === 2;
 }

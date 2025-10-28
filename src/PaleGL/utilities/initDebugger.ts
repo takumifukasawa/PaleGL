@@ -18,7 +18,7 @@ import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { getPostProcessPassByType, PostProcess } from '@/PaleGL/postprocess/postProcess.ts';
 import { POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER } from '@/PaleGL/constants.ts';
 
-export function initDebugger(
+export const initDebugger = (
     wrapperElement: HTMLElement,
     {
         renderer,
@@ -37,7 +37,7 @@ export function initDebugger(
         // directionalLight: DirectionalLight,
         cameraPostProcess: PostProcess;
     }
-): DebuggerGUI {
+): DebuggerGUI => {
     const debuggerGUI = createDebuggerGUI();
 
     //

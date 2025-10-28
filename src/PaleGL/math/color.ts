@@ -2,70 +2,70 @@
 
 export type Color = { e: Float32Array };
 
-export function createColor(r: number = 0, g: number = 0, b: number = 0, a: number = 1): Color {
+export const createColor = (r: number = 0, g: number = 0, b: number = 0, a: number = 1): Color => {
     return { e: new Float32Array([r, g, b, a]) };
 }
 
-export function getColorR(color: Color) {
+export const getColorR = (color: Color) => {
     return color.e[0];
 }
 
-export function getColorG(color: Color) {
+export const getColorG = (color: Color) => {
     return color.e[1];
 }
 
-export function getColorB(color: Color) {
+export const getColorB = (color: Color) => {
     return color.e[2];
 }
 
-export function getColorA(color: Color) {
+export const getColorA = (color: Color) => {
     return color.e[3];
 }
 
-export function getColorR255(color: Color) {
+export const getColorR255 = (color: Color) => {
     return color.e[0] * 255;
 }
 
-export function getColorG255(color: Color) {
+export const getColorG255 = (color: Color) => {
     return color.e[1] * 255;
 }
 
-export function getColorB255(color: Color) {
+export const getColorB255 = (color: Color) => {
     return color.e[2] * 255;
 }
 
-export function getColorA255(color: Color) {
+export const getColorA255 = (color: Color) => {
     return color.e[3] * 255;
 }
 
-export function getColorRGBArray(color: Color) {
+export const getColorRGBArray = (color: Color) => {
     return [color.e[0], color.e[1], color.e[2]];
 }
 
-export function setColorR(color: Color, value: number) {
+export const setColorR = (color: Color, value: number) => {
     color.e[0] = value;
 }
 
-export function setColorG(color: Color, value: number) {
+export const setColorG = (color: Color, value: number) => {
     color.e[1] = value;
 }
 
-export function setColorB(color: Color, value: number) {
+export const setColorB = (color: Color, value: number) => {
     color.e[2] = value;
 }
 
-export function setColorA(color: Color, value: number) {
+export const setColorA = (color: Color, value: number) => {
     color.e[3] = value;
 }
 
-export function setColorChannels(color: Color, r: number, g: number, b: number, a: number) {
+export const setColorChannels = (color: Color, r: number, g: number, b: number, a: number) => {
     color.e[0] = r;
     color.e[1] = g;
     color.e[2] = b;
     color.e[3] = a;
 }
 
-export function setColorChannel(color: Color, key: string, value: number) {
+export const setColorChannel = (color: Color, key: string, value: number) => {
     switch (key) {
         case 'r':
             color.e[0] = value;
@@ -82,7 +82,7 @@ export function setColorChannel(color: Color, key: string, value: number) {
     }
 }
 
-export function multiplyColorScalar(color: Color, s: number, withAlpha: boolean = false) {
+export const multiplyColorScalar = (color: Color, s: number, withAlpha: boolean = false) => {
     color.e[0] *= s;
     color.e[1] *= s;
     color.e[2] *= s;
@@ -92,7 +92,7 @@ export function multiplyColorScalar(color: Color, s: number, withAlpha: boolean 
     return color;
 }
 
-export function getColorRGB(color: Color) {
+export const getColorRGB = (color: Color) => {
     return {
         r: getColorR255(color),
         g: getColorG255(color),
@@ -100,7 +100,7 @@ export function getColorRGB(color: Color) {
     };
 }
 
-export function getColorHexCoord(color: Color, withHash = true) {
+export const getColorHexCoord = (color: Color, withHash = true) => {
     const rgb = getColorRGB(color);
     const r = rgb.r.toString(16).padStart(2, '0');
     const g = rgb.g.toString(16).padStart(2, '0');
@@ -111,11 +111,11 @@ export function getColorHexCoord(color: Color, withHash = true) {
     return str;
 }
 
-export function cloneColor(color: Color) {
+export const cloneColor = (color: Color) => {
     return new Float32Array([color.e[0], color.e[1], color.e[2], color.e[3]]);
 }
 
-export function copyColor(dest: Color, src: Color) {
+export const copyColor = (dest: Color, src: Color) => {
     dest.e[0] = src.e[0];
     dest.e[1] = src.e[1];
     dest.e[2] = src.e[2];
@@ -123,28 +123,28 @@ export function copyColor(dest: Color, src: Color) {
 }
     
 
-export function createColorWhite() {
+export const createColorWhite = () => {
     return createColor(1, 1, 1, 1);
 }
 
-export function createColorBlack() {
+export const createColorBlack = () => {
     return createColor(0, 0, 0, 1);
 }
 
-export function createColorGreen() {
+export const createColorGreen = () => {
     return createColor(0, 0, 1, 1);
 }
 
-export function createColorFromRGB(r: number, g: number, b: number, a: number = 255) {
+export const createColorFromRGB = (r: number, g: number, b: number, a: number = 255) => {
     return createColor(r / 255, g / 255, b / 255, a / 255);
 }
 
-export function createColorFromArray(data: number[]) {
+export const createColorFromArray = (data: number[]) => {
     return createColor(data[0], data[1], data[2], data[3] ? data[3] : 1);
 }
 
 // hex ... #rrggbb or rrggbb
-export function createColorFromHex(hex: string) {
+export const createColorFromHex = (hex: string) => {
     const coord = hex.slice(0, 1) === '#' ? hex.slice(1) : hex;
     const r = coord.slice(0, 2);
     const g = coord.slice(2, 4);
@@ -153,7 +153,7 @@ export function createColorFromHex(hex: string) {
 }
 
 // hex ... #rrggbbi or rrggbbii (ii = intensity 0~10)
-export function createEmissiveColorFromHex(hex: string) {
+export const createEmissiveColorFromHex = (hex: string) => {
     const coord = hex.slice(0, 1) === '#' ? hex.slice(1) : hex;
     const r = coord.slice(0, 2);
     const g = coord.slice(2, 4);
@@ -168,7 +168,7 @@ export function createEmissiveColorFromHex(hex: string) {
     );
 }
 
-export function getColorRange(minColor: Color, maxColor: Color) {
+export const getColorRange = (minColor: Color, maxColor: Color) => {
     const r = randomRange(getColorR(minColor), getColorR(maxColor));
     const g = randomRange(getColorG(minColor), getColorG(maxColor));
     const b = randomRange(getColorB(minColor), getColorB(maxColor));

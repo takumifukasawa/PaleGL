@@ -2,7 +2,7 @@
 
 export type TimeSkipper = ReturnType<typeof createTimeSkipper>;
 
-export function createTimeSkipper(targetFPS: number, callback: Callback) {
+export const createTimeSkipper = (targetFPS: number, callback: Callback) => {
     return {
         targetFPS: targetFPS,
         callback: callback,
