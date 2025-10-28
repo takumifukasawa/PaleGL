@@ -84,7 +84,7 @@ export type DepthOfFieldPass = PostProcessPassBase &
         compositePass: FragmentPass;
     };
 
-export function createDepthOfFieldPass(args: DepthOfFieldPassArgs) {
+export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
     const { gpu, enabled } = args;
 
     const focusDistance = args.focusDistance ?? 14;

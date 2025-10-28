@@ -51,9 +51,9 @@ type ObjectSpaceRaymarchGlassArgs = {
 
 export type ObjectSpaceRaymarchGlassMaterial = Material;
 
-export function createObjectSpaceRaymarchGlassMaterial(
+export const createObjectSpaceRaymarchGlassMaterial = (
     args: ObjectSpaceRaymarchGlassArgs
-): ObjectSpaceRaymarchGlassMaterial {
+): ObjectSpaceRaymarchGlassMaterial => {
     const {
         fragmentShaderTemplate,
         fragmentShaderContent,

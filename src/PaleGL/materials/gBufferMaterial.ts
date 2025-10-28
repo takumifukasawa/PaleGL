@@ -69,7 +69,7 @@ export type GBufferMaterial = Material & {
 }
 
 // TODO: 実質的にLitのMaterialなので、GBufferから命名剝がしたい
-export function createGBufferMaterial(args: GBufferMaterialArgs): GBufferMaterial {
+export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMaterial => {
     const {
         // TODO: 外部化
         // vertexShaderModifiers = [],

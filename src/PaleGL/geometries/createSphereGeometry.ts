@@ -15,12 +15,12 @@ type SphereGeometry = {
  * 半径 r、横分割数 widthSegments、縦分割数 heightSegments の球ジオメトリを生成する。
  * position, normal, uv, index（インデックス描画用）を返す。
  */
-export function createSphereGeometryRawData(
+export const createSphereGeometryRawData = (
     radius: number,
     widthSegments: number,
     heightSegments: number,
     invertNormals: boolean = false
-): SphereGeometry {
+): SphereGeometry => {
     widthSegments = Math.max(3, Math.floor(widthSegments));
     heightSegments = Math.max(2, Math.floor(heightSegments));
 
@@ -116,7 +116,7 @@ type SphereGeometryArgs = {
     invertNormals?: boolean;
 };
 
-export function createSphereGeometry(args: SphereGeometryArgs) {
+export const createSphereGeometry = (args: SphereGeometryArgs) => {
     const { gpu, radius = 1, widthSegments = 8, heightSegments = 8, invertNormals } = args;
 
     const rawData = createSphereGeometryRawData(radius, widthSegments, heightSegments, invertNormals);

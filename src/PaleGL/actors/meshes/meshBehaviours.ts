@@ -106,64 +106,64 @@ export function startMesh(actor: Actor, args: ActorStartArgs) {
     (startMeshBehaviour[mesh.meshType] ?? startMeshBehaviourBase)(mesh, args);
 }
 
-export function replaceMeshMaterial(mesh: Mesh, gpu: Gpu, index: number, material: Material) {
-    const tmpMaterial = mesh.materials[index];
-    if (tmpMaterial.shader) {
-        deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
-    }
-    mesh.materials[index] = material;
-    if (!isCompiledMaterialShader(mesh.materials[index])) {
-        startMaterial(mesh.materials[index], {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-        });
-    }
-    const tmpDepthMaterial = mesh.depthMaterials[index];
-    if (tmpDepthMaterial?.shader) {
-        deleteProgram(gpu.gl, tmpDepthMaterial.shader.glObject);
-    }
-    mesh.depthMaterials[index] = material;
-    if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
-        startMaterial(mesh.depthMaterials[index], {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-        });
-    }
-}
-
-export function replaceMeshMaterialByArgs(mesh: Mesh, gpu: Gpu, index: number, args: MaterialArgs = {}) {
-    const tmpMaterial = mesh.materials[index];
-    const newMaterial = cloneMaterial(tmpMaterial, args);
-    if (tmpMaterial.shader) {
-        deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
-    }
-    // mesh.materials[index] = createMaterial({
-    //     ...tmpMaterial.cachedArgs,
-    //     ...args, // NOTE: 追加したい何かがあるときはここ
-    // });
-    mesh.materials[index] = newMaterial;
-    if (!isCompiledMaterialShader(mesh.materials[index])) {
-        startMaterial(mesh.materials[index], {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-        });
-    }
-    const tmpDepthMaterial = mesh.depthMaterials[index];
-    const newDepthMaterial = cloneMaterial(tmpDepthMaterial, {});
-    if (tmpDepthMaterial.shader) {
-        deleteProgram(gpu.gl, tmpDepthMaterial.shader?.glObject);
-    }
-    // mesh.depthMaterials[index] = createMaterial({
-    //     ...tmpDepthMaterial.cachedArgs,
-    // });
-    mesh.depthMaterials[index] = newDepthMaterial;
-    if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
-        startMaterial(mesh.depthMaterials[index], {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-        });
-    }
-}
+// export function replaceMeshMaterial(mesh: Mesh, gpu: Gpu, index: number, material: Material) {
+//     const tmpMaterial = mesh.materials[index];
+//     if (tmpMaterial.shader) {
+//         deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
+//     }
+//     mesh.materials[index] = material;
+//     if (!isCompiledMaterialShader(mesh.materials[index])) {
+//         startMaterial(mesh.materials[index], {
+//             gpu,
+//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+//         });
+//     }
+//     const tmpDepthMaterial = mesh.depthMaterials[index];
+//     if (tmpDepthMaterial?.shader) {
+//         deleteProgram(gpu.gl, tmpDepthMaterial.shader.glObject);
+//     }
+//     mesh.depthMaterials[index] = material;
+//     if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
+//         startMaterial(mesh.depthMaterials[index], {
+//             gpu,
+//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+//         });
+//     }
+// }
+// 
+// export function replaceMeshMaterialByArgs(mesh: Mesh, gpu: Gpu, index: number, args: MaterialArgs = {}) {
+//     const tmpMaterial = mesh.materials[index];
+//     const newMaterial = cloneMaterial(tmpMaterial, args);
+//     if (tmpMaterial.shader) {
+//         deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
+//     }
+//     // mesh.materials[index] = createMaterial({
+//     //     ...tmpMaterial.cachedArgs,
+//     //     ...args, // NOTE: 追加したい何かがあるときはここ
+//     // });
+//     mesh.materials[index] = newMaterial;
+//     if (!isCompiledMaterialShader(mesh.materials[index])) {
+//         startMaterial(mesh.materials[index], {
+//             gpu,
+//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+//         });
+//     }
+//     const tmpDepthMaterial = mesh.depthMaterials[index];
+//     const newDepthMaterial = cloneMaterial(tmpDepthMaterial, {});
+//     if (tmpDepthMaterial.shader) {
+//         deleteProgram(gpu.gl, tmpDepthMaterial.shader?.glObject);
+//     }
+//     // mesh.depthMaterials[index] = createMaterial({
+//     //     ...tmpDepthMaterial.cachedArgs,
+//     // });
+//     mesh.depthMaterials[index] = newDepthMaterial;
+//     if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
+//         startMaterial(mesh.depthMaterials[index], {
+//             gpu,
+//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+//         });
+//     }
+// }
 
 export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) {
     // TODO: uniformsの中身を引き継いだ方がいいと思われる

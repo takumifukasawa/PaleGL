@@ -34,7 +34,7 @@ export const boxGeometrySurfacePairs = [
     [1, 7, 3, 5],
 ];
 
-export function createBoxGeometryRawData(size: Vector3 = createVector3One()) {
+export const createBoxGeometryRawData = (size: Vector3 = createVector3One()) => {
     const s = scaleVector3ByScalar(size, 0.5);
 
     // -----------------------------
@@ -118,7 +118,7 @@ export function createBoxGeometryRawData(size: Vector3 = createVector3One()) {
     };
 }
 
-export function createBoxGeometryData(size: Vector3) {
+export const createBoxGeometryData = (size: Vector3) => {
     const rawData = createBoxGeometryRawData(size);
 
     // TODO: uniqでfilter
@@ -152,7 +152,7 @@ export type BoxGeometry = Geometry & { cornerPositions: number[][] };
 // type BoxGeometryArgs = GeometryArgs & { size: number };
 type BoxGeometryArgs = { gpu: Gpu, size?: Vector3 };
 
-export function createBoxGeometry(args: BoxGeometryArgs): BoxGeometry {
+export const createBoxGeometry = (args: BoxGeometryArgs): BoxGeometry => {
     const { gpu, size = createVector3One() } = args; // デフォルトが長さ1
 
     const s = scaleVector3ByScalar(size, 0.5);

@@ -53,7 +53,7 @@ export type ScreenSpaceRaymarchMaterialArgs = {
 
 export type ScreenSpaceRaymarchMaterial = ReturnType<typeof createScreenSpaceRaymarchMaterial>;
 
-export function createScreenSpaceRaymarchMaterial({
+export const createScreenSpaceRaymarchMaterial = ({
     // TODO: 外部化
     fragmentShader,
     depthFragmentShader,
@@ -71,7 +71,7 @@ export function createScreenSpaceRaymarchMaterial({
     emissiveColor,
     uniformBlockNames,
     ...options
-}: ScreenSpaceRaymarchMaterialArgs) {
+}: ScreenSpaceRaymarchMaterialArgs) => {
     const _baseMap = baseMap || null;
     const _baseColor = baseColor || createColorWhite();
     const _baseMapTiling = baseMapTiling || createVector4(1, 1, 0, 0);

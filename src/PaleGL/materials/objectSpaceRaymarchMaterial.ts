@@ -47,7 +47,7 @@ if (import.meta.hot) {
        });
 }
 
-export function createObjectSpaceRaymarchUniforms() {
+export const createObjectSpaceRaymarchUniforms = () => {
     return [
         ['uIsPerspective', UNIFORM_TYPE_FLOAT, 0],
         ['uUseWorld', UNIFORM_TYPE_FLOAT, 0],
@@ -74,7 +74,7 @@ export type ObjectSpaceRaymarchMaterialArgs = {
 
 export type ObjectSpaceRaymarchMaterial = Material;
 
-export function createObjectSpaceRaymarchMaterial({
+export const createObjectSpaceRaymarchMaterial = ({
     fragmentShaderTemplate,
     fragmentShaderContent,
     depthFragmentShaderTemplate,
@@ -86,7 +86,7 @@ export function createObjectSpaceRaymarchMaterial({
     depthFragmentShaderTemplate?: string;
     depthFragmentShaderContent: string;
     materialArgs: ObjectSpaceRaymarchMaterialArgs;
-}) {
+}) => {
     const { shadingModelId = SHADING_MODEL_ID_LIT, uniforms = [], uniformBlockNames } = materialArgs;
 
     const baseMap = materialArgs.baseMap ?? null;

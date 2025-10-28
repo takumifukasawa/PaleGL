@@ -63,9 +63,9 @@ type ObjectSpaceRaymarchGBufferArgs = {
 
 export type ObjectSpaceRaymarchGBufferMaterial = Material;
 
-export function createObjectSpaceRaymarchGBufferMaterial(
+export const createObjectSpaceRaymarchGBufferMaterial = (
     args: ObjectSpaceRaymarchGBufferArgs
-): ObjectSpaceRaymarchGBufferMaterial {
+): ObjectSpaceRaymarchGBufferMaterial => {
     const {
         fragmentShaderTemplate,
         fragmentShaderContent,

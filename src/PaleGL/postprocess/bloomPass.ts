@@ -86,7 +86,7 @@ type BloomPassArgs = PostProcessPassParametersBaseArgs & Partial<BloomPassParame
 // ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
 // TODO: mipmap使う方法に変えてみる
 // export function createBloomPass(args: { gpu: Gpu; parameters?: BloomPassParametersArgs }): BloomPass {
-export function createBloomPass(args: BloomPassArgs): BloomPass {
+export const createBloomPass = (args: BloomPassArgs): BloomPass => {
     const { gpu, enabled } = args;
 
     const name = 'BloomPass';

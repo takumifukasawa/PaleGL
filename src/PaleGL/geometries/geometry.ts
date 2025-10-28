@@ -4,7 +4,7 @@ import { createVector3, getBinormalFromTangent, getVector3Tangent } from '@/Pale
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 
-export function createTangentsAndBinormals(normals: number[]) {
+export const createTangentsAndBinormals = (normals: number[]) => {
     const tangents: number[] = [];
     const binormals: number[] = [];
     for (let i = 0; i < normals.length / 3; i++) {
@@ -23,7 +23,7 @@ export function createTangentsAndBinormals(normals: number[]) {
     };
 }
 
-export function createBinormals(normals: number[], tangents: number[]) {
+export const createBinormals = (normals: number[], tangents: number[]) => {
     const binormals = [];
     for (let i = 0; i < normals.length / 3; i++) {
         const n = createVector3(normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2]);
@@ -56,7 +56,7 @@ export type Geometry = ReturnType<typeof createGeometry>;
 // NOTE: あんまりgpu持たせたくないけど持たせた方がいろいろと楽
 // TODO: actorをlifecycleに乗せたのでgpuもたせなくてもいいかも
 // TODO: vaoの生成2回走ってる
-export function createGeometry(args: GeometryArgs) {
+export const createGeometry = (args: GeometryArgs) => {
     const {
         gpu,
         // indices,

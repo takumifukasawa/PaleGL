@@ -200,7 +200,7 @@ export const isCompiledMaterialShader = (material: Material) => material.shader 
 
 export const useMaterialAlphaTest = (material: Material) => material.alphaTest !== null;
 
-export function createMaterial(args: MaterialArgs): Material {
+export const createMaterial = (args: MaterialArgs): Material => {
     const {
         name = '',
 

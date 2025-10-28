@@ -25,7 +25,7 @@ export type Light = Actor & {
 };
 
 // TODO: interfaceでいいかも
-export function createLight({ name, intensity, color, lightType }: LightArgs & { lightType: LightType }): Light {
+export const createLight = ({ name, intensity, color, lightType }: LightArgs & { lightType: LightType }): Light => {
     const actor = createActor({ name, type: ACTOR_TYPE_LIGHT });
 
     const castShadow: boolean = false; // bool

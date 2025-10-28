@@ -15,7 +15,7 @@ type PostProcessVolumeArgs = ActorArgs & {
 export type PostProcessVolume = Volume & ReturnType<typeof createPostProcessVolume>;
 
 // TODO: 本当はpassそのものを持たせるのがよい気がするが・・・
-export function createPostProcessVolume(args: PostProcessVolumeArgs) {
+export const createPostProcessVolume = (args: PostProcessVolumeArgs) => {
     const parameters: PostProcessVolumeParameterSet[] = [];
 
     const volume = createVolume({

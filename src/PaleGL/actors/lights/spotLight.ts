@@ -31,7 +31,7 @@ export type SpotLight = Light & {
     penumbraAngle: number;
 };
 
-export function createSpotLight(options: SpotLightArgs): SpotLight {
+export const createSpotLight = (options: SpotLightArgs): SpotLight => {
     const light = createLight({ ...options, lightType: LIGHT_TYPE_SPOT });
 
     light.shadowCamera = createPerspectiveCamera(45, 1, 0.1, 20);
@@ -71,11 +71,11 @@ export const updateSpotLight: UpdateLightFunc = (light: Light) => {
     }
 };
 
-export function getSpotLightConeCos(light: SpotLight) {
+export const getSpotLightConeCos = (light: SpotLight) => {
     return angleToCos(light.coneAngle);
 }
 
-export function getSpotLightPenumbraCos(light: SpotLight) {
+export const getSpotLightPenumbraCos = (light: SpotLight) => {
     return angleToCos(light.penumbraAngle);
 }
 

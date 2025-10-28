@@ -66,7 +66,7 @@ export type ScreenSpaceShadowPass = PostProcessSinglePass & ScreenSpaceShadowPas
 
 export type ScreenSpaceShadowPassArgs = PostProcessPassParametersBaseArgs & Partial<ScreenSpaceShadowPassParameters>;
 
-export function createScreenSpaceShadowPass(args: ScreenSpaceShadowPassArgs) {
+export const createScreenSpaceShadowPass = (args: ScreenSpaceShadowPassArgs) => {
     const { gpu, enabled } = args;
 
     const fragmentShader = screenSpaceShadowFragmentShader;

@@ -95,7 +95,7 @@ type StreakPassArgs = PostProcessPassParametersBaseArgs & Partial<StreakPassPara
 type DownSamplePass = { pass: FragmentPass; prevPass: FragmentPass; downScale: number };
 type UpSamplePass = { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass };
 
-export function createStreakPass(args: StreakPassArgs): StreakPass {
+export const createStreakPass = (args: StreakPassArgs): StreakPass => {
     const { gpu, enabled } = args;
 
     const threshold = args.threshold || 0.9;

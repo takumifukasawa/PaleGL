@@ -13,7 +13,7 @@ export type PointLight = Light & {
     attenuation: number;
 };
 
-export function createPointLight(options: PointLightArgs) {
+export const createPointLight = (options: PointLightArgs) => {
     const light = createLight({ ...options, lightType: LIGHT_TYPE_POINT });
 
     const distance: number = options.distance;

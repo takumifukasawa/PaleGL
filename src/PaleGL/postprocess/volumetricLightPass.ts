@@ -106,7 +106,7 @@ export type VolumetricLightPass = PostProcessSinglePass &
 
 export type VolumetricLightPassArgs = PostProcessPassParametersBaseArgs & Partial<VolumetricLightPassParameters>;
 
-export function createVolumetricLightPass(args: VolumetricLightPassArgs): VolumetricLightPass {
+export const createVolumetricLightPass = (args: VolumetricLightPassArgs): VolumetricLightPass => {
     const { gpu, enabled } = args;
 
     const rayStep = args.rayStep ?? 0.62;

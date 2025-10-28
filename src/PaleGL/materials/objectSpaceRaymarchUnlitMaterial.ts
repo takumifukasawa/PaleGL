@@ -49,9 +49,9 @@ type ObjectSpaceRaymarchUnlitArgs = {
 
 export type ObjectSpaceRaymarchUnlitMaterial = Material;
 
-export function createObjectSpaceRaymarchUnlitMaterial(
+export const createObjectSpaceRaymarchUnlitMaterial = (
     args: ObjectSpaceRaymarchUnlitArgs
-): ObjectSpaceRaymarchUnlitMaterial {
+): ObjectSpaceRaymarchUnlitMaterial => {
     const {
         fragmentShaderTemplate,
         fragmentShaderContent,

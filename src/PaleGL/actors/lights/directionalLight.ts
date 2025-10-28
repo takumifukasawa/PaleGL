@@ -11,7 +11,7 @@ import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type DirectionalLight = Light;
 
-export function createDirectionalLight(options: LightArgs): DirectionalLight {
+export const createDirectionalLight = (options: LightArgs): DirectionalLight => {
     const light = createLight({ ...options, lightType: LIGHT_TYPE_DIRECTIONAL });
 
     // light.shadowCamera = createOrthographicCamera(-1, 1, -1, 1, 0.1, 1);

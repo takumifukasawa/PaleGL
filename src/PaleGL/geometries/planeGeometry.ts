@@ -15,7 +15,7 @@ type PlaneGeometryRawDataOptions = {
     divRowNum?: number; // 行分割数
 };
 
-export function createPlaneGeometryRawData({
+export const createPlaneGeometryRawData = ({
     calculateTangent,
     calculateBinormal,
     flipUvY,
@@ -24,7 +24,7 @@ export function createPlaneGeometryRawData({
     offset = createVector3Zero(),
     divColNum = 1, // 列分割数
     divRowNum = 1, // 行分割数
-}: PlaneGeometryRawDataOptions) {
+}: PlaneGeometryRawDataOptions) => {
     const normal = [0, 0, 1]; // +z方向を向いている板ポリ
 
     const rawPositions: number[] = [];
@@ -93,7 +93,7 @@ export function createPlaneGeometryRawData({
     };
 }
 
-export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
+export const createPlaneGeometryData = (args: PlaneGeometryRawDataOptions) => {
     const rawData = createPlaneGeometryRawData(args);
 
     const attributes: Attribute[] = [
@@ -142,12 +142,12 @@ export function createPlaneGeometryData(args: PlaneGeometryRawDataOptions) {
 
 export type PlaneGeometry = Geometry;
 
-export function createPlaneGeometry({
+export const createPlaneGeometry = ({
     gpu,
     ...args
 }: {
     gpu: Gpu;
-} & PlaneGeometryRawDataOptions): Geometry {
+} & PlaneGeometryRawDataOptions): Geometry => {
     const { attributes, indices, drawCount } = createPlaneGeometryData(args);
 
     const geometry = createGeometry({
