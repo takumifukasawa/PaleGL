@@ -198,7 +198,7 @@ export const createSSRPass = (args: SSRPassArgs): SsrPass => {
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
-export const renderSSRPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
+export function renderSSRPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const ssrPass = postProcessPass as SsrPass;
     setMaterialUniformValue(ssrPass.material, 'uRayDepthBias', ssrPass.rayDepthBias);
     setMaterialUniformValue(ssrPass.material, 'uRayNearestDistance', ssrPass.rayNearestDistance);

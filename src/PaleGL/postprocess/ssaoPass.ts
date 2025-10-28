@@ -209,7 +209,7 @@ export const createSSAOPass = (args: SSAOPassParametersArgs): SsaoPass => {
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
-export const renderSSAOPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
+export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const ssaoPass = postProcessPass as SsaoPass;
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionSampleLength', ssaoPass.occlusionSampleLength);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionBias', ssaoPass.occlusionBias);

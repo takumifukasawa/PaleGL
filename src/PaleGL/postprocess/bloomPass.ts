@@ -256,14 +256,14 @@ export function setBloomPassSize(postProcessPass: PostProcessPass, width: number
     setPostProcessPassSize(bloomPass.compositePass, width, height);
 }
 
-function renderBlur(
+const renderBlur = (
     bloomPass: BloomPass,
     renderer: Renderer,
     horizontalRenderTarget: RenderTarget,
     verticalRenderTarget: RenderTarget,
     beforeRenderTarget: RenderTarget,
     downSize: number
-) {
+) => {
     const w = bloomPass.width / downSize;
     const h = bloomPass.height / downSize;
 

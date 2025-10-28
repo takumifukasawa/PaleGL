@@ -104,7 +104,7 @@ export const createVignettePass = (args: VignettePassArgs): VignettePass => {
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_ASPECT, width / height);
 // }
 
-export const renderVignettePass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
+export function renderVignettePass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const vignettePass = postProcessPass as VignettePass;
     setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_FROM, vignettePass.vignetteRadiusFrom);
     setMaterialUniformValue(vignettePass.material, UNIFORM_NAME_VIGNETTE_RADIUS_TO, vignettePass.vignetteRadiusTo);

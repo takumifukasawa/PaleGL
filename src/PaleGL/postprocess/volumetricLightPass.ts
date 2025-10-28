@@ -296,6 +296,6 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
     renderPostProcessSinglePassBehaviour(volumetricLightPass, options);
 }
 
-export function setVolumetricLightPassSpotLights(volumetricLightPass: VolumetricLightPass, spotLights: SpotLight[]) {
+export const setVolumetricLightPassSpotLights = (volumetricLightPass: VolumetricLightPass, spotLights: SpotLight[]) => {
     volumetricLightPass.spotLights = spotLights;
 }

@@ -167,7 +167,7 @@ export const setFogPassTextures = (
     setMaterialUniformValue(fogPass.material, UNIFORM_NOISE_TEXTURE, noiseTexture);
 }
 
-export const renderFogPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
+export function renderFogPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
     const fogPass = postProcessPass as FogPass;
     setMaterialUniformValue(fogPass.material, UNIFORM_FOG_COLOR, fogPass.fogColor);
     setMaterialUniformValue(fogPass.material, UNIFORM_FOG_STRENGTH, fogPass.fogStrength);

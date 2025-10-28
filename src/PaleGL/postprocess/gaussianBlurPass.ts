@@ -29,7 +29,7 @@ export type GaussianBlurPass = PostProcessPassBase & {
 
 export type GaussianBlurPassParametersArgs = PostProcessPassParametersBaseArgs;
 
-export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): GaussianBlurPass {
+export const createGaussianBlurPass = (args: GaussianBlurPassParametersArgs): GaussianBlurPass => {
     const { gpu, enabled } = args;
 
     const materials: Material[] = [];
@@ -93,11 +93,11 @@ export function createGaussianBlurPass(args: GaussianBlurPassParametersArgs): Ga
     };
 }
 
-export function getGaussianBlurPassRenderTarget(gaussianBlurPass: GaussianBlurPass) {
+export const getGaussianBlurPassRenderTarget = (gaussianBlurPass: GaussianBlurPass) => {
     return gaussianBlurPass.passes[gaussianBlurPass.passes.length - 1].renderTarget;
 }
 
-export function setGaussianBlurPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+export const setGaussianBlurPassSize = (postProcessPass: PostProcessPassBase, width: number, height: number) => {
     const gaussianBlurPass = postProcessPass as GaussianBlurPass;
     setPostProcessPassSize(gaussianBlurPass.horizontalBlurPass, width, height);
     setMaterialUniformValue(gaussianBlurPass.horizontalBlurPass.material, UNIFORM_NAME_TARGET_WIDTH, width);
