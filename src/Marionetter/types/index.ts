@@ -243,13 +243,15 @@ export type MarionetterClipInfoType =
 //     d: number;
 // };
 
-export const MARIONETTER_ANIMATION_CLIP_START_INDEX = 1;
-export const MARIONETTER_ANIMATION_CLIP_DURATION_INDEX = 2;
-export const MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX = 3;
-export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 4;
+export const MARIONETTER_ANIMATION_CLIP_NAME_INDEX = 0;
+export const MARIONETTER_ANIMATION_CLIP_TYPE_INDEX = 1;
+export const MARIONETTER_ANIMATION_CLIP_START_INDEX = 2;
+export const MARIONETTER_ANIMATION_CLIP_DURATION_INDEX = 3;
+export const MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX = 4;
+export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 5;
 
-// [clipInfoType, start, duration, post-extraporation]
-export type MarionetterClipInfoBase = [MarionetterClipInfoType, number, number, MARIONETTER_CLIP_POST_EXTRAPORATION_MODE];
+// [name, clipInfoType, start, duration, post-extraporation]
+export type MarionetterClipInfoBase = [string, MarionetterClipInfoType, number, number, MARIONETTER_CLIP_POST_EXTRAPORATION_MODE];
 
 // export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 // export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
