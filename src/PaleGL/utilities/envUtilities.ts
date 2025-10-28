@@ -1,16 +1,16 @@
 
-export function isProduction() {
+export const isProduction = () => {
     return import.meta.env.MODE === 'production';
 }
 
-export function isDevelopment() {
+export const isDevelopment = () => {
     return import.meta.env.MODE === 'development';
 }
 
-export function isNeededCompact() {
+export const isNeededCompact = () => {
     return import.meta.env.VITE_COMPACT === 'true';
 }
 
-export function isMinifyShader() {
+export const isMinifyShader = () => {
     return import.meta.env.VITE_MINIFY_SHADER === "true";
 }

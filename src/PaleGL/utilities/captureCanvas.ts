@@ -1,4 +1,4 @@
-export function captureCanvas(canvas: HTMLCanvasElement) {
+export const captureCanvas = (canvas: HTMLCanvasElement) => {
     const a = document.createElement('a');
     window.addEventListener('keypress', (e) => {
         if (e.code === 'KeyR') {
