@@ -68,7 +68,7 @@ type PostProcessPassBaseArgs = Omit<PostProcessPassBase, 'width' | 'height' | 'e
         enabled: boolean;
     }>;
 
-export function createPostProcessPassBase(args: PostProcessPassBaseArgs): PostProcessPassBase {
+export const createPostProcessPassBase = (args: PostProcessPassBaseArgs): PostProcessPassBase => {
     return {
         gpu: args.gpu,
         name: args.name,
@@ -89,7 +89,7 @@ export type PostProcessSinglePass = PostProcessPassBase & {
     // materials: Material[];
 };
 
-export function createPostProcessSinglePass(args: {
+export const createPostProcessSinglePass = (args: {
     gpu: Gpu;
     type: PostProcessPassType;
     vertexShader?: string;
@@ -110,7 +110,7 @@ export function createPostProcessSinglePass(args: {
     srcTextureEnabled?: boolean;
 
     enabled?: boolean;
-}): PostProcessSinglePass {
+}): PostProcessSinglePass => {
     const {
         gpu,
         type,
@@ -195,11 +195,11 @@ export function createPostProcessSinglePass(args: {
     };
 }
 
-export function getPostProcessBaseVertexShader() {
+export const getPostProcessBaseVertexShader = () => {
     return postProcessPassVertexShader;
 }
 
-export function getPostProcessCommonUniforms(): UniformsData {
+export const getPostProcessCommonUniforms = (): UniformsData => {
     return [
         [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_FLOAT, 1],
         [UNIFORM_NAME_TARGET_WIDTH, UNIFORM_TYPE_FLOAT, 1],

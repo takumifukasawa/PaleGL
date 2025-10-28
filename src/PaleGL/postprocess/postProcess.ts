@@ -46,7 +46,7 @@ export type PostProcess = {
 };
 
 // TODO: actorを継承してもいいかもしれない
-export function createPostProcess(postProcessCamera?: Camera): PostProcess {
+export const createPostProcess = (postProcessCamera?: Camera): PostProcess => {
     const passes: PostProcessPassBase[] = [];
     postProcessCamera = postProcessCamera ? postProcessCamera : createFullQuadOrthographicCamera();
     const selfEnabled = true;
@@ -59,7 +59,7 @@ export function createPostProcess(postProcessCamera?: Camera): PostProcess {
     };
 }
 
-export function isPostProcessEnabled(postProcess: PostProcess) {
+export const isPostProcessEnabled = (postProcess: PostProcess) => {
     if (!postProcess.selfEnabled) {
         return false;
     }
@@ -73,11 +73,11 @@ export function isPostProcessEnabled(postProcess: PostProcess) {
     return false;
 }
 
-export function setPostProcessEnabled(postProcess: PostProcess, value: boolean) {
+export const setPostProcessEnabled = (postProcess: PostProcess, value: boolean) => {
     postProcess.selfEnabled = value;
 }
 
-export function hasPostProcessPassEnabled(postProcess: PostProcess) {
+export const hasPostProcessPassEnabled = (postProcess: PostProcess) => {
     for (let i = 0; i < postProcess.passes.length; i++) {
         if (postProcess.passes[i].enabled) {
             return true;
@@ -86,10 +86,10 @@ export function hasPostProcessPassEnabled(postProcess: PostProcess) {
     return false;
 }
 
-export function getPostProcessPassByType<T extends PostProcessPassBase>(
+export const getPostProcessPassByType = <T extends PostProcessPassBase>(
     postProcess: PostProcess,
     passType: PostProcessPassType
-) {
+) => {
     for (let i = 0; i < postProcess.passes.length; i++) {
         if (postProcess.passes[i].type === passType) {
             return postProcess.passes[i] as T;
@@ -98,7 +98,7 @@ export function getPostProcessPassByType<T extends PostProcessPassBase>(
     return null;
 }
 
-export function getPostProcessLastRenderTarget(postProcess: PostProcess) {
+export const getPostProcessLastRenderTarget = (postProcess: PostProcess) => {
     let lastPass: PostProcessPassBase | null = null;
     for (let i = postProcess.passes.length - 1; i >= 0; i--) {
         if (postProcess.passes[i].enabled) {
@@ -112,24 +112,24 @@ export function getPostProcessLastRenderTarget(postProcess: PostProcess) {
     return getPostProcessPassRenderTarget(lastPass);
 }
 
-export function setPostProcessSize(postProcess: PostProcess, width: number, height: number) {
+export const setPostProcessSize = (postProcess: PostProcess, width: number, height: number) => {
     setCameraSize(postProcess.postProcessCamera, width, height);
     // this.renderTarget.setSize(width, height);
     postProcess.passes.forEach((pass) => setPostProcessPassSize(pass, width, height));
 }
 
-export function addPostProcessPass(postProcess: PostProcess, pass: PostProcessPassBase) {
+export const addPostProcessPass = (postProcess: PostProcess, pass: PostProcessPassBase) => {
     postProcess.passes.push(pass);
 }
 
-export function updatePostProcess(postProcess: PostProcess) {
+export const updatePostProcess = (postProcess: PostProcess) => {
     postProcess.passes.forEach((pass) => {
         updatePostProcessPass(pass);
     });
 }
 
 // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
-export function updatePassMaterial({
+export const updatePassMaterial = ({
     pass,
     renderer,
     targetCamera,
@@ -143,7 +143,7 @@ export function updatePassMaterial({
     // time: number;
     lightActors?: LightActors;
     fallbackTextureBlack: Texture;
-}) {
+}) => {
     pass.materials.forEach((passMaterial) => {
         // TODO: 必要なのだけ割り当てたいが・・・
         if (lightActors) {
@@ -204,7 +204,7 @@ export function updatePassMaterial({
     });
 }
 
-export function renderPass({
+export const renderPass = ({
     pass,
     gpu,
     renderer,
@@ -219,7 +219,7 @@ export function renderPass({
     pass: PostProcessPassBase;
     camera: Camera;
     isLastPass: boolean;
-}) {
+}) => {
     updatePassMaterial({
         pass,
         renderer,
@@ -248,7 +248,7 @@ export function renderPass({
     });
 }
 
-export function renderPostProcess(
+export const renderPostProcess = (
     postProcess: PostProcess,
     {
         gpu,
@@ -261,7 +261,7 @@ export function renderPostProcess(
         lightActors,
         onAfterRenderPass,
     }: PostProcessRenderArgs
-) {
+) => {
     // if (!sceneRenderTarget) {
     //     console.error('[PostProcess.render] scene render target is empty.');
     // }
