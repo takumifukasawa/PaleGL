@@ -38,6 +38,7 @@ import {
     TimeAccumulator,
 } from '@/PaleGL/utilities/timeAccumulator.ts';
 import { createTimeSkipper, execTimeSkipper, startTimeSkipper, TimeSkipper } from '@/PaleGL/utilities/timeSkipper.ts';
+import { wait } from '@/PaleGL/utilities/wait.ts';
 
 type EngineOnStartCallbackArgs = void;
 
@@ -335,7 +336,11 @@ function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
     }
 }
 
-export function warmRender(engine: Engine) {
+export async function warmRender(
+    engine: Engine,
+    waitTime: number = 16,
+    onRenderActor?: (actor: Actor, index: number, total: number) => void
+) {
     // for debug
     // console.log(`[Engine.warmRender]`);
 
@@ -344,28 +349,62 @@ export function warmRender(engine: Engine) {
         return;
     }
 
-    // 描画させたいので全部中央に置いちゃう
-    const tmpTransformPair: { actor: Actor; p: Vector3; r: Rotator }[] = [];
+    if (!engine.scene.mainCamera) {
+        console.error('mainCamera is not set');
+        return;
+    }
+
+    const camera = engine.scene.mainCamera;
+    const enabledActors: Actor[] = [];
+
+    // enabled なアクターを抽出（カメラ以外）
     traverseScene(engine.scene, (actor) => {
-        const tmpP = cloneVector3(actor.transform.position);
-        const tmpR = cloneRotator(actor.transform.rotation);
-        // TODO: mainカメラだけ抽出したい
-        if (actor.type === ACTOR_TYPE_CAMERA) {
-            setTranslation(actor.transform, createVector3(0, 0, 10));
-            setRotation(actor.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
-        } else {
-            setTranslation(actor.transform, createVector3Zero());
+        if (actor.enabled && actor.type !== ACTOR_TYPE_CAMERA) {
+            enabledActors.push(actor);
         }
-        tmpTransformPair.push({ actor, p: tmpP, r: tmpR });
     });
 
+    // 元の位置・回転を保存
+    const cameraOriginal = {
+        p: cloneVector3(camera.transform.position),
+        r: cloneRotator(camera.transform.rotation),
+    };
+    const actorOriginals = enabledActors.map((actor) => ({
+        actor,
+        p: cloneVector3(actor.transform.position),
+        r: cloneRotator(actor.transform.rotation),
+    }));
+
+    // カメラを固定位置に移動
+    setTranslation(camera.transform, createVector3(0, 0, 10));
+    setRotation(camera.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 180, 0)));
+
+    // 各アクターを1個ずつ処理
+    for (let i = 0; i < enabledActors.length; i++) {
+        const actor = enabledActors[i];
+        setTranslation(actor.transform, createVector3Zero());
+
+        fixedUpdateEngine(engine, 0, 0);
+        updateEngine(engine, 0, 0);
+
+        if (onRenderActor) {
+            onRenderActor(actor, i, enabledActors.length);
+        }
+
+        await wait(waitTime);
+    } 
+
+    // 全て元に戻す
+    setTranslation(camera.transform, cameraOriginal.p);
+    setRotation(camera.transform, cameraOriginal.r);
+    actorOriginals.forEach(({ actor, p, r }) => {
+        setTranslation(actor.transform, p);
+        setRotation(actor.transform, r);
+    });
+
+    // 元の状態を反映するため最後に一回描画
     fixedUpdateEngine(engine, 0, 0);
     updateEngine(engine, 0, 0);
-
-    tmpTransformPair.forEach((pair) => {
-        setTranslation(pair.actor.transform, pair.p);
-        setRotation(pair.actor.transform, pair.r);
-    });
 }
 
 // time[sec]
