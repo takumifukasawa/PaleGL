@@ -52,7 +52,9 @@ tsc                        # 型チェック（出力なし）
 ### デモビルドとパッケージング
 ```bash
 npm run pack:demo          # デモファイルをパック
-npm run build_and_pack:demo # デモをビルドしてパック
+npm run build_and_pack:demo:roadroller # デモをビルドしてパック（Roadroller + Terser最適化 + ライセンス生成）
+npm run build_and_pack:demo:optimized  # デモをビルドしてパック（Roadroller + Terser最適化）
+npm run build_and_pack:demo            # デモをビルドしてパック（基本版）
 ```
 
 ### マリオネッターサーバー
