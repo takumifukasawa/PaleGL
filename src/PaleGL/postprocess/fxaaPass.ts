@@ -21,7 +21,7 @@ export type FxaaPass = PostProcessSinglePass;
 
 export type FXAAPassArgs = PostProcessPassParametersBaseArgs;
 
-export function createFXAAPass(args: FXAAPassArgs): FxaaPass {
+export const createFXAAPass = (args: FXAAPassArgs): FxaaPass => {
     const { gpu, enabled } = args;
     const fragmentShader = fxaaFragmentShader;
 

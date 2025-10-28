@@ -143,7 +143,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
     } as SharedTextureInfo,
 ];
 
-export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Renderer }): SharedTextures {
+export const createSharedTextures = ({ gpu, renderer }: { gpu: Gpu; renderer: Renderer }): SharedTextures => {
     const sharedTextures: SharedTextures = new Map();
 
     for (let i = 0; i < sharedTextureInfos.length; i++) {
@@ -160,7 +160,7 @@ export function createSharedTextures({ gpu, renderer }: { gpu: Gpu; renderer: Re
     return sharedTextures;
 }
 
-export function renderSharedTextures(renderer: Renderer, sharedTextures: SharedTextures) {
+export const renderSharedTextures = (renderer: Renderer, sharedTextures: SharedTextures) => {
     sharedTextures.forEach((sharedTexture) => {
         if (sharedTexture.needsUpdate) {
             renderEffectTexture(renderer, sharedTexture);

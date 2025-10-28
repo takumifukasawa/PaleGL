@@ -51,7 +51,7 @@ export type GlitchPass = PostProcessSinglePass & GlitchPassParameters;
 
 export type GlitchPassArgs = PostProcessPassParametersBaseArgs & Partial<GlitchPassParameters>;
 
-export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
+export const createGlitchPass = (args: GlitchPassArgs): GlitchPass => {
     const { gpu, enabled } = args;
 
     const blendRate = args.blendRate ?? 0;
@@ -75,7 +75,7 @@ export function createGlitchPass(args: GlitchPassArgs): GlitchPass {
     };
 }
 
-export function renderGlitchPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+export const renderGlitchPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
     const glitchPass = postProcessPass as GlitchPass;
     setMaterialUniformValue(glitchPass.material, UNIFORM_NAME_BLEND_RATE, glitchPass.blendRate);
     renderPostProcessSinglePassBehaviour(glitchPass, options);

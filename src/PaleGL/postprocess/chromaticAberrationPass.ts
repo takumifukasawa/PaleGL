@@ -55,7 +55,7 @@ export type ChromaticAberrationPass = PostProcessSinglePass & ChromaticAberratio
 
 type ChromaticAberrationPassArgs = PostProcessPassParametersBaseArgs & Partial<ChromaticAberrationPassParameters>;
 
-export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs): ChromaticAberrationPass {
+export const createChromaticAberrationPass = (args: ChromaticAberrationPassArgs): ChromaticAberrationPass => {
     const { gpu, enabled } = args;
 
     const scale = args.scale ?? UNIFORM_VALUE_CHROMATIC_ABERRATION_SCALE;
@@ -89,10 +89,10 @@ export function createChromaticAberrationPass(args: ChromaticAberrationPassArgs)
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
-export function renderChromaticAberrationPass(
+export const renderChromaticAberrationPass = (
     postProcessPass: PostProcessPassBase,
     options: PostProcessPassRenderArgs
-) {
+) => {
     const chromaticAberrationPass = postProcessPass as ChromaticAberrationPass;
     setMaterialUniformValue(
         chromaticAberrationPass.material,

@@ -93,7 +93,7 @@ type UniformBlock = {
 
 type UniformBlocks = UniformBlock[];
 
-export function createUniforms(...dataArray: UniformsData[]): Uniforms {
+export const createUniforms = (...dataArray: UniformsData[]): Uniforms => {
     // TODO: 配列じゃなくて uniform name を key とした Map objectの方がいいかも
     const data: UniformsData = [];
     const uniformBlocks: UniformBlocks = [];

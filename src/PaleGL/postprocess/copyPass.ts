@@ -10,7 +10,7 @@ export type CopyPassArgs = PostProcessPassParametersBaseArgs;
 
 export type CopyPass = PostProcessSinglePass;
 
-export function createCopyPass(args: CopyPassArgs): CopyPass {
+export const createCopyPass = (args: CopyPassArgs): CopyPass => {
     const { gpu, enabled } = args;
     const fragmentShader = copyPassFragmentShader;
 

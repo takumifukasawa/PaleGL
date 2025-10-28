@@ -21,7 +21,7 @@ export type FragmentPassParametersArgs = PostProcessPassParametersBaseArgs & Fra
 
 export type FragmentPass = PostProcessSinglePass;
 
-export function createFragmentPass(args: FragmentPassParametersArgs): FragmentPass {
+export const createFragmentPass = (args: FragmentPassParametersArgs): FragmentPass => {
     const {
         gpu,
         fragmentShader,

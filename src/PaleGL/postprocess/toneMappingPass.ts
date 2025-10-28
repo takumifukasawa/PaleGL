@@ -11,7 +11,7 @@ export type ToneMappingPass = PostProcessPassBase;
 
 export type ToneMappingPassArgs = PostProcessPassParametersBaseArgs;
 
-export function createToneMappingPass(args: ToneMappingPassArgs): ToneMappingPass {
+export const createToneMappingPass = (args: ToneMappingPassArgs): ToneMappingPass => {
     const { gpu, enabled } = args;
 
     const uniforms: UniformsData = [
