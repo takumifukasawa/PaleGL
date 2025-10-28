@@ -95,7 +95,7 @@ type StreakPassArgs = PostProcessPassParametersBaseArgs & Partial<StreakPassPara
 type DownSamplePass = { pass: FragmentPass; prevPass: FragmentPass; downScale: number };
 type UpSamplePass = { pass: FragmentPass; prevPass: FragmentPass; downSamplePass: FragmentPass };
 
-export function createStreakPass(args: StreakPassArgs): StreakPass {
+export const createStreakPass = (args: StreakPassArgs): StreakPass => {
     const { gpu, enabled } = args;
 
     const threshold = args.threshold || 0.9;
@@ -219,11 +219,11 @@ export function createStreakPass(args: StreakPassArgs): StreakPass {
     };
 }
 
-export function getStreakPassRenderTarget(PostProcessPass: PostProcessPassBase) {
+export const getStreakPassRenderTarget = (PostProcessPass: PostProcessPassBase) => {
     return (PostProcessPass as StreakPass).compositePass.renderTarget;
 }
 
-export function setStreakPassSize(postProcessPass: PostProcessPassBase, width: number, height: number) {
+export const setStreakPassSize = (postProcessPass: PostProcessPassBase, width: number, height: number) => {
     const streakPass = postProcessPass as StreakPass;
 
     streakPass.width = width;
@@ -253,7 +253,7 @@ export function setStreakPassSize(postProcessPass: PostProcessPassBase, width: n
     setPostProcessPassSize(streakPass.compositePass, streakPass.width, streakPass.height);
 }
 
-export function renderStreakPass(
+export const renderStreakPass = (
     postProcessPass: PostProcessPassBase,
     {
         gpu,
@@ -265,7 +265,7 @@ export function renderStreakPass(
         targetCamera,
         time,
     }: PostProcessPassRenderArgs
-) {
+) => {
     const streakPass = postProcessPass as StreakPass;
 
     // // 一回だけ呼びたい

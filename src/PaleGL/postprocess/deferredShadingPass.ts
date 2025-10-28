@@ -43,7 +43,7 @@ export type DeferredShadingPassArgs = PostProcessPassParametersBaseArgs;
 
 export type DeferredShadingPass = PostProcessSinglePass;
 
-export function createDeferredShadingPass(args: DeferredShadingPassArgs): DeferredShadingPass {
+export const createDeferredShadingPass = (args: DeferredShadingPassArgs): DeferredShadingPass => {
     const { gpu } = args;
 
     const uniforms: UniformsData = [
@@ -88,7 +88,7 @@ export function createDeferredShadingPass(args: DeferredShadingPassArgs): Deferr
     };
 }
 
-export function createSkyboxUniforms(): UniformsData {
+export const createSkyboxUniforms = (): UniformsData => {
     return [
         [
             UNIFORM_NAME_SKYBOX,
@@ -104,7 +104,7 @@ export function createSkyboxUniforms(): UniformsData {
     ];
 }
 
-export function updateMaterialSkyboxUniforms(material: Material, skybox: Skybox) {
+export const updateMaterialSkyboxUniforms = (material: Material, skybox: Skybox) => {
     setMaterialUniformValue(material, UNIFORM_NAME_SKYBOX, [
         [UNIFORM_NAME_STRUCT_MEMBER_CUBE_MAP, UNIFORM_TYPE_CUBE_MAP, skybox.cubeMap],
         [UNIFORM_NAME_STRUCT_MEMBER_DIFFUSE_INTENSITY, UNIFORM_TYPE_FLOAT, skybox.baseIntensity],

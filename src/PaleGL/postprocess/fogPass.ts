@@ -93,7 +93,7 @@ export type FogPass = PostProcessSinglePass & FogPassParameters;
 
 export type FogPassArgs = PostProcessPassParametersBaseArgs & Partial<FogPassParameters>;
 
-export function createFogPass(args: FogPassArgs) {
+export const createFogPass = (args: FogPassArgs) => {
     const { gpu, enabled } = args;
     const fragmentShader = fogFragmentShader;
 
@@ -154,20 +154,20 @@ export function createFogPass(args: FogPassArgs) {
     };
 }
 
-export function setFogPassTextures(
+export const setFogPassTextures = (
     fogPass: FogPass,
     lightShaftRtTexture: Texture,
     volumetricLightRtTexture: Texture,
     screenSpaceShadowRtTexture: Texture,
     noiseTexture: Texture
-) {
+) => {
     setMaterialUniformValue(fogPass.material, UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, lightShaftRtTexture);
     setMaterialUniformValue(fogPass.material, volumetricLightTextureUniformName, volumetricLightRtTexture);
     setMaterialUniformValue(fogPass.material, UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE, screenSpaceShadowRtTexture);
     setMaterialUniformValue(fogPass.material, UNIFORM_NOISE_TEXTURE, noiseTexture);
 }
 
-export function renderFogPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+export const renderFogPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
     const fogPass = postProcessPass as FogPass;
     setMaterialUniformValue(fogPass.material, UNIFORM_FOG_COLOR, fogPass.fogColor);
     setMaterialUniformValue(fogPass.material, UNIFORM_FOG_STRENGTH, fogPass.fogStrength);

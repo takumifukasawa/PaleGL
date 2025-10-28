@@ -149,7 +149,7 @@ export type SsaoPass = PostProcessSinglePass & SSAOPassParameters;
 
 export type SSAOPassParametersArgs = PostProcessPassParametersBaseArgs & Partial<SSAOPassParameters>;
 
-export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
+export const createSSAOPass = (args: SSAOPassParametersArgs): SsaoPass => {
     const { gpu, enabled } = args;
 
     const occlusionSampleLength: number = args.occlusionSampleLength ?? 0.121;
@@ -209,7 +209,7 @@ export function createSSAOPass(args: SSAOPassParametersArgs): SsaoPass {
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
-export function renderSSAOPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+export const renderSSAOPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
     const ssaoPass = postProcessPass as SsaoPass;
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionSampleLength', ssaoPass.occlusionSampleLength);
     setMaterialUniformValue(ssaoPass.material, 'uOcclusionBias', ssaoPass.occlusionBias);

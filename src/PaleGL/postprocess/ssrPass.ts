@@ -115,7 +115,7 @@ export type SsrPass = PostProcessSinglePass & SSRPassParameters;
 
 export type SSRPassArgs = PostProcessPassParametersBaseArgs & Partial<SSRPassParameters>;
 
-export function createSSRPass(args: SSRPassArgs): SsrPass {
+export const createSSRPass = (args: SSRPassArgs): SsrPass => {
     const { gpu, enabled } = args;
 
     const fragmentShader = ssrFragmentShader;
@@ -198,7 +198,7 @@ export function createSSRPass(args: SSRPassArgs): SsrPass {
 //     setMaterialUniformValue(this.material, UNIFORM_NAME_TARGET_HEIGHT, height);
 // }
 
-export function renderSSRPass(postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) {
+export const renderSSRPass = (postProcessPass: PostProcessPassBase, options: PostProcessPassRenderArgs) => {
     const ssrPass = postProcessPass as SsrPass;
     setMaterialUniformValue(ssrPass.material, 'uRayDepthBias', ssrPass.rayDepthBias);
     setMaterialUniformValue(ssrPass.material, 'uRayNearestDistance', ssrPass.rayNearestDistance);
