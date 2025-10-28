@@ -1089,6 +1089,7 @@ export type MarionetterClipType =
 export type MarionetterClipArgs = { actor: Actor; time: number; scene: Scene };
 
 export type MarionetterAnimationClipBase = {
+    name: string;
     type: MarionetterClipType;
 };
 

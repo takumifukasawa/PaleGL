@@ -25,6 +25,7 @@ import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
 import {
     MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
     MARIONETTER_ANIMATION_CLIP_DURATION_INDEX,
+    MARIONETTER_ANIMATION_CLIP_NAME_INDEX,
     MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX,
     MARIONETTER_ANIMATION_CLIP_START_INDEX,
     MARIONETTER_ANIMATION_CLIP_TYPE_INDEX,
@@ -423,6 +424,11 @@ function createMarionetterAnimationClip(
     const localScale: Vector3 = createVector3One();
 
     // console.log('hogehoge - clip', animationClip);
+    const name = animationClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = animationClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = animationClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const postExtrapolation = animationClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+    const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
     // actorに直接valueを割り当てる関数
     const execute = (args: MarionetterClipArgs) => {
@@ -444,10 +450,6 @@ function createMarionetterAnimationClip(
 
         // const start = animationClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
-        const start = animationClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-        const duration = animationClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-        const postExtrapolation = animationClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
-        const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
         // // for debug
         // // for debug
@@ -662,6 +664,7 @@ function createMarionetterAnimationClip(
     };
 
     return {
+        name,
         type: MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
         clipInfo: animationClip,
         // bind,
@@ -680,6 +683,13 @@ function createMarionetterLightControlClip(
     // const bind = (targetObj: Light) => {
     //     obj = targetObj;
     // };
+
+    const name = lightControlClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = lightControlClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = lightControlClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const bindings = lightControlClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    const postExtrapolation = lightControlClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+
     const execute = (args: MarionetterClipArgs) => {
         const { actor, time } = args;
         const light = actor as Light;
@@ -700,10 +710,6 @@ function createMarionetterLightControlClip(
         // // const { start, bindings } = lightControlClip;
         // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
-        const start = lightControlClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-        const duration = lightControlClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-        const bindings = lightControlClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-        const postExtrapolation = lightControlClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -776,6 +782,7 @@ function createMarionetterLightControlClip(
     };
 
     return {
+        name,
         type: MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
         clipInfo: lightControlClip,
         // bind,
@@ -799,7 +806,10 @@ function createMarionetterActivationControlClip(
     //     // console.log(start, duration, actor, time)
     // };
 
+    const name = activationControlClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+
     return {
+        name,
         type: MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
         clipInfo: activationControlClip,
         execute: () => {},
@@ -810,6 +820,7 @@ function createMarionetterObjectMoveAndLookAtClip(
     objectMoveAndLookAtClip: MarionetterObjectMoveAndLookAtClipInfo
 ): MarionetterObjectMoveAndLookAtClip {
     return {
+        name: objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX],
         type: MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
         clipInfo: objectMoveAndLookAtClip,
         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
