@@ -1,6 +1,10 @@
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import {
+    createInstancingParticle,
+    InstancingParticleArgs,
+    overrideInstancingParticleMaterialSettings,
+} from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
     FragmentShaderModifiers,
     TEXTURE_FILTER_TYPE_NEAREST,
@@ -44,6 +48,8 @@ export type GpuParticle = Mesh & {
     mrtDoubleBuffer: MRTDoubleBuffer;
     materialForInitialize: Material;
     materialForUpdate: Material;
+    vatWidth: number;
+    vatHeight: number;
 };
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
@@ -126,21 +132,16 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         updateFragmentModifiers
     );
 
-    iterateAllMeshMaterials(gpuParticle, (mat) => {
-        mat.useVAT = true;
-        // depthが作られる前なのでdepthUniformsにも設定する
-        const vatResolution = createVector2(vatWidth, vatHeight);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
-    });
+    const vatGPUParticle: GpuParticle = {
+        ...gpuParticle,
+        mrtDoubleBuffer,
+        materialForInitialize,
+        materialForUpdate,
+        vatWidth,
+        vatHeight,
+    };
 
-    const vatGPUParticle: GpuParticle = { ...gpuParticle, mrtDoubleBuffer, materialForInitialize, materialForUpdate };
+    overrideGPUParticleMaterialSettings(vatGPUParticle);
 
     subscribeActorOnStart(vatGPUParticle, ({ renderer }) => {
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
@@ -165,6 +166,26 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     });
 
     return vatGPUParticle;
+};
+
+export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) => {
+    if (!gpuParticle.materials[0].isInstancing) {
+        overrideInstancingParticleMaterialSettings(gpuParticle);
+    }
+    iterateAllMeshMaterials(gpuParticle, (mat) => {
+        mat.useVAT = true;
+        mat.cachedArgs.useVAT = true;
+        // depthが作られる前なのでdepthUniformsにも設定する
+        const vatResolution = createVector2(gpuParticle.vatWidth, gpuParticle.vatHeight);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
+    });
 };
 
 export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticle) => {

@@ -1,7 +1,11 @@
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
+import {
+    createInstancingParticle,
+    InstancingParticleArgs,
+    overrideInstancingParticleMaterialSettings,
+} from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
     ATTRIBUTE_NAME_NORMAL,
     ATTRIBUTE_NAME_POSITION,
@@ -46,6 +50,8 @@ export type GPUTrailParticle = Mesh & {
     mrtDoubleBuffer: MRTDoubleBuffer;
     materialForInitialize: Material;
     materialForUpdate: Material;
+    vatWidth: number;
+    vatHeight: number;
 };
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
@@ -287,29 +293,16 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         createUniforms()
     );
 
-    // materialの強制更新
-    // uniformsの追加
-    iterateAllMeshMaterials(gpuParticle, (mat) => {
-        mat.useVAT = true;
-        mat.isTrail = true;
-        // depthが作られる前なのでdepthUniformsにも設定する
-        const vatResolution = createVector2(vatWidth, vatHeight);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
-    });
-
     const vatGPUParticle: GPUTrailParticle = {
         ...gpuParticle,
         mrtDoubleBuffer,
         materialForInitialize,
         materialForUpdate,
+        vatWidth,
+        vatHeight,
     };
+
+    overrideGPUTrailParticleMaterialSettings(vatGPUParticle);
 
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
@@ -334,6 +327,30 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     return vatGPUParticle;
+};
+
+export const overrideGPUTrailParticleMaterialSettings = (gpuTrailParticle: GPUTrailParticle) => {
+    if (!gpuTrailParticle.materials[0].isInstancing) {
+        overrideInstancingParticleMaterialSettings(gpuTrailParticle);
+    }
+    // materialの強制更新
+    // uniformsの追加
+    iterateAllMeshMaterials(gpuTrailParticle, (mat) => {
+        mat.useVAT = true;
+        mat.cachedArgs.useVAT = true;
+        mat.isTrail = true;
+        mat.cachedArgs.isTrail = true;
+        // depthが作られる前なのでdepthUniformsにも設定する
+        const vatResolution = createVector2(gpuTrailParticle.vatWidth, gpuTrailParticle.vatHeight);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
+    });
 };
 
 export const resetGPUTrailParticleByInitialize = (renderer: Renderer, gpuTrailParticle: GPUTrailParticle) => {

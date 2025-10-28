@@ -1,10 +1,19 @@
 import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
-import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
+import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 // @ts-ignore - type-only import
-import { ATTRIBUTE_NAME_INSTANCE_POSITION, ATTRIBUTE_NAME_INSTANCE_SCALE, ATTRIBUTE_NAME_INSTANCE_ROTATION, ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET, ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR, ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR, ATTRIBUTE_NAME_INSTANCE_VELOCITY, type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_STATIC_DRAW } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
+    ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
+    ATTRIBUTE_NAME_INSTANCE_POSITION,
+    ATTRIBUTE_NAME_INSTANCE_ROTATION,
+    ATTRIBUTE_NAME_INSTANCE_SCALE,
+    ATTRIBUTE_NAME_INSTANCE_VELOCITY,
+    ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
+    ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+} from '@/PaleGL/constants.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 
@@ -51,7 +60,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         // default
         // vat
         // vatData,
-        makeDataPerInstanceFunction
+        makeDataPerInstanceFunction,
     } = args;
 
     const mesh =
@@ -198,40 +207,14 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         )
     );
 
-    // const useVAT = !!vatData;
-
-    iterateAllMeshMaterials(mesh, (mat) => {
-        // mat.useVAT = useVAT;
-        mat.isInstancing = true; // 強制trueにしちゃう
-        // if (useVAT) {
-        //     // depthが作られる前なのでdepthUniformsにも設定する
-        //     const vatResolution = createVector2(vatData.width, vatData.height);
-        //     addUniformValue(
-        //         mat.uniforms,
-        //         UniformNames.VATPositionMap,
-        //         UNIFORM_TYPE_TEXTURE,
-        //         null
-        //     );
-        //     addUniformValue(
-        //         mat.depthUniforms,
-        //         UniformNames.VATPositionMap,
-        //         UNIFORM_TYPE_TEXTURE,
-        //         null
-        //     );
-        //     addUniformValue(
-        //         mat.uniforms,
-        //         UNIFORM_NAME_VAT_RESOLUTION,
-        //         UNIFORM_TYPE_VECTOR2,
-        //         vatResolution
-        //     );
-        //     addUniformValue(
-        //         mat.depthUniforms,
-        //         UNIFORM_NAME_VAT_RESOLUTION,
-        //         UNIFORM_TYPE_VECTOR2,
-        //         vatResolution
-        //     );
-        // }
-    });
+    overrideInstancingParticleMaterialSettings(mesh);
 
     return mesh;
+};
+
+export const overrideInstancingParticleMaterialSettings = (particle: Mesh) => {
+    iterateAllMeshMaterials(particle, (mat) => {
+        mat.isInstancing = true; // 強制trueにしちゃう
+        mat.cachedArgs.isInstancing = true;
+    });
 };
