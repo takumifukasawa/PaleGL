@@ -86,8 +86,7 @@ void main() {
 
     vec3 worldNormal = vNormal;
 
-    // #include <normal_map_f>
-    #include ../partial/normal-map-fragment.partial.glsl
+    #include <normal_map_f>
 
     #ifdef USE_VERTEX_COLOR
     baseColor *= vVertexColor;
