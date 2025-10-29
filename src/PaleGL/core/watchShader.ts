@@ -83,7 +83,7 @@ if (store.ready && changed.length) {
 store.ready = true;
 
 // API
-export const get = (path: string) => store.CURRENT[path] ?? '';
+export const getCurrentShaderContent = (path: string) => store.CURRENT[path] ?? '';
 
 export function getMany(paths: string[]) {
     return Object.fromEntries(paths.map((p) => [p, store.CURRENT[p] ?? ''])) as Record<string, string>;

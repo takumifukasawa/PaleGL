@@ -2,12 +2,7 @@
 
 export async function createDirectoryAsync(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (fs.existsSync(path)) {
-            console.warn('directory already exists: ', path);
-            resolve();
-            return;
-        }
-        fs.mkdir(path, (err) => {
+        fs.mkdir(path, { recursive: true }, (err) => {
             if (err) {
                 reject(err);
                 return;

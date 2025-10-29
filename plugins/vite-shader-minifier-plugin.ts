@@ -216,7 +216,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // コピーするディレクトリのhashを作成
                 const hashOriginalSrc = crypto
                     .createHash('sha512')
-                    .update(`${name}:${(+new Date()).toString()}`)
+                    .update(`${name}:${(+new Date()).toString()}:${Math.random()}:original`)
                     .digest('hex')
                     .slice(0, hashSliceNum);
                 await wait(ioInterval);
@@ -224,7 +224,7 @@ export const shaderMinifierPlugin: (options: ShaderMinifierPluginOptions) => Plu
                 // minify格納ディレクトリのhashを作成
                 const hashTransformed = crypto
                     .createHash('sha512')
-                    .update(`${name}:${(+new Date()).toString()}`)
+                    .update(`${name}:${(+new Date()).toString()}:${Math.random()}:transformed`)
                     .digest('hex')
                     .slice(0, hashSliceNum);
                 await wait(ioInterval);
