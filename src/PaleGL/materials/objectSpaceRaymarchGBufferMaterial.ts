@@ -112,6 +112,14 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
 
     const mergedUniforms: UniformsData = [...commonUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];
 
+    // templateが片方しか指定されていない場合はおそらく想定していない
+    if (
+        (fragmentShaderTemplate && !depthFragmentShaderTemplate) ||
+        (!fragmentShaderTemplate && depthFragmentShaderTemplate)
+    ) {
+        console.warn(`difference template!`);
+    }
+    
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
         ...args,

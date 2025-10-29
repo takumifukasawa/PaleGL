@@ -65,6 +65,11 @@ const NEXT = shaders;
 const changed = Object.keys(NEXT).filter((k) => NEXT[k] !== store.CURRENT[k]);
 store.CURRENT = NEXT;
 
+if (!isNeededCompact()) {
+    console.log('[watchShader] store.CURRENT keys:', Object.keys(store.CURRENT));
+    console.log('[watchShader] store.CURRENT entries:', Object.entries(store.CURRENT).map(([k, v]) => [k, v.length]));
+}
+
 // 初回起動（ready=false）は通知しない。2回目以降のHMR時のみ通知
 if (store.ready && changed.length) {
     for (const [cb, set] of store.subs) {
