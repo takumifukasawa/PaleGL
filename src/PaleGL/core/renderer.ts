@@ -1489,7 +1489,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
 
     depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         updateActorTransformUniforms(renderer, actor, camera);
-
+        
         actor.depthMaterials.forEach((depthMaterial, i) => {
             if (!depthMaterial) {
                 console.error('[Renderer.depthPrePass] invalid depth material');
@@ -1509,7 +1509,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
             }
 
             renderMesh(renderer, actor.geometry, depthMaterial, cb);
-
+            
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'depth pre pass', actor.name, actor.geometry);
             }
