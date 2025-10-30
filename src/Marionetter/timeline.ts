@@ -52,6 +52,8 @@ import {
     MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE,
     MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK,
     MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK,
+    MARIONETTER_TRACK_TYPE_DEFAULT,
+    MARIONETTER_TRACK_TYPE_MARKER,
     MarionetterActivationControlClip,
     MarionetterActivationControlClipInfo,
     MarionetterAnimationClip,
@@ -192,6 +194,7 @@ export function buildMarionetterTimeline(
                 MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS
             ];
             tracks.push({
+                trackType: MARIONETTER_TRACK_TYPE_MARKER,
                 signalEmitters: signalEmitters.map((signalEmitter) => {
                     return buildSignalEmitter(signalEmitter);
                 }),
@@ -226,7 +229,8 @@ export function buildMarionetterTimeline(
             //     marionetterClips
             // );
 
-            const data = {
+            const data: MarionetterTimelineDefaultTrack = {
+                trackType: MARIONETTER_TRACK_TYPE_DEFAULT,
                 targetName,
                 targetActor,
                 clips: marionetterClips,
@@ -300,7 +304,7 @@ export function buildMarionetterTimeline(
                     }
                     // });
                 },
-            } as MarionetterTimelineDefaultTrack;
+            };
             tracks.push(data);
         }
     }

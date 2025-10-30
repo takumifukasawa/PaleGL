@@ -1044,13 +1044,22 @@ export type MarionetterTimelineTrackBase = {
     execute: (args: MarionetterTimelineTrackExecuteArgs) => void;
 };
 
+export const MARIONETTER_TRACK_TYPE_DEFAULT = 0;
+export const MARIONETTER_TRACK_TYPE_MARKER = 1;
+export type MarionetterTrackType =
+    typeof MARIONETTER_TRACK_TYPE_DEFAULT
+    | typeof MARIONETTER_TRACK_TYPE_MARKER;
+    
+
 export type MarionetterTimelineDefaultTrack = {
+    trackType: MarionetterTrackType;
     targetName: string;
     targetActor: Actor;
     clips: MarionetterClipKinds[];
 } & MarionetterTimelineTrackBase;
 
 export type MarionetterTimelineMarkerTrack = {
+    trackType: MarionetterTrackType;
     signalEmitters: MarionetterTimelineSignalEmitter[];
 } & MarionetterTimelineTrackBase;
 
