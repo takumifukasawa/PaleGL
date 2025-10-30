@@ -4,9 +4,9 @@ import {
     MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     SHADING_MODEL_ID_LIT,
     ShadingModelIds,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
-    UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
     UNIFORM_NAME_BASE_MAP_TILING,
@@ -20,13 +20,12 @@ import {
     UNIFORM_NAME_ROUGHNESS_MAP,
     UNIFORM_NAME_ROUGHNESS_MAP_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
-    UNIFORM_TYPE_TEXTURE,
+    UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR3,
     UNIFORM_TYPE_VECTOR4,
-    UNIFORM_TYPE_INT,
-    UNIFORM_TYPE_COLOR,
-
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -119,7 +118,7 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
     ) {
         console.warn(`difference template!`);
     }
-    
+
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
         ...args,
@@ -139,8 +138,14 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
         // depthWrite: false,
         // depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
 
+        // default
         depthFuncType: args.depthFuncType ?? DEPTH_FUNC_TYPE_LEQUAL,
         skipDepthPrePass: true,
+
+        // depthTest: false,
+        // depthWrite: false,
+        // depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
+        // // depthFuncType: DEPTH_FUNC_TYPE_ALWAYS,
 
         uniforms: mergedUniforms,
         depthUniforms: mergedUniforms, // TODO: common, uniforms の2つで十分なはず。alpha test をしない限り
@@ -166,4 +171,4 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
             ...(args.depthFragmentShaderModifiers ?? []),
         ],
     });
-}
+};
