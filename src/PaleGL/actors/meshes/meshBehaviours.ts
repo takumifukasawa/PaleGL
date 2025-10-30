@@ -204,6 +204,7 @@ export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: Mate
         }
         mesh.depthMaterials[i] = createMaterial({
             ...material.cachedArgs,
+            ...args
         });
     });
     mesh.depthMaterials.forEach((material) => {
