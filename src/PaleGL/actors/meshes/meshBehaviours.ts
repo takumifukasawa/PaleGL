@@ -10,7 +10,14 @@ import {
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
-import { ActorType, DEPTH_FUNC_TYPE_LEQUAL, MeshType, MESH_TYPE_SKINNED, MESH_TYPE_OBJECT_SPACE_RAYMARCH, MESH_TYPE_SCREEN_SPACE_RAYMARCH } from '@/PaleGL/constants.ts';
+import {
+    ActorType,
+    DEPTH_FUNC_TYPE_LEQUAL,
+    MESH_TYPE_OBJECT_SPACE_RAYMARCH,
+    MESH_TYPE_SCREEN_SPACE_RAYMARCH,
+    MESH_TYPE_SKINNED,
+    MeshType,
+} from '@/PaleGL/constants.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { deleteProgram } from '@/PaleGL/core/shader.ts';
@@ -24,7 +31,7 @@ import {
     setMaterialUniformValue,
     startMaterial,
 } from '@/PaleGL/materials/material.ts';
-import { cloneMaterial, updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
+import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
 
 // start actor -------------------------------------------------------
 
@@ -130,7 +137,7 @@ export function startMesh(actor: Actor, args: ActorStartArgs) {
 //         });
 //     }
 // }
-// 
+//
 // export function replaceMeshMaterialByArgs(mesh: Mesh, gpu: Gpu, index: number, args: MaterialArgs = {}) {
 //     const tmpMaterial = mesh.materials[index];
 //     const newMaterial = cloneMaterial(tmpMaterial, args);
@@ -165,7 +172,7 @@ export function startMesh(actor: Actor, args: ActorStartArgs) {
 //     }
 // }
 
-export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) {
+export const replaceMeshMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
     // TODO: uniformsの中身を引き継いだ方がいいと思われる
 
     // shaderを削除しつつ、新しいmaterialを生成して差し替え
@@ -187,7 +194,9 @@ export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: Materi
             });
         }
     });
+};
 
+export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
     // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
     mesh.depthMaterials.forEach((material, i) => {
         if (material.shader) {
@@ -205,7 +214,12 @@ export function replaceAllMeshMaterialsByArgs(mesh: Mesh, gpu: Gpu, args: Materi
             });
         }
     });
-}
+};
+
+export const replaceAllMeshMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
+    replaceMeshMaterialsByArgs(mesh, gpu, args);
+    replaceMeshDepthMaterialsByArgs(mesh, gpu, args);
+};
 
 // set size -------------------------------------------------------
 
