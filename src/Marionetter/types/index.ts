@@ -168,11 +168,14 @@ export type MarionetterTrackInfoType =
     | typeof MARIONETTER_TRACK_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_TRACK;
 
 export type MarionetterTrackInfoBase = {
+    name: string;
     type: MarionetterTrackInfoType;
     // shorten
+    n: string;
     t: MarionetterTrackInfoType;
 };
 
+export const MARIONETTER_TRACK_INFO_BASE_NAME = NeedsShorten ? 'n' : 'name';
 export const MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 
 export type MarionetterDefaultTrackInfo = MarionetterTrackInfoBase & {
@@ -251,7 +254,13 @@ export const MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX = 4;
 export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 5;
 
 // [name, clipInfoType, start, duration, post-extraporation]
-export type MarionetterClipInfoBase = [string, MarionetterClipInfoType, number, number, MARIONETTER_CLIP_POST_EXTRAPORATION_MODE];
+export type MarionetterClipInfoBase = [
+    string,
+    MarionetterClipInfoType,
+    number,
+    number,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
+];
 
 // export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
 // export const MARIONETTER_CLIP_INFO_BASE_PROPERTY_START = NeedsShorten ? 's' : 'start';
@@ -262,7 +271,7 @@ export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD = 1;
 export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP = 2;
 export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_PINGPONG = 3;
 export const MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_CONTINUE = 4;
-export type MARIONETTER_CLIP_POST_EXTRAPORATION_MODE = 
+export type MARIONETTER_CLIP_POST_EXTRAPORATION_MODE =
     | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_NONE
     | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD
     | typeof MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP
@@ -1046,12 +1055,10 @@ export type MarionetterTimelineTrackBase = {
 
 export const MARIONETTER_TRACK_TYPE_DEFAULT = 0;
 export const MARIONETTER_TRACK_TYPE_MARKER = 1;
-export type MarionetterTrackType =
-    typeof MARIONETTER_TRACK_TYPE_DEFAULT
-    | typeof MARIONETTER_TRACK_TYPE_MARKER;
-    
+export type MarionetterTrackType = typeof MARIONETTER_TRACK_TYPE_DEFAULT | typeof MARIONETTER_TRACK_TYPE_MARKER;
 
 export type MarionetterTimelineDefaultTrack = {
+    name: string;
     trackType: MarionetterTrackType;
     targetName: string;
     targetActor: Actor;
@@ -1059,6 +1066,7 @@ export type MarionetterTimelineDefaultTrack = {
 } & MarionetterTimelineTrackBase;
 
 export type MarionetterTimelineMarkerTrack = {
+    name: string;
     trackType: MarionetterTrackType;
     signalEmitters: MarionetterTimelineSignalEmitter[];
 } & MarionetterTimelineTrackBase;
