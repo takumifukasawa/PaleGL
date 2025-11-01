@@ -14,7 +14,13 @@ import { updateLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setSizeMesh, startMesh, updateMesh } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { updateSkyboxTransform } from '@/PaleGL/actors/meshes/skybox.ts';
-import { ActorType, ACTOR_TYPE_MESH, ACTOR_TYPE_SKYBOX, ACTOR_TYPE_CAMERA, ACTOR_TYPE_LIGHT } from '@/PaleGL/constants.ts';
+import {
+    ACTOR_TYPE_CAMERA,
+    ACTOR_TYPE_LIGHT,
+    ACTOR_TYPE_MESH,
+    ACTOR_TYPE_SKYBOX,
+    ActorType,
+} from '@/PaleGL/constants.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
@@ -44,7 +50,7 @@ export const startActorBehaviourBase = (actor: Actor, args: ActorStartArgs) => {
     actor.onStart.forEach((cb) => {
         cb(args);
     });
-}
+};
 
 export const startActorBehaviour: Partial<Record<ActorType, (actor: Actor, { gpu, scene }: ActorStartArgs) => void>> = {
     [ACTOR_TYPE_MESH]: startMesh,
@@ -158,7 +164,13 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     // TODO: componentで必要になったら呼ぶ
 };
 
-export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T, clip: MarionetterClipKinds, clipTime: number) => {
+export const processActorPropertyBinder = <T extends TimelinePropertyValue>(
+    actor: Actor,
+    key: string,
+    value: T,
+    clip: MarionetterClipKinds,
+    clipTime: number
+) => {
     actor.onProcessPropertyBinder.forEach((cb) => cb(key, value, clip, clipTime));
     // TODO: すべてのcomponentにすべてのpropertyが渡ってしまっているので不必要なプロパティは送らないようにしたい
     actor.components.forEach(([model, behaviour]) => {
@@ -170,7 +182,7 @@ export const processActorPropertyBinder = <T extends TimelinePropertyValue>(acto
 
 export const preProcessActorTimeline = (actor: Actor, timelineTime: number) => {
     actor.onPreProcessTimeline.forEach((cb) => cb(timelineTime));
-    // TODO
+    // TODO: componentで必要になったら呼ぶ
     // _components.forEach((component) => {
     //     component.processTimeline?.(timelineTime, timelinePrevTime, timelineDeltaTime);
     // });

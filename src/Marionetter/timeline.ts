@@ -33,6 +33,7 @@ import {
     MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP,
     MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP,
     MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD,
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
     MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
@@ -467,11 +468,10 @@ function createMarionetterAnimationClip(
         // const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_INFO_PROPERTY_BINDINGS];
 
         // // for debug
-        // // for debug
         // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
-        const timeInClip = time - start;
+        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -525,28 +525,6 @@ function createMarionetterAnimationClip(
                 case PROPERTY_MATERIAL_BASE_COLOR_A:
                     // TODO: GBufferMaterialとの連携？
                     break;
-                // TODO: marionetter じゃなくてもいいかもしれない
-                // case MarionetterPostProcessBloom.bloomIntensity:
-                //     const bloomParams = (actor as PostProcessVolume).findParameter<BloomPassParameters>(
-                //         PostProcessPassType.Bloom
-                //     );
-                //     if (bloomParams) {
-                //         bloomParams.bloomAmount = value;
-                //     }
-                //     break;
-                // case MarionetterPostProcessDepthOfField.focusDistance:
-                //     break;
-                // case MarionetterPostProcessVignette.vignetteIntensity:
-                //     break;
-                // case MarionetterPostProcessVolumetricLight.volumetricLightRayStep:
-                //     const volumetricLightParams = (
-                //         actor as PostProcessVolume
-                //     ).findParameter<VolumetricLightPassParameters>(PostProcessPassType.VolumetricLight);
-                //     if (volumetricLightParams) {
-                //         volumetricLightParams.rayStep = value;
-                //     }
-                //     console.log(actor)
-                //     break;
                 default:
                     const accessors = propertyName.split('.');
                     if (accessors.length > 1) {
@@ -676,6 +654,8 @@ function createMarionetterAnimationClip(
         colorPropertyMap.forEach((color, key) => {
             processActorPropertyBinder(actor, key, color, animationClip, timeInClip);
         });
+
+        actor.onPostProcessClip.forEach((cb) => cb(animationClip, timeInClip));
     };
 
     return animationClip;
@@ -686,20 +666,28 @@ function createMarionetterAnimationClip(
  * @param lightControlClip
  */
 function createMarionetterLightControlClip(
-    lightControlClip: MarionetterLightControlClipInfo
+    lightControlClipInfo: MarionetterLightControlClipInfo
 ): MarionetterLightControlClip {
     // let obj: Light | null;
     // const bind = (targetObj: Light) => {
     //     obj = targetObj;
     // };
 
-    const name = lightControlClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = lightControlClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = lightControlClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-    const bindings = lightControlClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-    const postExtrapolation = lightControlClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+    const name = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const bindings = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    const postExtrapolation = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
-    const execute = (args: MarionetterClipArgs) => {
+    const lightControlClip: MarionetterLightControlClip = {
+        name,
+        type: MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
+        clipInfo: lightControlClipInfo,
+        // bind,
+        execute: () => {},
+    };
+
+    lightControlClip.execute = (args: MarionetterClipArgs) => {
         const { actor, time } = args;
         const light = actor as Light;
         let hasPropertyColorR: boolean = false;
@@ -720,12 +708,14 @@ function createMarionetterLightControlClip(
         // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
 
+        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
             // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
             // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const [propertyName, keyframes] = binding;
-            const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
+            const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
                 case PROPERTY_COLOR_R:
@@ -788,15 +778,11 @@ function createMarionetterLightControlClip(
         // if(hasPropertyRange) {
         //     obj.range = range;
         // }
+
+        actor.onPostProcessClip.forEach((cb) => cb(lightControlClip, timeInClip));
     };
 
-    return {
-        name,
-        type: MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
-        clipInfo: lightControlClip,
-        // bind,
-        execute,
-    };
+    return lightControlClip;
 }
 
 /**
@@ -804,37 +790,45 @@ function createMarionetterLightControlClip(
  * @param lightControlClip
  */
 function createMarionetterActivationControlClip(
-    activationControlClip: MarionetterActivationControlClipInfo
+    activationControlClipInfo: MarionetterActivationControlClipInfo
 ): MarionetterActivationControlClip {
-    // let obj: Light | null;
-    // const bind = (targetObj: Light) => {
-    //     obj = targetObj;
-    // };
-    // const execute = (actor: Actor, time: number) => {
-    //     // const { start, duration} = activationControlClip;
-    //     // console.log(start, duration, actor, time)
-    // };
+    const name = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    // const bindings = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    const postExtrapolation = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
-    const name = activationControlClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-
-    return {
+    const activationControlClip: MarionetterActivationControlClip = {
         name,
         type: MARIONETTER_CLIP_TYPE_ACTIVATION_CONTROL_CLIP,
-        clipInfo: activationControlClip,
-        execute: () => {},
+        clipInfo: activationControlClipInfo,
+        execute: (args) => {
+            const { actor, time } = args;
+            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+            actor.onPostProcessClip.forEach((cb) => cb(activationControlClip, timeInClip));
+        },
     };
+
+    return activationControlClip;
 }
 
 function createMarionetterObjectMoveAndLookAtClip(
-    objectMoveAndLookAtClip: MarionetterObjectMoveAndLookAtClipInfo
+    objectMoveAndLookAtClipInfo: MarionetterObjectMoveAndLookAtClipInfo
 ): MarionetterObjectMoveAndLookAtClip {
-    return {
-        name: objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX],
+    const name = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const bindings = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    const postExtrapolation = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+
+    const objectMoveAndLookAtClip: MarionetterObjectMoveAndLookAtClip = {
+        name,
         type: MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
-        clipInfo: objectMoveAndLookAtClip,
+        clipInfo: objectMoveAndLookAtClipInfo,
         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
             const { actor, time, scene } = args;
 
+            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
             // let hasLocalPosition: boolean = false;
             // let hasLocalRotationEuler: boolean = false;
             // let hasLocalScale: boolean = false;
@@ -849,17 +843,13 @@ function createMarionetterObjectMoveAndLookAtClip(
 
             // const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
             // const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
-            const start = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-            const duration = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-            const bindings = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-            const postExtrapolation = objectMoveAndLookAtClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
             // TODO: typeがあった方がよい. ex) animation clip, light control clip
             bindings.forEach((binding) => {
                 // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
                 // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
                 const [propertyName, keyframes] = binding;
-                const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
+                const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
                 switch (propertyName) {
                     case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X:
@@ -886,6 +876,8 @@ function createMarionetterObjectMoveAndLookAtClip(
             }
         },
     };
+
+    return objectMoveAndLookAtClip;
 }
 
 // function createMarionetterHumanClip(humanClip: MarionetterHumanClipInfo): MarionetterHumanClip {
@@ -953,4 +945,32 @@ const isHoldClipPostExtrapolate = (clip: MarionetterClipKinds) => {
         clip.clipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX] ===
         MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD
     );
+};
+
+const resolveClipTime = (
+    timelineTime: number,
+    clipStartTime: number,
+    clipDuration: number,
+    postExtrapolationMode: MARIONETTER_CLIP_POST_EXTRAPORATION_MODE
+) => {
+    let timeInClip = timelineTime - clipStartTime;
+
+    // clip が time を越していた時
+    if (timeInClip >= clipDuration) {
+        if (postExtrapolationMode === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD) {
+            // 最後の状態で止める（hold clip）
+            timeInClip = clipDuration - 0.001; // 絶妙にoffset
+            // t = lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - 0.001; // 絶妙にoffset
+        } else if (postExtrapolationMode === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
+            // クリップ内でループ
+            timeInClip = timeInClip % clipDuration;
+        } else {
+            // デフォルト
+            // 最後の状態で止める
+            // 最後の状態で止める（hold clip）
+            timeInClip = clipDuration - 0.001; // 絶妙にoffset
+        }
+    }
+
+    return timeInClip;
 };

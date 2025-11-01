@@ -115,21 +115,25 @@ export function curveUtilityEvaluateCurve(
     if (t < firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
         return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
-
-    // clip が最後のkeyを越していたとき
+    
     if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
-        if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD) {
-            // 最後の状態で止める（hold clip）
-            t = lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - 0.001; // 絶妙にoffset
-        } else if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
-            // クリップ内でループ
-            t = t % lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME];
-        } else {
-            // デフォルト
-            // 最後の状態で止める
-            return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
-        }
+        return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
+
+    // // clip が最後のkeyを越していたとき
+    // if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
+    //     if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD) {
+    //         // 最後の状態で止める（hold clip）
+    //         t = lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME] - 0.001; // 絶妙にoffset
+    //     } else if (postExtrapolation === MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP) {
+    //         // クリップ内でループ
+    //         t = t % lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME];
+    //     } else {
+    //         // デフォルト
+    //         // 最後の状態で止める
+    //         return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
+    //     }
+    // }
 
     // TODO: keyframeが多いとループ数が増えるのでtimeをbinarysearchかけるとよい
     for (let i = 0; i < keys.length - 1; i++) {

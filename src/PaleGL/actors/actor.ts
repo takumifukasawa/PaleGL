@@ -32,7 +32,13 @@ type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number;
 type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = () => void;
-type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(key: string, value: T, clip: MarionetterClipKinds, clipTime: number) => void;
+type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(
+    key: string,
+    value: T,
+    clip: MarionetterClipKinds,
+    clipTime: number
+) => void;
+type OnPostProcessClip = (clip: MarionetterClipKinds, clipTime: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
 
 export type ActorArgs = { name?: string; type?: ActorType };
@@ -54,6 +60,7 @@ export type Actor = {
     onLastUpdate: OnLastUpdateCallback[];
     onBeforeRender: OnBeforeRenderCallback[];
     onProcessPropertyBinder: OnProcessPropertyBinder[];
+    onPostProcessClip: OnPostProcessClip[]
     onPreProcessTimeline: OnProcessTimeline[];
     onPostProcessTimeline: OnProcessTimeline[];
     enabled: boolean;
@@ -77,6 +84,7 @@ export const createActor = ({ name = '', type = ACTOR_TYPE_NULL }: ActorArgs = {
     // TODO: timeline
     // let _onProcessClipFrame: OnProcessPropertyBinder | null = null;
     const onProcessPropertyBinder: OnProcessPropertyBinder[] = [];
+    const onPostProcessClip: OnPostProcessClip[] = [];
     const onPreProcessTimeline: OnProcessTimeline[] = [];
     const onPostProcessTimeline: OnProcessTimeline[] = [];
     const enabled: boolean = true;
@@ -98,6 +106,7 @@ export const createActor = ({ name = '', type = ACTOR_TYPE_NULL }: ActorArgs = {
         onLastUpdate,
         onBeforeRender,
         onProcessPropertyBinder,
+        onPostProcessClip,
         onPreProcessTimeline,
         onPostProcessTimeline,
         enabled,
@@ -135,12 +144,20 @@ export const subscribeActorProcessPropertyBinder = (actor: Actor, value: OnProce
     actor.onProcessPropertyBinder.push(value);
 };
 
+export const subscribeActorPostProcessClip = (actor: Actor, value: OnPostProcessClip) => {
+    actor.onPostProcessClip.push(value);
+};
+
 export const subscribeActorPreProcessTimeline = (actor: Actor, value: OnProcessTimeline) => {
     actor.onPreProcessTimeline.push(value);
 };
 
 export const subscribeActorPostProcessTimeline = (actor: Actor, value: OnProcessTimeline) => {
     actor.onPostProcessTimeline.push(value);
+};
+
+export const subscribeActorBeforeRender = (actor: Actor, value: OnBeforeRenderCallback) => {
+    actor.onBeforeRender.push(value);
 };
 
 export const addActorComponent = (actor: Actor, component: Component) => {
@@ -153,7 +170,7 @@ export const addActorComponents = (actor: Actor, components: Component[]) => {
 
 export const getActorComponent = <T extends Component>(actor: Actor): T | null => {
     return actor.components.find((component) => component) as T;
-}
+};
 
 // export const disposeActor = (actor: Actor) => {
 //     // dispose components
