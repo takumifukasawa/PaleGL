@@ -53,7 +53,7 @@ import {
 } from '@/PaleGL/math/color.ts';
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2.ts';
 import {
-    createFillVector3,
+    createVector3Fill,
     createVector3,
     createVector3Zero,
     setV3x,
@@ -380,7 +380,7 @@ const createTestGPUParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(testMesh.transform, createFillVector3(1.5));
+    setScaling(testMesh.transform, createVector3Fill(1.5));
     setTranslation(testMesh.transform, createVector3(-8, 1.5, 0));
     // addActorToScene(captureScene, testMesh);
     subscribeActorOnStart(testMesh, () => {
@@ -422,7 +422,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
+    setScaling(checkVelocityMesh.transform, createVector3Fill(1.5));
     setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
     // addActorToScene(captureScene, checkVelocityMesh);
     subscribeActorOnStart(checkVelocityMesh, () => {
@@ -437,7 +437,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkPositionMesh.transform, createFillVector3(1.5));
+    setScaling(checkPositionMesh.transform, createVector3Fill(1.5));
     setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
     // addActorToScene(captureScene, checkPositionMesh);
     subscribeActorOnStart(checkPositionMesh, () => {
@@ -452,7 +452,7 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkUpMesh.transform, createFillVector3(1.5));
+    setScaling(checkUpMesh.transform, createVector3Fill(1.5));
     setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
     // addActorToScene(captureScene, checkUpMesh);
     subscribeActorOnStart(checkUpMesh, () => {
@@ -493,7 +493,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkVelocityMesh.transform, createFillVector3(1.5));
+    setScaling(checkVelocityMesh.transform, createVector3Fill(1.5));
     setTranslation(checkVelocityMesh.transform, createVector3(-8, 1.5, 6));
     // addActorToScene(captureScene, checkVelocityMesh);
     subscribeActorOnStart(checkVelocityMesh, () => {
@@ -508,7 +508,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkPositionMesh.transform, createFillVector3(1.5));
+    setScaling(checkPositionMesh.transform, createVector3Fill(1.5));
     setTranslation(checkPositionMesh.transform, createVector3(-8, 1.5, 3));
     // addActorToScene(captureScene, checkPositionMesh);
     subscribeActorOnStart(checkPositionMesh, () => {
@@ -523,7 +523,7 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
         geometry: createPlaneGeometry({ gpu }),
         material: createUnlitMaterial(),
     });
-    setScaling(checkUpMesh.transform, createFillVector3(1.5));
+    setScaling(checkUpMesh.transform, createVector3Fill(1.5));
     setTranslation(checkUpMesh.transform, createVector3(-8, 1.5, 0));
     // addActorToScene(captureScene, checkUpMesh);
     subscribeActorOnStart(checkUpMesh, () => {
@@ -593,7 +593,7 @@ const createTestNormalMap = (gpu: Gpu, texture: Texture) => {
             // faceSide: FaceSide.Double
         }),
     });
-    setScaling(checkMesh.transform, createFillVector3(2));
+    setScaling(checkMesh.transform, createVector3Fill(2));
     setTranslation(checkMesh.transform, createVector3(-8, 0.5, 4));
     setRotationX(checkMesh.transform, -90);
     addActorToScene(captureScene, checkMesh);
@@ -2018,27 +2018,27 @@ vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
     // noise -----------------------------------
 
     const randomNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.RANDOM_NOISE);
-    setScaling(randomNoiseTextureMesh.transform, createFillVector3(1.5));
+    setScaling(randomNoiseTextureMesh.transform, createVector3Fill(1.5));
     setTranslation(randomNoiseTextureMesh.transform, createVector3(8, 1.5, 0));
     addActorToScene(captureScene, randomNoiseTextureMesh);
 
     const fbmNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.FBM_NOISE);
-    setScaling(fbmNoiseTextureMesh.transform, createFillVector3(1.5));
+    setScaling(fbmNoiseTextureMesh.transform, createVector3Fill(1.5));
     setTranslation(fbmNoiseTextureMesh.transform, createVector3(8, 1.5, 2));
     addActorToScene(captureScene, fbmNoiseTextureMesh);
 
     const perlinNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.PERLIN_NOISE);
-    setScaling(perlinNoiseTextureMesh.transform, createFillVector3(1.5));
+    setScaling(perlinNoiseTextureMesh.transform, createVector3Fill(1.5));
     setTranslation(perlinNoiseTextureMesh.transform, createVector3(8, 1.5, 4));
     addActorToScene(captureScene, perlinNoiseTextureMesh);
 
     const improvedNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.IMPROVE_NOISE);
-    setScaling(improvedNoiseTextureMesh.transform, createFillVector3(1.5));
+    setScaling(improvedNoiseTextureMesh.transform, createVector3Fill(1.5));
     setTranslation(improvedNoiseTextureMesh.transform, createVector3(8, 1.5, 6));
     addActorToScene(captureScene, improvedNoiseTextureMesh);
 
     const simplexNoiseTextureMesh = createSharedTextureMesh(engine, SharedTexturesTypes.SIMPLEX_NOISE);
-    setScaling(simplexNoiseTextureMesh.transform, createFillVector3(1.5));
+    setScaling(simplexNoiseTextureMesh.transform, createVector3Fill(1.5));
     setTranslation(simplexNoiseTextureMesh.transform, createVector3(8, 1.5, 8));
     addActorToScene(captureScene, simplexNoiseTextureMesh);
 

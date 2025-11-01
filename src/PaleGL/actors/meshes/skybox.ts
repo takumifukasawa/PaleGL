@@ -22,7 +22,7 @@ import skyboxVertexShader from '@/PaleGL/shaders/skybox-vertex.glsl';
 import skyboxFragmentShader from '@/PaleGL/shaders/skybox-fragment.glsl';
 import { UpdateActorTransformFunc, defaultUpdateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { setScaling, setTranslation } from '@/PaleGL/core/transform.ts';
-import { createFillVector3 } from '@/PaleGL/math/vector3.ts';
+import { createVector3Fill } from '@/PaleGL/math/vector3.ts';
 import { createSphereGeometry } from '@/PaleGL/geometries/createSphereGeometry.ts';
 
 // tmp
@@ -176,7 +176,7 @@ export const updateSkyboxTransform: UpdateActorTransformFunc = (actor, camera) =
     if (camera) {
         setTranslation(skybox.transform, camera.transform.position);
         // 1.733 ... 単位立方体の対角線の長さ sqrt(1 + 1 + 1)
-        setScaling(skybox.transform, createFillVector3(camera.far / 1.733));
+        setScaling(skybox.transform, createVector3Fill(camera.far / 1.733));
     }
 
     defaultUpdateActorTransform(actor);

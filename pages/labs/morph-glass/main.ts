@@ -56,7 +56,7 @@ import { loadCubeMap } from '@/PaleGL/loaders/loadCubeMap';
 import { loadGLTF } from '@/PaleGL/loaders/loadGLTF';
 import { createColor, createColorBlack, createColorWhite } from '@/PaleGL/math/color';
 import { v2o } from '@/PaleGL/math/vector2';
-import { createFillVector3, createVector3 } from '@/PaleGL/math/vector3';
+import { createVector3Fill, createVector3 } from '@/PaleGL/math/vector3';
 import { createVector4 } from '@/PaleGL/math/vector4';
 import { createBufferVisualizerPass } from '@/PaleGL/postprocess/bufferVisualizerPass';
 import { addPostProcessPass, createPostProcess, setPostProcessEnabled } from '@/PaleGL/postprocess/postProcess.ts';
@@ -453,7 +453,7 @@ const main = async () => {
             (child as Mesh).castShadow = true;
         }
     });
-    setScaling(streetFloorActor.transform, createFillVector3(1));
+    setScaling(streetFloorActor.transform, createVector3Fill(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
     setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_METALLIC, 0.5);
     setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_ROUGHNESS, 1);
@@ -474,7 +474,7 @@ const main = async () => {
     addActorToScene(captureScene, bgActor);
     // setTranslation(bgActor.transform, createVector3(0, .88, 0));
     setTranslation(bgActor.transform, createVector3(0, -6, -20));
-    setScaling(bgActor.transform, createFillVector3(8));
+    setScaling(bgActor.transform, createVector3Fill(8));
 
     //
     // glass

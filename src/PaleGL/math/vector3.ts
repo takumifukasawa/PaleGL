@@ -272,8 +272,12 @@ export const getBinormalFromTangent = (t: Vector3, n: Vector3) => {
     return crossVectorsV3(t, negateVector3(cloneVector3(n)));
 }
 
-export const createFillVector3 = (value: number) => {
+export const createVector3Fill = (value: number) => {
     return createVector3(value, value, value);
+}
+
+export const createVector3Inverse = (v: Vector3) => {
+    return createVector3(1 / v3x(v), 1 / v3y(v), 1 / v3z(v));
 }
 
 export const lerpVector3 = (v1: Vector3, v2: Vector3, r: number) => {

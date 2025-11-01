@@ -35,7 +35,7 @@ import {
 import { createVector2, createVector2Zero, v2o, v2x, v2y } from '@/PaleGL/math/vector2';
 import {
     addVector3Array,
-    createFillVector3,
+    createVector3Fill,
     createVector3,
     createVector3Up,
     createVector3Zero,
@@ -967,7 +967,7 @@ const main = async () => {
             (child as Mesh).castShadow = true;
         }
     });
-    setScaling(streetFloorActor.transform, createFillVector3(1));
+    setScaling(streetFloorActor.transform, createVector3Fill(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
     streetFloorMaterial.fragmentShaderModifiers = [
         {
@@ -990,7 +990,7 @@ emissiveColor *= d;
     streetLightActorLeft = await createStreetLightActor();
     subscribeActorOnStart(streetLightActorLeft, () => {
         streetLightActorLeft.transform.position = createVector3(6, 0, 0);
-        streetLightActorLeft.transform.scale = createFillVector3(1.8);
+        streetLightActorLeft.transform.scale = createVector3Fill(1.8);
     });
     addActorToScene(captureScene, streetLightActorLeft);
 
@@ -998,7 +998,7 @@ emissiveColor *= d;
     subscribeActorOnStart(streetLightActorRight, () => {
         streetLightActorRight.transform.rotation = createRotator(createQuaternionFromEulerDegrees(0, 180, 0));
         streetLightActorRight.transform.position = createVector3(-6, 0, 0);
-        streetLightActorRight.transform.scale = createFillVector3(1.8);
+        streetLightActorRight.transform.scale = createVector3Fill(1.8);
     });
     addActorToScene(captureScene, streetLightActorRight);
 
@@ -1013,7 +1013,7 @@ emissiveColor *= d;
     );
     attractSphereMesh.name = 'attractSphere';
     subscribeActorOnStart(attractSphereMesh, () => {
-        setScaling(attractSphereMesh.transform, createFillVector3(0.5));
+        setScaling(attractSphereMesh.transform, createVector3Fill(0.5));
     });
     attractSphereMesh.onFixedUpdate = [() => {
         const ray = viewpointToRay(
