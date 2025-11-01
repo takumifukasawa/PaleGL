@@ -141,6 +141,7 @@ export const MATERIAL_TYPE_G_BUFFER = 1;
 export const MATERIAL_TYPE_UNLIT = 2;
 export const MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH = 3;
 export const MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH = 4;
+// export const MATERIAL_TYPE_TRANSPARENT = 5;
 
 export type MaterialType =
     | typeof MATERIAL_TYPE_MISC
@@ -148,6 +149,7 @@ export type MaterialType =
     | typeof MATERIAL_TYPE_UNLIT
     | typeof MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH
     | typeof MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH;
+    // | typeof MATERIAL_TYPE_TRANSPARENT;
 
 export const UI_QUEUE_TYPE_NONE = 0;
 export const UI_QUEUE_TYPE_AFTER_TONE = 1;
