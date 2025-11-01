@@ -1,4 +1,4 @@
-import { TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import {
     Actor,
     ActorFixedUpdateArgs,
@@ -158,8 +158,8 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     // TODO: componentで必要になったら呼ぶ
 };
 
-export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T) => {
-    actor.onProcessPropertyBinder.forEach((cb) => cb(key, value));
+export const processActorPropertyBinder = <T extends TimelinePropertyValue>(actor: Actor, key: string, value: T, clip: MarionetterClipKinds, clipTime: number) => {
+    actor.onProcessPropertyBinder.forEach((cb) => cb(key, value, clip, clipTime));
     // TODO: すべてのcomponentにすべてのpropertyが渡ってしまっているので不必要なプロパティは送らないようにしたい
     actor.components.forEach(([model, behaviour]) => {
         if (behaviour.onFilterPropertyBinder(key)) {

@@ -415,7 +415,7 @@ function createMarionetterClips(
  * @param animationClip
  */
 function createMarionetterAnimationClip(
-    animationClip: MarionetterAnimationClipInfo
+    animationClipInfo: MarionetterAnimationClipInfo
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterAnimationClip {
     // TODO: 負荷対策のためにキャッシュしたい
@@ -431,14 +431,22 @@ function createMarionetterAnimationClip(
     const localScale: Vector3 = createVector3One();
 
     // console.log('hogehoge - clip', animationClip);
-    const name = animationClip[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = animationClip[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = animationClip[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-    const postExtrapolation = animationClip[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
-    const bindings = animationClip[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    const name = animationClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+    const start = animationClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+    const duration = animationClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const postExtrapolation = animationClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+    const bindings = animationClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+
+    const animationClip: MarionetterAnimationClip = {
+        name,
+        type: MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
+        clipInfo: animationClipInfo,
+        // bind,
+        execute: () => {},
+    };
 
     // actorに直接valueを割り当てる関数
-    const execute = (args: MarionetterClipArgs) => {
+    animationClip.execute = (args: MarionetterClipArgs) => {
         const { actor, time } = args;
         let hasLocalPosition: boolean = false;
         let hasLocalRotationEuler: boolean = false;
@@ -463,12 +471,12 @@ function createMarionetterAnimationClip(
         // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
+        const timeInClip = time - start;
+
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
-            // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
             const [propertyName, keyframes] = binding;
-            const value = curveUtilityEvaluateCurve(time - start, duration, keyframes, postExtrapolation);
+            const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
                 case PROPERTY_LOCAL_POSITION_X:
@@ -630,7 +638,7 @@ function createMarionetterAnimationClip(
         // set float
         // numberの場合はすぐにセットしちゃう
         numberPropertyMap.forEach((numberValue, numberKey) => {
-            processActorPropertyBinder(actor, numberKey, numberValue);
+            processActorPropertyBinder(actor, numberKey, numberValue, animationClip, timeInClip);
         });
 
         // iterate vector4
@@ -653,30 +661,24 @@ function createMarionetterAnimationClip(
 
         // set vector2
         vector2PropertyMap.forEach((vector2, key) => {
-            processActorPropertyBinder(actor, key, vector2);
+            processActorPropertyBinder(actor, key, vector2, animationClip, timeInClip);
         });
         // set vector3
         vector3PropertyMap.forEach((vector3, key) => {
-            processActorPropertyBinder(actor, key, vector3);
+            processActorPropertyBinder(actor, key, vector3, animationClip, timeInClip);
         });
         // set vector4
         vector4PropertyMap.forEach((vector4, key) => {
-            processActorPropertyBinder(actor, key, vector4);
+            processActorPropertyBinder(actor, key, vector4, animationClip, timeInClip);
         });
 
         // set color
         colorPropertyMap.forEach((color, key) => {
-            processActorPropertyBinder(actor, key, color);
+            processActorPropertyBinder(actor, key, color, animationClip, timeInClip);
         });
     };
 
-    return {
-        name,
-        type: MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
-        clipInfo: animationClip,
-        // bind,
-        execute,
-    };
+    return animationClip;
 }
 
 /**
