@@ -518,7 +518,19 @@ void main() {
         outColor = resultColor;
         return;
     }
+  
+    //  
+    // CUSTOM_BEGIN --------------------------------
+    // additional materials
+    if(2.5 < shadingModelId && shadingModelId < 3.5) {
+        outColor = vec4(1.);
+        return;
+    }
 
+    //  
+    // CUSTOM_END ----------------------------------
+    //  
+    
     // for debug
     // outColor = vec4(baseColor, 1.);
     // outColor = vec4(baseColor, 1.);

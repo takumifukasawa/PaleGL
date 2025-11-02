@@ -31,6 +31,7 @@ vec3 fGetNormalObjectSpaceDfScene(vec3 p, mat4 WtoO, vec3 scale, float useWorld)
 
     // 軽量版
     // ref: https://x.com/Shiranui_Isuzu_/status/1074492632179474432?s=20
+    // License: Unspecified (個人のツイート)
     const float d = .0001;
     vec3 n = vec3(0., 0., 0.);
     for (int i = 0; i < 4; i++)
@@ -57,6 +58,7 @@ vec3 fGetNormalDfScene(vec3 p) {
 
     // 軽量版
     // ref: https://x.com/Shiranui_Isuzu_/status/1074492632179474432?s=20
+    // License: Unspecified (個人のツイート)
     const float d = .0001;
     vec3 n = vec3(0., 0., 0.);
     for (int i = 0; i < 4; i++)

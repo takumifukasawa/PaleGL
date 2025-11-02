@@ -8,6 +8,7 @@ uniform float uTiling;
 
 // ---------------------------------------------------------------------
 // ref: https://www.shadertoy.com/view/ltB3zD
+// License: CC BY-NC-SA 3.0 (Shadertoy default license)
 
 const float PHI = 1.61803398874989484820459; // Φ = Golden Ratio 
 

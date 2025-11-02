@@ -19,8 +19,9 @@ uniform float uBokehRadius;
 // #define BOKEH_KERNEL_SMALL
 
 // #if defined(BOKEH_KERNEL_SMALL)
-// 
+//
 // // ref: https://github.com/keijiro/KinoBokeh/blob/master/Assets/Kino/Bokeh/Shader/DiskKernel.cginc
+// // License: MIT License (Copyright Unity Technologies & Keijiro Takahashi)
 
 // #define KERNEL_SAMPLE_COUNT 16
 // const vec2[16] kernel = vec2[](

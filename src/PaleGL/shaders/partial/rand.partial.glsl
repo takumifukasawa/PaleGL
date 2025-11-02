@@ -4,12 +4,14 @@ float fRand(float x){
 
 // 0 - 1
 // ref: https://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-fRand-one-liner
+// License: CC BY-SA 4.0 (Stack Overflow content license)
 float fRand(vec2 co){
     // return fract(sin(dot(co.xy ,vec2(12.98, 78.23))) * 43.75);
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 // ref: https://thebookofshaders.com/edit.php#11/2d-gnoise.frag
+// License: Copyright Patricio Gonzalez Vivo - All Rights Reserved
 vec2 fRand2(vec2 st){
     st = vec2( dot(st,vec2(127.1,311.7)),
     dot(st,vec2(269.5,183.3)) );

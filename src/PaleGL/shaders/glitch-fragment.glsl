@@ -12,10 +12,8 @@ uniform float uTargetWidth;
 uniform float uTargetHeight;
 uniform float uBlendRate;
 
-uniform float uVignetteRadius;
-uniform float uVignettePower;
-
 // ref: https://www.sawcegames.com/en/post/nier-automata-glitch
+// License: Unspecified (© Sawce 2025)
 
 float fBlockNoise(vec2 st, vec2 scale, vec2 offset) {
     st *= scale;

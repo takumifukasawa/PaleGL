@@ -78,6 +78,7 @@ export const rad2Deg = (rad: number) => rad * (180 / Math.PI);
 export const deg2Rad = (deg: number) => deg * (Math.PI / 180);
 
 // ref: https://gist.github.com/avilde/3736a903560b35fd587d213a3f79fad7
+// License: Public Domain (Source: https://github.com/bryc/code)
 const mulberry32 = (seed: number): number => {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;

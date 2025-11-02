@@ -191,6 +191,7 @@ export function createTexture({
             console.log(`[Texture.constructor] extDXT1`, extDXT1);
 
             // ref: https://mklearning.blogspot.com/2014/10/webgldds.html
+            // License: Unspecified (個人ブログ)
 
             // FCCを32bit符号付き整数に変換する
             const fourCCToInt32 = (value: string) => {

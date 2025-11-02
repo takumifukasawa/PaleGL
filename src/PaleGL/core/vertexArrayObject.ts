@@ -114,6 +114,7 @@ export function setVertexArrayObjectAttribute(vao: VertexArrayObject, attribute:
             // size ... 頂点ごとに埋める数
             // stride is always 0 because buffer is not interleaved.
             // ref: https://developer.mozilla.org/ja/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+            // License: CC-BY-SA 2.5+ (code samples: CC0/Public Domain)
             gl.vertexAttribPointer(newLocation, size, GL_FLOAT, false, 0, 0);
             break;
         case Uint16Array:

@@ -1,4 +1,5 @@
 // ref: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
+// License: CC BY-SA 4.0 (Stack Overflow content license)
 
 /* eslint-disable */
 export const uuidv4 = (): number => {

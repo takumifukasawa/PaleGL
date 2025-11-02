@@ -16,6 +16,7 @@
 //
 
 // ref: https://www.shadertoy.com/view/ldlcRf
+// License: CC BY-NC-SA 3.0 (Shadertoy default license)
 vec2 fMinMat(vec2 d1, vec2 d2) {
     return (d1.x < d2.x) ? d1 : d2;
 }
