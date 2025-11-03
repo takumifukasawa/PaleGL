@@ -80,25 +80,27 @@ const uniformNameCameraAltitude = 'uCameraAltitude';
 
 export const createProceduralAtmosphereSkybox: (
     args: ProceduralAtmosphereSkyboxOptions
-) => ProceduralAtmosphereSkybox = ({
-    gpu,
-    size = 256,
-    updateInterval = 2,
-    baseIntensity = 0.2,
-    specularIntensity = 0.2,
-    rotationOffset = 0,
-    fragmentShader = proceduralCubeMapAtmosphereFragmentShader,
-    sunPosition = [1, 1, 0],
-    sunIntensity = 22.0,
-    planetRadius = 6371e3,
-    atmosphereRadius = 6471e3,
-    rayleighCoefficient = [5.5e-6, 13.0e-6, 22.4e-6],
-    mieCoefficient = 21e-6,
-    rayleighScaleHeight = 8e3,
-    mieScaleHeight = 1.2e3,
-    mieScatteringDirection = 0.758,
-    cameraAltitude = 100.0,
-}: ProceduralAtmosphereSkyboxOptions) => {
+) => ProceduralAtmosphereSkybox = (args: ProceduralAtmosphereSkyboxOptions) => {
+   const {
+       gpu,
+       size = 256,
+       updateInterval = 2,
+       baseIntensity = 0.2,
+       specularIntensity = 0.2,
+       rotationOffset = 0,
+       fragmentShader = proceduralCubeMapAtmosphereFragmentShader,
+       sunPosition = [1, 1, 0],
+       sunIntensity = 22.0,
+       planetRadius = 6371e3,
+       atmosphereRadius = 6471e3,
+       rayleighCoefficient = [5.5e-6, 13.0e-6, 22.4e-6],
+       mieCoefficient = 21e-6,
+       rayleighScaleHeight = 8e3,
+       mieScaleHeight = 1.2e3,
+       mieScatteringDirection = 0.758,
+       cameraAltitude = 100.0,
+   } = args; 
+    
     // let cubeMap: CubeMap;
     // let cubeMapUpdateContext: CubeMapUpdateContext | null = null;
     let frameCount = 0;
@@ -168,6 +170,19 @@ export const createProceduralAtmosphereSkybox: (
     const updateParameters = () => {
         if (skyboxMesh.cubeMapWithUpdateContext) {
             const targetMaterialUniforms = skyboxMesh.cubeMapWithUpdateContext.updateContext.material.uniforms!;
+            console.log(targetMaterialUniforms)
+            // console.log("======================");
+            // console.log(skyboxMesh);
+            // console.log(sunPosition);
+            // console.log(sunIntensity);
+            // console.log(planetRadius);
+            // console.log(atmosphereRadius);
+            // console.log(rayleighCoefficient);
+            // console.log(mieCoefficient);
+            // console.log(rayleighScaleHeight);
+            // console.log(mieScaleHeight);
+            // console.log(mieScatteringDirection);
+            // console.log(cameraAltitude);
             setUniformValue(targetMaterialUniforms, uniformNameSunPosition, skyboxMesh.sunPosition);
             setUniformValue(targetMaterialUniforms, uniformNameSunIntensity, skyboxMesh.sunIntensity);
             setUniformValue(targetMaterialUniforms, uniformNamePlanetRadius, skyboxMesh.planetRadius);
@@ -189,7 +204,7 @@ export const createProceduralAtmosphereSkybox: (
         if (skyboxMesh.cubeMapWithUpdateContext) {
             frameCount++;
             if (frameCount % skyboxMesh.cubeMapWithUpdateContext.updateContext.updateInterval === 0) {
-                updateParameters();
+                // updateParameters();
                 updateProceduralCubeMap(renderer, skyboxMesh.cubeMapWithUpdateContext.cubeMap, skyboxMesh.cubeMapWithUpdateContext.updateContext);
             }
         }

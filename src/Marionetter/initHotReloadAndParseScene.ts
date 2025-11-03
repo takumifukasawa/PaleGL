@@ -18,7 +18,12 @@ export const initHotReloadAndParseScene = (
                 cache: 'no-cache',
             }).then(async (res) => {
                 const sceneJson = (await res.json()) as unknown as MarionetterScene;
-                const optimizedSceneJson = optimizeJsonData(sceneJson) as unknown as MarionetterScene;
+                const optimizedSceneJson = optimizeJsonData({
+                    obj: sceneJson,
+                    enableRound: true,
+                    decimalPlaces: 10
+                }) as unknown as MarionetterScene;
+                // const optimizedSceneJson = sceneJson as unknown as MarionetterScene;
                 console.log('hot reload scene', optimizedSceneJson);
                 // if (marionetterSceneStructure) {
                 // console.log('hot reload: marionetterSceneStructure', marionetterSceneStructure);

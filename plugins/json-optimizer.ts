@@ -1,12 +1,22 @@
 type objType = { [k: string]: unknown };
 
-export function optimizeJsonData(
-    obj: objType,
-    decimalPlaces: number = 3,
-    filePath?: string,
-    currentPath: string = '',
-    verbose: boolean = false,
-): unknown {
+export type OptimizeJsonDataOptions = {
+    obj: unknown;
+    enableRound?: boolean;
+    decimalPlaces?: number;
+    filePath?: string;
+    currentPath?: string;
+    verbose?: boolean;
+};
+
+export function optimizeJsonData({
+    obj,
+    enableRound = true,
+    decimalPlaces = 3,
+    filePath,
+    currentPath = '',
+    verbose = false,
+}: OptimizeJsonDataOptions): unknown {
     const optimizeNumber = (num: number, path: string): number => {
         // 整数に変換できる値は整数にする
         if (Number.isInteger(num)) {
@@ -40,28 +50,33 @@ export function optimizeJsonData(
 
     if (Array.isArray(obj)) {
         return obj.map((item, index) =>
-            optimizeJsonData(
-                item as objType,
+            optimizeJsonData({
+                obj: item,
+                enableRound,
                 decimalPlaces,
                 filePath,
-                currentPath ? `${currentPath}[${index}]` : `[${index}]`
-            )
+                currentPath: currentPath ? `${currentPath}[${index}]` : `[${index}]`,
+                verbose,
+            })
         );
     } else if (typeof obj === 'object' && obj !== null) {
+        const objTyped = obj as objType;
         const newObj = {} as objType;
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                newObj[key] = optimizeJsonData(
-                    obj[key] as objType,
+        for (const key in objTyped) {
+            if (Object.prototype.hasOwnProperty.call(objTyped, key)) {
+                newObj[key] = optimizeJsonData({
+                    obj: objTyped[key],
+                    enableRound,
                     decimalPlaces,
                     filePath,
-                    currentPath ? `${currentPath}.${key}` : key
-                );
+                    currentPath: currentPath ? `${currentPath}.${key}` : key,
+                    verbose,
+                });
             }
         }
         return newObj;
     } else if (typeof obj === 'number') {
-        return optimizeNumber(obj, currentPath);
+        return enableRound ? optimizeNumber(obj, currentPath) : obj;
     } else {
         return obj;
     }
