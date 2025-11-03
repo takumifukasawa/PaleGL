@@ -149,7 +149,7 @@ export type MaterialType =
     | typeof MATERIAL_TYPE_UNLIT
     | typeof MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH
     | typeof MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH;
-    // | typeof MATERIAL_TYPE_TRANSPARENT;
+// | typeof MATERIAL_TYPE_TRANSPARENT;
 
 export const UI_QUEUE_TYPE_NONE = 0;
 export const UI_QUEUE_TYPE_AFTER_TONE = 1;
@@ -361,6 +361,7 @@ export const POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT = 16;
 export const POST_PROCESS_PASS_TYPE_FRAGMENT = 17;
 export const POST_PROCESS_PASS_TYPE_FOG = 18;
 export const POST_PROCESS_PASS_TYPE_FRAGMENT_PASS = 19;
+export const POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS = 20;
 
 export type PostProcessPassType =
     | typeof POST_PROCESS_PASS_TYPE_BLOOM
@@ -382,7 +383,8 @@ export type PostProcessPassType =
     | typeof POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT
     | typeof POST_PROCESS_PASS_TYPE_FRAGMENT
     | typeof POST_PROCESS_PASS_TYPE_FOG
-    | typeof POST_PROCESS_PASS_TYPE_FRAGMENT_PASS;
+    | typeof POST_PROCESS_PASS_TYPE_FRAGMENT_PASS
+    | typeof POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS;
 
 // -----------------------------------------------------------------------------
 // uniforms

@@ -20,7 +20,7 @@ export const createStats = (args: StatsArgs = {}) => {
 
     const domElement = document.createElement('div');
     const passes: { groupLabel: string; passInfos: PassInfo[] }[] = [];
-    const passGroupStates: boolean[] = [];
+    const passGroupStates = new Map<string, boolean>();
     const drawVertexCount = 0;
     const drawCallCount = 0;
     const showFPS: boolean = true;
@@ -80,9 +80,10 @@ white-space: break-spaces;
     // イベント委譲でパスグループの折り畳みを制御
     passInfoView.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
-        if (target.dataset.passGroupIndex !== undefined) {
-            const index = parseInt(target.dataset.passGroupIndex, 10);
-            stats.passGroupStates[index] = !stats.passGroupStates[index];
+        if (target.dataset.groupLabel !== undefined) {
+            const groupLabel = target.dataset.groupLabel;
+            const currentState = stats.passGroupStates.get(groupLabel) ?? false;
+            stats.passGroupStates.set(groupLabel, !currentState);
             updateStatsView(stats);
         }
     });
@@ -149,12 +150,8 @@ const updateStatsView = (stats: Stats) => {
 
     // 各パスグループを処理
     for (let i = 0; i < stats.passes.length; i++) {
-        // 状態が未定義なら折り畳みで初期化
-        if (stats.passGroupStates[i] === undefined) {
-            stats.passGroupStates[i] = false;
-        }
-
-        const isExpanded = stats.passGroupStates[i];
+        const groupLabel = stats.passes[i].groupLabel;
+        const isExpanded = stats.passGroupStates.get(groupLabel) ?? false;
 
         // 統計情報を計算
         let totalDrawCalls = 0;
@@ -168,7 +165,7 @@ const updateStatsView = (stats: Stats) => {
         const header = document.createElement('div');
         header.style.cursor = 'pointer';
         header.style.userSelect = 'none';
-        header.dataset.passGroupIndex = i.toString();
+        header.dataset.groupLabel = groupLabel;
 
         const arrow = isExpanded ? '▼' : '▶';
         header.textContent = `${arrow} [${stats.passes[i].groupLabel}] draw calls: ${totalDrawCalls}, vertex count: ${totalVertexCount}`;

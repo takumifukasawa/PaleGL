@@ -26,47 +26,50 @@ import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import {
+    ACTOR_TYPE_LIGHT,
     // ActorType,
     ACTOR_TYPE_MESH,
-    ACTOR_TYPE_LIGHT,
+    ACTOR_TYPE_POST_PROCESS_VOLUME,
     // ACTOR_TYPE_CAMERA,
     ACTOR_TYPE_SKYBOX,
+    BLEND_TYPE_ADDITIVE,
     // BlendType,
     BLEND_TYPE_OPAQUE,
     BLEND_TYPE_TRANSPARENT,
-    BLEND_TYPE_ADDITIVE,
     // LightType,
     LIGHT_TYPE_DIRECTIONAL,
-    LIGHT_TYPE_SPOT,
     LIGHT_TYPE_POINT,
+    LIGHT_TYPE_SPOT,
     MAX_POINT_LIGHT_COUNT,
     MAX_SPOT_LIGHT_COUNT,
     // MeshType,
     // MESH_TYPE_SKINNED,
     // MESH_TYPE_TEXT,
     MESH_TYPE_SPRITE_ATLAS,
-    ACTOR_TYPE_POST_PROCESS_VOLUME,
-    RenderQueueType,
-    RENDER_QUEUE_TYPE_OPAQUE,
+    RENDER_QUEUE_TYPE_AFTER_TONE,
     RENDER_QUEUE_TYPE_ALPHA_TEST,
+    RENDER_QUEUE_TYPE_OPAQUE,
+    RENDER_QUEUE_TYPE_OVERLAY,
     RENDER_QUEUE_TYPE_SKYBOX,
     RENDER_QUEUE_TYPE_TRANSPARENT,
-    RENDER_QUEUE_TYPE_AFTER_TONE,
-    RENDER_QUEUE_TYPE_OVERLAY,
     RENDER_TARGET_TYPE_DEPTH,
     RENDER_TARGET_TYPE_EMPTY,
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
+    RenderQueueType,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
     // UIQueueType,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
-    UNIFORM_BLOCK_NAME_COMMON,
-    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_BLOCK_NAME_CAMERA,
+    UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
-    UNIFORM_BLOCK_NAME_SPOT_LIGHT,
     UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    UNIFORM_BLOCK_NAME_SPOT_LIGHT,
     UNIFORM_BLOCK_NAME_TIMELINE,
+    UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UNIFORM_NAME_CAMERA_ASPECT,
     UNIFORM_NAME_CAMERA_FAR,
     UNIFORM_NAME_CAMERA_FOV,
@@ -80,6 +83,13 @@ import {
     UNIFORM_NAME_INVERSE_VIEW_MATRIX,
     UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
     UNIFORM_NAME_INVERSE_WORLD_MATRIX,
+    UNIFORM_NAME_NORMAL_MATRIX,
+    UNIFORM_NAME_POINT_LIGHT,
+    UNIFORM_NAME_PROJECTION_MATRIX,
+    UNIFORM_NAME_SCENE_TEXTURE,
+    UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
+    UNIFORM_NAME_SPOT_LIGHT,
+    UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
     UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION,
     UNIFORM_NAME_STRUCT_MEMBER_COLOR,
     UNIFORM_NAME_STRUCT_MEMBER_CONE_COS,
@@ -88,39 +98,29 @@ import {
     UNIFORM_NAME_STRUCT_MEMBER_INTENSITY,
     UNIFORM_NAME_STRUCT_MEMBER_PENUMBRA_COS,
     UNIFORM_NAME_STRUCT_MEMBER_POSITION,
-    UNIFORM_NAME_NORMAL_MATRIX,
-    UNIFORM_NAME_POINT_LIGHT,
-    UNIFORM_NAME_PROJECTION_MATRIX,
-    UNIFORM_NAME_SCENE_TEXTURE,
     UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX,
-    UNIFORM_NAME_SPOT_LIGHT,
-    UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
     UNIFORM_NAME_TIME,
     UNIFORM_NAME_TIMELINE_DELTA_TIME,
     UNIFORM_NAME_TIMELINE_TIME,
     UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
-    UNIFORM_NAME_VIEWPORT,
     UNIFORM_NAME_VIEW_DIRECTION,
     UNIFORM_NAME_VIEW_MATRIX,
     UNIFORM_NAME_VIEW_POSITION,
     UNIFORM_NAME_VIEW_PROJECTION_MATRIX,
+    UNIFORM_NAME_VIEWPORT,
     UNIFORM_NAME_WORLD_MATRIX,
     UNIFORM_NAME_WVP_MATRIX,
-    UNIFORM_TYPE_INT,
-    UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_BOOL,
+    UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_FLOAT,
+    UNIFORM_TYPE_INT,
+    UNIFORM_TYPE_MATRIX4,
+    UNIFORM_TYPE_STRUCT,
+    UNIFORM_TYPE_STRUCT_ARRAY,
     UNIFORM_TYPE_VECTOR2,
     UNIFORM_TYPE_VECTOR3,
     UNIFORM_TYPE_VECTOR4,
-    UNIFORM_TYPE_MATRIX4,
-    UNIFORM_TYPE_COLOR,
-    UNIFORM_TYPE_STRUCT,
-    UNIFORM_TYPE_STRUCT_ARRAY,
-    UNIFORM_INDEX_NAME,
-    UNIFORM_INDEX_TYPE,
-    UNIFORM_INDEX_VALUE,
     UniformTypes,
-    UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
 } from '@/PaleGL/constants';
 import { replaceShaderIncludes } from '@/PaleGL/core/buildShader.ts';
 import { SharedTextures, SharedTexturesTypes } from '@/PaleGL/core/createSharedTextures.ts';
@@ -209,6 +209,7 @@ import {
     ChromaticAberrationPass,
     createChromaticAberrationPass,
 } from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
+import { ColorCurtainPass, createColorCurtainPass } from '@/PaleGL/postprocess/colorCurtainPass.ts';
 import {
     createDeferredShadingPass,
     DeferredShadingPass,
@@ -350,6 +351,7 @@ export type Renderer = {
     glitchPass: GlitchPass;
     vignettePass: VignettePass;
     fxaaPass: FxaaPass;
+    blackCurtainPass: ColorCurtainPass;
     //
     renderTarget: CameraRenderTargetType | null;
     clearColorDirtyFlag: boolean;
@@ -457,6 +459,7 @@ export function createRenderer({
     const glitchPass = createGlitchPass({ gpu });
     const vignettePass = createVignettePass({ gpu });
     const fxaaPass = createFXAAPass({ gpu });
+    const blackCurtainPass = createColorCurtainPass({ gpu, name: 'BlackCurtain' });
 
     addPostProcessPass(scenePostProcess, fxaaPass);
     addPostProcessPass(scenePostProcess, depthOfFieldPass);
@@ -466,6 +469,7 @@ export function createRenderer({
     addPostProcessPass(scenePostProcess, vignettePass);
     addPostProcessPass(scenePostProcess, chromaticAberrationPass);
     addPostProcessPass(scenePostProcess, glitchPass);
+    addPostProcessPass(scenePostProcess, blackCurtainPass);
 
     //
     // initialize global uniform buffer objects
@@ -545,17 +549,23 @@ export function createRenderer({
         [
             UNIFORM_NAME_SPOT_LIGHT,
             UNIFORM_TYPE_STRUCT_ARRAY,
-            maton.range(MAX_SPOT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
-                [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
-                [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
-                [UNIFORM_NAME_STRUCT_MEMBER_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
-                [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_CONE_COS, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_PENUMBRA_COS, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
-            ]) as UniformBufferObjectStructArrayValue,
+            maton.range(MAX_SPOT_LIGHT_COUNT).map(
+                (): UniformBufferObjectStructValue => [
+                    [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+                    [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                    [UNIFORM_NAME_STRUCT_MEMBER_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                    [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_CONE_COS, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_PENUMBRA_COS, UNIFORM_TYPE_FLOAT, 0],
+                    [
+                        UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX,
+                        UNIFORM_TYPE_MATRIX4,
+                        createMat4Identity(),
+                    ],
+                ]
+            ) as UniformBufferObjectStructArrayValue,
         ],
     ];
     globalUniformBufferObjects.push({
@@ -572,13 +582,15 @@ export function createRenderer({
         [
             UNIFORM_NAME_POINT_LIGHT,
             UNIFORM_TYPE_STRUCT_ARRAY,
-            maton.range(MAX_POINT_LIGHT_COUNT).map((): UniformBufferObjectStructValue => [
-                [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
-                [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
-                [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
-                [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
-            ]) as UniformBufferObjectStructArrayValue,
+            maton.range(MAX_POINT_LIGHT_COUNT).map(
+                (): UniformBufferObjectStructValue => [
+                    [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+                    [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+                    [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
+                    [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
+                ]
+            ) as UniformBufferObjectStructArrayValue,
         ],
     ];
     globalUniformBufferObjects.push({
@@ -660,6 +672,7 @@ export function createRenderer({
         glitchPass,
         vignettePass,
         fxaaPass,
+        blackCurtainPass,
         //
         renderTarget,
         clearColorDirtyFlag,
@@ -750,6 +763,7 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setPostProcessPassSize(renderer.glitchPass, w, h);
     setPostProcessPassSize(renderer.vignettePass, w, h);
     setPostProcessPassSize(renderer.fxaaPass, w, h);
+    setPostProcessPassSize(renderer.blackCurtainPass, w, h);
 }
 
 // TODO: 本当はclearcolorの色も渡せるとよい
@@ -812,6 +826,27 @@ export function beforeRenderRenderer(renderer: Renderer, time: number, deltaTime
     updateCommonUniforms(renderer, { time, deltaTime });
 }
 
+const isActorEnabledInHierarchy = (actor: Actor) => {
+    if (!actor.enabled) {
+        return false;
+    }
+    let targetActor: Actor = actor;
+    let parent: Actor | null = null;
+    while (true) {
+        parent = targetActor.parent;
+        // 親がnullになるまでsearch
+        if (parent) {
+            if (parent.enabled) {
+                targetActor = parent;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+};
+
 export function renderRenderer(
     renderer: Renderer,
     scene: Scene,
@@ -864,7 +899,10 @@ export function renderRenderer(
     traverseScene(scene, (actor) => {
         switch (actor.type) {
             case ACTOR_TYPE_SKYBOX:
-                if (!actor.enabled) {
+                // if (!actor.enabled) {
+                //     return;
+                // }
+                if (!isActorEnabledInHierarchy(actor)) {
                     return;
                 }
                 renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_SKYBOX].push(
@@ -875,7 +913,10 @@ export function renderRenderer(
                 return;
             case ACTOR_TYPE_MESH:
                 // case ActorTypes.SkinnedMesh:
-                if (!actor.enabled) {
+                // if (!actor.enabled) {
+                //     return;
+                // }
+                if (!isActorEnabledInHierarchy(actor)) {
                     return;
                 }
                 const mesh = actor as Mesh;
@@ -936,7 +977,8 @@ export function renderRenderer(
                 break;
 
             case ACTOR_TYPE_LIGHT:
-                if (actor.enabled) {
+                // if (actor.enabled) {
+                if (isActorEnabledInHierarchy(actor)) {
                     const light = actor as Light;
                     switch (light.lightType) {
                         case LIGHT_TYPE_DIRECTIONAL:
@@ -1310,6 +1352,8 @@ export function renderRenderer(
             }
         },
         // lightActors,
+        stats: renderer.stats ?? undefined,
+        groupLabel: 'postprocess (renderer)',
     });
 
     if (isCameraLastPassAndHasNotPostProcess) {
@@ -1344,6 +1388,8 @@ export function renderRenderer(
                 time, // TODO: engineから渡したい
                 isCameraLastPass: !camera.renderTarget,
                 lightActors,
+                stats: renderer.stats ?? undefined,
+                groupLabel: 'postprocess (camera)',
             });
         }
     }
@@ -1489,7 +1535,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
 
     depthPrePassRenderMeshInfos.forEach(({ actor, materialIndex, cb }) => {
         updateActorTransformUniforms(renderer, actor, camera);
-        
+
         actor.depthMaterials.forEach((depthMaterial, i) => {
             if (!depthMaterial) {
                 console.error('[Renderer.depthPrePass] invalid depth material');
@@ -1509,7 +1555,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
             }
 
             renderMesh(renderer, actor.geometry, depthMaterial, cb);
-            
+
             if (renderer.stats) {
                 addPassInfoStats(renderer.stats, 'depth pre pass', actor.name, actor.geometry);
             }
@@ -2048,7 +2094,7 @@ function updateUniformBlockValue(
                         data.push(0);
                     } else {
                         const val = v as UniformBufferObjectElementValueNoNeedsPadding;
-                        data.push(...(val instanceof Float32Array ? val : (val as {e: Float32Array}).e));
+                        data.push(...(val instanceof Float32Array ? val : (val as { e: Float32Array }).e));
                     }
                 });
                 updateUniformBufferData(targetUbo, uniformName, new Float32Array(data));
@@ -2059,8 +2105,8 @@ function updateUniformBlockValue(
                     typeof value === 'number'
                         ? new Float32Array([value])
                         : value instanceof Float32Array
-                        ? value
-                        : (value as {e: Float32Array}).e
+                          ? value
+                          : (value as { e: Float32Array }).e
                 );
             }
             break;
@@ -2093,11 +2139,19 @@ function updateDirectionalLightUniforms(renderer: Renderer, directionalLight: Di
         // pattern: 回転を適用
         // TODO: quaternion側にバグがありそう
         // value: rotateVectorByQuaternion(createVector3(0, 0, -1), directionalLight.transform.rotation.quaternion),
-        [UNIFORM_NAME_STRUCT_MEMBER_DIRECTION, UNIFORM_TYPE_VECTOR3, normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position)))],
+        [
+            UNIFORM_NAME_STRUCT_MEMBER_DIRECTION,
+            UNIFORM_TYPE_VECTOR3,
+            normalizeVector3(negateVector3(cloneVector3(directionalLight.transform.position))),
+        ],
         [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, directionalLight.intensity],
         [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, directionalLight.color],
         // name: UniformNames.LightViewProjectionMatrix,
-        [UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, directionalLight.shadowMapProjectionMatrix],
+        [
+            UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX,
+            UNIFORM_TYPE_MATRIX4,
+            directionalLight.shadowMapProjectionMatrix,
+        ],
     ]);
 }
 
@@ -2110,13 +2164,21 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
             return [
                 [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, spotLight.color],
                 [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, spotLight.transform.position],
-                [UNIFORM_NAME_STRUCT_MEMBER_DIRECTION, UNIFORM_TYPE_VECTOR3, cloneVector3(getWorldForward(spotLight.transform))],
+                [
+                    UNIFORM_NAME_STRUCT_MEMBER_DIRECTION,
+                    UNIFORM_TYPE_VECTOR3,
+                    cloneVector3(getWorldForward(spotLight.transform)),
+                ],
                 [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, spotLight.intensity],
                 [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, spotLight.distance],
                 [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, spotLight.attenuation],
                 [UNIFORM_NAME_STRUCT_MEMBER_CONE_COS, UNIFORM_TYPE_FLOAT, getSpotLightConeCos(spotLight)],
                 [UNIFORM_NAME_STRUCT_MEMBER_PENUMBRA_COS, UNIFORM_TYPE_FLOAT, getSpotLightPenumbraCos(spotLight)],
-                [UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, spotLight.shadowMapProjectionMatrix],
+                [
+                    UNIFORM_NAME_STRUCT_MEMBER_SHADOW_MAP_PROJECTION_MATRIX,
+                    UNIFORM_TYPE_MATRIX4,
+                    spotLight.shadowMapProjectionMatrix,
+                ],
             ];
         }) as UniformBufferObjectStructArrayValue
     );

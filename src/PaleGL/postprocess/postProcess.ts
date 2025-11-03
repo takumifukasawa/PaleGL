@@ -1,5 +1,22 @@
-﻿import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import {getDummyBlackTexture, Gpu} from '@/PaleGL/core/gpu.ts';
+﻿import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
+import {
+    PostProcessPassType,
+    UNIFORM_NAME_DEPTH_TEXTURE,
+    UNIFORM_NAME_GBUFFER_A_TEXTURE,
+    UNIFORM_NAME_GBUFFER_B_TEXTURE,
+    UNIFORM_NAME_GBUFFER_C_TEXTURE,
+    UNIFORM_NAME_GBUFFER_D_TEXTURE,
+    UNIFORM_NAME_INVERSE_PROJECTION_MATRIX,
+    UNIFORM_NAME_INVERSE_VIEW_MATRIX,
+    UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
+    UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
+    UNIFORM_NAME_VIEW_PROJECTION_MATRIX,
+} from '@/PaleGL/constants.ts';
+import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
+import { getDummyBlackTexture, Gpu } from '@/PaleGL/core/gpu.ts';
 import {
     applyLightShadowMapUniformValues,
     LightActors,
@@ -7,13 +24,9 @@ import {
     updateRendererCameraUniforms,
 } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget } from '@/PaleGL/core/renderTarget.ts';
-import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
-import { PostProcessPassType, UNIFORM_NAME_VIEW_PROJECTION_MATRIX, UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX, UNIFORM_NAME_INVERSE_VIEW_MATRIX, UNIFORM_NAME_INVERSE_PROJECTION_MATRIX, UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX, UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_NAME_GBUFFER_D_TEXTURE, UNIFORM_NAME_DEPTH_TEXTURE } from '@/PaleGL/constants.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
-import { createFullQuadOrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCameraBehaviour.ts';
-import { setCameraSize } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/matrix4.ts';
 import { PostProcessPassBase, PostProcessPassRenderArgs } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import {
     getPostProcessPassRenderTarget,
@@ -21,7 +34,7 @@ import {
     setPostProcessPassSize,
     updatePostProcessPass,
 } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { cloneMat4, invertMat4, transposeMat4 } from '@/PaleGL/math/matrix4.ts';
+import { addPassInfoStats, Stats } from '@/PaleGL/utilities/stats.ts';
 // import { Light } from '@/PaleGL/actors/light.ts';
 // import {Matrix4} from "@/PaleGL/math/matrix4.ts";
 // import {PostProcess} from "@/PaleGL/constants.ts";
@@ -37,6 +50,8 @@ type PostProcessRenderArgs = {
     isCameraLastPass: boolean;
     lightActors?: LightActors;
     onAfterRenderPass?: (pass: PostProcessPassBase) => void;
+    stats?: Stats;
+    groupLabel?: string;
 };
 
 export type PostProcess = {
@@ -57,7 +72,7 @@ export const createPostProcess = (postProcessCamera?: Camera): PostProcess => {
         // postProcessCamera: createFullQuadOrthographicCamera(),
         selfEnabled,
     };
-}
+};
 
 export const isPostProcessEnabled = (postProcess: PostProcess) => {
     if (!postProcess.selfEnabled) {
@@ -71,11 +86,11 @@ export const isPostProcessEnabled = (postProcess: PostProcess) => {
     }
 
     return false;
-}
+};
 
 export const setPostProcessEnabled = (postProcess: PostProcess, value: boolean) => {
     postProcess.selfEnabled = value;
-}
+};
 
 export const hasPostProcessPassEnabled = (postProcess: PostProcess) => {
     for (let i = 0; i < postProcess.passes.length; i++) {
@@ -84,7 +99,7 @@ export const hasPostProcessPassEnabled = (postProcess: PostProcess) => {
         }
     }
     return false;
-}
+};
 
 export const getPostProcessPassByType = <T extends PostProcessPassBase>(
     postProcess: PostProcess,
@@ -96,7 +111,16 @@ export const getPostProcessPassByType = <T extends PostProcessPassBase>(
         }
     }
     return null;
-}
+};
+
+export const getPostProcessPassByName = (postProcess: PostProcess, name: string) => {
+    for (let i = 0; i < postProcess.passes.length; i++) {
+        if (postProcess.passes[i].name === name) {
+            return postProcess.passes[i] as PostProcessPassBase;
+        }
+    }
+    return null;
+};
 
 export const getPostProcessLastRenderTarget = (postProcess: PostProcess) => {
     let lastPass: PostProcessPassBase | null = null;
@@ -110,23 +134,23 @@ export const getPostProcessLastRenderTarget = (postProcess: PostProcess) => {
         return null;
     }
     return getPostProcessPassRenderTarget(lastPass);
-}
+};
 
 export const setPostProcessSize = (postProcess: PostProcess, width: number, height: number) => {
     setCameraSize(postProcess.postProcessCamera, width, height);
     // this.renderTarget.setSize(width, height);
     postProcess.passes.forEach((pass) => setPostProcessPassSize(pass, width, height));
-}
+};
 
 export const addPostProcessPass = (postProcess: PostProcess, pass: PostProcessPassBase) => {
     postProcess.passes.push(pass);
-}
+};
 
 export const updatePostProcess = (postProcess: PostProcess) => {
     postProcess.passes.forEach((pass) => {
         updatePostProcessPass(pass);
     });
-}
+};
 
 // TODO: ここでuniform更新するの分かりづらい気がするがどう？一つにまとめた方がよい？
 export const updatePassMaterial = ({
@@ -202,7 +226,7 @@ export const updatePassMaterial = ({
             renderer.depthPrePassRenderTarget.depthTexture
         );
     });
-}
+};
 
 export const renderPass = ({
     pass,
@@ -246,7 +270,7 @@ export const renderPass = ({
         time,
         lightActors,
     });
-}
+};
 
 export const renderPostProcess = (
     postProcess: PostProcess,
@@ -260,6 +284,8 @@ export const renderPostProcess = (
         isCameraLastPass,
         lightActors,
         onAfterRenderPass,
+        stats,
+        groupLabel,
     }: PostProcessRenderArgs
 ) => {
     // if (!sceneRenderTarget) {
@@ -298,6 +324,10 @@ export const renderPostProcess = (
         //     time,
         // });
 
+        if (stats && groupLabel) {
+            addPassInfoStats(stats, groupLabel, pass.name, pass.geometry);
+        }
+
         renderPass({
             pass,
             gpu,
@@ -317,4 +347,4 @@ export const renderPostProcess = (
             onAfterRenderPass(pass);
         }
     });
-}
+};

@@ -42,14 +42,6 @@ export const createObjectMoveAndLookAtController = (args: {
                 const { actor, scene, localPosition } = args;
                 update(actor, scene, localPosition);
             },
-
-            // onUpdateCallback: (args) => {
-            //     // const { actor } = args;
-            //     // actor.transform.position = localPosition;
-            //     // if(lookAtTargetActor) {
-            //     //     actor.transform.lookAtActor(lookAtTargetActor);
-            //     // }
-            // }
         },
     ];
 }

@@ -27,8 +27,8 @@ import {
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
-import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
-import { cloneVector3, createVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { cloneRotator, createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
+import { cloneVector3, createVector3, createVector3Zero } from '@/PaleGL/math/vector3.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import {
@@ -392,7 +392,7 @@ export async function warmRender(
         }
 
         await wait(waitTime);
-    } 
+    }
 
     // 全て元に戻す
     setTranslation(camera.transform, cameraOriginal.p);

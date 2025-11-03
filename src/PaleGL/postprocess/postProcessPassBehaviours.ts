@@ -1,6 +1,8 @@
 import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { POST_PROCESS_PASS_TYPE_BLOOM, POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD, POST_PROCESS_PASS_TYPE_FOG, POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, POST_PROCESS_PASS_TYPE_GLITCH, POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, POST_PROCESS_PASS_TYPE_SSAO, POST_PROCESS_PASS_TYPE_SSR, POST_PROCESS_PASS_TYPE_STREAK, POST_PROCESS_PASS_TYPE_VIGNETTE, POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT, PostProcessPassType, UNIFORM_NAME_TARGET_WIDTH, UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_NAME_TEXEL_SIZE, UNIFORM_NAME_ASPECT, UNIFORM_NAME_SRC_TEXTURE } from '@/PaleGL/constants.ts';
+import { POST_PROCESS_PASS_TYPE_BLOOM, POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER, POST_PROCESS_PASS_TYPE_CHROMATIC_ABERRATION, POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD, POST_PROCESS_PASS_TYPE_FOG, POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR, POST_PROCESS_PASS_TYPE_GLITCH, POST_PROCESS_PASS_TYPE_LIGHT_SHAFT, POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW, POST_PROCESS_PASS_TYPE_SSAO, POST_PROCESS_PASS_TYPE_SSR, POST_PROCESS_PASS_TYPE_STREAK, POST_PROCESS_PASS_TYPE_VIGNETTE, POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT, PostProcessPassType, UNIFORM_NAME_TARGET_WIDTH, UNIFORM_NAME_TARGET_HEIGHT, UNIFORM_NAME_TEXEL_SIZE, UNIFORM_NAME_ASPECT, UNIFORM_NAME_SRC_TEXTURE,
+    POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS
+} from '@/PaleGL/constants.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { RenderTarget, setRenderTargetSize } from '@/PaleGL/core/renderTarget.ts';
 import { setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
@@ -43,6 +45,7 @@ import {
     updateBufferVisualizerPass,
 } from '@/PaleGL/postprocess/bufferVisualizerPass.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+import { renderColorCurtainPass } from '@/PaleGL/postprocess/colorCurtainPass.ts';
 
 // set size ------------------------------------
 
@@ -216,6 +219,7 @@ const createRenderPostProcessPassBehaviour = (): Partial<
         [POST_PROCESS_PASS_TYPE_STREAK]: renderStreakPass,
         [POST_PROCESS_PASS_TYPE_VIGNETTE]: renderVignettePass,
         [POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT]: renderVolumetricLightPass,
+        [POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS]: renderColorCurtainPass
     };
 
     // 開発時のみBufferVisualizerを追加
