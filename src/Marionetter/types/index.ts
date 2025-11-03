@@ -1162,3 +1162,21 @@ export const TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL = 0;
 export type TimelinePropertyBinderTarget = typeof TIMELINE_PROPERTY_BINDER_TARGET_MATERIAL;
 
 export type TimelinePropertyValue = number | Vector2 | Vector3 | Vector4 | Color;
+
+//
+// camera controller
+//
+
+export type MarionetterCameraControllerInfo = {
+    near: number;
+    far: number;
+    fov: number;
+    // shorten
+    nc: number;
+    fc: number;
+    f: number;
+};
+
+export const MARIONETTER_CAMERA_CONTROLLER_INFO_PROPERTY_NEAR = NeedsShorten ? 'nc' : 'near';
+export const MARIONETTER_CAMERA_CONTROLLER_INFO_PROPERTY_FAR = NeedsShorten ? 'fc' : 'far';
+export const MARIONETTER_CAMERA_CONTROLLER_INFO_PROPERTY_FOV = NeedsShorten ? 'f' : 'fov';
