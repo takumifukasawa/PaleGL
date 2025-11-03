@@ -1,12 +1,25 @@
 import { NeedsShorten } from '@/Marionetter/types';
-import { Component, COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT, createComponent } from '@/PaleGL/components/component.ts';
+import {
+    COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
+    ComponentBehaviour,
+    ComponentModel,
+    createComponent,
+} from '@/PaleGL/components/component.ts';
 import { createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
-export type HandShakeController = Component & {};
+export type HandShakeControllerModel = ComponentModel & {
+    params: {
+        amplitude: Vector3;
+        speed: Vector3;
+        offset: Vector3;
+    };
+};
 
-export const AMPLITUDE_PROPERTY_NAME = NeedsShorten ? 'a' : 'amplitude';
-export const SPEED_PROPERTY_NAME = NeedsShorten ? 's' : 'speed';
-export const OFFSET_PROPERTY_NAME = NeedsShorten ? 'o' : 'offset';
+export type HandShakeController = [HandShakeControllerModel, ComponentBehaviour];
+
+export const HAND_SHAKE_AMPLITUDE_PROPERTY_NAME = NeedsShorten ? 'hsa' : 'handShakeAmplitude';
+export const HAND_SHAKE_SPEED_PROPERTY_NAME = NeedsShorten ? 'hss' : 'handShakeSpeed';
+export const HAND_SHAKE_OFFSET_PROPERTY_NAME = NeedsShorten ? 'hso' : 'handShakeOffset';
 
 // timeline から操作される
 export function createHandShakeController(
@@ -27,23 +40,41 @@ export function createHandShakeController(
     // const amplitude: Vector3 = args.amplitude;
     // const speed: Vector3 = args.speed;
     // const offset: Vector3 = args.offset;
-    const currentV: Vector3 = createVector3Zero();
+    // const currentV: Vector3 = createVector3Zero();
 
-    return {
+    const params = {
+        amplitude,
+        speed,
+        offset,
+        currentOffset: createVector3Zero(),
+    };
+
+    const component = {
         ...createComponent({
             type: COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
             // name: 'HandShakeController',
             // onFilterPropertyBinder: () => console.log("hoge"),
             onUpdateCallback: (actor, _a, _b, time) => {
-                const x = Math.sin(time * v3x(speed) + v3x(offset)) * v3x(amplitude);
-                const y = Math.sin(time * v3y(speed) + v3y(offset)) * v3y(amplitude);
-                const z = Math.sin(time * v3z(speed) + v3z(offset)) * v3z(amplitude);
-                setV3x(currentV, x);
-                setV3y(currentV, y);
-                setV3z(currentV, z);
+                const x = Math.sin(time * v3x(params.speed) + v3x(params.offset)) * v3x(params.amplitude);
+                const y = Math.sin(time * v3y(params.speed) + v3y(params.offset)) * v3y(params.amplitude);
+                const z = Math.sin(time * v3z(params.speed) + v3z(params.offset)) * v3z(params.amplitude);
+                setV3x(params.currentOffset, x);
+                setV3y(params.currentOffset, y);
+                setV3z(params.currentOffset, z);
                 // setTranslation(actor.transform, currentV);
-                updateCb(currentV);
+                updateCb(params.currentOffset);
             },
+            // onProcessPropertyBinder: (actor, _, key, value) => {
+            //     console.log(key,  value);
+            // }
         }),
     };
+
+    return [
+        {
+            ...component[0],
+            params,
+        },
+        component[1],
+    ];
 }

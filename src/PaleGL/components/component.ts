@@ -58,9 +58,15 @@ type OnPostProcessTimelineCallback = (actor: Actor, componentModel: ComponentMod
 //     postProcessTimeline?: (actor: Actor, timelineTime: number) => void;
 // };
 
+export const COMPONENT_TYPE_DEFAULT = 0;
+export const COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT = 1;
+
+export type ComponentType = typeof COMPONENT_TYPE_DEFAULT | typeof COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT;
+
 export type ComponentModel = {
     name?: string;
     actor?: Actor;
+    type: ComponentType;
 };
 
 export type ComponentBehaviour = {
@@ -83,6 +89,7 @@ export type Component = [ComponentModel, ComponentBehaviour];
 
 export type ComponentArgs = {
     name?: string;
+    type?: ComponentType;
     onStartCallback?: OnStartCallback;
     onFixedUpdateCallback?: OnFixedUpdateCallback;
     onBeforeUpdateCallback?: OnBeforeUpdateCallback;
@@ -96,18 +103,20 @@ export type ComponentArgs = {
 export const createComponent = (args: ComponentArgs): Component => {
     const {
         name,
+        type,
         onStartCallback,
         onFixedUpdateCallback,
         onBeforeUpdateCallback,
         onUpdateCallback,
         onLastUpdateCallback,
-        onFilterPropertyBinder = () => true, 
+        onFilterPropertyBinder = () => true,
         onProcessPropertyBinder,
         onPostProcessTimeline,
     } = args;
 
     const model: ComponentModel = {
         name: name || '',
+        type: type || COMPONENT_TYPE_DEFAULT,
     };
     const behaviour: ComponentBehaviour = {
         onStartCallback,
@@ -121,8 +130,26 @@ export const createComponent = (args: ComponentArgs): Component => {
     };
 
     return [model, behaviour];
-}
+};
 
 export const setActorToComponent = (componentModel: ComponentModel, actor: Actor) => {
     componentModel.actor = actor;
+};
+
+export function findComponentByType<T extends Component>(components: Component[], type: ComponentType): T | null {
+    console.log("hogehoge", components)
+    for (let i = 0; i < components.length; i++) {
+        const component = components[i];
+        console.log("hogehoge", component); 
+        if (component[0].type === type) {
+            return components[i] as T;
+        }
+    }
+    return null;
+}
+export function getComponentModel<T extends ComponentModel>(component: Component) {
+    return component[0] as T;
+}
+export function getComponentBehaviour<T extends ComponentBehaviour>(component: Component) {
+    return component[1] as T;
 }
