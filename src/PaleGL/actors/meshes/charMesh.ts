@@ -5,19 +5,20 @@ import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     DEPTH_FUNC_TYPE_EQUAL,
+    FACE_SIDE_DOUBLE,
     MESH_TYPE_TEXT,
     PRIMITIVE_TYPE_TRIANGLES,
     SHADING_MODEL_ID_UNLIT,
+    UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
-    UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_FONT_MAP,
     UNIFORM_NAME_FONT_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_COLOR,
+    UNIFORM_TYPE_INT,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
-    UNIFORM_TYPE_INT,
 } from '@/PaleGL/constants.ts';
 import { createVector4 } from '@/PaleGL/math/vector4.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
@@ -118,6 +119,7 @@ export function createCharMesh({
         alphaTest: 0.5,
         depthTest: true,
         depthWrite: false,
+        faceSide: FACE_SIDE_DOUBLE,
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         depthFuncType: DEPTH_FUNC_TYPE_EQUAL,
