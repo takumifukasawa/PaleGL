@@ -41,7 +41,7 @@ type OnLastUpdateCallback = (
     deltaTime: number
 ) => void;
 type OnFilterPropertyBinderCallback = (key: string) => boolean;
-type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
+export type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
     actor: Actor,
     componentModel: ComponentModel,
     key: string,
@@ -49,22 +49,6 @@ type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
 ) => void;
 type OnPostProcessTimelineCallback = (actor: Actor, componentModel: ComponentModel, timelineTime: number) => void;
 type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu) => void;
-
-// export type Component = {
-//     name: string;
-//     start: (args: ComponentStartArgs) => void;
-//     fixedUpdate: (args: ComponentFixedUpdateArgs) => void;
-//     beforeUpdate: (args: ComponentBeforeUpdateArgs) => void;
-//     update: (args: ComponentUpdateArgs) => void;
-//     lastUpdate: (args: ComponentLastUpdateArgs) => void;
-//     processPropertyBinder?: (key: string, value: number) => void;
-//     postProcessTimeline?: (actor: Actor, timelineTime: number) => void;
-// };
-
-// export const COMPONENT_TYPE_DEFAULT = 0;
-// export const COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT = 1;
-
-// export type ComponentType = typeof COMPONENT_TYPE_DEFAULT | typeof COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT;
 
 export type ComponentModel = {
     name?: string;

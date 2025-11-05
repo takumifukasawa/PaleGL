@@ -1,6 +1,17 @@
+import { NeedsShorten } from '@/Marionetter/types';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { Component, ComponentBehaviour, ComponentModel, createComponent } from '@/PaleGL/components/component.ts';
+import {
+    Component,
+    ComponentBehaviour,
+    ComponentModel,
+    createComponent,
+    OnProcessPropertyBinderCallback,
+} from '@/PaleGL/components/component.ts';
 import { COMPONENT_TYPE_MATERIAL_SWITCH } from '@/PaleGL/constants.ts';
+
+const Property = {
+    materialIndex: NeedsShorten ? 'ms_mi' : 'materialIndex',
+} as const;
 
 export type MaterialSwitchControllerBehaviour = ComponentBehaviour & {
     switchMaterial: (index: number) => void;
@@ -18,8 +29,11 @@ export const createMaterialSwitchController = (mesh: Mesh): MaterialSwitchContro
         }
     };
 
-    const onProcessPropertyBinder = (actor, componentModel, key, value) => {
-        console.log('hogehoge', actor, componentModel, key, value);
+    const onProcessPropertyBinder: OnProcessPropertyBinderCallback = (actor, componentModel, key, value) => {
+        if (key === Property.materialIndex) {
+            const materialIndex=  Math.floor((value as number) + .001); // 念のためちょっとオフセット
+            switchMaterial(materialIndex);
+        }
     };
 
     return createComponent({ type: COMPONENT_TYPE_MATERIAL_SWITCH, onProcessPropertyBinder }, { switchMaterial });
