@@ -32,6 +32,8 @@ export type PrimitiveType =
 export const SHADING_MODEL_ID_LIT = 1;
 export const SHADING_MODEL_ID_UNLIT = 2;
 export const SHADING_MODEL_ID_SKYBOX = 3;
+// 4以上はカスタム
+// 実際に使う数をgbuffer.partial.glslのSHADING_MODEL_NUMを書き換える
 
 export type ShadingModelIds =
     | typeof SHADING_MODEL_ID_LIT

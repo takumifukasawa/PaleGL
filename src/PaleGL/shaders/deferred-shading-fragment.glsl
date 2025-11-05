@@ -518,23 +518,25 @@ void main() {
         outColor = resultColor;
         return;
     }
+    
+    // skybox
+    // 3
   
     //  
     // CUSTOM_BEGIN --------------------------------
     // additional materials
-    if(2.5 < shadingModelId && shadingModelId < 3.5) {
-        outColor = vec4(1.);
-        return;
-    }
+    // if(3.5 < shadingModelId && shadingModelId < 4.5) {
+    //     return;
+    // }
 
     //  
     // CUSTOM_END ----------------------------------
     //  
     
+    // ここから先はlit(shadingModel=1)が走る
+    
     // for debug
-    // outColor = vec4(baseColor, 1.);
-    // outColor = vec4(baseColor, 1.);
-    // outColor = vec4(vec3(metallic), 1.);
+    // outColor = vec4(1., 0., 0., 1.);
     // return;
     // outColor = vec4(vec3(step(1.5, shadingModelId)), 1.);
     // return;

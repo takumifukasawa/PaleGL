@@ -1,5 +1,5 @@
 ﻿
-#define SHADING_MODEL_NUM 3.
+#define SHADING_MODEL_NUM 4.
 
 struct sGBufferA {
     vec3 smBaseColor; // rgb
