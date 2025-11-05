@@ -1,10 +1,6 @@
 import { NeedsShorten } from '@/Marionetter/types';
-import {
-    COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
-    ComponentBehaviour,
-    ComponentModel,
-    createComponent,
-} from '@/PaleGL/components/component.ts';
+import { ComponentBehaviour, ComponentModel, createComponent } from '@/PaleGL/components/component.ts';
+import { COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT } from '@/PaleGL/constants.ts';
 import { createVector3Zero, setV3x, setV3y, setV3z, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export type HandShakeControllerModel = ComponentModel & {

@@ -330,10 +330,10 @@ export const setUniformValueToAllMeshMaterials = (mesh: Mesh, name: string, newV
     mesh.depthMaterials.forEach((material) => setMaterialUniformValue(material, name, newValue, log));
 };
 
-export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolean) => {
-    mesh.materials[index].canRender = flag;
-    mesh.depthMaterials[index].canRender = flag;
-};
+// export const setCanRenderMeshMaterial = (mesh: Mesh, index: number, flag: boolean) => {
+//     mesh.materials[index].canRender = flag;
+//     mesh.depthMaterials[index].canRender = flag;
+// };
 
 export const iterateAllMeshMaterials = (mesh: Mesh, callback: (mesh: Material) => void) => {
     mesh.materials.forEach((material) => callback(material));

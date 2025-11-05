@@ -113,7 +113,7 @@ export type MaterialArgs = {
     queue?: RenderQueue;
     depthUniforms?: UniformsData;
 
-    renderEnabled?: boolean;
+    // renderEnabled?: boolean;
 
     showLog?: boolean;
 };
@@ -195,7 +195,7 @@ export type Material = {
     uniforms: Uniforms;
     depthUniforms: Uniforms;
     //
-    renderEnabled: boolean;
+    // renderEnabled: boolean;
     //
     cachedArgs: MaterialArgs;
 };
@@ -243,7 +243,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         // height map
         useHeightMap = false,
 
-        renderEnabled = true,
+        // renderEnabled = true,
 
         showLog = false, // depthUniforms = {},
     } = args;
@@ -376,7 +376,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         fragmentShaderModifiers,
         depthFragmentShaderModifiers,
 
-        renderEnabled,
+        // renderEnabled,
 
         cachedArgs: args,
     };

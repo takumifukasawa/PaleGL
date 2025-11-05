@@ -1,10 +1,6 @@
 import { Actor } from '@/PaleGL/actors/actor.ts';
-import {
-    COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
-    ComponentBehaviour,
-    ComponentModel,
-    createComponent,
-} from '@/PaleGL/components/component.ts';
+import { ComponentBehaviour, ComponentModel, createComponent } from '@/PaleGL/components/component.ts';
+import { COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT } from '@/PaleGL/constants.ts';
 import { findActorInSceneByName, Scene } from '@/PaleGL/core/scene.ts';
 import { setLookAtActor } from '@/PaleGL/core/transform.ts';
 import { addVector3AndVector3, copyVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';

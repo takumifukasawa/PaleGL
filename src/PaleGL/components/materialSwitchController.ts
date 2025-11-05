@@ -11,10 +11,10 @@ export type MaterialSwitchController = Component<ComponentModel, MaterialSwitchC
 export const createMaterialSwitchController = (mesh: Mesh): MaterialSwitchController => {
     const switchMaterial = (index: number) => {
         for (let i = 0; i < mesh.materials.length; i++) {
-            mesh.materials[i].renderEnabled = i === index;
+            mesh.materials[i].canRender = i === index;
         }
         for (let i = 0; i < mesh.depthMaterials.length; i++) {
-            mesh.depthMaterials[i].renderEnabled = i === index;
+            mesh.depthMaterials[i].canRender = i === index;
         }
     };
 
