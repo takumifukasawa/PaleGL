@@ -351,7 +351,7 @@ export type Renderer = {
     glitchPass: GlitchPass;
     vignettePass: VignettePass;
     fxaaPass: FxaaPass;
-    blackCurtainPass: ColorCurtainPass;
+    colorCurtainPass: ColorCurtainPass;
     //
     renderTarget: CameraRenderTargetType | null;
     clearColorDirtyFlag: boolean;
@@ -459,7 +459,7 @@ export function createRenderer({
     const glitchPass = createGlitchPass({ gpu });
     const vignettePass = createVignettePass({ gpu });
     const fxaaPass = createFXAAPass({ gpu });
-    const blackCurtainPass = createColorCurtainPass({ gpu, name: 'BlackCurtain' });
+    const colorCurtainPass = createColorCurtainPass({ gpu, name: 'ColorCurtain' });
 
     addPostProcessPass(scenePostProcess, fxaaPass);
     addPostProcessPass(scenePostProcess, depthOfFieldPass);
@@ -469,7 +469,7 @@ export function createRenderer({
     addPostProcessPass(scenePostProcess, vignettePass);
     addPostProcessPass(scenePostProcess, chromaticAberrationPass);
     addPostProcessPass(scenePostProcess, glitchPass);
-    addPostProcessPass(scenePostProcess, blackCurtainPass);
+    addPostProcessPass(scenePostProcess, colorCurtainPass);
 
     //
     // initialize global uniform buffer objects
@@ -672,7 +672,7 @@ export function createRenderer({
         glitchPass,
         vignettePass,
         fxaaPass,
-        blackCurtainPass,
+        colorCurtainPass: colorCurtainPass,
         //
         renderTarget,
         clearColorDirtyFlag,
@@ -763,7 +763,7 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setPostProcessPassSize(renderer.glitchPass, w, h);
     setPostProcessPassSize(renderer.vignettePass, w, h);
     setPostProcessPassSize(renderer.fxaaPass, w, h);
-    setPostProcessPassSize(renderer.blackCurtainPass, w, h);
+    setPostProcessPassSize(renderer.colorCurtainPass, w, h);
 }
 
 // TODO: 本当はclearcolorの色も渡せるとよい

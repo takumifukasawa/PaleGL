@@ -831,6 +831,10 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
     glitchEnabled: number;
     glitchBlendRate: number;
 
+    colorCurtainEnabled: number;
+    colorCurtainColor: string;
+    colorCurtainBlendRate: number;
+
     // shorten ---
 
     sss_on: number;
@@ -922,11 +926,15 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
 
     gl_on: number;
     gl_br: number;
-};
 
-export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten
-    ? 'bl_a'
-    : 'bloomAmount';
+    cc_on: number;
+    cc_c: string;
+    cc_br: number;
+}; 
+
+// export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten
+//     ? 'bl_a'
+//     : 'bloomAmount';
 
 // object move and look at controller component
 

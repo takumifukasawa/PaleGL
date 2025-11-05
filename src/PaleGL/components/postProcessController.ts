@@ -5,13 +5,22 @@ import {
     PostProcessParameterBindingValue,
 } from '@/PaleGL/components/postProcessControllerEntries.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
+import { findActorByName } from '@/PaleGL/core/scene.ts';
+import { Actor } from '@/PaleGL/actors/actor.ts';
+import { getVector3Distance } from '@/PaleGL/math/vector3.ts';
+import {
+    DepthOfFieldPassParametersKey,
+    DepthOfFieldPassParametersPropertyMap,
+} from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+
+const DOF_TARGET_ACTOR_NAME = "DofTarget";
 
 export type PostProcessController = Component;
 
 const assignPropertyInternal = (bindingValue: PostProcessParameterBindingValue, newValue: unknown) => {
     const [target, targetPropertyKey, converter] = bindingValue;
     // for debug
-    // console.log("assignProperty", target, targetPropertyKey, converter, newValue);
+    // console.log("assignProperty", target, targetPropertyKey, newValue);
     if (converter) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore-next-line
@@ -29,12 +38,11 @@ const assignProperties = (
     bindings = new Map<string, PostProcessParameterBindingValue>()
 ) => {
     // for debug
-    // console.log('assignProperties', postProcessControllerComponentInfo, bindings);
     bindings.forEach((bindingValue, bindingKey) => {
         const newValue =
             postProcessControllerComponentInfo[bindingKey as keyof MarionetterPostProcessControllerComponentInfo];
         // for debug
-        // console.log('Assigning property', bindingKey, bindingValue, newValue);
+        // console.log('Assigning property', bindingKey, bindingValue, newValue, postProcessControllerComponentInfo);
         assignPropertyInternal(bindingValue, newValue);
     });
 };
@@ -53,14 +61,26 @@ export const createPostProcessController = (
     renderer: Renderer,
     postProcessControllerComponentInfo: MarionetterPostProcessControllerComponentInfo
 ): PostProcessController => {
+    let dofTarget: Actor | null = null;
     const bindings = buildPostProcessControllerEntries(renderer);
     return createComponent({
-        onStartCallback: () => {
+        onStartCallback: (actor, componentModel, gpu, scene) => {
             assignProperties(postProcessControllerComponentInfo, bindings);
+            dofTarget = findActorByName(scene.children, DOF_TARGET_ACTOR_NAME);
+            if (!dofTarget) {
+                console.error(`dof target is not found. should apply name ${DOF_TARGET_ACTOR_NAME}`);
+            }
         },
         // eslint-disable-next-line
         onProcessPropertyBinder: (_a, _b, key, value) => {
             assignProperty(bindings, key, value);
         },
+        onUpdateCallback: (actor, model, gpu, scene, time, deltaTime) => {
+            const camera = scene.mainCamera;
+            if (camera && dofTarget) {
+                const distance = getVector3Distance(camera.transform.position, dofTarget.transform.position);
+                assignProperty(bindings, DepthOfFieldPassParametersPropertyMap.focusDistance, distance);
+            }
+        }
     });
 }

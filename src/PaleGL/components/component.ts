@@ -28,6 +28,7 @@ type OnUpdateCallback = (
     actor: Actor,
     componentModel: ComponentModel,
     gpu: Gpu,
+    scene: Scene,
     time: number,
     deltaTime: number
 ) => void;
@@ -46,6 +47,7 @@ type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
     value: T
 ) => void;
 type OnPostProcessTimelineCallback = (actor: Actor, componentModel: ComponentModel, timelineTime: number) => void;
+type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu) => void;
 
 // export type Component = {
 //     name: string;
@@ -78,6 +80,7 @@ export type ComponentBehaviour = {
     onFilterPropertyBinder: OnFilterPropertyBinderCallback;
     onProcessPropertyBinder?: OnProcessPropertyBinderCallback;
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
+    onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
 
 export type Component = [ComponentModel, ComponentBehaviour];
@@ -98,6 +101,7 @@ export type ComponentArgs = {
     onFilterPropertyBinder?: OnFilterPropertyBinderCallback;
     onProcessPropertyBinder?: OnProcessPropertyBinderCallback;
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
+    onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
 
 export const createComponent = (args: ComponentArgs): Component => {
@@ -112,6 +116,7 @@ export const createComponent = (args: ComponentArgs): Component => {
         onFilterPropertyBinder = () => true,
         onProcessPropertyBinder,
         onPostProcessTimeline,
+        onBeforeRenderCallback,
     } = args;
 
     const model: ComponentModel = {
@@ -127,6 +132,7 @@ export const createComponent = (args: ComponentArgs): Component => {
         onFilterPropertyBinder,
         onProcessPropertyBinder,
         onPostProcessTimeline,
+        onBeforeRenderCallback,
     };
 
     return [model, behaviour];
@@ -137,10 +143,8 @@ export const setActorToComponent = (componentModel: ComponentModel, actor: Actor
 };
 
 export function findComponentByType<T extends Component>(components: Component[], type: ComponentType): T | null {
-    console.log("hogehoge", components)
     for (let i = 0; i < components.length; i++) {
         const component = components[i];
-        console.log("hogehoge", component); 
         if (component[0].type === type) {
             return components[i] as T;
         }

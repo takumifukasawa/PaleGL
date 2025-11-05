@@ -227,6 +227,7 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
 
     // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
     // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
+    // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
     traverseScene(engine.scene, (actor) => {
         updateActor(actor, {
             gpu: engine.renderer.gpu,

@@ -44,11 +44,11 @@ export type StartActorFunc = (actor: Actor, args: ActorStartArgs) => void;
 
 export const startActorBehaviourBase = (actor: Actor, args: ActorStartArgs) => {
     const { gpu, scene } = args;
-    actor.components.forEach(([model, behaviour]) => {
-        behaviour.onStartCallback?.(actor, model, gpu, scene);
-    });
     actor.onStart.forEach((cb) => {
         cb(args);
+    });
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onStartCallback?.(actor, model, gpu, scene);
     });
 };
 
@@ -131,7 +131,7 @@ export const updateActor: UpdateActorFunc = (actor, args) => {
     // updateの場合は必ず共通処理を通す
     tryStartActor(actor, { gpu, scene, renderer });
     actor.components.forEach(([model, behaviour]) => {
-        behaviour.onUpdateCallback?.(actor, model, gpu, time, deltaTime);
+        behaviour.onUpdateCallback?.(actor, model, gpu, scene, time, deltaTime);
     });
     actor.onUpdate.forEach((cb) => {
         cb(args);
@@ -161,7 +161,9 @@ export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
     actor.onBeforeRender.forEach((cb) => {
         cb();
     });
-    // TODO: componentで必要になったら呼ぶ
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onBeforeRenderCallback?.(actor, model, gpu);
+    });
 };
 
 export const processActorPropertyBinder = <T extends TimelinePropertyValue>(

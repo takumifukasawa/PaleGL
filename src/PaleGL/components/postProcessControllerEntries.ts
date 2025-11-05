@@ -7,6 +7,10 @@ import {
     ChromaticAberrationPassParametersPropertyMap,
 } from '@/PaleGL/postprocess/chromaticAberrationPass.ts';
 import {
+    ColorCurtainPassParametersKey,
+    ColorCurtainPassParametersPropertyMap,
+} from '@/PaleGL/postprocess/colorCurtainPass.ts';
+import {
     DepthOfFieldPassParametersKey,
     DepthOfFieldPassParametersPropertyMap,
 } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
@@ -346,6 +350,21 @@ export const buildPostProcessControllerEntries = (renderer: Renderer) => {
             [renderer.glitchPass, GlitchPassParametersKey.enabled, numToBoolConverter],
         ],
         [GlitchPassParametersPropertyMap.blendRate, [renderer.glitchPass, GlitchPassParametersKey.blendRate]],
+
+        // color curtain ---
+
+        [
+            ColorCurtainPassParametersPropertyMap.enabled,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.enabled, numToBoolConverter],
+        ],
+        [
+            ColorCurtainPassParametersPropertyMap.color,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorConverter],
+        ],
+        [
+            ColorCurtainPassParametersPropertyMap.blendRate,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.blendRate],
+        ],
     ] satisfies ReadonlyArray<readonly [string, PostProcessParameterBindingValue]>;
 
     return new Map<string, PostProcessParameterBindingValue>(entries);
