@@ -18,5 +18,9 @@ export const createMaterialSwitchController = (mesh: Mesh): MaterialSwitchContro
         }
     };
 
-    return createComponent({ type: COMPONENT_TYPE_MATERIAL_SWITCH }, { switchMaterial });
+    const onProcessPropertyBinder = (actor, componentModel, key, value) => {
+        console.log('hogehoge', actor, componentModel, key, value);
+    };
+
+    return createComponent({ type: COMPONENT_TYPE_MATERIAL_SWITCH, onProcessPropertyBinder }, { switchMaterial });
 };
