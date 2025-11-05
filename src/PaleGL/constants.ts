@@ -163,6 +163,15 @@ export const UI_ANCHOR_TYPE_CENTER = 0;
 
 export type UIAnchorType = typeof UI_ANCHOR_TYPE_CENTER;
 
+export const COMPONENT_TYPE_DEFAULT = 0;
+export const COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT = 1;
+export const COMPONENT_TYPE_MATERIAL_SWITCH = 1;
+
+export type ComponentType =
+    | typeof COMPONENT_TYPE_DEFAULT
+    | typeof COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT
+    | typeof COMPONENT_TYPE_MATERIAL_SWITCH;
+
 export const CAMERA_TYPE_PERSPECTIVE = 0;
 export const CAMERA_TYPE_ORTHOGRAPHIC = 1;
 

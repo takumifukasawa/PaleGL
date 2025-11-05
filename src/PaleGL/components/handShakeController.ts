@@ -54,7 +54,7 @@ export function createHandShakeController(
             type: COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
             // name: 'HandShakeController',
             // onFilterPropertyBinder: () => console.log("hoge"),
-            onUpdateCallback: (actor, _a, _b, time) => {
+            onUpdateCallback: (actor, _a, _b, _s, time) => {
                 const x = Math.sin(time * v3x(params.speed) + v3x(params.offset)) * v3x(params.amplitude);
                 const y = Math.sin(time * v3y(params.speed) + v3y(params.offset)) * v3y(params.amplitude);
                 const z = Math.sin(time * v3z(params.speed) + v3z(params.offset)) * v3z(params.amplitude);

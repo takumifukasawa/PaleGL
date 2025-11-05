@@ -1,5 +1,6 @@
 import { TimelinePropertyValue } from '@/Marionetter/types';
 import { Actor } from '@/PaleGL/actors/actor.ts';
+import { COMPONENT_TYPE_DEFAULT, ComponentType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
 
@@ -60,10 +61,10 @@ type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu
 //     postProcessTimeline?: (actor: Actor, timelineTime: number) => void;
 // };
 
-export const COMPONENT_TYPE_DEFAULT = 0;
-export const COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT = 1;
+// export const COMPONENT_TYPE_DEFAULT = 0;
+// export const COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT = 1;
 
-export type ComponentType = typeof COMPONENT_TYPE_DEFAULT | typeof COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT;
+// export type ComponentType = typeof COMPONENT_TYPE_DEFAULT | typeof COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT;
 
 export type ComponentModel = {
     name?: string;
@@ -83,7 +84,11 @@ export type ComponentBehaviour = {
     onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
 
-export type Component = [ComponentModel, ComponentBehaviour];
+// export type Component<T> = [ComponentModel, ComponentBehaviour];
+export type Component<T extends ComponentModel = ComponentModel, U extends ComponentBehaviour = ComponentBehaviour> = [
+    T,
+    U,
+];
 // name: string,
 // actor: Actor | undefined,
 // onStartCallback?: OnStartCallback,
@@ -104,7 +109,15 @@ export type ComponentArgs = {
     onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
 
-export const createComponent = (args: ComponentArgs): Component => {
+type AdditionalComponentBehaviour = object;
+
+export const createComponent = <
+    T extends ComponentModel = ComponentModel,
+    U extends ComponentBehaviour = ComponentBehaviour,
+>(
+    args: ComponentArgs,
+    additionalBehaviour: AdditionalComponentBehaviour = {}
+): Component<T, U> => {
     const {
         name,
         type,
@@ -133,9 +146,10 @@ export const createComponent = (args: ComponentArgs): Component => {
         onProcessPropertyBinder,
         onPostProcessTimeline,
         onBeforeRenderCallback,
+        ...additionalBehaviour,
     };
 
-    return [model, behaviour];
+    return [model, behaviour] as Component<T, U>;
 };
 
 export const setActorToComponent = (componentModel: ComponentModel, actor: Actor) => {

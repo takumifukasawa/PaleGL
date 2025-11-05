@@ -1,32 +1,32 @@
 ﻿import {
-    BlendType,
+    BLEND_TYPE_ADDITIVE,
     BLEND_TYPE_OPAQUE,
     BLEND_TYPE_TRANSPARENT,
-    BLEND_TYPE_ADDITIVE,
+    BlendType,
+    DEPTH_FUNC_TYPE_LEQUAL,
     DepthFragmentShaderModifiers,
     DepthFuncType,
-    DEPTH_FUNC_TYPE_LEQUAL,
-    FaceSide,
     FACE_SIDE_FRONT,
+    FaceSide,
     FragmentShaderModifiers,
-    MaterialType,
     MATERIAL_TYPE_MISC,
-    PrimitiveType,
+    MaterialType,
     PRIMITIVE_TYPE_TRIANGLES,
+    PrimitiveType,
+    RENDER_QUEUE_TYPE_ALPHA_TEST,
+    RENDER_QUEUE_TYPE_OPAQUE,
+    RENDER_QUEUE_TYPE_SKYBOX,
+    RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderQueue,
     RenderQueueType,
-    RENDER_QUEUE_TYPE_OPAQUE,
-    RENDER_QUEUE_TYPE_ALPHA_TEST,
-    RENDER_QUEUE_TYPE_TRANSPARENT,
-    RENDER_QUEUE_TYPE_SKYBOX,
-    UniformBlockName,
+    UNIFORM_INDEX_NAME,
+    UNIFORM_INDEX_TYPE,
+    UNIFORM_INDEX_VALUE,
     UNIFORM_NAME_INVERSE_WORLD_MATRIX,
     UNIFORM_NAME_TIME,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_MATRIX4,
-    UNIFORM_INDEX_NAME,
-    UNIFORM_INDEX_TYPE,
-    UNIFORM_INDEX_VALUE,
+    UniformBlockName,
     UniformTypes,
     // UniformType
     VertexShaderModifiers,
@@ -113,6 +113,8 @@ export type MaterialArgs = {
     queue?: RenderQueue;
     depthUniforms?: UniformsData;
 
+    renderEnabled?: boolean;
+
     showLog?: boolean;
 };
 
@@ -142,11 +144,11 @@ export type DepthFragmentShaderGenerator = () => string;
 
 export const setMaterialUniformValue = (material: Material, name: string, value: UniformValue, log?: boolean) => {
     setUniformValue(material.uniforms, name, value, log);
-}
+};
 
 export const addMaterialUniformValue = (material: Material, name: string, type: UniformTypes, value: UniformValue) => {
     addUniformValue(material.uniforms, name, type, value);
-}
+};
 
 export type Material = {
     name: string;
@@ -193,6 +195,8 @@ export type Material = {
     uniforms: Uniforms;
     depthUniforms: Uniforms;
     //
+    renderEnabled: boolean;
+    //
     cachedArgs: MaterialArgs;
 };
 
@@ -238,6 +242,8 @@ export const createMaterial = (args: MaterialArgs): Material => {
 
         // height map
         useHeightMap = false,
+
+        renderEnabled = true,
 
         showLog = false, // depthUniforms = {},
     } = args;
@@ -370,9 +376,11 @@ export const createMaterial = (args: MaterialArgs): Material => {
         fragmentShaderModifiers,
         depthFragmentShaderModifiers,
 
+        renderEnabled,
+
         cachedArgs: args,
     };
-}
+};
 
 export const startMaterial = (
     material: Material,
@@ -470,11 +478,15 @@ export const startMaterial = (
 export const copyUniformValues = (source: Material, destination: Material) => {
     destination.uniforms.data = destination.uniforms.data.map((dstData) => {
         const srcData = source.uniforms.data.find((s) => s[UNIFORM_INDEX_NAME] === dstData[UNIFORM_INDEX_NAME]);
-        return srcData ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]] : dstData;
+        return srcData
+            ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]]
+            : dstData;
     });
     destination.depthUniforms.data = destination.depthUniforms.data.map((dstData) => {
         const srcData = source.depthUniforms.data.find((s) => s[UNIFORM_INDEX_NAME] === dstData[UNIFORM_INDEX_NAME]);
-        return srcData ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]] : dstData;
+        return srcData
+            ? [dstData[UNIFORM_INDEX_NAME], dstData[UNIFORM_INDEX_TYPE], srcData[UNIFORM_INDEX_VALUE]]
+            : dstData;
     });
 };
 
