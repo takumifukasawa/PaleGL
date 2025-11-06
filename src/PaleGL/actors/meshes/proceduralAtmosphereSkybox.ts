@@ -1,6 +1,18 @@
 import { NeedsShorten } from '@/Marionetter/types';
 import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
 import { createSkybox, Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
+import {
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_SUN_POSITION,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_SUN_INTENSITY,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_PLANET_RADIUS,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_ATMOSPHERE_RADIUS,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_RAYLEIGH_COEFFICIENT,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_COEFFICIENT,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_RAYLEIGH_SCALE_HEIGHT,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_SCALE_HEIGHT,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_SCATTERING_DIRECTION,
+    PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_CAMERA_ALTITUDE,
+} from './proceduralAtmosphereSkyboxConstants';
 import { UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants.ts';
 import type { CubeMap } from '@/PaleGL/core/cubeMap.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -48,24 +60,6 @@ export type ProceduralAtmosphereSkybox = Skybox & {
     cameraAltitude: number;
     cubeMapWithUpdateContext: CubeMapWithUpdateContext | null;
 };
-
-// export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_SUN_POSITION = NeedsShorten ? 'sp' : 'sunPosition';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_SUN_INTENSITY = NeedsShorten ? 'si' : 'sunIntensity';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_PLANET_RADIUS = NeedsShorten ? 'pr' : 'planetRadius';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_ATMOSPHERE_RADIUS = NeedsShorten ? 'ar' : 'atmosphereRadius';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_RAYLEIGH_COEFFICIENT = NeedsShorten
-    ? 'rc'
-    : 'rayleigthCoefficient';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_COEFFICIENT = NeedsShorten ? 'mc' : 'mieCoefficient';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_RAYLEIGH_SCALE_HEIGHT = NeedsShorten
-    ? 'rsh'
-    : 'rayleighScaleHeight';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_SCALE_HEIGHT = NeedsShorten ? 'msh' : 'mieScaleHeight';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_SCATTERING_DIRECTION = NeedsShorten
-    ? 'msd'
-    : 'mieScatteringDirection';
-export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_CAMERA_ALTITUDE = NeedsShorten ? 'ca' : 'cameraAltitude';
 
 const uniformNameSunPosition = 'uSunPosition';
 const uniformNameSunIntensity = 'uSunIntensity';

@@ -76,10 +76,31 @@ vec2 fOpFoldRotate(in vec2 p, float s) {
     return p;
 }
 
+// union
+float fOpUni(float d1, float d2) {
+    return min(d1, d2);
+}
+
+// sub
+float fOpSub(float d1, float d2) {
+    return max(-d1, d2);
+}
+
+// // intersection
+// float fOpInter(float d1, float d2) {
+//     return maax(d1, d2);
+// }
+
+// smooth union
 float fOpSm( float d1, float d2, float k )
 {
     float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0., 1. );
     return mix( d2, d1, h ) - k*h*(1.-h);
+}
+
+// smooth subtracgion
+float fOpSmSub(float d1, float d2, float k) {
+    return -fOpSm(d1, d2, k);
 }
 
 //

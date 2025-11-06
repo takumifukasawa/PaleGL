@@ -7,6 +7,7 @@ export type OptimizeJsonDataOptions = {
     filePath?: string;
     currentPath?: string;
     verbose?: boolean;
+    excludeKeys?: string[];
 };
 
 export function optimizeJsonData({
@@ -16,6 +17,7 @@ export function optimizeJsonData({
     filePath,
     currentPath = '',
     verbose = false,
+    excludeKeys = [],
 }: OptimizeJsonDataOptions): unknown {
     const optimizeNumber = (num: number, path: string): number => {
         // 整数に変換できる値は整数にする
@@ -57,6 +59,7 @@ export function optimizeJsonData({
                 filePath,
                 currentPath: currentPath ? `${currentPath}[${index}]` : `[${index}]`,
                 verbose,
+                excludeKeys,
             })
         );
     } else if (typeof obj === 'object' && obj !== null) {
@@ -64,13 +67,15 @@ export function optimizeJsonData({
         const newObj = {} as objType;
         for (const key in objTyped) {
             if (Object.prototype.hasOwnProperty.call(objTyped, key)) {
+                const shouldExclude = excludeKeys.includes(key);
                 newObj[key] = optimizeJsonData({
                     obj: objTyped[key],
-                    enableRound,
+                    enableRound: shouldExclude ? false : enableRound,
                     decimalPlaces,
                     filePath,
                     currentPath: currentPath ? `${currentPath}.${key}` : key,
                     verbose,
+                    excludeKeys,
                 });
             }
         }

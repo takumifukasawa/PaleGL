@@ -1,12 +1,14 @@
 import { Plugin } from 'vite';
 import { readFileSync } from 'fs';
 import { optimizeJsonData } from './json-optimizer';
+import { JSON_OPTIMIZER_EXCLUDE_KEYS } from './json-optimizer-config';
 
 export type OptimizeJsonPluginOptions = {
     enabled?: boolean;
     enableRound?: boolean;
     precision?: number;
     verbose?: boolean;
+    excludeKeys?: string[];
 };
 
 // Viteプラグインの定義
@@ -14,7 +16,7 @@ export type OptimizeJsonPluginOptions = {
 // - 小数点以下を指定桁数に丸める
 // - 整数に変換可能な値（1.0, 0.0など）は整数に変換
 export const optimizeJsonPlugin: (options?: OptimizeJsonPluginOptions) => Plugin = (options = {}) => {
-    const { enabled = true, enableRound = true, precision = 3, verbose = false } = options;
+    const { enabled = true, enableRound = true, precision = 3, verbose = false, excludeKeys = JSON_OPTIMIZER_EXCLUDE_KEYS } = options;
 
     return {
         name: 'vite-plugin-optimize-json',
@@ -36,6 +38,7 @@ export const optimizeJsonPlugin: (options?: OptimizeJsonPluginOptions) => Plugin
                         filePath: cleanId,
                         currentPath: '',
                         verbose,
+                        excludeKeys,
                     });
                     const optimizedStr = JSON.stringify(optimized);
                     return `export default ${JSON.stringify(optimizedStr)}`;
@@ -60,6 +63,7 @@ export const optimizeJsonPlugin: (options?: OptimizeJsonPluginOptions) => Plugin
                         filePath: id,
                         currentPath: '',
                         verbose,
+                        excludeKeys,
                     });
                     return {
                         code: `export default ${JSON.stringify(optimized)}`,

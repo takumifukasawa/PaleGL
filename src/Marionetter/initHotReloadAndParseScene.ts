@@ -1,6 +1,7 @@
 import { Marionetter, MarionetterScene } from '@/Marionetter/types';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { optimizeJsonData } from '../../plugins/json-optimizer';
+import { JSON_OPTIMIZER_DEFAULT_OPTIONS } from '../../plugins/json-optimizer-config';
 
 export const initHotReloadAndParseScene = (
     hotReloadUrl: string,
@@ -20,8 +21,7 @@ export const initHotReloadAndParseScene = (
                 const sceneJson = (await res.json()) as unknown as MarionetterScene;
                 const optimizedSceneJson = optimizeJsonData({
                     obj: sceneJson,
-                    enableRound: true,
-                    decimalPlaces: 10
+                    ...JSON_OPTIMIZER_DEFAULT_OPTIONS,
                 }) as unknown as MarionetterScene;
                 // const optimizedSceneJson = sceneJson as unknown as MarionetterScene;
                 console.log('hot reload scene', optimizedSceneJson);
