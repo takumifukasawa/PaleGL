@@ -12,13 +12,13 @@ export const createMaterialController = (name: string, bindings: Bindings): Mate
         name,
         onFilterPropertyBinder: (key: string) => bindings.has(key),
         onProcessPropertyBinder: (actor, _, key, value) => {
-            // // for debug
-            // console.log(
-            //     `[MaterialController] onProcessPropertyBinder: actor=${actor.name}, key=${key}, value=${value}`
-            // );
             if (bindings.has(key)) {
                 const uniformName = bindings.get(key)!;
                 setUniformValueToAllMeshMaterials(actor as Mesh, uniformName, value);
+                // // for debug
+                // console.log(
+                //     `[MaterialController] onProcessPropertyBinder: actor=${actor.name}, key=${key}, uniformName=${uniformName}, value=${value}`
+                // );
             }
         },
     });

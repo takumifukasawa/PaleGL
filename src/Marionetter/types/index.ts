@@ -993,16 +993,16 @@ export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterCompo
 };
 
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR = NeedsShorten
-    ? 'bc'
+    ? 'gm_bc'
     : 'baseColor';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR = NeedsShorten
-    ? 'ec'
+    ? 'gm_ec'
     : 'emissiveColor';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_METALLIC = NeedsShorten
-    ? 'ec'
+    ? 'gm_m'
     : 'metallic';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_ROUGHNESS = NeedsShorten
-    ? 'r'
+    ? 'gm_r'
     : 'roughness';
 
 // //

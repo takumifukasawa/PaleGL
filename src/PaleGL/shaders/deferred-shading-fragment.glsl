@@ -526,9 +526,9 @@ void main() {
     // CUSTOM_BEGIN --------------------------------
     // additional materials
     // if(3.5 < shadingModelId && shadingModelId < 4.5) {
+    //     outColor = vec4(2.);
     //     return;
     // }
-
     //  
     // CUSTOM_END ----------------------------------
     //  
