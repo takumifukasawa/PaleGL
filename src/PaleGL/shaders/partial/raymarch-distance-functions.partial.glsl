@@ -2,9 +2,9 @@
 // defines
 // 
 
-#define OP_ID(p, r) round(p / r)
-#define OP_RE(p, r) p - r * round(p / r)
-#define OP_LI_RE(p, r, l) p - r * clamp(round(p / r), -l, l)
+#define OP_ID(p,r) round(p/r)
+#define OP_RE(p,r) p-r*round(p/r)
+#define OP_LI_RE(p,r,l) p-r*clamp(round(p/r),-l,l)
 
 #define EPS .0001 // general eps
 #define OI 99 // object space iteration
@@ -81,7 +81,7 @@ float fOpUni(float d1, float d2) {
     return min(d1, d2);
 }
 
-// sub
+// sub: d2 - d1
 float fOpSub(float d1, float d2) {
     return max(-d1, d2);
 }
