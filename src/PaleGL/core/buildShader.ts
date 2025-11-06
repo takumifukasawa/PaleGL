@@ -86,15 +86,6 @@ export type ShaderDefines = {
     useHeightMap: boolean;
 };
 
-// tmp
-// const insertShaderPairs: {
-//     [key in ShaderPartialPragmas]: string;
-// } = {
-//     // [ShaderPartialPragmas.ENGINE_UNIFORMS]: uniformBlockCommon,
-//     // [ShaderPartialPragmas.TRANSFORM_VERTEX_UNIFORMS]: uniformBlockTransformations,
-//     // [ShaderPartialPragmas.CAMERA_UNIFORMS]: uniformBlockCamera,
-// };
-
 const includesDict = new Map<string, string>([
     ['common', commonPartialContent],
     ['buffer_visualizer_h', isDevelopment() ? bufferVisualizerHeaderContent : ''],
@@ -122,6 +113,9 @@ const includesDict = new Map<string, string>([
     ['os_raymarch_f', objectSpaceRaymarchFunctionsPartialContent],
     ['perlin', perlinPartialContent],
     ['curl_noise', curlNoisePartialContent],
+    // CUSTOM_BEGIN
+    // ['human_df']
+    // CUSTOM_END
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
