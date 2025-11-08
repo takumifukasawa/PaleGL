@@ -102,6 +102,7 @@ export type MaterialArgs = {
 
     // vat gpu particle
     useVAT?: boolean;
+    useVATLookForward?: boolean;
     isTrail?: boolean;
 
     // height map
@@ -175,6 +176,7 @@ export type Material = {
     jointNum: number | null;
     isInstancing: boolean;
     useVAT: boolean;
+    useVATLookForward: boolean;
     isTrail: boolean;
     useHeightMap: boolean;
     useInstanceLookDirection: boolean;
@@ -228,6 +230,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         gpuSkinning = false,
 
         useVAT = false,
+        useVATLookForward = false,
         isTrail = false,
 
         // instancing
@@ -351,6 +354,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         jointNum,
         isInstancing,
         useVAT,
+        useVATLookForward,
         isTrail,
         useHeightMap,
         useInstanceLookDirection,
@@ -409,6 +413,7 @@ export const startMaterial = (
         useVertexColor: material.useVertexColor,
         isInstancing: material.isInstancing,
         useVAT: material.useVAT,
+        useVATLookForward: material.useVATLookForward,
         isTrail: material.isTrail,
         useHeightMap: material.useHeightMap,
         useAlphaTest: material.alphaTest !== null,

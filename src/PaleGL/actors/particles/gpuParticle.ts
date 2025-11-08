@@ -51,6 +51,7 @@ export type GPUParticleArgs = InstancingParticleArgs & {
     // updateFragmentModifiers?: FragmentShaderModifiers;
     shaders: GPUParticleUpdaterShaders[];
     initialUpdaterIndex?: number;
+    useVATLookForward?: boolean;
 };
 
 export type GPUParticleUpdaterShaders = {
@@ -75,6 +76,7 @@ export type GpuParticle = Mesh & {
     prevUpdaterIndex: number;
     updaterIndex: number;
     updaters: GPUParticleUpdater[];
+    useVATLookForward: boolean;
 };
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
@@ -130,6 +132,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         // updateFragmentModifiers,
         shaders,
         initialUpdaterIndex = 0,
+        useVATLookForward = false,
     } = args;
 
     const instancingParticle = createInstancingParticle(args);
@@ -141,7 +144,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         height: vatHeight,
         minFilter: TEXTURE_FILTER_TYPE_NEAREST,
         magFilter: TEXTURE_FILTER_TYPE_NEAREST,
-        textureTypes: [TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F], // 0: velocity, 1: position
+        textureTypes: [TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F, TEXTURE_TYPE_RGBA16F], // 0: velocity, 1: position, 2: up
     });
 
     const createUniforms = (): UniformsData => [
@@ -200,6 +203,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         prevUpdaterIndex: initialUpdaterIndex,
         updaterIndex: initialUpdaterIndex,
         updaters,
+        useVATLookForward,
     };
 
     addActorComponent(gpuParticle, createGPUParticleController(gpuParticle));
@@ -254,6 +258,8 @@ export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) =>
     iterateAllMeshMaterials(gpuParticle, (mat) => {
         mat.useVAT = true;
         mat.cachedArgs.useVAT = true;
+        mat.useVATLookForward = gpuParticle.useVATLookForward;
+        mat.cachedArgs.useVATLookForward = gpuParticle.useVATLookForward;
         // depthが作られる前なのでdepthUniformsにも設定する
         const vatResolution = createVector2(gpuParticle.vatWidth, gpuParticle.vatHeight);
         addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);

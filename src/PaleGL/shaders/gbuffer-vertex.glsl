@@ -126,8 +126,8 @@ mat4 fGetScalingMat(vec3 s) {
 }
 
 mat4 fGetLookMat(vec3 front, vec3 up) {
-    // vec3 z = -normalize(front);
-    vec3 z = normalize(front); // こっちでいいはず？
+    vec3 z = -normalize(front);
+    // vec3 z = normalize(front); // こっちでいいはず？. TODO: 要確認
     vec3 y = up;
     vec3 x = cross(y, z);
     return mat4(
@@ -314,7 +314,7 @@ void main() {
 
     #ifdef USE_VAT
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        #ifdef USE_TRAIL
+        #if defined(USE_TRAIL)
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),
                 aTrailIndex
@@ -331,6 +331,12 @@ void main() {
             );
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
             instanceTranslation = fGetTranslationMat(vatPosition);
+            #if defined(USE_VAT_LOOK_FORWARD)
+                vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
+                vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
+                instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
+                // instanceTranslation = vec3(0., 5., 0.);
+            #endif
         #endif
     #else
         instanceTranslation = fGetTranslationMat(aInstancePosition);
