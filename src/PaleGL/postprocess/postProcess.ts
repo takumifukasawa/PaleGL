@@ -14,6 +14,7 @@ import {
     UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
     UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
     UNIFORM_NAME_VIEW_PROJECTION_MATRIX,
+    UNIFORM_NAME_PREV_VIEW_PROJECTION_MATRIX,
 } from '@/PaleGL/constants.ts';
 import { GBufferRenderTargets } from '@/PaleGL/core/gBufferRenderTargets.ts';
 import { getDummyBlackTexture, Gpu } from '@/PaleGL/core/gpu.ts';
@@ -194,6 +195,11 @@ export const updatePassMaterial = ({
             passMaterial,
             UNIFORM_NAME_TRANSPOSE_INVERSE_VIEW_MATRIX,
             transposeMat4(invertMat4(cloneMat4(targetCamera.viewMatrix)))
+        );
+        setMaterialUniformValue(
+            passMaterial,
+            UNIFORM_NAME_PREV_VIEW_PROJECTION_MATRIX,
+            targetCamera.prevViewProjectionMatrix
         );
 
         // passMaterial.uniforms.setValue(UNIFORM_NAME_TIME, time);

@@ -39,6 +39,7 @@ export type Camera = Actor & {
     viewMatrix: Matrix4;
     projectionMatrix: Matrix4;
     viewProjectionMatrix: Matrix4;
+    prevViewProjectionMatrix: Matrix4;
     inverseViewProjectionMatrix: Matrix4;
     inverseViewMatrix: Matrix4;
     inverseProjectionMatrix: Matrix4;
@@ -70,6 +71,7 @@ export function createCamera({
     const viewMatrix = createMat4Identity();
     const projectionMatrix = createMat4Identity();
     const viewProjectionMatrix = createMat4Identity();
+    const prevViewProjectionMatrix = createMat4Identity();
     const inverseViewProjectionMatrix = createMat4Identity();
     const inverseViewMatrix = createMat4Identity();
     const inverseProjectionMatrix = createMat4Identity();
@@ -87,6 +89,7 @@ export function createCamera({
         viewMatrix,
         projectionMatrix,
         viewProjectionMatrix,
+        prevViewProjectionMatrix,
         inverseViewProjectionMatrix,
         inverseViewMatrix,
         inverseProjectionMatrix,

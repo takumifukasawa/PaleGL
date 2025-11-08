@@ -375,6 +375,7 @@ export const POST_PROCESS_PASS_TYPE_FRAGMENT = 17;
 export const POST_PROCESS_PASS_TYPE_FOG = 18;
 export const POST_PROCESS_PASS_TYPE_FRAGMENT_PASS = 19;
 export const POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS = 20;
+export const POST_PROCESS_PASS_TYPE_MOTION_BLUR = 21;
 
 export type PostProcessPassType =
     | typeof POST_PROCESS_PASS_TYPE_BLOOM
@@ -397,7 +398,8 @@ export type PostProcessPassType =
     | typeof POST_PROCESS_PASS_TYPE_FRAGMENT
     | typeof POST_PROCESS_PASS_TYPE_FOG
     | typeof POST_PROCESS_PASS_TYPE_FRAGMENT_PASS
-    | typeof POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS;
+    | typeof POST_PROCESS_PASS_TYPE_BLACK_CURTAIN_PASS
+    | typeof POST_PROCESS_PASS_TYPE_MOTION_BLUR;
 
 // -----------------------------------------------------------------------------
 // uniforms
@@ -455,6 +457,7 @@ export const UNIFORM_NAME_VIEW_MATRIX = 'uViewMatrix';
 export const UNIFORM_NAME_PROJECTION_MATRIX = 'uProjectionMatrix';
 export const UNIFORM_NAME_WVP_MATRIX = 'uWVPMatrix';
 export const UNIFORM_NAME_VIEW_PROJECTION_MATRIX = 'uViewProjectionMatrix';
+export const UNIFORM_NAME_PREV_VIEW_PROJECTION_MATRIX = 'uPrevViewProjectionMatrix';
 export const UNIFORM_NAME_NORMAL_MATRIX = 'uNormalMatrix';
 export const UNIFORM_NAME_INVERSE_WORLD_MATRIX = 'uInverseWorldMatrix';
 export const UNIFORM_NAME_INVERSE_VIEW_MATRIX = 'uInverseViewMatrix';
@@ -559,6 +562,7 @@ export type UniformName =
     | typeof UNIFORM_NAME_PROJECTION_MATRIX
     | typeof UNIFORM_NAME_WVP_MATRIX
     | typeof UNIFORM_NAME_VIEW_PROJECTION_MATRIX
+    | typeof UNIFORM_NAME_PREV_VIEW_PROJECTION_MATRIX
     | typeof UNIFORM_NAME_NORMAL_MATRIX
     | typeof UNIFORM_NAME_INVERSE_WORLD_MATRIX
     | typeof UNIFORM_NAME_INVERSE_VIEW_MATRIX

@@ -44,6 +44,7 @@ import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.
 import { createMaterial } from '@/PaleGL/materials/material.ts';
 import {
     cloneMat4,
+    copyMat4,
     createTranslationMatrix,
     getMat4Position,
     invertMat4,
@@ -384,6 +385,7 @@ export const setSizeCamera = (actor: Actor, width: number, height: number) => {
 export const updateCameraTransform: UpdateActorTransformFunc = (actor) => {
     const camera = actor as Camera;
     defaultUpdateActorTransform(actor);
+    copyMat4(camera.prevViewProjectionMatrix, camera.viewProjectionMatrix);
     camera.viewMatrix = invertMat4(cloneMat4(camera.transform.worldMatrix));
     camera.inverseProjectionMatrix = invertMat4(cloneMat4(camera.projectionMatrix));
     camera.inverseViewMatrix = invertMat4(cloneMat4(camera.viewMatrix));
