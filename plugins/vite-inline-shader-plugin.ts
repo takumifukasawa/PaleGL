@@ -22,7 +22,7 @@ export type InlineShaderPluginOptions = {
  *             // prettier-ignore
  *             SHADER_TEST_FLOOR
  *         )
- * After:  import __inline_shader_0 from '../shaders/object-space-raymarch-human.glsl';
+ * After:  import __inline_shader_0 from '../shaders/object-space-raymarch-human-particle.glsl';
  *         const shader = __inline_shader_0;
  */
 export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin => {
