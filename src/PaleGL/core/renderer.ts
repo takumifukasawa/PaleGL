@@ -672,7 +672,7 @@ export function createRenderer({
         glitchPass,
         vignettePass,
         fxaaPass,
-        colorCurtainPass: colorCurtainPass,
+        colorCurtainPass,
         //
         renderTarget,
         clearColorDirtyFlag,

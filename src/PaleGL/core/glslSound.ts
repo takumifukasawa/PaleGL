@@ -4,6 +4,8 @@ import { createTransformFeedbackBuffer } from '@/PaleGL/core/transformFeedbackBu
 import { type AttributeUsageType, ATTRIBUTE_USAGE_TYPE_DYNAMIC_COPY, UNIFORM_TYPE_FLOAT } from '@/PaleGL/constants.ts';
 import { setUniformValue } from '@/PaleGL/core/uniforms.ts';
 import { buildVertexShader } from '@/PaleGL/core/buildShader.ts';
+import { createTexture, Texture, updateTexture } from '@/PaleGL/core/texture.ts';
+import { TEXTURE_FILTER_TYPE_NEAREST, TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE } from '@/PaleGL/constants';
 
 // ------------------------------------------------------------------------------
 // ref:
@@ -24,7 +26,9 @@ export type GLSLSound = {
     audioContext: AudioContext;
     node: AudioBufferSourceNode | null;
     gainNode: GainNode | null;
+    analyserNode: AnalyserNode | null;
     audioBuffer: AudioBuffer | null;
+    audioTexture: Texture | null;
     volume: number;
     startTime: number;
     offsetTime: number;
@@ -50,6 +54,19 @@ export function createGLSLSound(gpu: Gpu, vertexShader: string, duration: number
 
     const audioContext = new AudioContext();
 
+    const analyserNode = audioContext.createAnalyser();
+    analyserNode.fftSize = 2048;
+
+    const audioTexture = createTexture({
+        gpu,
+        width: 1024,
+        height: 1,
+        minFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        magFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        wrapS: TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
+        wrapT: TEXTURE_WRAP_TYPE_CLAMP_TO_EDGE,
+    });
+
     const rawVertexShader = buildVertexShader(
         vertexShader,
         [],
@@ -67,7 +84,9 @@ export function createGLSLSound(gpu: Gpu, vertexShader: string, duration: number
         audioContext,
         node: null,
         gainNode: null,
+        analyserNode,
         audioBuffer: null,
+        audioTexture,
         volume,
         startTime,
         offsetTime,
@@ -188,7 +207,13 @@ export function playGLSLSound(
     glslSound.gainNode.connect(glslSound.audioContext.destination);
     glslSound.gainNode.gain.value = glslSound.volume;
 
-    glslSound.node.connect(glslSound.gainNode);
+    if (glslSound.analyserNode) {
+        glslSound.analyserNode.connect(glslSound.gainNode);
+        glslSound.node.connect(glslSound.analyserNode);
+    } else {
+        glslSound.node.connect(glslSound.gainNode);
+    }
+
     glslSound.node.buffer = glslSound.audioBuffer;
     glslSound.node.loop = false;
     glslSound.node.start(0, time);
@@ -220,4 +245,36 @@ export function getGLSLSoundCurrentTime(glslSound: GLSLSound) {
     //     `[GlslSound.getCurrentTime] audio context currentTime: ${audioContext.currentTime}, current time: ${currentTime}, offset time: ${offsetTime}`
     // );
     return glslSound.currentTime;
+}
+
+export function getGLSLSoundFrequencyData(glslSound: GLSLSound, dataArray: Uint8Array) {
+    if (glslSound.analyserNode) {
+        glslSound.analyserNode.getByteFrequencyData(dataArray);
+    }
+}
+
+export function getGLSLSoundTimeDomainData(glslSound: GLSLSound, dataArray: Uint8Array) {
+    if (glslSound.analyserNode) {
+        glslSound.analyserNode.getByteTimeDomainData(dataArray);
+    }
+}
+
+export function updateGLSLSoundTextureFromFrequencyData(glslSound: GLSLSound, dataArray: Uint8Array) {
+    if (glslSound.audioTexture) {
+        updateTexture(glslSound.audioTexture, {
+            width: 1024,
+            height: 1,
+            data: dataArray,
+        });
+    }
+}
+
+export function updateGLSLSoundTextureFromTimeDomainData(glslSound: GLSLSound, dataArray: Uint8Array) {
+    if (glslSound.audioTexture) {
+        updateTexture(glslSound.audioTexture, {
+            width: 1024,
+            height: 1,
+            data: dataArray,
+        });
+    }
 }

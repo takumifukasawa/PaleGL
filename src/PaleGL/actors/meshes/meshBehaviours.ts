@@ -113,64 +113,31 @@ export function startMesh(actor: Actor, args: ActorStartArgs) {
     (startMeshBehaviour[mesh.meshType] ?? startMeshBehaviourBase)(mesh, args);
 }
 
-// export function replaceMeshMaterial(mesh: Mesh, gpu: Gpu, index: number, material: Material) {
-//     const tmpMaterial = mesh.materials[index];
-//     if (tmpMaterial.shader) {
-//         deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
-//     }
-//     mesh.materials[index] = material;
-//     if (!isCompiledMaterialShader(mesh.materials[index])) {
-//         startMaterial(mesh.materials[index], {
-//             gpu,
-//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-//         });
-//     }
-//     const tmpDepthMaterial = mesh.depthMaterials[index];
-//     if (tmpDepthMaterial?.shader) {
-//         deleteProgram(gpu.gl, tmpDepthMaterial.shader.glObject);
-//     }
-//     mesh.depthMaterials[index] = material;
-//     if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
-//         startMaterial(mesh.depthMaterials[index], {
-//             gpu,
-//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-//         });
-//     }
-// }
-//
-// export function replaceMeshMaterialByArgs(mesh: Mesh, gpu: Gpu, index: number, args: MaterialArgs = {}) {
-//     const tmpMaterial = mesh.materials[index];
-//     const newMaterial = cloneMaterial(tmpMaterial, args);
-//     if (tmpMaterial.shader) {
-//         deleteProgram(gpu.gl, tmpMaterial.shader.glObject);
-//     }
-//     // mesh.materials[index] = createMaterial({
-//     //     ...tmpMaterial.cachedArgs,
-//     //     ...args, // NOTE: 追加したい何かがあるときはここ
-//     // });
-//     mesh.materials[index] = newMaterial;
-//     if (!isCompiledMaterialShader(mesh.materials[index])) {
-//         startMaterial(mesh.materials[index], {
-//             gpu,
-//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-//         });
-//     }
-//     const tmpDepthMaterial = mesh.depthMaterials[index];
-//     const newDepthMaterial = cloneMaterial(tmpDepthMaterial, {});
-//     if (tmpDepthMaterial.shader) {
-//         deleteProgram(gpu.gl, tmpDepthMaterial.shader?.glObject);
-//     }
-//     // mesh.depthMaterials[index] = createMaterial({
-//     //     ...tmpDepthMaterial.cachedArgs,
-//     // });
-//     mesh.depthMaterials[index] = newDepthMaterial;
-//     if (!isCompiledMaterialShader(mesh.depthMaterials[index])) {
-//         startMaterial(mesh.depthMaterials[index], {
-//             gpu,
-//             attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
-//         });
-//     }
-// }
+export const replaceMeshMaterialByArgs = (
+    mesh: Mesh,
+    gpu: Gpu,
+    index: number,
+    args: MaterialArgs = {},
+    needsStart = true
+) => {
+    // TODO: uniformsの中身を引き継いだ方がいいと思われる
+
+    if (mesh.materials[index].shader) {
+        deleteProgram(gpu.gl, mesh.materials[index].shader.glObject);
+    }
+    mesh.materials[index] = createMaterial({
+        ...mesh.materials[index].cachedArgs,
+        ...args, // NOTE: 追加したい何かがあるときはここでoverride・
+    });
+
+    // 差し替えたmaterialをコンパイル
+    if (!isCompiledMaterialShader(mesh.materials[index]) && needsStart) {
+        startMaterial(mesh.materials[index], {
+            gpu,
+            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+        });
+    }
+};
 
 export const replaceMeshMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
     // TODO: uniformsの中身を引き継いだ方がいいと思われる
@@ -196,6 +163,30 @@ export const replaceMeshMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialA
     });
 };
 
+export const replaceMeshDepthMaterialByArgs = (
+    mesh: Mesh,
+    gpu: Gpu,
+    index: number,
+    args: MaterialArgs = {},
+    needsStart = true
+) => {
+    // // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
+    // console.log("hogehoge", mesh.depthMaterials, mesh.depthMaterials[index])
+    if (mesh.depthMaterials[index].shader) {
+        deleteProgram(gpu.gl, mesh.depthMaterials[index].shader?.glObject);
+    }
+    mesh.depthMaterials[index] = createMaterial({
+        ...mesh.depthMaterials[index].cachedArgs,
+        ...args,
+    });
+    if (!isCompiledMaterialShader(mesh.depthMaterials[index]) && needsStart) {
+        startMaterial(mesh.depthMaterials[index], {
+            gpu,
+            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+        });
+    }
+};
+
 export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
     // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
     mesh.depthMaterials.forEach((material, i) => {
@@ -204,7 +195,7 @@ export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: Mate
         }
         mesh.depthMaterials[i] = createMaterial({
             ...material.cachedArgs,
-            ...args
+            ...args,
         });
     });
     mesh.depthMaterials.forEach((material) => {
