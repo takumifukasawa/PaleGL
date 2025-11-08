@@ -38,18 +38,34 @@ export type GPUParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
     vatWidth: number;
     vatHeight: number;
+    // initializeFragmentShader: string;
+    // updateFragmentShader: string;
+    // initializeFragmentModifiers?: FragmentShaderModifiers;
+    // updateFragmentModifiers?: FragmentShaderModifiers;
+    shaders: GPUParticleUpdaterShaders[];
+};
+
+export type GPUParticleUpdaterShaders = {
     initializeFragmentShader: string;
     updateFragmentShader: string;
     initializeFragmentModifiers?: FragmentShaderModifiers;
     updateFragmentModifiers?: FragmentShaderModifiers;
 };
 
+// materialForInitialize: Material;
+// materialForUpdate: Material;
+export type GPUParticleUpdater = [Material, Material];
+
 export type GpuParticle = Mesh & {
     mrtDoubleBuffer: MRTDoubleBuffer;
-    materialForInitialize: Material;
-    materialForUpdate: Material;
+    // materialForInitialize: Material;
+    // materialForUpdate: Material;
+    // vatWidth: number;
+    // vatHeight: number;
     vatWidth: number;
     vatHeight: number;
+    currentUpdaterIndex: number;
+    updaters: GPUParticleUpdater[];
 };
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
@@ -86,15 +102,20 @@ const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDo
     updateMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, material);
 };
 
+// const getCurrentUpdater = (gpuParticle: GpuParticle) => {
+//     return gpuParticle.updaters[gpuParticle.currentUpdaterIndex];
+// }
+
 export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     const {
         gpu,
         vatWidth,
         vatHeight,
-        initializeFragmentShader,
-        updateFragmentShader,
-        initializeFragmentModifiers,
-        updateFragmentModifiers,
+        // initializeFragmentShader,
+        // updateFragmentShader,
+        // initializeFragmentModifiers,
+        // updateFragmentModifiers,
+        shaders,
     } = args;
 
     const gpuParticle = createInstancingParticle(args);
@@ -115,35 +136,60 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
     ];
 
-    const materialForInitialize = createGraphicsDoubleBufferMaterial(
-        initializeFragmentShader,
-        vatWidth,
-        vatHeight,
-        createUniforms(),
-        [],
-        initializeFragmentModifiers
-    );
-    const materialForUpdate = createGraphicsDoubleBufferMaterial(
-        updateFragmentShader,
-        vatWidth,
-        vatHeight,
-        createUniforms(),
-        [],
-        updateFragmentModifiers
-    );
+    const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {
+        const { initializeFragmentShader, initializeFragmentModifiers, updateFragmentShader, updateFragmentModifiers } =
+            initializer;
+        const materialForInitialize = createGraphicsDoubleBufferMaterial(
+            initializeFragmentShader,
+            vatWidth,
+            vatHeight,
+            createUniforms(),
+            [],
+            initializeFragmentModifiers
+        );
+        const materialForUpdate = createGraphicsDoubleBufferMaterial(
+            updateFragmentShader,
+            vatWidth,
+            vatHeight,
+            createUniforms(),
+            [],
+            updateFragmentModifiers
+        );
+        return [materialForInitialize, materialForUpdate];
+    });
+
+    // const materialForInitialize = createGraphicsDoubleBufferMaterial(
+    //     initializeFragmentShader,
+    //     vatWidth,
+    //     vatHeight,
+    //     createUniforms(),
+    //     [],
+    //     initializeFragmentModifiers
+    // );
+    // const materialForUpdate = createGraphicsDoubleBufferMaterial(
+    //     updateFragmentShader,
+    //     vatWidth,
+    //     vatHeight,
+    //     createUniforms(),
+    //     [],
+    //     updateFragmentModifiers
+    // );
 
     const vatGPUParticle: GpuParticle = {
         ...gpuParticle,
         mrtDoubleBuffer,
-        materialForInitialize,
-        materialForUpdate,
+        // materialForInitialize,
+        // materialForUpdate,
         vatWidth,
         vatHeight,
+        currentUpdaterIndex: 0,
+        updaters,
     };
 
     overrideGPUParticleMaterialSettings(vatGPUParticle);
 
     subscribeActorOnStart(vatGPUParticle, ({ renderer }) => {
+        const [materialForInitialize, materialForUpdate] = vatGPUParticle.updaters[vatGPUParticle.currentUpdaterIndex];
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
 
@@ -155,6 +201,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     let tmpReadUpMap;
 
     subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
+        const [, materialForUpdate] = vatGPUParticle.updaters[vatGPUParticle.currentUpdaterIndex];
         renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
 
         tmpReadVelocityMap = getReadVelocityMap(mrtDoubleBuffer);
@@ -189,7 +236,8 @@ export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) =>
 };
 
 export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticle) => {
-    const { mrtDoubleBuffer, materialForInitialize } = gpuParticle;
+    const [materialForInitialize] = gpuParticle.updaters[gpuParticle.currentUpdaterIndex];
+    const { mrtDoubleBuffer } = gpuParticle;
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
 };
