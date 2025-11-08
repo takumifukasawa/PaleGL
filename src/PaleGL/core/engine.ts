@@ -241,7 +241,13 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
             case ACTOR_TYPE_MESH:
                 // case ActorTypes.UiActor:
                 // case ActorTypes.SkinnedMesh:
-                beforeRenderActor(actor, { gpu: engine.renderer.gpu });
+                beforeRenderActor(actor, {
+                    gpu: engine.renderer.gpu,
+                    renderer: engine.renderer,
+                    scene: engine.scene!,
+                    time,
+                    deltaTime,
+                });
                 const mesh = actor as Mesh;
                 mesh.materials.forEach((mat) => {
                     if (mat) {

@@ -22,7 +22,13 @@ import { createVector2 } from '@/PaleGL/math/vector2.ts';
 //     createGraphicsDoubleBuffer,
 //     GraphicsDoubleBuffer,
 // } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
-import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import {
+    addActorComponent,
+    subscribeActorBeforeRender,
+    subscribeActorOnStart,
+    subscribeActorOnUpdate,
+} from '@/PaleGL/actors/actor.ts';
+import { createGPUParticleController } from '@/PaleGL/components/gpuParticleController.ts';
 import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
@@ -33,6 +39,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { restElement } from '@babel/types';
 
 export type GPUParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
@@ -43,6 +50,7 @@ export type GPUParticleArgs = InstancingParticleArgs & {
     // initializeFragmentModifiers?: FragmentShaderModifiers;
     // updateFragmentModifiers?: FragmentShaderModifiers;
     shaders: GPUParticleUpdaterShaders[];
+    initialUpdaterIndex?: number;
 };
 
 export type GPUParticleUpdaterShaders = {
@@ -64,7 +72,8 @@ export type GpuParticle = Mesh & {
     // vatHeight: number;
     vatWidth: number;
     vatHeight: number;
-    currentUpdaterIndex: number;
+    prevUpdaterIndex: number;
+    updaterIndex: number;
     updaters: GPUParticleUpdater[];
 };
 
@@ -116,9 +125,10 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         // initializeFragmentModifiers,
         // updateFragmentModifiers,
         shaders,
+        initialUpdaterIndex = 0,
     } = args;
 
-    const gpuParticle = createInstancingParticle(args);
+    const instancingParticle = createInstancingParticle(args);
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -175,44 +185,61 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     //     updateFragmentModifiers
     // );
 
-    const vatGPUParticle: GpuParticle = {
-        ...gpuParticle,
+    const gpuParticle: GpuParticle = {
+        ...instancingParticle,
         mrtDoubleBuffer,
         // materialForInitialize,
         // materialForUpdate,
         vatWidth,
         vatHeight,
-        currentUpdaterIndex: 0,
+        prevUpdaterIndex: initialUpdaterIndex,
+        updaterIndex: initialUpdaterIndex,
         updaters,
     };
 
-    overrideGPUParticleMaterialSettings(vatGPUParticle);
+    addActorComponent(gpuParticle, createGPUParticleController(gpuParticle));
 
-    subscribeActorOnStart(vatGPUParticle, ({ renderer }) => {
-        const [materialForInitialize, materialForUpdate] = vatGPUParticle.updaters[vatGPUParticle.currentUpdaterIndex];
-        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
-        tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
+    overrideGPUParticleMaterialSettings(gpuParticle);
 
-        resetGPUParticleByInitialize(renderer, vatGPUParticle);
+    subscribeActorOnStart(gpuParticle, ({ renderer }) => {
+        for (let i = 0; i < gpuParticle.updaters.length; i++) {
+            const [materialForInitialize, materialForUpdate] = gpuParticle.updaters[i];
+            tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
+            tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
+        }
+        // const [materialForInitialize, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
+        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
+        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
+
+        resetGPUParticleByInitialize(renderer, gpuParticle);
     });
 
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
     let tmpReadUpMap;
 
-    subscribeActorOnUpdate(vatGPUParticle, ({ renderer }) => {
-        const [, materialForUpdate] = vatGPUParticle.updaters[vatGPUParticle.currentUpdaterIndex];
+    subscribeActorOnUpdate(gpuParticle, ({ renderer }) => {
+        const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
         renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
 
         tmpReadVelocityMap = getReadVelocityMap(mrtDoubleBuffer);
         tmpReadPositionMap = getReadPositionMap(mrtDoubleBuffer);
         tmpReadUpMap = getReadUpMap(mrtDoubleBuffer);
-        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_VELOCITY_MAP, tmpReadVelocityMap);
-        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_POSITION_MAP, tmpReadPositionMap);
-        setUniformValueToAllMeshMaterials(gpuParticle, UNIFORM_NAME_UP_MAP, tmpReadUpMap);
+        setUniformValueToAllMeshMaterials(instancingParticle, UNIFORM_NAME_VELOCITY_MAP, tmpReadVelocityMap);
+        setUniformValueToAllMeshMaterials(instancingParticle, UNIFORM_NAME_POSITION_MAP, tmpReadPositionMap);
+        setUniformValueToAllMeshMaterials(instancingParticle, UNIFORM_NAME_UP_MAP, tmpReadUpMap);
     });
 
-    return vatGPUParticle;
+    subscribeActorBeforeRender(gpuParticle, ({ renderer }) => {
+        // renderの直前にMRTをリセットするかを確認
+        if (gpuParticle.prevUpdaterIndex !== gpuParticle.updaterIndex) {
+            console.log(`GPUParticle switch updater: ${gpuParticle.prevUpdaterIndex} -> ${gpuParticle.updaterIndex}`);
+            resetGPUParticleByInitialize(renderer, gpuParticle);
+        }
+        gpuParticle.prevUpdaterIndex = gpuParticle.updaterIndex;
+    });
+    
+    return gpuParticle;
 };
 
 export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) => {
@@ -236,8 +263,12 @@ export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) =>
 };
 
 export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticle) => {
-    const [materialForInitialize] = gpuParticle.updaters[gpuParticle.currentUpdaterIndex];
+    const [materialForInitialize] = gpuParticle.updaters[gpuParticle.updaterIndex];
     const { mrtDoubleBuffer } = gpuParticle;
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
+};
+
+export const switchGPUParticleUpdater = (gpuParticle: GpuParticle, index: number) => {
+    gpuParticle.updaterIndex = index;
 };

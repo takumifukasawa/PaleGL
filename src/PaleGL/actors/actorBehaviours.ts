@@ -1,6 +1,7 @@
 import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import {
     Actor,
+    ActorBeforeRenderArgs,
     ActorFixedUpdateArgs,
     ActorLastUpdateArgs,
     ActorStartArgs,
@@ -22,7 +23,6 @@ import {
     ActorType,
 } from '@/PaleGL/constants.ts';
 import { updateAnimator } from '@/PaleGL/core/animator.ts';
-import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { updateActorTransformMatrix } from '@/PaleGL/core/transform.ts';
 import { disposeMaterial } from '@/PaleGL/materials/material.ts';
@@ -157,9 +157,10 @@ export const lastUpdateActor = (actor: Actor, args: ActorLastUpdateArgs) => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const beforeRenderActor = (actor: Actor, { gpu }: { gpu: Gpu }) => {
+export const beforeRenderActor = (actor: Actor, args: ActorBeforeRenderArgs) => {
+    const { gpu } = args;
     actor.onBeforeRender.forEach((cb) => {
-        cb();
+        cb(args);
     });
     actor.components.forEach(([model, behaviour]) => {
         behaviour.onBeforeRenderCallback?.(actor, model, gpu);
