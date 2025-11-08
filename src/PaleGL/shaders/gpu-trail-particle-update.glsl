@@ -63,8 +63,8 @@ void main() {
         
         #pragma GPU_PARTICLE_MODIFY_UPDATE
         
-        nextPosition = prevPosition + nextVelocity;
-        vec3 front = normalize(nextVelocity);
+        nextPosition = prevPosition + outVelocity;
+        vec3 front = normalize(outVelocity);
         vec3 right = cross(front, normalize(prevUp));
         nextUp = normalize(cross(right, front));
     } else {

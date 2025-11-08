@@ -9,6 +9,7 @@ import {
     FragmentShaderModifiers,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
+    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_NAME_POSITION_MAP,
     UNIFORM_NAME_UP_MAP,
     UNIFORM_NAME_VAT_RESOLUTION,
@@ -39,7 +40,6 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
-import { restElement } from '@babel/types';
 
 export type GPUParticleArgs = InstancingParticleArgs & {
     gpu: Gpu;
@@ -84,7 +84,11 @@ const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
 const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
 
-export const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDoubleBuffer, material: Material) => {
+export const renderMRTDoubleBufferAndSwap = (
+    renderer: Renderer,
+    mrtDoubleBuffer: MRTDoubleBuffer,
+    material: Material
+) => {
     // velocity 更新前に前フレームのpositionをvelocityのuniformに設定する
     // prettier-ignore
     setMaterialUniformValue(
@@ -144,6 +148,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         [UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null],
         [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null],
         [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, createVector2(vatWidth, vatHeight)],
     ];
 
     const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {
@@ -154,7 +159,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
             vatWidth,
             vatHeight,
             createUniforms(),
-            [],
+            [UNIFORM_BLOCK_NAME_TIMELINE],
             initializeFragmentModifiers
         );
         const materialForUpdate = createGraphicsDoubleBufferMaterial(
@@ -162,7 +167,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
             vatWidth,
             vatHeight,
             createUniforms(),
-            [],
+            [UNIFORM_BLOCK_NAME_TIMELINE],
             updateFragmentModifiers
         );
         return [materialForInitialize, materialForUpdate];
@@ -238,7 +243,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         }
         gpuParticle.prevUpdaterIndex = gpuParticle.updaterIndex;
     });
-    
+
     return gpuParticle;
 };
 
