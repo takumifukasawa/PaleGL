@@ -84,7 +84,7 @@ const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
 const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
 
-const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDoubleBuffer, material: Material) => {
+export const renderMRTDoubleBufferAndSwap = (renderer: Renderer, mrtDoubleBuffer: MRTDoubleBuffer, material: Material) => {
     // velocity 更新前に前フレームのpositionをvelocityのuniformに設定する
     // prettier-ignore
     setMaterialUniformValue(
