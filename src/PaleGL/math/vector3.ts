@@ -205,6 +205,7 @@ export const addVector3Array = (...vectors: Vector3[]) => {
     return v;
 };
 
+// v2 -> v1
 export const vector3SubVector3 = (v1: Vector3, v2: Vector3) => {
     // return new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     return createVector3(v3x(v1) - v3x(v2), v3y(v1) - v3y(v2), v3z(v1) - v3z(v2));
