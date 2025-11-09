@@ -1,4 +1,4 @@
-import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, MarionetterTimelineTrackKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import {
     Actor,
     ActorBeforeRenderArgs,
@@ -193,10 +193,10 @@ export const processActorPropertyBinder = <T extends TimelinePropertyValue>(
     });
 };
 
-export const processActorPostProcessClip = (actor: Actor, clip: MarionetterClipKinds, clipTime: number) => {
-    actor.onPostProcessClip.forEach((cb) => cb(clip, clipTime));
+export const processActorPostProcessClip = (actor: Actor, track: MarionetterTimelineTrackKinds, clip: MarionetterClipKinds, clipTime: number) => {
+    actor.onPostProcessClip.forEach((cb) => cb(track, clip, clipTime));
     actor.components.forEach(([model, behaviour]) => {
-        behaviour.onPostProcessClip?.(actor, model, clip, clipTime);
+        behaviour.onPostProcessClip?.(actor, model, track, clip, clipTime);
     });
 };
 

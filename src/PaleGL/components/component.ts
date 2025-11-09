@@ -1,4 +1,4 @@
-import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, MarionetterTimelineDefaultTrack, MarionetterTimelineTrackKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { COMPONENT_TYPE_DEFAULT, ComponentType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -55,6 +55,7 @@ export type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
 export type OnPostProcessClipCallback = (
     actor: Actor,
     componentModel: ComponentModel,
+    track: MarionetterTimelineDefaultTrack,
     clip: MarionetterClipKinds,
     clipTime: number
 ) => void;

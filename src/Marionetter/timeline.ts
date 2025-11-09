@@ -196,14 +196,15 @@ export function buildMarionetterTimeline(
             const signalEmitters = (track as MarionetterMarkerTrackInfo)[
                 MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS
             ];
-            tracks.push({
+            const data = {
                 name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
                 trackType: MARIONETTER_TRACK_TYPE_MARKER,
                 signalEmitters: signalEmitters.map((signalEmitter) => {
                     return buildSignalEmitter(signalEmitter);
                 }),
                 execute: () => {},
-            } as MarionetterTimelineMarkerTrack);
+            } as MarionetterTimelineMarkerTrack;
+            tracks.push(data);
         } else {
             const targetName = (track as MarionetterDefaultTrackInfo)[
                 MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME
@@ -214,17 +215,29 @@ export function buildMarionetterTimeline(
             //     // Scene.find(placedScene.children, targetName),
             // ];
             let targetActor = findActorByName(marionetterActors, targetName);
-            //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
-            const marionetterClips = createMarionetterClips(clips);
-            // if (targetActors.length < 1) {
-            //     console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
-            // }
+
             if (!targetActor) {
                 console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
             }
 
             targetActor = targetActor as Actor;
 
+            const data: MarionetterTimelineDefaultTrack = {
+                name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
+                trackType: MARIONETTER_TRACK_TYPE_DEFAULT,
+                targetName,
+                targetActor,
+                clips: [],
+                // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
+                execute: (args: MarionetterTimelineTrackExecuteArgs) => {},
+            };
+            
+            
+            //const marionetterClips = createMarionetterClips(clips, needsSomeActorsConvertLeftHandAxisToRightHandAxis);
+            const marionetterClips = createMarionetterClips(data, clips);
+            // if (targetActors.length < 1) {
+            //     console.warn(`[buildMarionetterTimeline] target actor is not found: ${targetName}`);
+            // }
             // for debug
             // console.log(
             //     `[buildMarionetterTimeline] targetName: ${targetName}, targetActor:`,
@@ -233,83 +246,156 @@ export function buildMarionetterTimeline(
             //     marionetterClips
             // );
 
-            const data: MarionetterTimelineDefaultTrack = {
-                name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
-                trackType: MARIONETTER_TRACK_TYPE_DEFAULT,
-                targetName,
-                targetActor,
-                clips: marionetterClips,
-                // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
-                execute: (args: MarionetterTimelineTrackExecuteArgs) => {
-                    const { time, scene } = args;
-                    let beforeClipAtTime: MarionetterClipKinds | null = null;
-                    let clipAtTime: MarionetterClipKinds | null = null;
-                    for (let i = 0; i < marionetterClips.length; i++) {
-                        const { clipInfo } = marionetterClips[i];
-                        const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-                        const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-                        // その時間再生すべきclipがあったら
-                        if (isTimeInClip(time, start, start + duration)) {
-                            clipAtTime = marionetterClips[i];
-                            break;
-                        }
-
-                        if (time > start + duration) {
-                            beforeClipAtTime = marionetterClips[i];
-                        }
+            const execute = (args: MarionetterTimelineTrackExecuteArgs) => {
+                const { time, scene } = args;
+                let beforeClipAtTime: MarionetterClipKinds | null = null;
+                let clipAtTime: MarionetterClipKinds | null = null;
+                for (let i = 0; i < marionetterClips.length; i++) {
+                    const { clipInfo } = marionetterClips[i];
+                    const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+                    const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+                    // その時間再生すべきclipがあったら
+                    if (isTimeInClip(time, start, start + duration)) {
+                        clipAtTime = marionetterClips[i];
+                        break;
                     }
 
-                    // 現在時刻にclipはないが直前にclipがある場合
-                    // 直前のclipが終了後も再生すべきclipなら直前のclipを再生
-                    if (beforeClipAtTime && !clipAtTime) {
-                        if (
-                            isHoldClipPostExtrapolate(beforeClipAtTime) ||
-                            isLoopClipPostExtrapolate(beforeClipAtTime)
-                        ) {
-                            clipAtTime = beforeClipAtTime;
-                        }
+                    if (time > start + duration) {
+                        beforeClipAtTime = marionetterClips[i];
                     }
+                }
 
-                    // const clipAtTime = marionetterClips.find(
-                    //     ({ clipInfo }) => {
-                    //         const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-                    //         const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-                    //         return isTimeInClip(time, start, start + duration);
-                    //     }
-                    // );
-
-                    // NOTE: 渡されるtimeそのものがframeTimeになった
-                    // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
-
-                    // まずactorのprocessTimelineを実行
-                    if (targetActor) {
-                        preProcessActorTimeline(targetActor, time);
-                    }
-
+                // 現在時刻にclipはないが直前にclipがある場合
+                // 直前のclipが終了後も再生すべきclipなら直前のclipを再生
+                if (beforeClipAtTime && !clipAtTime) {
                     if (
-                        track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
-                        MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+                        isHoldClipPostExtrapolate(beforeClipAtTime) ||
+                        isLoopClipPostExtrapolate(beforeClipAtTime)
                     ) {
-                        if (targetActor) {
-                            if (clipAtTime) {
-                                targetActor.enabled = true;
-                            } else {
-                                targetActor.enabled = false;
-                            }
-                        }
-                    } else {
-                        if (targetActor && clipAtTime) {
-                            clipAtTime.execute({ actor: targetActor, time, scene });
-                        }
+                        clipAtTime = beforeClipAtTime;
                     }
+                }
 
-                    // clipの実行後にupdate
+                // const clipAtTime = marionetterClips.find(
+                //     ({ clipInfo }) => {
+                //         const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+                //         const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+                //         return isTimeInClip(time, start, start + duration);
+                //     }
+                // );
+
+                // NOTE: 渡されるtimeそのものがframeTimeになった
+                // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
+
+                // まずactorのprocessTimelineを実行
+                if (targetActor) {
+                    preProcessActorTimeline(targetActor, time);
+                }
+
+                if (
+                    track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
+                    MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+                ) {
                     if (targetActor) {
-                        postProcessActorTimeline(targetActor, time);
+                        if (clipAtTime) {
+                            targetActor.enabled = true;
+                        } else {
+                            targetActor.enabled = false;
+                        }
                     }
-                    // });
-                },
+                } else {
+                    if (targetActor && clipAtTime) {
+                        clipAtTime.execute({ actor: targetActor, time, scene });
+                    }
+                }
+
+                // clipの実行後にupdate
+                if (targetActor) {
+                    postProcessActorTimeline(targetActor, time);
+                }
+                // });
             };
+            
+            data.clips = marionetterClips;
+            data.execute = execute;
+
+            // const data: MarionetterTimelineDefaultTrack = {
+            //     name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
+            //     trackType: MARIONETTER_TRACK_TYPE_DEFAULT,
+            //     targetName,
+            //     targetActor,
+            //     clips: marionetterClips,
+            //     // TODO: clip間の mixer,interpolate,extrapolate の挙動が必要
+            //     execute: (args: MarionetterTimelineTrackExecuteArgs) => {
+            //         const { time, scene } = args;
+            //         let beforeClipAtTime: MarionetterClipKinds | null = null;
+            //         let clipAtTime: MarionetterClipKinds | null = null;
+            //         for (let i = 0; i < marionetterClips.length; i++) {
+            //             const { clipInfo } = marionetterClips[i];
+            //             const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+            //             const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+            //             // その時間再生すべきclipがあったら
+            //             if (isTimeInClip(time, start, start + duration)) {
+            //                 clipAtTime = marionetterClips[i];
+            //                 break;
+            //             }
+
+            //             if (time > start + duration) {
+            //                 beforeClipAtTime = marionetterClips[i];
+            //             }
+            //         }
+
+            //         // 現在時刻にclipはないが直前にclipがある場合
+            //         // 直前のclipが終了後も再生すべきclipなら直前のclipを再生
+            //         if (beforeClipAtTime && !clipAtTime) {
+            //             if (
+            //                 isHoldClipPostExtrapolate(beforeClipAtTime) ||
+            //                 isLoopClipPostExtrapolate(beforeClipAtTime)
+            //             ) {
+            //                 clipAtTime = beforeClipAtTime;
+            //             }
+            //         }
+
+            //         // const clipAtTime = marionetterClips.find(
+            //         //     ({ clipInfo }) => {
+            //         //         const start = clipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
+            //         //         const duration = clipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+            //         //         return isTimeInClip(time, start, start + duration);
+            //         //     }
+            //         // );
+
+            //         // NOTE: 渡されるtimeそのものがframeTimeになった
+            //         // const frameTime = time % marionetterPlayableDirectorComponentInfo.d;
+
+            //         // まずactorのprocessTimelineを実行
+            //         if (targetActor) {
+            //             preProcessActorTimeline(targetActor, time);
+            //         }
+
+            //         if (
+            //             track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
+            //             MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
+            //         ) {
+            //             if (targetActor) {
+            //                 if (clipAtTime) {
+            //                     targetActor.enabled = true;
+            //                 } else {
+            //                     targetActor.enabled = false;
+            //                 }
+            //             }
+            //         } else {
+            //             if (targetActor && clipAtTime) {
+            //                 clipAtTime.execute({ actor: targetActor, time, scene });
+            //             }
+            //         }
+
+            //         // clipの実行後にupdate
+            //         if (targetActor) {
+            //             postProcessActorTimeline(targetActor, time);
+            //         }
+            //         // });
+            //     },
+            // };
             tracks.push(data);
         }
     }
@@ -367,6 +453,7 @@ export function buildMarionetterTimeline(
  * @param clips
  */
 function createMarionetterClips(
+    track: MarionetterTimelineDefaultTrack,
     clips: MarionetterClipInfoKinds[]
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterClipKinds[] {
@@ -380,22 +467,23 @@ function createMarionetterClips(
             case MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP:
                 marionetterClips.push(
                     createMarionetterAnimationClip(
+                        track,
                         clip as MarionetterAnimationClipInfo
                         // needsSomeActorsConvertLeftHandAxisToRightHandAxis
                     )
                 );
                 break;
             case MARIONETTER_CLIP_INFO_TYPE_LIGHT_CONTROL_CLIP:
-                marionetterClips.push(createMarionetterLightControlClip(clip as MarionetterLightControlClipInfo));
+                marionetterClips.push(createMarionetterLightControlClip(track, clip as MarionetterLightControlClipInfo));
                 break;
             case MARIONETTER_CLIP_INFO_TYPE_ACTIVATION_CONTROL_CLIP:
                 marionetterClips.push(
-                    createMarionetterActivationControlClip(clip as MarionetterActivationControlClipInfo)
+                    createMarionetterActivationControlClip(track, clip as MarionetterActivationControlClipInfo)
                 );
                 break;
             case MARIONETTER_CLIP_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP:
                 marionetterClips.push(
-                    createMarionetterObjectMoveAndLookAtClip(clip as MarionetterObjectMoveAndLookAtClipInfo)
+                    createMarionetterObjectMoveAndLookAtClip(track, clip as MarionetterObjectMoveAndLookAtClipInfo)
                 );
                 break;
 
@@ -417,6 +505,7 @@ function createMarionetterClips(
  * @param animationClip
  */
 function createMarionetterAnimationClip(
+    track: MarionetterTimelineDefaultTrack,
     animationClipInfo: MarionetterAnimationClipInfo
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterAnimationClip {
@@ -656,7 +745,7 @@ function createMarionetterAnimationClip(
             processActorPropertyBinder(actor, key, color, animationClip, timeInClip);
         });
 
-        processActorPostProcessClip(actor, animationClip, timeInClip);
+        processActorPostProcessClip(actor, track, animationClip, timeInClip);
     };
 
     return animationClip;
@@ -667,6 +756,7 @@ function createMarionetterAnimationClip(
  * @param lightControlClip
  */
 function createMarionetterLightControlClip(
+    track: MarionetterTimelineDefaultTrack,
     lightControlClipInfo: MarionetterLightControlClipInfo
 ): MarionetterLightControlClip {
     // let obj: Light | null;
@@ -780,7 +870,7 @@ function createMarionetterLightControlClip(
         //     obj.range = range;
         // }
 
-        processActorPostProcessClip(actor, lightControlClip, timeInClip);
+        processActorPostProcessClip(actor, track, lightControlClip, timeInClip);
     };
 
     return lightControlClip;
@@ -791,6 +881,7 @@ function createMarionetterLightControlClip(
  * @param lightControlClip
  */
 function createMarionetterActivationControlClip(
+    track: MarionetterTimelineDefaultTrack,
     activationControlClipInfo: MarionetterActivationControlClipInfo
 ): MarionetterActivationControlClip {
     const name = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
@@ -806,7 +897,7 @@ function createMarionetterActivationControlClip(
         execute: (args) => {
             const { actor, time } = args;
             const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
-            processActorPostProcessClip(actor, activationControlClip, timeInClip);
+            processActorPostProcessClip(actor, track, activationControlClip, timeInClip);
         },
     };
 
@@ -814,6 +905,7 @@ function createMarionetterActivationControlClip(
 }
 
 function createMarionetterObjectMoveAndLookAtClip(
+    track: MarionetterTimelineDefaultTrack,
     objectMoveAndLookAtClipInfo: MarionetterObjectMoveAndLookAtClipInfo
 ): MarionetterObjectMoveAndLookAtClip {
     const name = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];

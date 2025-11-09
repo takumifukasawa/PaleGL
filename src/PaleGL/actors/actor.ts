@@ -5,7 +5,7 @@ import { Animator, createAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Component } from '@/PaleGL/components/component.ts';
 import { Scene } from '@/PaleGL/core/scene.ts';
-import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, MarionetterTimelineTrackKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
 import { OrthographicCamera } from '@/PaleGL/actors/cameras/orthographicCamera.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
@@ -45,7 +45,7 @@ type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(
     clip: MarionetterClipKinds,
     clipTime: number
 ) => void;
-type OnPostProcessClip = (clip: MarionetterClipKinds, clipTime: number) => void;
+type OnPostProcessClip = (track: MarionetterTimelineTrackKinds, clip: MarionetterClipKinds, clipTime: number) => void;
 type OnProcessTimeline = (timelineTime: number) => void;
 
 export type ActorArgs = { name?: string; type?: ActorType };
