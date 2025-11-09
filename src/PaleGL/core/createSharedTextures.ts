@@ -5,9 +5,9 @@ import {
     UNIFORM_NAME_FREQUENCY,
     UNIFORM_NAME_GRID_SIZE,
     UNIFORM_NAME_OCTAVES,
+    UNIFORM_NAME_SPEED,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_VECTOR2,
-
 } from '@/PaleGL/constants.ts';
 import {
     createEffectTextureSystem,
@@ -59,6 +59,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             [UNIFORM_NAME_AMPLITUDE, UNIFORM_TYPE_FLOAT, 0.307],
             [UNIFORM_NAME_FREQUENCY, UNIFORM_TYPE_FLOAT, 1.357],
             [UNIFORM_NAME_FACTOR, UNIFORM_TYPE_FLOAT, 0.597],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,
@@ -77,6 +78,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             //     value: 0,
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(TEXTURE_SIZE, TEXTURE_SIZE)],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,
@@ -98,6 +100,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
             ['uIsImproved', UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,
@@ -117,6 +120,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
             ['uIsImproved', UNIFORM_TYPE_FLOAT, 1],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,
@@ -135,6 +139,7 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             //     value: 0,
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
         ],
         tilingEnabled: true,
         edgeMaskMix: 1,
@@ -158,7 +163,7 @@ export const createSharedTextures = ({ gpu, renderer }: { gpu: Gpu; renderer: Re
     }
 
     return sharedTextures;
-}
+};
 
 export const renderSharedTextures = (renderer: Renderer, sharedTextures: SharedTextures) => {
     sharedTextures.forEach((sharedTexture) => {
@@ -166,4 +171,4 @@ export const renderSharedTextures = (renderer: Renderer, sharedTextures: SharedT
             renderEffectTexture(renderer, sharedTexture);
         }
     });
-}
+};

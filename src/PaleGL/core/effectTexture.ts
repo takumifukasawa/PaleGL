@@ -1,14 +1,13 @@
 import {
-    RenderTargetType,
     RENDER_TARGET_TYPE_RGBA,
-    TextureFilterType,
+    RenderTargetType,
     TEXTURE_FILTER_TYPE_LINEAR,
     TEXTURE_WRAP_TYPE_REPEAT,
+    TextureFilterType,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_NAME_SRC_TEXTURE,
-    UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
-
+    UNIFORM_TYPE_TEXTURE,
 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
@@ -98,10 +97,7 @@ export const createEffectTextureSystem: (
     const effectMaterial = createMaterial({
         vertexShader: getPostProcessBaseVertexShader(),
         fragmentShader: effectFragmentShader,
-        uniforms: [
-            ...effectUniforms,
-            ['uSpeed', UNIFORM_TYPE_FLOAT, 1.0],
-        ],
+        uniforms: [...effectUniforms],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON],
     });
 
