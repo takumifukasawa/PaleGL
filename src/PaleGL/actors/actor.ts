@@ -1,5 +1,5 @@
 ﻿import { createTransform, Transform } from '@/PaleGL/core/transform.ts';
-import { ActorType, ACTOR_TYPE_NULL } from '@/PaleGL/constants';
+import { ActorType, ACTOR_TYPE_NULL, ComponentType } from '@/PaleGL/constants';
 import { uuidv4 } from '@/PaleGL/utilities/uuid';
 import { Animator, createAnimator } from '@/PaleGL/core/animator.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -32,7 +32,13 @@ type OnSetSizeCallback = (
 type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
 type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
-type OnBeforeRenderCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
+type OnBeforeRenderCallback = (args: {
+    scene: Scene;
+    gpu: Gpu;
+    renderer: Renderer;
+    time: number;
+    deltaTime: number;
+}) => void;
 type OnProcessPropertyBinder = <T extends TimelinePropertyValue>(
     key: string,
     value: T,
@@ -61,7 +67,7 @@ export type Actor = {
     onLastUpdate: OnLastUpdateCallback[];
     onBeforeRender: OnBeforeRenderCallback[];
     onProcessPropertyBinder: OnProcessPropertyBinder[];
-    onPostProcessClip: OnPostProcessClip[]
+    onPostProcessClip: OnPostProcessClip[];
     onPreProcessTimeline: OnProcessTimeline[];
     onPostProcessTimeline: OnProcessTimeline[];
     enabled: boolean;
@@ -171,6 +177,11 @@ export const addActorComponents = (actor: Actor, components: Component[]) => {
 
 export const getActorComponent = <T extends Component>(actor: Actor): T | null => {
     return actor.components.find((component) => component) as T;
+};
+
+export const findActorComponent = <T extends Component>(actor: Actor, type: ComponentType): T | null => {
+    const component = actor.components.find(([model]) => model.type === type);
+    return component ? (component as T) : null;
 };
 
 // export const disposeActor = (actor: Actor) => {
