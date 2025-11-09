@@ -84,3 +84,70 @@ export const generateDiskCap = (
         }
     }
 };
+
+export const createCircleCrossSection = (radius: number = 0.5, segments: number = 8): { x: number; y: number }[] => {
+    const points: { x: number; y: number }[] = [];
+    for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
+        points.push({
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius,
+        });
+    }
+    return points;
+};
+
+export const createRectangleCrossSection = (width: number = 1, height: number = 0.1): { x: number; y: number }[] => {
+    const hw = width / 2;
+    const hh = height / 2;
+    return [
+        { x: -hw, y: -hh },
+        { x: hw, y: -hh },
+        { x: hw, y: hh },
+        { x: -hw, y: hh },
+        { x: -hw, y: -hh },
+    ];
+};
+
+export const generateSplineCap = (
+    positions: number[],
+    normals: number[],
+    uvs: number[],
+    indices: number[],
+    centerX: number,
+    centerY: number,
+    centerZ: number,
+    normalX: number,
+    normalY: number,
+    normalZ: number,
+    ringPositions: number[],
+    startIndex: number,
+    flipNormal: boolean
+) => {
+    const ringCount = ringPositions.length / 3;
+    const nX = flipNormal ? -normalX : normalX;
+    const nY = flipNormal ? -normalY : normalY;
+    const nZ = flipNormal ? -normalZ : normalZ;
+
+    positions.push(centerX, centerY, centerZ);
+    normals.push(nX, nY, nZ);
+    uvs.push(0.5, 0.5);
+
+    const centerIdx = startIndex;
+
+    for (let i = 0; i < ringCount; i++) {
+        const idx = i * 3;
+        positions.push(ringPositions[idx], ringPositions[idx + 1], ringPositions[idx + 2]);
+        normals.push(nX, nY, nZ);
+        uvs.push(0.5, 0.5);
+    }
+
+    const ringStart = centerIdx + 1;
+    for (let i = 0; i < ringCount - 1; i++) {
+        if (flipNormal) {
+            indices.push(centerIdx, ringStart + i, ringStart + i + 1);
+        } else {
+            indices.push(centerIdx, ringStart + i + 1, ringStart + i);
+        }
+    }
+};
