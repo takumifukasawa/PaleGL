@@ -9,6 +9,13 @@ import { generateSplineCap } from '@/PaleGL/geometries/geometryHelpers.ts';
 
 type CrossSection = { x: number; y: number }[];
 
+type SplineMeshModifiers = {
+    scale?: (t: number) => number;
+    scaleX?: (t: number) => number;
+    scaleY?: (t: number) => number;
+    twist?: (t: number) => number;
+};
+
 type SplineMeshRawData = {
     positions: number[];
     normals: number[];
@@ -24,13 +31,39 @@ type SplineMeshGeometryArgs = {
     segmentSamples?: number;
     dynamic?: boolean;
     caps?: boolean;
+    modifiers?: SplineMeshModifiers;
+};
+
+const applyModifiers = (csX: number, csY: number, t: number, modifiers?: SplineMeshModifiers) => {
+    let x = csX;
+    let y = csY;
+
+    if (modifiers?.scaleX) x *= modifiers.scaleX(t);
+    if (modifiers?.scaleY) y *= modifiers.scaleY(t);
+    if (modifiers?.scale) {
+        x *= modifiers.scale(t);
+        y *= modifiers.scale(t);
+    }
+
+    if (modifiers?.twist) {
+        const angle = modifiers.twist(t);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const rotX = x * cos - y * sin;
+        const rotY = x * sin + y * cos;
+        x = rotX;
+        y = rotY;
+    }
+
+    return { x, y };
 };
 
 const generateSplineMeshRawData = (
     controlPoints: Vector3[],
     crossSection: CrossSection,
     segmentSamples: number = 10,
-    caps: boolean = true
+    caps: boolean = true,
+    modifiers?: SplineMeshModifiers
 ): SplineMeshRawData => {
     const positions: number[] = [];
     const normals: number[] = [];
@@ -48,8 +81,9 @@ const generateSplineMeshRawData = (
 
         for (let j = 0; j < crossSectionCount; j++) {
             const cs = crossSection[j];
-            const offsetNormal = scaleVector3ByScalar(cloneVector3(firstPoint.normal), cs.x);
-            const offsetBinormal = scaleVector3ByScalar(cloneVector3(firstPoint.binormal), cs.y);
+            const modifiedCS = applyModifiers(cs.x, cs.y, 0, modifiers);
+            const offsetNormal = scaleVector3ByScalar(cloneVector3(firstPoint.normal), modifiedCS.x);
+            const offsetBinormal = scaleVector3ByScalar(cloneVector3(firstPoint.binormal), modifiedCS.y);
             const vertexPos = addVector3AndVector3(
                 addVector3AndVector3(cloneVector3(firstPoint.position), offsetNormal),
                 offsetBinormal
@@ -84,8 +118,10 @@ const generateSplineMeshRawData = (
             const cs = crossSection[j];
             const u = j / (crossSectionCount - 1);
 
-            const offsetNormal = scaleVector3ByScalar(cloneVector3(normal), cs.x);
-            const offsetBinormal = scaleVector3ByScalar(cloneVector3(binormal), cs.y);
+            const modifiedCS = applyModifiers(cs.x, cs.y, v, modifiers);
+
+            const offsetNormal = scaleVector3ByScalar(cloneVector3(normal), modifiedCS.x);
+            const offsetBinormal = scaleVector3ByScalar(cloneVector3(binormal), modifiedCS.y);
             const vertexPos = addVector3AndVector3(
                 addVector3AndVector3(cloneVector3(position), offsetNormal),
                 offsetBinormal
@@ -95,8 +131,8 @@ const generateSplineMeshRawData = (
 
             const csNormal = normalizeVector3(
                 addVector3AndVector3(
-                    scaleVector3ByScalar(cloneVector3(normal), cs.x),
-                    scaleVector3ByScalar(cloneVector3(binormal), cs.y)
+                    scaleVector3ByScalar(cloneVector3(normal), modifiedCS.x),
+                    scaleVector3ByScalar(cloneVector3(binormal), modifiedCS.y)
                 )
             );
             normals.push(v3x(csNormal), v3y(csNormal), v3z(csNormal));
@@ -126,8 +162,9 @@ const generateSplineMeshRawData = (
 
         for (let j = 0; j < crossSectionCount; j++) {
             const cs = crossSection[j];
-            const offsetNormal = scaleVector3ByScalar(cloneVector3(lastPoint.normal), cs.x);
-            const offsetBinormal = scaleVector3ByScalar(cloneVector3(lastPoint.binormal), cs.y);
+            const modifiedCS = applyModifiers(cs.x, cs.y, 1, modifiers);
+            const offsetNormal = scaleVector3ByScalar(cloneVector3(lastPoint.normal), modifiedCS.x);
+            const offsetBinormal = scaleVector3ByScalar(cloneVector3(lastPoint.binormal), modifiedCS.y);
             const vertexPos = addVector3AndVector3(
                 addVector3AndVector3(cloneVector3(lastPoint.position), offsetNormal),
                 offsetBinormal
@@ -162,9 +199,9 @@ const generateSplineMeshRawData = (
 };
 
 export const createSplineMeshGeometry = (args: SplineMeshGeometryArgs): Geometry => {
-    const { gpu, controlPoints, crossSection, segmentSamples = 10, dynamic = false, caps = true } = args;
+    const { gpu, controlPoints, crossSection, segmentSamples = 10, dynamic = false, caps = true, modifiers } = args;
 
-    const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps);
+    const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps, modifiers);
 
     const usageType = dynamic ? ATTRIBUTE_USAGE_TYPE_DYNAMIC_DRAW : ATTRIBUTE_USAGE_TYPE_STATIC_DRAW;
 
@@ -189,9 +226,10 @@ export const updateSplineMeshGeometry = (
     controlPoints: Vector3[],
     crossSection: CrossSection,
     segmentSamples: number = 10,
-    caps: boolean = true
+    caps: boolean = true,
+    modifiers?: SplineMeshModifiers
 ) => {
-    const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps);
+    const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps, modifiers);
 
     updateGeometryAttribute(geometry, ATTRIBUTE_NAME_POSITION, new Float32Array(rawData.positions));
     updateGeometryAttribute(geometry, ATTRIBUTE_NAME_NORMAL, new Float32Array(rawData.normals));

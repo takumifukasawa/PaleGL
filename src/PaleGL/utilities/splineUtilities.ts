@@ -135,15 +135,6 @@ export const sampleSplinePoints = (
             ? controlPoints[i + 2]
             : subVectorsV3(scaleVector3ByScalar(cloneVector3(p2), 2), p1);
 
-        if (i === 0) {
-            console.log('[Spline Debug] Control points for segment 0:', {
-                p0: [p0[0], p0[1], p0[2]],
-                p1: [p1[0], p1[1], p1[2]],
-                p2: [p2[0], p2[1], p2[2]],
-                p3: [p3[0], p3[1], p3[2]],
-            });
-        }
-
         const samples = i === segments - 1 ? segmentSamples + 1 : segmentSamples;
 
         for (let j = 0; j < samples; j++) {
@@ -151,13 +142,6 @@ export const sampleSplinePoints = (
             const position = evaluateCatmullRomSpline(t, p0, p1, p2, p3);
             const tangent = getCatmullRomSplineTangent(t, p0, p1, p2, p3);
             const { normal, binormal } = getFrenetFrame(tangent);
-
-            if (i === 0 && j < 3) {
-                console.log(`[Spline Debug] Sample ${j} (t=${t}):`, {
-                    position: [position[0], position[1], position[2]],
-                    tangent: [tangent[0], tangent[1], tangent[2]],
-                });
-            }
 
             points.push({ position, tangent, normal, binormal });
         }
