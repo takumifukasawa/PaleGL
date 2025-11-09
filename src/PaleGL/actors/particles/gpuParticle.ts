@@ -41,18 +41,17 @@ import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDouble
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
-export type GPUParticleArgs = InstancingParticleArgs & {
+export type GPUParticleArgsBase = InstancingParticleArgs & {
     gpu: Gpu;
     vatWidth: number;
     vatHeight: number;
-    // initializeFragmentShader: string;
-    // updateFragmentShader: string;
-    // initializeFragmentModifiers?: FragmentShaderModifiers;
-    // updateFragmentModifiers?: FragmentShaderModifiers;
     shaders: GPUParticleUpdaterShaders[];
     initialUpdaterIndex?: number;
-    useVATLookForward?: boolean;
 };
+
+export type GPUParticleArgs = GPUParticleArgsBase & {
+    useVATLookForward?: boolean;
+}
 
 export type GPUParticleUpdaterShaders = {
     initializeFragmentShader: string;
@@ -65,7 +64,7 @@ export type GPUParticleUpdaterShaders = {
 // materialForUpdate: Material;
 export type GPUParticleUpdater = [Material, Material];
 
-export type GpuParticle = Mesh & {
+export type GpuParticleBase = Mesh & {
     mrtDoubleBuffer: MRTDoubleBuffer;
     // materialForInitialize: Material;
     // materialForUpdate: Material;
@@ -76,6 +75,9 @@ export type GpuParticle = Mesh & {
     prevUpdaterIndex: number;
     updaterIndex: number;
     updaters: GPUParticleUpdater[];
+};
+
+export type GpuParticle = GpuParticleBase & {
     useVATLookForward: boolean;
 };
 
@@ -273,13 +275,13 @@ export const overrideGPUParticleMaterialSettings = (gpuParticle: GpuParticle) =>
     });
 };
 
-export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticle) => {
+export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: GpuParticleBase) => {
     const [materialForInitialize] = gpuParticle.updaters[gpuParticle.updaterIndex];
     const { mrtDoubleBuffer } = gpuParticle;
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
 };
 
-export const switchGPUParticleUpdater = (gpuParticle: GpuParticle, index: number) => {
+export const switchGPUParticleUpdater = (gpuParticle: GpuParticleBase, index: number) => {
     gpuParticle.updaterIndex = index;
 };

@@ -36,34 +36,18 @@ import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.t
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
+    GPUParticleArgsBase, GpuParticleBase,
     GPUParticleUpdater,
     GPUParticleUpdaterShaders,
     renderMRTDoubleBufferAndSwap,
     resetGPUParticleByInitialize,
 } from '@/PaleGL/actors/particles/gpuParticle.ts';
 
-export type GPUTrailParticleArgs = InstancingParticleArgs & {
-    gpu: Gpu;
+export type GPUTrailParticleArgs = GPUParticleArgsBase & {
     mesh: Mesh;
-    vatWidth: number;
-    vatHeight: number;
-    // initializeFragmentShader: string;
-    // updateFragmentShader: string;
-    shaders: GPUParticleUpdaterShaders[];
-    initialUpdaterIndex?: number;
 };
 
-// export type InstancingParticle = Mesh & { positionGraphicsDoubleBuffer: GraphicsDoubleBuffer };
-export type GPUTrailParticle = Mesh & {
-    mrtDoubleBuffer: MRTDoubleBuffer;
-    // materialForInitialize: Material;
-    // materialForUpdate: Material;
-    vatWidth: number;
-    vatHeight: number;
-    prevUpdaterIndex: number;
-    updaterIndex: number;
-    updaters: GPUParticleUpdater[];
-};
+export type GPUTrailParticle = GpuParticleBase;
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
