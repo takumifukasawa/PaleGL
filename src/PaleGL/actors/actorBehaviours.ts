@@ -167,6 +167,16 @@ export const beforeRenderActor = (actor: Actor, args: ActorBeforeRenderArgs) => 
     });
 };
 
+export const preProcessActorTimeline = (actor: Actor, timelineTime: number) => {
+    actor.onPreProcessTimeline.forEach((cb) => cb(timelineTime));
+    // TODO: componentで必要になったら呼ぶ
+    actor.components.forEach(([model, behaviour]) => {
+        // component.processTimeline?.(timelineTime, timelinePrevTime, timelineDeltaTime);
+        // behaviour.onPostProcessTimeline?.(actor, model, timelineTime);
+        behaviour.onPreProcessTimeline?.(actor, model, timelineTime);
+    });
+};
+
 export const processActorPropertyBinder = <T extends TimelinePropertyValue>(
     actor: Actor,
     key: string,
@@ -183,12 +193,11 @@ export const processActorPropertyBinder = <T extends TimelinePropertyValue>(
     });
 };
 
-export const preProcessActorTimeline = (actor: Actor, timelineTime: number) => {
-    actor.onPreProcessTimeline.forEach((cb) => cb(timelineTime));
-    // TODO: componentで必要になったら呼ぶ
-    // _components.forEach((component) => {
-    //     component.processTimeline?.(timelineTime, timelinePrevTime, timelineDeltaTime);
-    // });
+export const processActorPostProcessClip = (actor: Actor, clip: MarionetterClipKinds, clipTime: number) => {
+    actor.onPostProcessClip.forEach((cb) => cb(clip, clipTime));
+    actor.components.forEach(([model, behaviour]) => {
+        behaviour.onPostProcessClip?.(actor, model, clip, clipTime);
+    });
 };
 
 export const postProcessActorTimeline = (actor: Actor, timelineTime: number) => {

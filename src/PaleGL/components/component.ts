@@ -1,4 +1,4 @@
-import { TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, TimelinePropertyValue } from '@/Marionetter/types';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { COMPONENT_TYPE_DEFAULT, ComponentType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -41,13 +41,28 @@ type OnLastUpdateCallback = (
     deltaTime: number
 ) => void;
 type OnFilterPropertyBinderCallback = (key: string) => boolean;
+export type OnPreProcessTimelineCallback = (
+    actor: Actor,
+    componentModel: ComponentModel,
+    timelineTime: number
+) => void;
 export type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
     actor: Actor,
     componentModel: ComponentModel,
     key: string,
     value: T
 ) => void;
-type OnPostProcessTimelineCallback = (actor: Actor, componentModel: ComponentModel, timelineTime: number) => void;
+export type OnPostProcessClipCallback = (
+    actor: Actor,
+    componentModel: ComponentModel,
+    clip: MarionetterClipKinds,
+    clipTime: number
+) => void;
+export type OnPostProcessTimelineCallback = (
+    actor: Actor,
+    componentModel: ComponentModel,
+    timelineTime: number
+) => void;
 type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu) => void;
 
 export type ComponentModel = {
@@ -63,7 +78,9 @@ export type ComponentBehaviour = {
     onUpdateCallback?: OnUpdateCallback;
     onLastUpdateCallback?: OnLastUpdateCallback;
     onFilterPropertyBinder: OnFilterPropertyBinderCallback;
+    onPreProcessTimeline?: OnPreProcessTimelineCallback;
     onProcessPropertyBinder?: OnProcessPropertyBinderCallback;
+    onPostProcessClip?: OnPostProcessClipCallback;
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
     onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
@@ -73,11 +90,6 @@ export type Component<T extends ComponentModel = ComponentModel, U extends Compo
     T,
     U,
 ];
-// name: string,
-// actor: Actor | undefined,
-// onStartCallback?: OnStartCallback,
-// onProcessPropertyBinder?: OnProcessPropertyBinderCallback,
-// }
 
 export type ComponentArgs = {
     name?: string;
@@ -88,7 +100,9 @@ export type ComponentArgs = {
     onUpdateCallback?: OnUpdateCallback;
     onLastUpdateCallback?: OnLastUpdateCallback;
     onFilterPropertyBinder?: OnFilterPropertyBinderCallback;
+    onPreProcessTimeline?: OnPreProcessTimelineCallback;
     onProcessPropertyBinder?: OnProcessPropertyBinderCallback;
+    onPostProcessClip?: OnPostProcessClipCallback;
     onPostProcessTimeline?: OnPostProcessTimelineCallback;
     onBeforeRenderCallback?: OnBeforeRenderCallback;
 };
@@ -111,7 +125,9 @@ export const createComponent = <
         onUpdateCallback,
         onLastUpdateCallback,
         onFilterPropertyBinder = () => true,
+        onPreProcessTimeline,
         onProcessPropertyBinder,
+        onPostProcessClip,
         onPostProcessTimeline,
         onBeforeRenderCallback,
     } = args;
@@ -127,7 +143,9 @@ export const createComponent = <
         onUpdateCallback,
         onLastUpdateCallback,
         onFilterPropertyBinder,
+        onPreProcessTimeline,
         onProcessPropertyBinder,
+        onPostProcessClip,
         onPostProcessTimeline,
         onBeforeRenderCallback,
         ...additionalBehaviour,

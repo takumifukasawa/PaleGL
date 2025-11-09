@@ -83,6 +83,7 @@ import { Actor, getActorComponent } from '@/PaleGL/actors/actor.ts';
 import {
     postProcessActorTimeline,
     preProcessActorTimeline,
+    processActorPostProcessClip,
     processActorPropertyBinder,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { updateProjectionMatrix } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
@@ -655,7 +656,7 @@ function createMarionetterAnimationClip(
             processActorPropertyBinder(actor, key, color, animationClip, timeInClip);
         });
 
-        actor.onPostProcessClip.forEach((cb) => cb(animationClip, timeInClip));
+        processActorPostProcessClip(actor, animationClip, timeInClip);
     };
 
     return animationClip;
@@ -779,7 +780,7 @@ function createMarionetterLightControlClip(
         //     obj.range = range;
         // }
 
-        actor.onPostProcessClip.forEach((cb) => cb(lightControlClip, timeInClip));
+        processActorPostProcessClip(actor, lightControlClip, timeInClip);
     };
 
     return lightControlClip;
@@ -805,7 +806,7 @@ function createMarionetterActivationControlClip(
         execute: (args) => {
             const { actor, time } = args;
             const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
-            actor.onPostProcessClip.forEach((cb) => cb(activationControlClip, timeInClip));
+            processActorPostProcessClip(actor, activationControlClip, timeInClip);
         },
     };
 
