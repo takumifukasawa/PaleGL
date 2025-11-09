@@ -233,3 +233,11 @@ vec3 fRandomInSphere(float v) {
 vec3 fRandomOnPlane(vec3 plane, float seed) {
   return vec3(fRand(seed) * plane.x, plane.y, fRand(seed + 1.) * plane.z) - vec3(plane.x, 0., plane.z) * .5;
 }
+
+float fBlockNoise(vec2 st, vec2 scale, vec2 offset) {
+    st *= scale;
+    vec2 ipos = floor(st);
+    // vec2 fpos = fract(st);
+    float r = fRand(ipos + offset);
+    return r;
+}

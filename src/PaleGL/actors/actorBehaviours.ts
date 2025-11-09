@@ -256,3 +256,25 @@ export const disposeActor = (actor: Actor) => {
             break;
     }
 };
+
+
+export const isActorEnabledInHierarchy = (actor: Actor) => {
+    if (!actor.enabled) {
+        return false;
+    }
+    let targetActor: Actor = actor;
+    let parent: Actor | null = null;
+    while (true) {
+        parent = targetActor.parent;
+        // 親がnullになるまでsearch
+        if (parent) {
+            if (parent.enabled) {
+                targetActor = parent;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+};

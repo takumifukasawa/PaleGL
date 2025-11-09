@@ -15,13 +15,13 @@ uniform float uBlendRate;
 // ref: https://www.sawcegames.com/en/post/nier-automata-glitch
 // License: Unspecified (© Sawce 2025)
 
-float fBlockNoise(vec2 st, vec2 scale, vec2 offset) {
-    st *= scale;
-    vec2 ipos = floor(st);
-    // vec2 fpos = fract(st);
-    float r = fRand(ipos + offset);
-    return r;
-}
+// float fBlockNoise(vec2 st, vec2 scale, vec2 offset) {
+//     st *= scale;
+//     vec2 ipos = floor(st);
+//     // vec2 fpos = fract(st);
+//     float r = fRand(ipos + offset);
+//     return r;
+// }
 
 void main() {
     vec2 uv = vUv;

@@ -1,5 +1,5 @@
 ﻿import { Actor } from '@/PaleGL/actors/actor.ts';
-import { updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
+import { isActorEnabledInHierarchy, updateActorTransform } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera, CameraRenderTargetType } from '@/PaleGL/actors/cameras/camera.ts';
 import {
     getCameraForward,
@@ -832,26 +832,6 @@ export function beforeRenderRenderer(renderer: Renderer, time: number, deltaTime
     updateCommonUniforms(renderer, { time, deltaTime });
 }
 
-const isActorEnabledInHierarchy = (actor: Actor) => {
-    if (!actor.enabled) {
-        return false;
-    }
-    let targetActor: Actor = actor;
-    let parent: Actor | null = null;
-    while (true) {
-        parent = targetActor.parent;
-        // 親がnullになるまでsearch
-        if (parent) {
-            if (parent.enabled) {
-                targetActor = parent;
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
-};
 
 export function renderRenderer(
     renderer: Renderer,
