@@ -57,6 +57,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     options: UIShapeTextMeshArgs<T, U>
 ): UIShapeTextMesh<T, U> {
     const {
+        name,
         anchor = UI_ANCHOR_TYPE_CENTER,
         align,
         characterSpacing = 0,
@@ -68,7 +69,7 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
         shapeFontTexture
     } = options;
 
-    const actor = options.actor || createUIActor({ name: 'ui-shape-text-mesh' });
+    const actor = options.actor || createUIActor({ name });
 
     const baseUniforms: UniformsData = [
         ['uColor', UNIFORM_TYPE_COLOR, color],

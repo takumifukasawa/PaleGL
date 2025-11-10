@@ -10,7 +10,7 @@ import { Scene } from '@/PaleGL/core/scene.ts';
 // export type ComponentUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
 // export type ComponentLastUpdateArgs = { gpu: Gpu; time: number; deltaTime: number };
 
-type OnStartCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu, scene: Scene) => void;
+export type OnStartCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu, scene: Scene) => void;
 type OnFixedUpdateCallback = (
     actor: Actor,
     componentModel: ComponentModel,
