@@ -184,7 +184,7 @@ export function createPlayer(
                 if (sceneViewCameraEntity) {
                     sceneViewCameraEntity.near = data.cameraNear;
                     sceneViewCameraEntity.far = data.cameraFar;
-                    if (sceneViewCameraEntity.type === CAMERA_TYPE_PERSPECTIVE) {
+                    if (sceneViewCameraEntity.cameraType === CAMERA_TYPE_PERSPECTIVE) {
                         (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
                     }
                     setTranslation(
@@ -346,22 +346,10 @@ function buildScene(
         createSceneUICamera(player.scene);
         setCameraPostProcess(camera, cameraPostProcess);
         cachedPlayerCamera = camera;
-        // subscribeActorOnUpdate(camera, () => {
-        //     console.log("camera", camera.near, camera.far, (camera as PerspectiveCamera).fov);
-        // });
     }
 
-    // // orbit camera controller
-    // orbitCameraEntity = createOrbitCamera(player, inputController, cameraPostProcess);
-
-    // if (!tmpSceneViewCamera) {
-    //     sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
-    // }
     if (player.hotRebuildSceneEnabled || initialBuild) {
         sceneViewCameraEntity = createSceneViewCamera(player, cameraPostProcess);
-        // subscribeActorOnUpdate(sceneViewCameraEntity, () => {
-        //     console.log("s-camera", sceneViewCameraEntity.near, sceneViewCameraEntity.far, (sceneViewCameraEntity as PerspectiveCamera).fov);
-        // });
     }
 
     player.marionetter = marionetter;
