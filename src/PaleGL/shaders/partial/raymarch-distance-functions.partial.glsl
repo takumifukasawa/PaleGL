@@ -43,10 +43,10 @@ vec2 fOpRo(vec2 p, float a) {
 // xz: 前後回転: -で前
 // xy: 上下回転: -で上
 // yz: ひねり: +で[+z->-y]側へひねり
-vec3 fOpRot3(vec3 p, float xz, float xy, float yz) {
-    p.xz = fOpRo(p.xz, -xz);
-    p.xy = fOpRo(p.xy, -xy);
-    p.yz = fOpRo(p.yz, -yz);
+vec3 fOpRot3(vec3 p, float x, float y, float z) {
+    p.xy = fOpRo(p.xy, -z); // z
+    p.yz = fOpRo(p.yz, -x); // x
+    p.xz = fOpRo(p.xz, -y); // y
     return p;
 }
 
