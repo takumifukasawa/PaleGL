@@ -2,6 +2,13 @@
 // human distance functions ---------------------------------------------------
 //
 
+struct sHuman {
+    vec3 smPelvisP;
+    vec3 smHeadP;
+    float smDist;
+};
+
+
 uniform vec3 uAdjustScale;
 
 vec3 fOpHumanRot3(vec3 p, float axis, vec3 rot) {
@@ -460,7 +467,7 @@ float fdfLeg(
     return d;
 }
 
-float fDfHuman(
+sHuman fDfHuman(
     vec3 p,
     // ---   
     vec3 pelvisPosition,
@@ -480,6 +487,8 @@ float fDfHuman(
     vec3 rightWristRotation
     // ---    
 ) {
+    sHuman humanObj;
+
     vec3 q = fOpTr(p, vec3(0., -1.5, 0.)); // boundsの高さの半分、地面の高さまで手動オフセット
     float d = 1e6;
     
@@ -493,6 +502,8 @@ float fDfHuman(
     // pShoulder.xz = fOpRo(pShoulder.xz, PI * axis * shoulderRot.y); // ひねり
     // pShoulder.xy = fOpRo(pShoulder.xy, PI * axis * shoulderRot.z); // 上下
     // pShoulder.yz = fOpRo(pShoulder.yz, -PI * shoulderRot.x); // 前後
+  
+    humanObj.smPelvisP = pPelvis;
     
     vec3 _pPelvis = pPelvis;
     // _pPelvis.xz *= 2.;
@@ -575,6 +586,8 @@ float fDfHuman(
         // dNeck,
         .02
     );
+  
+    humanObj.smHeadP = _pHead2;
     
     // metaball begin ---
     float du = 2.4; // metaball head duration
@@ -645,8 +658,11 @@ float fDfHuman(
     // d = fDfBox(q, vec3(2.));
     // p.yz = fOpRo(p.yz, PI * .2);
     // d = fDfRcot(p, .05, .08, .8);
+   
+    humanObj.smDist = d;
     
-    return d;
+    // return d;
+    return humanObj;
 }
 
 
@@ -771,7 +787,7 @@ float fDfHumanGiant(
         d,
         pSpine2,
         -1.,
-        leftShoulderRotation * vec3(-1., 1., 1.),
+        leftShoulderRotation * vec3(1., 1., 1.),
         leftElbowRotation * vec3(-1., -1., -1.),
         leftWristRotation
     );
@@ -780,7 +796,7 @@ float fDfHumanGiant(
         d,
         pSpine2,
         1.,
-        rightShoulderRotation * vec3(1., -1., -1.),
+        rightShoulderRotation * vec3(-1., -1., -1.),
         rightElbowRotation * vec3(1., 1., 1.),
         rightWristRotation
     );
