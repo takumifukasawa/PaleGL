@@ -16,13 +16,28 @@ function parseShaderCache(shaderCachePath: string): Map<string, string> {
     try {
         const content = fs.readFileSync(shaderCachePath, 'utf-8');
 
+        console.log('[inlineShaderPlugin] shaderCache.ts file read successfully');
+        console.log('[inlineShaderPlugin] Content length:', content.length);
+
+        // shaderPathMapの位置を探す
+        const mapStart = content.indexOf('const shaderPathMap');
+        console.log('[inlineShaderPlugin] shaderPathMap found at position:', mapStart);
+
+        if (mapStart !== -1) {
+            const excerpt = content.substring(mapStart, mapStart + 500);
+            console.log('[inlineShaderPlugin] shaderPathMap excerpt:\n', excerpt);
+        }
+
         // shaderPathMap の内容を抽出
         // [CONST_NAME, getShaderPathInternal('filename.glsl')] のパターンを探す
-        const mapEntryPattern = /\[(SHADER_[A-Z_]+),\s*getShaderPathInternal\('([^']+)'\)\]/g;
+        // 複数行にわたるエントリーにも対応（s フラグで . が改行にマッチ）
+        const mapEntryPattern = /\[\s*(SHADER_[A-Z_]+)\s*,\s*getShaderPathInternal\(\s*'([^']+)'\s*\)\s*\]/gs;
 
         let match;
+        let matchCount = 0;
         while ((match = mapEntryPattern.exec(content)) !== null) {
-            const [, constantName, fileName] = match;
+            const [fullMatch, constantName, fileName] = match;
+            console.log(`[inlineShaderPlugin] Match ${++matchCount}: ${constantName} -> ${fileName}`);
             shaderFileMap.set(constantName, fileName);
         }
 
