@@ -37,11 +37,9 @@ import {
     VertexShaderModifiers,
 } from '@/PaleGL/constants.ts';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
-import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
-// import uniformBlockCommon from '@/PaleGL/shaders/partial/uniform-block-common.glsl';
-// import uniformBlockTransformations from '@/PaleGL/shaders/partial/uniform-block-transformations.glsl';
-// import uniformBlockCamera from '@/PaleGL/shaders/partial/uniform-block-cameras.glsl';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
+import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
 import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
@@ -68,7 +66,9 @@ import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.par
 import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
 import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+// CUSTOM_BEGIN
+import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
+// CUSTOM_END
 
 export type ShaderDefines = {
     receiveShadow: boolean;
@@ -115,7 +115,7 @@ const includesDict = new Map<string, string>([
     ['perlin', perlinPartialContent],
     ['curl_noise', curlNoisePartialContent],
     // CUSTOM_BEGIN
-    // ['human_df']
+    ['human_df', raymarchHumanFunctionsPartialContent]
     // CUSTOM_END
 ]);
 
