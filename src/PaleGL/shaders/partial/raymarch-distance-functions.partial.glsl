@@ -266,3 +266,19 @@ float fDfVes(vec3 p, vec3 a, vec3 b, float w)
  
     return length(q-h.xy) - h.z;
 }
+
+// curve ------------------------
+
+float fExpImpulse(float x, float k) {
+    float h = k*x;
+    return h*exp(1.0-h);
+}
+
+float fParabola(float x, float k) {
+    return pow( 4.0*x*(1.0-x), k );
+}
+
+float fPcurve(float x, float a, float b) {
+    float k = pow(a+b,a+b)/(pow(a,a)*pow(b,b));
+    return k*pow(x,a)*pow(1.0-x,b);
+}
