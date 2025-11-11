@@ -1,18 +1,57 @@
 import { Plugin } from 'vite';
 import * as path from 'node:path';
+import * as fs from 'node:fs';
 
 export type InlineShaderPluginOptions = {
-    /** シェーダー定数名 → ファイル名のマッピング */
-    shaderFileMap: Map<string, string>;
     /** シェーダーインライン化の対象ディレクトリ */
     targetDirs: string[];
 };
+
+/**
+ * shaderCache.tsを解析してシェーダーマッピングを自動構築
+ */
+function parseShaderCache(shaderCachePath: string): Map<string, string> {
+    const shaderFileMap = new Map<string, string>();
+
+    try {
+        const content = fs.readFileSync(shaderCachePath, 'utf-8');
+
+        // shaderPathMap の内容を抽出
+        // [CONST_NAME, getShaderPathInternal('filename.glsl')] のパターンを探す
+        const mapEntryPattern = /\[(SHADER_[A-Z_]+),\s*getShaderPathInternal\('([^']+)'\)\]/g;
+
+        let match;
+        while ((match = mapEntryPattern.exec(content)) !== null) {
+            const [, constantName, fileName] = match;
+            shaderFileMap.set(constantName, fileName);
+        }
+
+        console.log(`[inlineShaderPlugin] Parsed ${shaderFileMap.size} shader mappings from shaderCache.ts`);
+
+        // デバッグ用: 最初の5個を表示
+        let count = 0;
+        for (const [key, value] of shaderFileMap.entries()) {
+            if (count++ < 5) {
+                console.log(`  ${key} -> ${value}`);
+            }
+        }
+        if (shaderFileMap.size > 5) {
+            console.log(`  ... and ${shaderFileMap.size - 5} more`);
+        }
+    } catch (error) {
+        console.error('[inlineShaderPlugin] Failed to parse shaderCache.ts:', error);
+    }
+
+    return shaderFileMap;
+}
 
 /**
  * シェーダーインライン化プラグイン
  *
  * ビルド時（VITE_COMPACT=true）に、getShaderCache(SHADER_XXX) / getShaderPath(SHADER_XXX) 呼び出しを
  * 直接importに変換し、watchShader.ts/shaderCache.tsをTree-shakingで削除可能にする。
+ *
+ * shaderCache.tsから自動的にマッピングを構築するため、手動での管理は不要。
  *
  * 改行やコメント（// prettier-ignore等）を含む複数行の呼び出しにも対応。
  *
@@ -26,9 +65,10 @@ export type InlineShaderPluginOptions = {
  *         const shader = __inline_shader_0;
  */
 export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin => {
-    const { shaderFileMap, targetDirs } = options;
+    const { targetDirs } = options;
 
     let isCompact = false;
+    let shaderFileMap = new Map<string, string>();
 
     return {
         name: 'inline-shader-plugin',
@@ -38,6 +78,10 @@ export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin =
             isCompact = config.env.VITE_COMPACT === 'true';
             if (isCompact) {
                 console.log('[inlineShaderPlugin] Shader inlining enabled (VITE_COMPACT=true)');
+
+                // shaderCache.tsのパスを解決
+                const shaderCachePath = path.resolve(__dirname, '../../src/pages/scripts/shaderCache.ts');
+                shaderFileMap = parseShaderCache(shaderCachePath);
             }
         },
 
