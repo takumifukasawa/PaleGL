@@ -7,9 +7,35 @@ struct sHuman {
     vec3 smHeadP;
     float smDist;
 };
-
-
+ 
 uniform vec3 uAdjustScale;
+
+uniform sampler2D uAnimationTexture;
+uniform int uClipStartRow;        // クリップのテクスチャ開始行
+uniform int uClipFrameCount;      // クリップの実際のフレーム数（可変）
+uniform float uAnimationTime;     // クリップ内の経過時間（秒）
+uniform float uAnimationFPS;      // FPS（デフォルト30）
+
+vec3 fGetJointInfo(int jointIndex) {
+    // クリップ内のフレームインデックスを計算（フレーム数は可変）
+    int frameIndex = int(mod(uAnimationTime * uAnimationFPS, float(uClipFrameCount)));
+
+    // テクスチャのY座標 = クリップ開始行 + ジョイントインデックス
+    int rowIndex = uClipStartRow + jointIndex;
+
+#ifdef USE_INSTANCING
+    // インスタンシング時は各インスタンスで時間をずらす
+    frameIndex = int(mod((uAnimationTime + vInstanceId * 0.1) * uAnimationFPS, float(uClipFrameCount)));
+#endif
+
+    return texelFetch(uAnimationTexture, ivec2(frameIndex, rowIndex), 0).xyz;
+}
+
+
+ 
+
+// human df ------------------------------------------
+
 
 vec3 fOpHumanRot3(vec3 p, float axis, vec3 rot) {
     vec3 _p = p;
