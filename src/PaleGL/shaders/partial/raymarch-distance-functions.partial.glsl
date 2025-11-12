@@ -86,10 +86,10 @@ float fOpSub(float d1, float d2) {
     return max(-d1, d2);
 }
 
-// // intersection
-// float fOpInter(float d1, float d2) {
-//     return maax(d1, d2);
-// }
+// intersection
+float fOpIntersection(float d1, float d2) {
+    return max(d1, d2);
+}
 
 // smooth union
 float fOpSm( float d1, float d2, float k )
