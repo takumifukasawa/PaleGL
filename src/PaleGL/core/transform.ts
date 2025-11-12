@@ -1,19 +1,5 @@
-﻿import {
-    cloneVector3,
-    createForwardV3,
-    createRightV3,
-    createUpV3,
-    createVector3,
-    createVector3One,
-    createVector3Up,
-    createVector3Zero,
-    multiplyVector3AndMatrix4,
-    normalizeVector3,
-    setV3x,
-    setV3y,
-    setV3z,
-    Vector3,
-} from '@/PaleGL/math/vector3.ts';
+﻿import { Actor } from '@/PaleGL/actors/actor.ts';
+import { ACTOR_TYPE_CAMERA } from '@/PaleGL/constants.js';
 import {
     assignMat4Identity,
     createLookAtMatrixRef,
@@ -34,7 +20,7 @@ import {
     multiplyTranslationMatrix,
     transposeMat4,
 } from '@/PaleGL/math/matrix4.ts';
-import { ACTOR_TYPE_CAMERA } from '@/PaleGL/constants.js';
+import { multiplyRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 import {
     createRotatorZero,
     Rotator,
@@ -42,8 +28,22 @@ import {
     setRotatorRotationDegreeY,
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
-import { multiplyRotationMatrixFromQuaternion } from '@/PaleGL/math/quaternion.ts';
-import { Actor } from '@/PaleGL/actors/actor.ts';
+import {
+    cloneVector3,
+    createForwardV3,
+    createRightV3,
+    createUpV3,
+    createVector3,
+    createVector3One,
+    createVector3Up,
+    createVector3Zero,
+    multiplyVector3AndMatrix4,
+    normalizeVector3,
+    setV3x,
+    setV3y,
+    setV3z,
+    Vector3,
+} from '@/PaleGL/math/vector3.ts';
 
 export type Transform = {
     inverseWorldMatrix: Matrix4;
@@ -135,8 +135,9 @@ export const worldToLocalPoint = (transform: Transform, p: Vector3) =>
     multiplyVector3AndMatrix4(p, transform.inverseWorldMatrix);
 export const worldToLocalDir = (transform: Transform, dir: Vector3) =>
     multiplyVector3AndMatrix4(dir, transform.normalMatrix);
-   
-export const getWorldPosition = (transform: Transform) => multiplyVector3AndMatrix4(cloneVector3(transform.position), transform.worldMatrix);
+
+export const getWorldPosition = (transform: Transform) =>
+    multiplyVector3AndMatrix4(cloneVector3(transform.position), transform.worldMatrix);
 
 export const updateActorTransformMatrix = (actor: Actor) => {
     if (actor.transform.lookAtTarget || actor.transform.lookAtTargetActor) {
@@ -230,5 +231,7 @@ export const updateActorTransformMatrix = (actor: Actor) => {
     // // console.log(`hogehoge - update matrix - name: ${_actor?.name}, is started: ${_actor?.isStarted}, actor: ${_actor}, parent: ${_actor?.parent}, ${_worldMatrix.e}, ${_localMatrix.e}`);
 
     // actor.transform.normalMatrix = transposeMat4(invertMat4(cloneMat4(actor.transform.worldMatrix)));
-    actor.transform.normalMatrix = transposeMat4(invertMat4Ref(actor.transform.normalMatrix, actor.transform.worldMatrix));
+    actor.transform.normalMatrix = transposeMat4(
+        invertMat4Ref(actor.transform.normalMatrix, actor.transform.worldMatrix)
+    );
 };

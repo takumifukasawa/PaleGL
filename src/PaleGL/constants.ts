@@ -130,6 +130,7 @@ export const MESH_TYPE_TEXT = 4;
 // UI: 5,
 export const MESH_TYPE_SPRITE_ATLAS = 6;
 export const MESH_TYPE_SPLINE = 7;
+export const MESH_TYPE_SPLINE_INSTANCING = 8;
 
 export type MeshType =
     | typeof MESH_TYPE_DEFAULT
@@ -138,7 +139,8 @@ export type MeshType =
     | typeof MESH_TYPE_SCREEN_SPACE_RAYMARCH
     | typeof MESH_TYPE_TEXT
     | typeof MESH_TYPE_SPRITE_ATLAS
-    | typeof MESH_TYPE_SPLINE;
+    | typeof MESH_TYPE_SPLINE
+    | typeof MESH_TYPE_SPLINE_INSTANCING;
 
 export const MATERIAL_TYPE_MISC = 0;
 export const MATERIAL_TYPE_G_BUFFER = 1;
