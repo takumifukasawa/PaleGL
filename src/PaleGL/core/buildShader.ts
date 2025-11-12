@@ -68,6 +68,7 @@ import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/ve
 import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 // CUSTOM_BEGIN
 import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
+import raymarchHumanFunctionsPostPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions-post.partial.glsl';
 // CUSTOM_END
 
 export type ShaderDefines = {
@@ -115,7 +116,8 @@ const includesDict = new Map<string, string>([
     ['perlin', perlinPartialContent],
     ['curl_noise', curlNoisePartialContent],
     // CUSTOM_BEGIN
-    ['human_df', raymarchHumanFunctionsPartialContent]
+    ['human_df', raymarchHumanFunctionsPartialContent],
+    ['human_dfp', raymarchHumanFunctionsPostPartialContent]
     // CUSTOM_END
 ]);
 
