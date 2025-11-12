@@ -6,6 +6,7 @@
 #include <tone>
 #include <gbuffer>
 #include <vcolor_fh>
+#include <normal_map_fh>
 
 #pragma APPEND_INCLUDE
 
