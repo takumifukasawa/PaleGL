@@ -31,6 +31,53 @@ vec3 fGetJointInfo(int jointIndex) {
     return texelFetch(uAnimationTexture, ivec2(frameIndex, rowIndex), 0).xyz;
 }
 
+// TODO: 共通化できる
+// raymarch-scene-functions.partial.glsl
+vec3 fToLocal(vec3 p, mat4 WtoO, vec3 scale) {
+    // scale = vec3(1.);
+    return (WtoO * vec4(p, 1.)).xyz * scale;
+}
+
+// TODO: 共通化できる
+// raymarch-scene-functions.partial.glsl
+bool fIsDfInnerBox(vec3 p, vec3 scale) {
+    // scale = vec3(1.);
+    // 0 だとマッハバンドっぽい境目が出るのでちょっと余裕を持たせる
+    const float eps = .0001;
+    return
+        abs(p.x) < scale.x * .5 + eps &&
+        abs(p.y) < scale.y * .5 + eps &&
+        abs(p.z) < scale.z * .5 + eps;
+}
+
+// TODO: 共通化できる
+// 既存の深度値と比較して、奥にある場合は破棄する
+// object-space-raymarch-fragment-functions.partial.glsl
+void fCheckDiscardByCompareRayDepthAndSceneDepth(
+    vec3 currentRayPosition,
+    sampler2D depthTexture,
+    float nearClip,
+    float farClip,
+    mat4 viewMatrix
+) {
+    // 既存の深度値と比較して、奥にある場合は破棄する
+    float rawDepth = texelFetch(depthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, nearClip, farClip);
+    vec4 currentRayViewPosition = (viewMatrix * vec4(currentRayPosition, 1.));
+    float currentDepth = fViewZToLinearDepth(currentRayViewPosition.z, nearClip, farClip);
+    if(currentDepth >= sceneDepth) {
+        discard;
+    }
+}
+
+// TODO: 共通化できる
+// object-space-raymarch-fragment-functions.partial.glsl
+vec3 fGetOSRaymarchViewRayDirection(vec3 origin, vec3 viewPosition, float isPerspective) {
+    return isPerspective > .5
+        ? normalize(origin - viewPosition)
+        : normalize(-viewPosition);
+}
+
 
  
 
