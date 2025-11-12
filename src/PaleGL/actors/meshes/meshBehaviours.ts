@@ -1,6 +1,7 @@
 import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
 import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
+import { updateSplineMeshBehaviour } from '@/PaleGL/actors/meshes/createSplineMesh.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     updateObjectSpaceRaymarchDepthMaterial,
@@ -16,6 +17,7 @@ import {
     MESH_TYPE_OBJECT_SPACE_RAYMARCH,
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     MESH_TYPE_SKINNED,
+    MESH_TYPE_SPLINE,
     MeshType,
 } from '@/PaleGL/constants.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
@@ -230,6 +232,7 @@ export const updateMeshBehaviour: Partial<Record<MeshType, UpdateActorFunc>> = {
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
     [MESH_TYPE_SKINNED]: updateSkinnedMesh,
     [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchMesh,
+    [MESH_TYPE_SPLINE]: updateSplineMeshBehaviour,
 };
 
 export function updateMesh(actor: Actor, args: ActorUpdateArgs) {

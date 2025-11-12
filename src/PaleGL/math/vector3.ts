@@ -65,9 +65,9 @@ export const getVector3Distance = (v1: Vector3, v2: Vector3) => {
     return mag;
 };
 
-export const copyVector3 = (sv: Vector3, tv: Vector3) => {
-    setV3(sv, v3x(tv), v3y(tv), v3z(tv));
-    return sv;
+export const copyVector3 = (toV: Vector3, fromV: Vector3) => {
+    setV3(toV, v3x(fromV), v3y(fromV), v3z(fromV));
+    return toV;
 };
 
 export const normalizeVector3 = (v: Vector3) => {
