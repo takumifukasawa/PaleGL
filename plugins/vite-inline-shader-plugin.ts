@@ -16,43 +16,19 @@ function parseShaderCache(shaderCachePath: string): Map<string, string> {
     try {
         const content = fs.readFileSync(shaderCachePath, 'utf-8');
 
-        console.log('[inlineShaderPlugin] shaderCache.ts file read successfully');
-        console.log('[inlineShaderPlugin] Content length:', content.length);
-
-        // shaderPathMapの位置を探す
-        const mapStart = content.indexOf('const shaderPathMap');
-        console.log('[inlineShaderPlugin] shaderPathMap found at position:', mapStart);
-
-        if (mapStart !== -1) {
-            const excerpt = content.substring(mapStart, mapStart + 500);
-            console.log('[inlineShaderPlugin] shaderPathMap excerpt:\n', excerpt);
-        }
-
         // shaderPathMap の内容を抽出
         // [CONST_NAME, getShaderPathInternal('filename.glsl')] のパターンを探す
         // 複数行にわたるエントリーにも対応（s フラグで . が改行にマッチ）
-        const mapEntryPattern = /\[\s*(SHADER_[A-Z_]+)\s*,\s*getShaderPathInternal\(\s*'([^']+)'\s*\)\s*\]/gs;
+        // エントリー末尾のオプションのカンマにも対応
+        const mapEntryPattern = /\[\s*(SHADER_[A-Z_]+)\s*,\s*getShaderPathInternal\(\s*'([^']+)'\s*\)\s*,?\s*\]/gs;
 
         let match;
-        let matchCount = 0;
         while ((match = mapEntryPattern.exec(content)) !== null) {
-            const [fullMatch, constantName, fileName] = match;
-            console.log(`[inlineShaderPlugin] Match ${++matchCount}: ${constantName} -> ${fileName}`);
+            const [, constantName, fileName] = match;
             shaderFileMap.set(constantName, fileName);
         }
 
         console.log(`[inlineShaderPlugin] Parsed ${shaderFileMap.size} shader mappings from shaderCache.ts`);
-
-        // デバッグ用: 最初の5個を表示
-        let count = 0;
-        for (const [key, value] of shaderFileMap.entries()) {
-            if (count++ < 5) {
-                console.log(`  ${key} -> ${value}`);
-            }
-        }
-        if (shaderFileMap.size > 5) {
-            console.log(`  ... and ${shaderFileMap.size - 5} more`);
-        }
     } catch (error) {
         console.error('[inlineShaderPlugin] Failed to parse shaderCache.ts:', error);
     }
@@ -63,7 +39,7 @@ function parseShaderCache(shaderCachePath: string): Map<string, string> {
 /**
  * シェーダーインライン化プラグイン
  *
- * ビルド時（VITE_COMPACT=true）に、getShaderCache(SHADER_XXX) / getShaderPath(SHADER_XXX) 呼び出しを
+ * ビルド時（VITE_COMPACT=true）に、getShaderCache(SHADER_XXX) / getShaderPath(SHADER_XXX) / getShaderContent(SHADER_XXX) 呼び出しを
  * 直接importに変換し、watchShader.ts/shaderCache.tsをTree-shakingで削除可能にする。
  *
  * shaderCache.tsから自動的にマッピングを構築するため、手動での管理は不要。
@@ -72,12 +48,14 @@ function parseShaderCache(shaderCachePath: string): Map<string, string> {
  *
  * 変換例:
  * Before: const shader = getShaderCache(SHADER_OBJECT_SPACE_RAYMARCH_HUMAN);
+ * Before: const content = getShaderContent(SHADER_TEST_FLOOR);
  * Before: getShaderPath(
  *             // prettier-ignore
  *             SHADER_TEST_FLOOR
  *         )
  * After:  import __inline_shader_0 from '../shaders/object-space-raymarch-human-particle.glsl';
  *         const shader = __inline_shader_0;
+ *         const content = __inline_shader_0;
  */
 export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin => {
     const { targetDirs } = options;
@@ -106,6 +84,69 @@ export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin =
                 return null;
             }
 
+            // watchShader.ts の import.meta.glob を空のオブジェクトに置き換え
+            if (id.includes('watchShader.ts')) {
+                console.log('[inlineShaderPlugin] Replacing import.meta.glob in watchShader.ts');
+                const modified = code.replace(
+                    /const rawShaders = import\.meta\.glob\(\[[\s\S]*?\],\s*\{[\s\S]*?\}\);/g,
+                    'const rawShaders = {};'
+                );
+                return {
+                    code: modified,
+                    map: null,
+                };
+            }
+
+            // shaderCache.ts を完全に書き換えてシェーダーを直接importする
+            if (id.includes('shaderCache.ts')) {
+                console.log('[inlineShaderPlugin] Transforming shaderCache.ts to use direct imports');
+
+                // シェーダー定数の定義を抽出
+                const constantPattern = /export const (SHADER_[A-Z_]+) = '([^']+)';/g;
+                const constants: Array<{ name: string; key: string }> = [];
+                let match;
+                while ((match = constantPattern.exec(code)) !== null) {
+                    constants.push({
+                        name: match[1],
+                        key: match[2],
+                    });
+                }
+
+                // 新しいコードを生成
+                const importStatements: string[] = [];
+                const mapEntries: string[] = [];
+
+                constants.forEach((constant, index) => {
+                    const fileName = shaderFileMap.get(constant.name);
+                    if (fileName) {
+                        const varName = `__shader_${index}`;
+                        importStatements.push(`import ${varName} from '../shaders/${fileName}';`);
+                        mapEntries.push(`    [${constant.name}, ${varName}]`);
+                    }
+                });
+
+                const newCode = `// Auto-generated by inline-shader-plugin
+${constants.map((c) => `export const ${c.name} = '${c.key}';`).join('\n')}
+
+${importStatements.join('\n')}
+
+const shaderContentMap = new Map<string, string>([
+${mapEntries.join(',\n')}
+]);
+
+export const getShaderPath = (key: string) => '';
+export const getShaderCache = (key: string) => shaderContentMap.get(key) || '';
+export const getShaderContent = (key: string) => shaderContentMap.get(key) || '';
+`;
+
+                console.log(`[inlineShaderPlugin] Generated ${constants.length} shader imports in shaderCache.ts`);
+
+                return {
+                    code: newCode,
+                    map: null,
+                };
+            }
+
             // 対象ディレクトリのTSファイルのみ処理
             const isTargetFile = targetDirs.some((dir) => id.includes(dir)) && id.endsWith('.ts');
 
@@ -113,9 +154,9 @@ export const inlineShaderPlugin = (options: InlineShaderPluginOptions): Plugin =
                 return null;
             }
 
-            // getShaderCache() / getShaderPath() 呼び出しをチェック（改行・コメント対応）
+            // getShaderCache() / getShaderPath() / getShaderContent() 呼び出しをチェック（改行・コメント対応）
             // 括弧内の空白・改行・コメント（// prettier-ignore等）を許容
-            const getShaderPattern = /get(?:ShaderCache|ShaderPath)\s*\((?:\s|\/\/[^\n]*\n)*(SHADER_[A-Z_]+)\s*\)/g;
+            const getShaderPattern = /get(?:ShaderCache|ShaderPath|ShaderContent)\s*\((?:\s|\/\/[^\n]*\n)*(SHADER_[A-Z_]+)\s*\)/g;
             const matches = [...code.matchAll(getShaderPattern)];
 
             if (matches.length === 0) {
@@ -279,11 +320,11 @@ function cleanupWatchShaderImports(code: string): string {
 
 /**
  * shaderCache.tsからのimport文をクリーンアップ
- * getShaderCache, getShaderPathを削除し、定数だけを残す
+ * getShaderCache, getShaderPath, getShaderContentを削除し、定数だけを残す
  */
 function cleanupShaderCacheImports(code: string): string {
-    // import { ... } from './shaderCache.ts' のパターンを検索
-    const importPattern = /import\s*\{\s*([^}]+)\s*\}\s*from\s*['"]\.\/shaderCache\.ts['"];?/g;
+    // import { ... } from './shaderCache.ts' or '#/scripts/shaderCache.ts' のパターンを検索
+    const importPattern = /import\s*\{\s*([^}]+)\s*\}\s*from\s*['"](?:\.\/shaderCache\.ts|#\/scripts\/shaderCache\.ts)['"];?/g;
 
     let replacementCount = 0;
     const result = code.replace(importPattern, (_match, importList) => {
@@ -294,9 +335,12 @@ function cleanupShaderCacheImports(code: string): string {
             .map((item: string) => item.trim())
             .filter((item: string) => item.length > 0);
 
-        // getShaderCache, getShaderPath を除外
+        // getShaderCache, getShaderPath, getShaderContent を除外
         const filteredImports = imports.filter(
-            (item: string) => !item.includes('getShaderCache') && !item.includes('getShaderPath')
+            (item: string) =>
+                !item.includes('getShaderCache') &&
+                !item.includes('getShaderPath') &&
+                !item.includes('getShaderContent')
         );
 
         // 残ったimportがない場合は、import文全体を削除
