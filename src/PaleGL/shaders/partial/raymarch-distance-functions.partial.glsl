@@ -197,11 +197,12 @@ float fDfCaa(vec3 p, vec3 c, float h, float r)
 //     return length(p) - r;
 // }
 
-// float dfTo(vec3 p, vec2 t)
-// {
-//     vec2 q = vec2(length(p.xz)-t.x,p.y);
-//     return length(q)-t.y;
-// }
+// t.xy ... [全体の太さ, 径の太さ]
+float fDfTorus(vec3 p, vec2 t)
+{
+    vec2 q = vec2(length(p.xz)-t.x,p.y);
+    return length(q)-t.y;
+}
 
 // float dfOc( vec3 p, float s)
 // {

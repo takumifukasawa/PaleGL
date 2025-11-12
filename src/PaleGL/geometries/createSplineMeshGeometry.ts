@@ -34,21 +34,11 @@ type SplineMeshGeometryArgs = {
     modifiers?: SplineMeshModifiers;
 };
 
-export type SplineGeometry = Geometry & {
-    splineMeshData: {
-        controlPoints: Vector3[];
-        crossSection: CrossSection;
-        segmentSamples: number;
-        caps: boolean;
-        modifiers?: SplineMeshModifiers;
-    };
-};
-
-type SplineMeshUpdateOptions = {
-    controlPoints?: Vector3[];
-    crossSection?: CrossSection;
-    segmentSamples?: number;
-    caps?: boolean;
+export type SplineMeshData = {
+    controlPoints: Vector3[];
+    crossSection: CrossSection;
+    segmentSamples: number;
+    caps: boolean;
     modifiers?: SplineMeshModifiers;
 };
 
@@ -216,7 +206,7 @@ const generateSplineMeshRawData = (
     };
 };
 
-export const createSplineMeshGeometry = (args: SplineMeshGeometryArgs): SplineGeometry => {
+export const createSplineMeshGeometry = (args: SplineMeshGeometryArgs): Geometry => {
     const { gpu, controlPoints, crossSection, segmentSamples = 10, dynamic = false, caps = true, modifiers } = args;
 
     const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps, modifiers);
@@ -234,40 +224,17 @@ export const createSplineMeshGeometry = (args: SplineMeshGeometryArgs): SplineGe
         attributes,
         indices: rawData.indices,
         drawCount: rawData.drawCount,
-    }) as SplineGeometry;
-
-    geometry.splineMeshData = {
-        controlPoints,
-        crossSection,
-        segmentSamples,
-        caps,
-        modifiers,
-    };
+    });
 
     return geometry;
 };
 
-export const updateSplineMeshGeometry = (
-    geometry: SplineGeometry,
-    options?: SplineMeshUpdateOptions
-) => {
-    const controlPoints = options?.controlPoints ?? geometry.splineMeshData.controlPoints;
-    const crossSection = options?.crossSection ?? geometry.splineMeshData.crossSection;
-    const segmentSamples = options?.segmentSamples ?? geometry.splineMeshData.segmentSamples;
-    const caps = options?.caps ?? geometry.splineMeshData.caps;
-    const modifiers = options?.modifiers ?? geometry.splineMeshData.modifiers;
+export const updateSplineMeshGeometry = (geometry: Geometry, splineMeshData: SplineMeshData) => {
+    const { controlPoints, crossSection, segmentSamples, caps, modifiers } = splineMeshData;
 
     const rawData = generateSplineMeshRawData(controlPoints, crossSection, segmentSamples, caps, modifiers);
 
     updateGeometryAttribute(geometry, ATTRIBUTE_NAME_POSITION, new Float32Array(rawData.positions));
     updateGeometryAttribute(geometry, ATTRIBUTE_NAME_NORMAL, new Float32Array(rawData.normals));
     updateGeometryAttribute(geometry, ATTRIBUTE_NAME_UV, new Float32Array(rawData.uvs));
-
-    geometry.splineMeshData = {
-        controlPoints,
-        crossSection,
-        segmentSamples,
-        caps,
-        modifiers,
-    };
 };
