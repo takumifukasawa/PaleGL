@@ -7,6 +7,7 @@ import {
     overrideInstancingParticleMaterialSettings,
 } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
+    ACTOR_TYPE_GPU_TRAIL_PARTICLE,
     ATTRIBUTE_NAME_NORMAL,
     ATTRIBUTE_NAME_POSITION,
     ATTRIBUTE_NAME_TRAIL_INDEX,
@@ -36,7 +37,8 @@ import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.t
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
-    GPUParticleArgsBase, GpuParticleBase,
+    GPUParticleArgsBase,
+    GpuParticleBase,
     GPUParticleUpdater,
     GPUParticleUpdaterShaders,
     renderMRTDoubleBufferAndSwap,
@@ -234,7 +236,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
 //         UNIFORM_NAME_VELOCITY_MAP,
 //         getReadVelocityMap(mrtDoubleBuffer)
 //     );
-// 
+//
 //     // 更新した速度をposition更新. doublebufferのuniformに設定
 //     // prettier-ignore
 //     setMaterialUniformValue(
@@ -242,14 +244,14 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
 //         UNIFORM_NAME_POSITION_MAP,
 //         getReadPositionMap(mrtDoubleBuffer)
 //     );
-// 
+//
 //     // prettier-ignore
 //     setMaterialUniformValue(
 //         material,
 //         UNIFORM_NAME_UP_MAP,
 //         getReadUpMap(mrtDoubleBuffer)
 //     );
-// 
+//
 //     // update velocity
 //     updateMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, material);
 // };
@@ -257,7 +259,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
 export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     const { gpu, mesh, vatWidth, vatHeight, shaders, initialUpdaterIndex = 0 } = args;
 
-    const instancingParticle = createInstancingParticle({ ...args, mesh });
+    const instancingParticle = createInstancingParticle({ ...args, mesh, type: ACTOR_TYPE_GPU_TRAIL_PARTICLE });
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -274,7 +276,6 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null],
         [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
     ];
-
 
     const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {
         const { initializeFragmentShader, initializeFragmentModifiers, updateFragmentShader, updateFragmentModifiers } =
@@ -298,7 +299,6 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         return [materialForInitialize, materialForUpdate];
     });
 
-
     const gpuParticle: GPUTrailParticle = {
         ...instancingParticle,
         mrtDoubleBuffer,
@@ -321,7 +321,6 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
             tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
             tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
         }
-        
         resetGPUParticleByInitialize(renderer, gpuParticle);
     });
 
@@ -345,7 +344,6 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         }
         gpuParticle.prevUpdaterIndex = gpuParticle.updaterIndex;
     });
-
 
     return gpuParticle;
 };

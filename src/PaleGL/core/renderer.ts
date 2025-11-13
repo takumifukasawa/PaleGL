@@ -1414,7 +1414,7 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     setGPUVertexArrayObject(renderer.gpu, geometry.vertexArrayObject);
     // material
     if (!material.shader) {
-        // console.error('invalid material shader');
+        console.error('invalid material shader');
         return;
     }
     setGPUShader(renderer.gpu, material.shader); // TODO: ない場合を判定したい

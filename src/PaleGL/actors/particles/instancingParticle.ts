@@ -2,9 +2,10 @@ import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.t
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
-// @ts-ignore - type-only import
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
+    ACTOR_TYPE_INSTANCING_PARTICLE,
+    ActorType,
     ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
     ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
     ATTRIBUTE_NAME_INSTANCE_POSITION,
@@ -29,6 +30,7 @@ type DataPerInstance = {
 
 export type InstancingParticleArgs = {
     mesh?: Mesh;
+    type?: ActorType;
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
@@ -66,6 +68,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
     const mesh =
         args.mesh ||
         createMesh({
+            type: args.type || ACTOR_TYPE_INSTANCING_PARTICLE,
             geometry: args.geometry!,
             material: args.material!,
         });

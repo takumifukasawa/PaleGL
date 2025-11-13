@@ -8,7 +8,14 @@ import {
     updateActorTransform,
 } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { ACTOR_TYPE_CAMERA, ACTOR_TYPE_MESH, ACTOR_TYPE_SKYBOX } from '@/PaleGL/constants';
+import { GpuParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
+import {
+    ACTOR_TYPE_CAMERA,
+    ACTOR_TYPE_GPU_PARTICLE,
+    ACTOR_TYPE_GPU_TRAIL_PARTICLE,
+    ACTOR_TYPE_MESH,
+    ACTOR_TYPE_SKYBOX,
+} from '@/PaleGL/constants';
 import {
     createSharedTextures,
     renderSharedTextures,
@@ -24,6 +31,7 @@ import {
     renderMesh,
     setRendererSize,
     setRendererStats,
+    tryStartMaterial,
 } from '@/PaleGL/core/renderer.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
@@ -373,15 +381,17 @@ export async function warmRender(
     });
 
     const renderer = engine.renderer;
+    const gpu = renderer.gpu;
 
     // 各メッシュを1つずつ処理
     for (let i = 0; i < meshes.length; i++) {
         const mesh = meshes[i];
         mesh.enabled = true;
-
+        
         // materials をレンダリング
         mesh.materials.forEach((material) => {
             if (material) {
+                tryStartMaterial(gpu, renderer, mesh.geometry, material);
                 renderMesh(renderer, mesh.geometry, material);
             }
         });
@@ -389,9 +399,21 @@ export async function warmRender(
         // depthMaterials をレンダリング
         mesh.depthMaterials.forEach((material) => {
             if (material) {
+                tryStartMaterial(gpu, renderer, mesh.geometry, material);
                 renderMesh(renderer, mesh.geometry, material);
             }
         });
+
+        // GpuParticle / GpuTrailParticle の updaters もレンダリング
+        if (mesh.type === ACTOR_TYPE_GPU_PARTICLE || mesh.type === ACTOR_TYPE_GPU_TRAIL_PARTICLE) {
+            const gpuParticle = mesh as GpuParticle;
+            gpuParticle.updaters.forEach(([initMaterial, updateMaterial]) => {
+                tryStartMaterial(gpu, renderer, renderer.sharedQuad, initMaterial);
+                renderMesh(renderer, renderer.sharedQuad, initMaterial);
+                tryStartMaterial(gpu, renderer, renderer.sharedQuad, updateMaterial);
+                renderMesh(renderer, renderer.sharedQuad, updateMaterial);
+            });
+        }
 
         mesh.enabled = false;
 
@@ -410,6 +432,8 @@ export async function warmRender(
     // 元の状態を反映するため、renderer内のマテリアルも含めて最後に一回描画
     fixedUpdateEngine(engine, 0, 0);
     updateEngine(engine, 0, 0);
+  
+    await wait(waitTime);
 }
 
 // time[sec]

@@ -111,8 +111,11 @@ export const ACTOR_TYPE_SKYBOX = 3;
 export const ACTOR_TYPE_CAMERA = 4;
 // TextMesh: 5,
 export const ACTOR_TYPE_POST_PROCESS_VOLUME = 5;
-// ObjectSpaceRaymarchMesh: 7,
-// ScreenSpaceRaymarchMesh: 8,
+export const ACTOR_TYPE_GPU_PARTICLE = 6;
+export const ACTOR_TYPE_GPU_TRAIL_PARTICLE = 7;
+export const ACTOR_TYPE_INSTANCING_PARTICLE = 7;
+// ObjectSpaceRaymarchMesh: 8,
+// ScreenSpaceRaymarchMesh: 9,
 
 export type ActorType =
     | typeof ACTOR_TYPE_NULL
@@ -120,7 +123,10 @@ export type ActorType =
     | typeof ACTOR_TYPE_LIGHT
     | typeof ACTOR_TYPE_SKYBOX
     | typeof ACTOR_TYPE_CAMERA
-    | typeof ACTOR_TYPE_POST_PROCESS_VOLUME;
+    | typeof ACTOR_TYPE_POST_PROCESS_VOLUME
+    | typeof ACTOR_TYPE_GPU_PARTICLE
+    | typeof ACTOR_TYPE_GPU_TRAIL_PARTICLE
+    | typeof ACTOR_TYPE_INSTANCING_PARTICLE;
 
 export const MESH_TYPE_DEFAULT = 0;
 export const MESH_TYPE_SKINNED = 1;

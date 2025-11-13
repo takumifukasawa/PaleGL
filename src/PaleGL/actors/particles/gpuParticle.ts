@@ -6,6 +6,7 @@ import {
     overrideInstancingParticleMaterialSettings,
 } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
+    ACTOR_TYPE_GPU_PARTICLE,
     FragmentShaderModifiers,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
@@ -51,7 +52,7 @@ export type GPUParticleArgsBase = InstancingParticleArgs & {
 
 export type GPUParticleArgs = GPUParticleArgsBase & {
     useVATLookForward?: boolean;
-}
+};
 
 export type GPUParticleUpdaterShaders = {
     initializeFragmentShader: string;
@@ -137,7 +138,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         useVATLookForward = false,
     } = args;
 
-    const instancingParticle = createInstancingParticle(args);
+    const instancingParticle = createInstancingParticle({ ...args, type: ACTOR_TYPE_GPU_PARTICLE });
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -218,10 +219,6 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
             tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
             tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
         }
-        // const [materialForInitialize, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
-        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForInitialize);
-        // tryStartMaterial(gpu, renderer, renderer.sharedQuad, materialForUpdate);
-
         resetGPUParticleByInitialize(renderer, gpuParticle);
     });
 
