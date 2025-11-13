@@ -105,7 +105,6 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
 
     const gbufferUniforms: UniformsData = [
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
-
         [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, metallic],
         [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
         [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],

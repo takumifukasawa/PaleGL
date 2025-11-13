@@ -516,7 +516,7 @@ float fdfLeg(
     vec3 footScale = vec3(
         max(.55 + pFoot.z * -.8, .01),
         max(.8 + pFoot.z * -2., .01),
-        1.
+        .85
     );
     float dFoot = fOpPoSc(
         fDfRBoxt(

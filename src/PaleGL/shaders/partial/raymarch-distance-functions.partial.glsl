@@ -299,7 +299,7 @@ float fPcurve(float x, float a, float b) {
 
 // ref:
 // https://www.shadertoy.com/view/ws3Bzf
-vec4 biplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
+vec4 fBiplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
 {
     // grab coord derivatives for texturing
     vec3 dpdx = dFdx(p);
@@ -333,4 +333,21 @@ vec4 biplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
     w = pow( w, vec2(k/8.0) );
     // blend and return
     return (x*w.x + y*w.y) / (w.x + w.y);
+}
+
+// ref:
+// https://qiita.com/edo_m18/items/c8995fe91778895c875e
+// https://www.shadertoy.com/view/wtjGWy
+vec3 fTex3D(sampler2D tex, vec3 p, vec3 n) {
+    vec3 blending = abs(n);
+    blending = normalize(max(blending, EPS));
+    
+    float b = (blending.x + blending.y + blending.z);
+    blending /= b;
+    
+    vec4 xaxis = texture(tex, p.yz); // yz plane
+    vec4 yaxis = texture(tex, p.xz); // xz plane
+    vec4 zaxis = texture(tex, p.xy); // xy plane
+
+    return (xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).rgb;
 }

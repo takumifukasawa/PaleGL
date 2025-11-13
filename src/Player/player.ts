@@ -88,7 +88,7 @@ export type Player = {
     marionetterSceneStructure: MarionetterSceneStructure | null;
     timelineDuration: number;
     hotRebuildSceneEnabled: boolean;
-    onHotReload?: (hotReload: boolean) => void;
+    onHotReload?: (hotReload: boolean) => Promise<void>;
 };
 
 // let isOrbitCameraEnabled = false;
@@ -103,7 +103,7 @@ export function createPlayer(
     pixelRatio: number,
     sceneJson: string,
     hotReloadJsonUrl: string,
-    onHotReload: (hotReload: boolean) => void,
+    onHotReload: (hotReload: boolean) => Promise<void>,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
     options: {
@@ -246,7 +246,7 @@ export function createPlayer(
     if (import.meta.env.VITE_HOT_RELOAD === 'true' && isDevelopment()) {
         if (marionetter) {
             marionetter.connect();
-            initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, (sceneJson) => {
+            initHotReloadAndParseScene(hotReloadJsonUrl, marionetter, async (sceneJson) => {
                 buildScene(
                     // prettier-ignore
                     gpu,
@@ -260,7 +260,7 @@ export function createPlayer(
                     generatedActorHook
                     // false,
                 );
-                onHotReload(true);
+                await onHotReload(true);
             });
         }
     }
