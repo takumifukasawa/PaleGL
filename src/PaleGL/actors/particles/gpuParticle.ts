@@ -17,8 +17,9 @@ import {
     UNIFORM_NAME_VELOCITY_MAP,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2,
+    UniformBlockName,
 } from '@/PaleGL/constants.ts';
-import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { addUniformValue, UniformBufferObjectBlockData, Uniforms, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 // import {
 //     createGraphicsDoubleBuffer,
@@ -59,6 +60,10 @@ export type GPUParticleUpdaterShaders = {
     updateFragmentShader: string;
     initializeFragmentModifiers?: FragmentShaderModifiers;
     updateFragmentModifiers?: FragmentShaderModifiers;
+    initializeUniforms?: UniformsData;
+    initializeUniformBlockNames?: UniformBlockName[];
+    updateUniforms?: UniformsData;
+    updateUniformBlockNames?: UniformBlockName[];
 };
 
 // materialForInitialize: Material;
@@ -158,22 +163,22 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     ];
 
     const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {
-        const { initializeFragmentShader, initializeFragmentModifiers, updateFragmentShader, updateFragmentModifiers } =
+        const { initializeFragmentShader, initializeFragmentModifiers, updateFragmentShader, updateFragmentModifiers, initializeUniforms = [], initializeUniformBlockNames = [], updateUniforms = [], updateUniformBlockNames = [] } =
             initializer;
         const materialForInitialize = createGraphicsDoubleBufferMaterial(
             initializeFragmentShader,
             vatWidth,
             vatHeight,
-            createUniforms(),
-            [UNIFORM_BLOCK_NAME_TIMELINE],
+            [...initializeUniforms, ...createUniforms()],
+            [...initializeUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
             initializeFragmentModifiers
         );
         const materialForUpdate = createGraphicsDoubleBufferMaterial(
             updateFragmentShader,
             vatWidth,
             vatHeight,
-            createUniforms(),
-            [UNIFORM_BLOCK_NAME_TIMELINE],
+            [...updateUniforms, ...createUniforms()],
+            [...updateUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
             updateFragmentModifiers
         );
         return [materialForInitialize, materialForUpdate];

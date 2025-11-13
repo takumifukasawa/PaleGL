@@ -173,6 +173,7 @@ vec2 fOsRaymarch(
             // ---
         ) * side;
         accLen += result.x;
+
         if (!fIsDfInnerBox(fToLocal(currentRayPosition, inverseWorldMatrix, boundsScale), boundsScale)) {
             break;
         }
