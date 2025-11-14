@@ -4,7 +4,6 @@ import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts'
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
-    ACTOR_TYPE_INSTANCING_PARTICLE,
     ActorType,
     ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
     ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
@@ -14,6 +13,8 @@ import {
     ATTRIBUTE_NAME_INSTANCE_VELOCITY,
     ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
     ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    MESH_TYPE_INSTANCING_PARTICLE,
+    MeshType,
 } from '@/PaleGL/constants.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
@@ -29,8 +30,10 @@ type DataPerInstance = {
 };
 
 export type InstancingParticleArgs = {
+    name?: string;
     mesh?: Mesh;
     type?: ActorType;
+    meshType?: MeshType;
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
@@ -64,16 +67,21 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         // vatData,
         makeDataPerInstanceFunction,
     } = args;
+    console.log(args);
 
     const mesh =
         args.mesh ||
         createMesh({
-            type: args.type || ACTOR_TYPE_INSTANCING_PARTICLE,
+            // name: args.name || '',
+            // meshType: args.meshType,
+            // type: args.type || ACTOR_TYPE_INSTANCING_PARTICLE,
             geometry: args.geometry!,
             material: args.material!,
         });
 
-    mesh.castShadow = true;
+    mesh.name = args.name || '';
+    mesh.meshType = args.meshType || MESH_TYPE_INSTANCING_PARTICLE;
+    mesh.castShadow = true; // TODO: 出し分け
     mesh.geometry.instanceCount = instanceCount;
 
     const instanceInfo: {

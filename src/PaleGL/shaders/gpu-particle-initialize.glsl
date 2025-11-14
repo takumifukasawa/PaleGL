@@ -6,6 +6,7 @@
 
 layout (location = 0) out vec3 outVelocity;
 layout (location = 1) out vec3 outPosition;
+layout (location = 2) out vec3 outUp;
 
 // uniform float uMaxRadius;
 
@@ -15,6 +16,8 @@ void main(void) {
   vec2 coord = vec2(float(gl_FragCoord.x), float(gl_FragCoord.y));
   float seed = fRand(coord);
   outPosition = fRandomInSphere(seed) * maxRadius;
+  outVelocity = vec3(0.);
+  outUp = vec3(0., 1., 0.);
 
   #pragma GPU_PARTICLE_MODIFY_INITIALIZE
         

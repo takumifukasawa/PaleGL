@@ -3,15 +3,14 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     createInstancingParticle,
-    InstancingParticleArgs,
     overrideInstancingParticleMaterialSettings,
 } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
-    ACTOR_TYPE_GPU_TRAIL_PARTICLE,
     ATTRIBUTE_NAME_NORMAL,
     ATTRIBUTE_NAME_POSITION,
     ATTRIBUTE_NAME_TRAIL_INDEX,
     ATTRIBUTE_NAME_UV,
+    MESH_TYPE_GPU_TRAIL_PARTICLE,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
     UNIFORM_NAME_POSITION_MAP,
@@ -26,21 +25,18 @@ import {
     createMRTDoubleBuffer,
     getReadMultipleRenderTargetOfMRTDoubleBuffer,
     MRTDoubleBuffer,
-    updateMRTDoubleBufferAndSwap,
 } from '@/PaleGL/core/doubleBuffer.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
-import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
+import { tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
     GPUParticleArgsBase,
     GpuParticleBase,
     GPUParticleUpdater,
-    GPUParticleUpdaterShaders,
     renderMRTDoubleBufferAndSwap,
     resetGPUParticleByInitialize,
 } from '@/PaleGL/actors/particles/gpuParticle.ts';
@@ -259,7 +255,7 @@ export const createTrailCylinderGeometry = (gpu: Gpu, radius: number, angleSegme
 export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     const { gpu, mesh, vatWidth, vatHeight, shaders, initialUpdaterIndex = 0 } = args;
 
-    const instancingParticle = createInstancingParticle({ ...args, mesh, type: ACTOR_TYPE_GPU_TRAIL_PARTICLE });
+    const instancingParticle = createInstancingParticle({ ...args, mesh, meshType: MESH_TYPE_GPU_TRAIL_PARTICLE });
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -275,6 +271,7 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         [UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null],
         [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null],
         [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, createVector2(vatWidth, vatHeight)],
     ];
 
     const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {

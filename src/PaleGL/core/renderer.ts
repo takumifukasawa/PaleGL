@@ -26,6 +26,7 @@ import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import {
+    // ACTOR_TYPE_GPU_PARTICLE, ACTOR_TYPE_GPU_TRAIL_PARTICLE, ACTOR_TYPE_INSTANCING_PARTICLE,
     ACTOR_TYPE_LIGHT,
     // ActorType,
     ACTOR_TYPE_MESH,
@@ -898,6 +899,10 @@ export function renderRenderer(
                 // actor.transform.parent = cameras.transform;
                 return;
             case ACTOR_TYPE_MESH:
+            // case ACTOR_TYPE_GPU_PARTICLE:
+            // case ACTOR_TYPE_GPU_TRAIL_PARTICLE:
+            // case ACTOR_TYPE_INSTANCING_PARTICLE:
+
                 // case ActorTypes.SkinnedMesh:
                 // if (!actor.enabled) {
                 //     return;

@@ -111,9 +111,9 @@ export const ACTOR_TYPE_SKYBOX = 3;
 export const ACTOR_TYPE_CAMERA = 4;
 // TextMesh: 5,
 export const ACTOR_TYPE_POST_PROCESS_VOLUME = 5;
-export const ACTOR_TYPE_GPU_PARTICLE = 6;
-export const ACTOR_TYPE_GPU_TRAIL_PARTICLE = 7;
-export const ACTOR_TYPE_INSTANCING_PARTICLE = 7;
+// export const ACTOR_TYPE_GPU_PARTICLE = 6;
+// export const ACTOR_TYPE_GPU_TRAIL_PARTICLE = 7;
+// export const ACTOR_TYPE_INSTANCING_PARTICLE = 8;
 // ObjectSpaceRaymarchMesh: 8,
 // ScreenSpaceRaymarchMesh: 9,
 
@@ -123,10 +123,10 @@ export type ActorType =
     | typeof ACTOR_TYPE_LIGHT
     | typeof ACTOR_TYPE_SKYBOX
     | typeof ACTOR_TYPE_CAMERA
-    | typeof ACTOR_TYPE_POST_PROCESS_VOLUME
-    | typeof ACTOR_TYPE_GPU_PARTICLE
-    | typeof ACTOR_TYPE_GPU_TRAIL_PARTICLE
-    | typeof ACTOR_TYPE_INSTANCING_PARTICLE;
+    | typeof ACTOR_TYPE_POST_PROCESS_VOLUME;
+    // | typeof ACTOR_TYPE_GPU_PARTICLE
+    // | typeof ACTOR_TYPE_GPU_TRAIL_PARTICLE
+    // | typeof ACTOR_TYPE_INSTANCING_PARTICLE;
 
 export const MESH_TYPE_DEFAULT = 0;
 export const MESH_TYPE_SKINNED = 1;
@@ -137,6 +137,9 @@ export const MESH_TYPE_TEXT = 4;
 export const MESH_TYPE_SPRITE_ATLAS = 6;
 export const MESH_TYPE_SPLINE = 7;
 export const MESH_TYPE_SPLINE_INSTANCING = 8;
+export const MESH_TYPE_GPU_PARTICLE = 9;
+export const MESH_TYPE_GPU_TRAIL_PARTICLE = 10;
+export const MESH_TYPE_INSTANCING_PARTICLE = 11;
 
 export type MeshType =
     | typeof MESH_TYPE_DEFAULT
@@ -146,7 +149,10 @@ export type MeshType =
     | typeof MESH_TYPE_TEXT
     | typeof MESH_TYPE_SPRITE_ATLAS
     | typeof MESH_TYPE_SPLINE
-    | typeof MESH_TYPE_SPLINE_INSTANCING;
+    | typeof MESH_TYPE_SPLINE_INSTANCING
+    | typeof MESH_TYPE_GPU_PARTICLE
+    | typeof MESH_TYPE_GPU_TRAIL_PARTICLE
+    | typeof MESH_TYPE_INSTANCING_PARTICLE;
 
 export const MATERIAL_TYPE_MISC = 0;
 export const MATERIAL_TYPE_G_BUFFER = 1;

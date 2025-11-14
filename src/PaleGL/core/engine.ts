@@ -11,10 +11,10 @@ import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { GpuParticle } from '@/PaleGL/actors/particles/gpuParticle.ts';
 import {
     ACTOR_TYPE_CAMERA,
-    ACTOR_TYPE_GPU_PARTICLE,
-    ACTOR_TYPE_GPU_TRAIL_PARTICLE,
     ACTOR_TYPE_MESH,
     ACTOR_TYPE_SKYBOX,
+    MESH_TYPE_GPU_PARTICLE,
+    MESH_TYPE_GPU_TRAIL_PARTICLE,
 } from '@/PaleGL/constants';
 import {
     createSharedTextures,
@@ -373,7 +373,9 @@ export async function warmRender(
     });
 
     // メッシュのみを抽出
-    const meshes = actors.filter((actor) => actor.type === ACTOR_TYPE_MESH || actor.type === ACTOR_TYPE_SKYBOX) as Mesh[];
+    const meshes = actors.filter(
+        (actor) => actor.type === ACTOR_TYPE_MESH || actor.type === ACTOR_TYPE_SKYBOX
+    ) as Mesh[];
 
     // すべてのアクターを無効化
     actors.forEach((actor) => {
@@ -387,7 +389,7 @@ export async function warmRender(
     for (let i = 0; i < meshes.length; i++) {
         const mesh = meshes[i];
         mesh.enabled = true;
-        
+
         // materials をレンダリング
         mesh.materials.forEach((material) => {
             if (material) {
@@ -405,7 +407,7 @@ export async function warmRender(
         });
 
         // GpuParticle / GpuTrailParticle の updaters もレンダリング
-        if (mesh.type === ACTOR_TYPE_GPU_PARTICLE || mesh.type === ACTOR_TYPE_GPU_TRAIL_PARTICLE) {
+        if (mesh.meshType === MESH_TYPE_GPU_PARTICLE || mesh.meshType === MESH_TYPE_GPU_TRAIL_PARTICLE) {
             const gpuParticle = mesh as GpuParticle;
             gpuParticle.updaters.forEach(([initMaterial, updateMaterial]) => {
                 tryStartMaterial(gpu, renderer, renderer.sharedQuad, initMaterial);
@@ -432,7 +434,7 @@ export async function warmRender(
     // 元の状態を反映するため、renderer内のマテリアルも含めて最後に一回描画
     fixedUpdateEngine(engine, 0, 0);
     updateEngine(engine, 0, 0);
-  
+
     await wait(waitTime);
 }
 

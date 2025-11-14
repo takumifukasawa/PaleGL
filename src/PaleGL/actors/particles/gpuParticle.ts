@@ -6,8 +6,8 @@ import {
     overrideInstancingParticleMaterialSettings,
 } from '@/PaleGL/actors/particles/instancingParticle.ts';
 import {
-    ACTOR_TYPE_GPU_PARTICLE,
     FragmentShaderModifiers,
+    MESH_TYPE_GPU_PARTICLE,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
     UNIFORM_BLOCK_NAME_TIMELINE,
@@ -19,7 +19,7 @@ import {
     UNIFORM_TYPE_VECTOR2,
     UniformBlockName,
 } from '@/PaleGL/constants.ts';
-import { addUniformValue, UniformBufferObjectBlockData, Uniforms, UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 // import {
 //     createGraphicsDoubleBuffer,
@@ -142,8 +142,10 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         initialUpdaterIndex = 0,
         useVATLookForward = false,
     } = args;
+    
+    console.log(args)
 
-    const instancingParticle = createInstancingParticle({ ...args, type: ACTOR_TYPE_GPU_PARTICLE });
+    const instancingParticle = createInstancingParticle({ ...args, meshType: MESH_TYPE_GPU_PARTICLE });
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
@@ -163,8 +165,16 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     ];
 
     const updaters: GPUParticleUpdater[] = shaders.map((initializer) => {
-        const { initializeFragmentShader, initializeFragmentModifiers, updateFragmentShader, updateFragmentModifiers, initializeUniforms = [], initializeUniformBlockNames = [], updateUniforms = [], updateUniformBlockNames = [] } =
-            initializer;
+        const {
+            initializeFragmentShader,
+            initializeFragmentModifiers,
+            updateFragmentShader,
+            updateFragmentModifiers,
+            initializeUniforms = [],
+            initializeUniformBlockNames = [],
+            updateUniforms = [],
+            updateUniformBlockNames = [],
+        } = initializer;
         const materialForInitialize = createGraphicsDoubleBufferMaterial(
             initializeFragmentShader,
             vatWidth,
@@ -183,23 +193,6 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         );
         return [materialForInitialize, materialForUpdate];
     });
-
-    // const materialForInitialize = createGraphicsDoubleBufferMaterial(
-    //     initializeFragmentShader,
-    //     vatWidth,
-    //     vatHeight,
-    //     createUniforms(),
-    //     [],
-    //     initializeFragmentModifiers
-    // );
-    // const materialForUpdate = createGraphicsDoubleBufferMaterial(
-    //     updateFragmentShader,
-    //     vatWidth,
-    //     vatHeight,
-    //     createUniforms(),
-    //     [],
-    //     updateFragmentModifiers
-    // );
 
     const gpuParticle: GpuParticle = {
         ...instancingParticle,
