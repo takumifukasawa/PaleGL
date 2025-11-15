@@ -1,5 +1,5 @@
 
-const fillFunc = <T>(arr: T[], ...value: T[]): T[] => {
+function fillFunc<T>(arr: T[], ...value: T[]): T[] {
     // 非破壊
     const newArr = [...arr];
     for (let i = 0; i < arr.length; i++) {
@@ -13,21 +13,21 @@ const fillFunc = <T>(arr: T[], ...value: T[]): T[] => {
     //     arr[i] = value;
     // }
     // return arr;
-};
+}
 
-const rangeFunc = (length: number, fillIndex: boolean = false): number[] => {
+function rangeFunc(length: number, fillIndex: boolean = false): number[]{
     // とりあえずindex埋め
     const array = (new Array(length)).fill(0) as number[];
     if(!fillIndex) {
         return array;
     }
     return array.map((_, i) => i);
-};
+}
 
-const compactFunc = <T>(arr: T[]): T[] => {
+function compactFunc<T>(arr: T[]): T[] {
     const newArr = [...arr];
     return newArr.filter(Boolean);
-};
+}
 
 export function uniqFunc<T>(arr: T[]): T[] {
     return [...new Set(arr)];
@@ -46,44 +46,44 @@ type MatonWrapper<T> = {
     // toFloat32Array: () => Float32Array;
 };
 
-const matonWrapper = <T>(obj: T[]): MatonWrapper<T> => {
+function matonWrapper<T>(obj: T[]): MatonWrapper<T> {
     const tmp: T[] = obj;
 
-    const fill = (...args: T[]): MatonWrapper<T> => {
+    function fill(...args: T[]): MatonWrapper<T> {
         // TODO: tmpにassignしないとダメな気がする
         // fillFunc(tmp, args[0]);
         fillFunc(tmp, ...args);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
-    };
-
-    const range = (length: number): MatonWrapper<T> => {
+    }
+    
+    function range(length: number): MatonWrapper<T> {
         // TODO: tmpにassignしないとダメな気がする
         rangeFunc(length);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
-    };
-
-    const compact = (): MatonWrapper<Exclude<T, null | undefined>> => {
+    }
+    
+    function compact(): MatonWrapper<Exclude<T, null | undefined>> {
         // TODO: tmpにassignしないとダメな気がする
         compactFunc(tmp);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
-    };
-
-    const uniq = (): MatonWrapper<T> => {
+    }
+    
+    function uniq(): MatonWrapper<T> {
         uniqFunc(tmp);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this as MatonWrapper<T>;
-    };
-
-    // const toFloat32Array = (): MatonWrapper<T>  => {
+    }
+    
+    // function toFloat32Array(): MatonWrapper<T>  {
     //     return float32ArrayFunc(tmp as number[]);
-    // };
+    // }
 
     const value = () => {
         return tmp;
@@ -95,9 +95,9 @@ const matonWrapper = <T>(obj: T[]): MatonWrapper<T> => {
         range,
         compact,
         uniq
-        // toFloat32Array
+        // toFloat32Array 
     };
-};
+}
 
 // wrapper
 const maton = <T>(obj: T[] = []) => {
