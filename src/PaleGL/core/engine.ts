@@ -140,7 +140,9 @@ export function createEngine({
     (engineBase as Engine).fixedUpdateFrameTimer = fixedUpdateFrameTimer;
     (engineBase as Engine).updateFrameTimer = updateFrameTimer;
 
-    setRendererStats(renderer, stats);
+    if (isDevelopment()) {
+        setRendererStats(renderer, stats);
+    }
 
     return engineBase as Engine;
 }
