@@ -138,8 +138,10 @@ export const replaceShaderIncludes = (src: string) => {
 
 const buildShaderDefines = ({
     receiveShadow,
-    isSkinning,
-    gpuSkinning,
+    // CUSTOM_BEGIN comment out
+    // isSkinning,
+    // gpuSkinning,
+    // CUSTOM_END
     useNormalMap,
     useEnvMap,
     // CUSTOM_BEGIN comment out
@@ -157,13 +159,15 @@ const buildShaderDefines = ({
     if (receiveShadow) {
         arr.push('#define USE_RECEIVE_SHADOW');
     }
-    if (isSkinning) {
-        if (gpuSkinning) {
-            arr.push('#define USE_SKINNING_GPU');
-        } else {
-            arr.push('#define USE_SKINNING_CPU');
-        }
-    }
+    // CUSTOM_BEGIN comment out
+    // if (isSkinning) {
+    //     if (gpuSkinning) {
+    //         arr.push('#define USE_SKINNING_GPU');
+    //     } else {
+    //         arr.push('#define USE_SKINNING_CPU');
+    //     }
+    // }
+    // CUSTOM_END
     if (useNormalMap) {
         arr.push('#define USE_NORMAL_MAP');
     }
