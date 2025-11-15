@@ -15,13 +15,13 @@ import {
     MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR,
     MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY,
     MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS,
-    MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING,
-    MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE,
+    MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX,
+    MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX,
+    MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX,
+    MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX,
+    MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX,
+    MARIONETTER_MATERIAL_INFO_COLOR_INDEX,
+    MARIONETTER_MATERIAL_INFO_TYPE_INDEX,
     MARIONETTER_MATERIAL_TYPE_LIT,
     MARIONETTER_MATERIAL_TYPE_UNLIT,
     MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
@@ -44,6 +44,7 @@ import {
     MarionetterFbmNoiseTextureControllerComponentInfo,
     MarionetterGBufferMaterialControllerComponentInfo,
     MarionetterLightComponentInfo,
+    MarionetterLitMaterialInfo,
     MarionetterMeshFilterComponentInfo,
     MarionetterMeshRendererComponentInfo,
     MarionetterObjectInfo,
@@ -59,7 +60,7 @@ import { Actor, addActorComponent, addChildActor, createActor } from '@/PaleGL/a
 import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts';
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
-import { createSpotLight, getSpotLightConeCos } from '@/PaleGL/actors/lights/spotLight.ts';
+import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
@@ -79,7 +80,6 @@ import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quat
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
 import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
-import { rad2Deg } from '@/PaleGL/utilities/mathUtilities.ts';
 // import { createHuman } from '../../../src/pages/scripts/createHuman.ts';
 // // ORIGINAL
 // // import { PostProcessPassType } from '@/PaleGL/constants.ts';
@@ -299,35 +299,29 @@ export function buildMarionetterScene(
             }
 
             // build material
-            switch (
-                meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL][
-                    MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE
-                ]
-            ) {
+            const materialInfo = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
+            switch (materialInfo[MARIONETTER_MATERIAL_INFO_TYPE_INDEX]) {
                 case MARIONETTER_MATERIAL_TYPE_LIT:
-                    const litMaterial = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
-                    const tiling = createVector4FromRawVector4(
-                        litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING]
-                    );
+                    const litMaterial = materialInfo as MarionetterLitMaterialInfo;
+                    const tiling = createVector4FromRawVector4(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX]);
                     material = createGBufferMaterial({
-                        baseColor: createColorFromHex(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR]),
+                        baseColor: createColorFromHex(litMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
                         baseMapTiling: tiling,
-                        metallic: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC],
+                        metallic: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX],
                         metallicMapTiling: tiling,
-                        roughness: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS],
+                        roughness: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX],
                         roughnessMapTiling: tiling,
                         emissiveColor: createEmissiveColorFromHex(
-                            litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION]
+                            litMaterial[MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX]
                         ),
-                        receiveShadow: !!litMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW],
+                        receiveShadow: !!litMaterial[MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX],
                     });
                     break;
                 case MARIONETTER_MATERIAL_TYPE_UNLIT:
-                    const unlitMaterial = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
+                    const unlitMaterial = materialInfo;
                     material = createUnlitMaterial({
-                        baseColor: createColorFromHex(unlitMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR]),
-                        // emissiveColor: createEmissiveColorFromHex(unlitMaterial[MarionetterUnlitMaterialInfoProperty.emission]),
-                        receiveShadow: !!unlitMaterial[MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW],
+                        baseColor: createColorFromHex(unlitMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
+                        receiveShadow: false,
                     });
                     break;
                 default:
@@ -448,7 +442,7 @@ export function buildMarionetterScene(
             //
             // transform情報
             //
-            
+
             // actors.push(actor);
             setScaling(
                 actor.transform,
