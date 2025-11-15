@@ -89,7 +89,14 @@ import {
     Matrix4,
 } from '@/PaleGL/math/matrix4.ts';
 
-export type RawVector4 = { x: number; y: number; z: number; w: number };
+// [x, y, z, w]
+export type RawVector4 = [number, number, number, number];
+
+// Array indices for RawVector4
+export const RAW_VECTOR4_X_INDEX = 0;
+export const RAW_VECTOR4_Y_INDEX = 1;
+export const RAW_VECTOR4_Z_INDEX = 2;
+export const RAW_VECTOR4_W_INDEX = 3;
 
 export type Vector4 = Float32Array;
 
@@ -122,8 +129,13 @@ export const setVector4Component = (v4: Vector4, key: string, value: number) => 
     }
 }
 
-export const createVector4FromRawVector4 = (obj: { x: number; y: number; z: number; w: number }) => {
-    return createVector4(obj.x, obj.y, obj.z, obj.w);
+export const createVector4FromRawVector4 = (raw: RawVector4) => {
+    return createVector4(
+        raw[RAW_VECTOR4_X_INDEX],
+        raw[RAW_VECTOR4_Y_INDEX],
+        raw[RAW_VECTOR4_Z_INDEX],
+        raw[RAW_VECTOR4_W_INDEX]
+    );
 }
 
 export const v4x = (v: Vector4) => v[0];

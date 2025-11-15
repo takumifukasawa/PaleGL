@@ -664,56 +664,34 @@ export type MarionetterMaterialType =
     | typeof MARIONETTER_MATERIAL_TYPE_LIT
     | typeof MARIONETTER_MATERIAL_TYPE_UNLIT;
 
-export type MarionetterMaterialInfo = {
-    type: MarionetterMaterialType;
-    name: string;
-    // shorten
-    t: MarionetterMaterialType;
-    n: string;
-};
+// [type, color]
+export type MarionetterUnlitMaterialInfo = [
+    MarionetterMaterialType, // 0: type
+    string, // 1: color
+];
 
-export const MARIONETTER_MATERIAL_INFO_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
-export const MARIONETTER_MATERIAL_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
+// [type, color, tiling, metallic, roughness, emission, receiveShadow]
+export type MarionetterLitMaterialInfo = [
+    MarionetterMaterialType, // 0: type
+    string, // 1: color
+    RawVector4, // 2: tiling
+    number, // 3: metallic
+    number, // 4: roughness
+    string, // 5: emission
+    number, // 6: receiveShadow
+];
 
-export type MarionetterLitMaterialInfo = MarionetterMaterialInfo & {
-    color: string;
-    metallic: number;
-    tiling: RawVector4;
-    roughness: number;
-    emission: string;
-    receiveShadow: number;
-    // shorten
-    c: string; // hex string
-    ti: RawVector4;
-    m: number;
-    r: number;
-    e: string; // hex string (rgbi ... i is intensity)
-    rs: number;
-};
-
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_TILING = NeedsShorten ? 'ti' : 'tiling';
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_METALLIC = NeedsShorten ? 'm' : 'metallic';
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_ROUGHNESS = NeedsShorten ? 'r' : 'roughness';
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_EMISSION = NeedsShorten ? 'e' : 'emission';
-export const MARIONETTER_LIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW = NeedsShorten ? 'rs' : 'receiveShadow';
-
-export type MarionetterUnlitMaterialInfo = MarionetterMaterialInfo & {
-    color: string;
-    receiveShadow: number;
-    // emission: string;
-    // shorten
-    c: string; // hex string
-    // e : string; // hex string (rgbi ... i is intensity)
-    rs: number;
-};
-
-export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
-// export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_EMISSION = NeedsShorten ? 'e' : 'emission';
-export const MARIONETTER_UNLIT_MATERIAL_INFO_PROPERTY_RECEIVE_SHADOW = NeedsShorten ? 'rs' : 'receiveShadow';
+// Array indices for material info
+export const MARIONETTER_MATERIAL_INFO_TYPE_INDEX = 0;
+export const MARIONETTER_MATERIAL_INFO_COLOR_INDEX = 1;
+export const MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX = 2;
+export const MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX = 3;
+export const MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX = 4;
+export const MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX = 5;
+export const MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX = 6;
 
 // merge
-export type MarionetterMaterialKinds = MarionetterLitMaterialInfo & MarionetterUnlitMaterialInfo;
+export type MarionetterMaterialKinds = MarionetterLitMaterialInfo | MarionetterUnlitMaterialInfo;
 
 // --- mesh renderer
 
