@@ -331,6 +331,12 @@ export const createMaterial = (args: MaterialArgs): Material => {
      */
     // const updateUniforms = () => {};
 
+    // let depthFragmentShaderModifiers: DepthFragmentShaderModifiers = args.depthFragmentShaderModifiers ?? [];
+    // // depth modifier がないけど fragment modifier があるときはそっちをcopy
+    // if (depthFragmentShaderModifiers.length < 1 && fragmentShaderModifiers.length > 0) {
+    //     depthFragmentShaderModifiers = [...fragmentShaderModifiers];
+    // }
+
     return {
         name,
         canRender,

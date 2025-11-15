@@ -4,6 +4,11 @@ uniform vec4 uColor; // TODO: fbase color
 uniform sampler2D uBaseMap; 
 uniform vec4 uBaseMapTiling;
 
+#ifdef USE_HEIGHT_MAP
+uniform sampler2D uHeightMap;
+uniform vec4 uHeightMapTiling;
+#endif
+
 #ifdef USE_ALPHA_TEST
 uniform float uAlphaTestThreshold;
 #endif
@@ -21,22 +26,25 @@ out vec4 outColor;
 void main() {
     vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
   
-    // TODO: multiply fbase color
+    // TODO: multiply base color
     vec4 baseMapColor = texture(uBaseMap, uv);
-    
-    vec4 baseColor = vec4(0.);
+   
+    // 後半はuvを最適化の過程で消されないようにする対策 
+    vec4 baseColor = uColor * baseMapColor + vec4(uv.xy, 1., 1.) * 0.;
 
 #ifdef USE_VERTEX_COLOR
-    baseColor = vVertexColor * uColor * baseMapColor;
-#else
-    baseColor = uColor * baseMapColor;
+    baseColor *= vVertexColor;
 #endif   
 
     // TODO: fbase color を渡して alpha をかける
     vec4 resultColor = baseColor;
 
-    // #include <alpha_test_f>
-    #include ./partial/alpha-test-fragment.partial.glsl
-
+    #include <alpha_test_f>
+    // #include ./partial/alpha-test-fragment.partial.glsl
+    
+    #pragma BEFORE_OUT
+    
     outColor = vec4(1., 1., 1., 1.);
+
+    #pragma AFTER_OUT
 }

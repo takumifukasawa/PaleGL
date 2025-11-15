@@ -84,6 +84,8 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 isInstancing: material.isInstancing,
                 useInstanceLookDirection: material.useInstanceLookDirection,
                 useVertexColor: material.useVertexColor,
+                
+                useHeightMap: material.useHeightMap,
 
                 uniformBlockNames: material.uniformBlockNames, // TODO: 外側からも追加して渡せるほうがいいかもしれない
                 // depthFuncType: this.mainMaterial.depthFuncType
