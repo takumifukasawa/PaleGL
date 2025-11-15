@@ -123,7 +123,7 @@ export function initDebugger(
         });
 
         addSliderDebugger(directionalLightDebuggerGroup, {
-            label: 'pos x',
+            label: 'position x',
             minValue: -10,
             maxValue: 10,
             stepValue: 0.001,
@@ -134,7 +134,7 @@ export function initDebugger(
         });
 
         addSliderDebugger(directionalLightDebuggerGroup, {
-            label: 'pos y',
+            label: 'position y',
             minValue: 0,
             maxValue: 10,
             stepValue: 0.001,
@@ -145,7 +145,7 @@ export function initDebugger(
         });
 
         addSliderDebugger(directionalLightDebuggerGroup, {
-            label: 'pos z',
+            label: 'position z',
             minValue: -10,
             maxValue: 10,
             stepValue: 0.001,
@@ -165,7 +165,7 @@ export function initDebugger(
     const objectSpaceRaymarchMeshDebuggerGroup = addDebugGroup(debuggerGUI, 'object space raymarch', false);
 
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
-        label: 'pos x',
+        label: 'position x',
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
@@ -176,7 +176,7 @@ export function initDebugger(
     });
 
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
-        label: 'pos y',
+        label: 'position y',
         minValue: 0,
         maxValue: 10,
         stepValue: 0.001,
@@ -187,7 +187,7 @@ export function initDebugger(
     });
 
     addSliderDebugger(objectSpaceRaymarchMeshDebuggerGroup, {
-        label: 'pos z',
+        label: 'position z',
         minValue: -10,
         maxValue: 10,
         stepValue: 0.001,
@@ -431,7 +431,7 @@ export function initDebugger(
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
-        label: 'jitter size x',
+        label: 'ray jitter size x',
         initialValue: v3x(renderer.volumetricLightPass.rayJitterSize),
         minValue: 0,
         maxValue: 1,
@@ -441,7 +441,7 @@ export function initDebugger(
         },
     });
     addSliderDebugger(volumetricLightDebuggerGroup, {
-        label: 'jitter size y',
+        label: 'ray jitter size y',
         initialValue: v3y(renderer.volumetricLightPass.rayJitterSize),
         minValue: 0,
         maxValue: 1,
@@ -787,7 +787,7 @@ export function initDebugger(
         });
 
         addSliderDebugger(ssrDebuggerGroup, {
-            label: 'jitter size x',
+            label: 'reflection ray jitter size x',
             minValue: 0.001,
             maxValue: 0.1,
             stepValue: 0.001,
@@ -798,7 +798,7 @@ export function initDebugger(
         });
 
         addSliderDebugger(ssrDebuggerGroup, {
-            label: 'jitter size y',
+            label: 'reflection ray jitter size y',
             minValue: 0.001,
             maxValue: 0.1,
             stepValue: 0.001,
