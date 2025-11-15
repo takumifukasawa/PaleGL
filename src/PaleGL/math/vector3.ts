@@ -14,10 +14,20 @@
     Matrix4,
 } from '@/PaleGL/math/matrix4.ts';
 
-export type RawVector3 = { x: number; y: number; z: number };
+// [x, y, z]
+export type RawVector3 = [number, number, number];
+
+// Array indices for RawVector3
+export const RAW_VECTOR3_X_INDEX = 0;
+export const RAW_VECTOR3_Y_INDEX = 1;
+export const RAW_VECTOR3_Z_INDEX = 2;
 
 export const createVector3FromRaw = (raw: RawVector3) => {
-    return createVector3(raw.x, raw.y, raw.z);
+    return createVector3(
+        raw[RAW_VECTOR3_X_INDEX],
+        raw[RAW_VECTOR3_Y_INDEX],
+        raw[RAW_VECTOR3_Z_INDEX]
+    );
 };
 
 // export const createVector3Zero = () => new Vector3(0, 0, 0);

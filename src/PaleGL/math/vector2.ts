@@ -62,10 +62,18 @@
 // }
 
 
-export type RawVector2 = { x: number; y: number; };
+// [x, y]
+export type RawVector2 = [number, number];
+
+// Array indices for RawVector2
+export const RAW_VECTOR2_X_INDEX = 0;
+export const RAW_VECTOR2_Y_INDEX = 1;
 
 export const createVector2FromRaw = (raw: RawVector2) => {
-    return createVector2(raw.x, raw.y);
+    return createVector2(
+        raw[RAW_VECTOR2_X_INDEX],
+        raw[RAW_VECTOR2_Y_INDEX]
+    );
 }
 
 export type Vector2 = Float32Array;
