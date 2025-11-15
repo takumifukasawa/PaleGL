@@ -1,7 +1,5 @@
 import {
     MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
-    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_HOLD,
-    MARIONETTER_CLIP_POST_EXTRAPORATION_MODE_LOOP,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT,
     MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME,
@@ -68,21 +66,28 @@ function curveUtilityEvaluate(t: number, k0: MarionetterCurveKeyframe, k1: Mario
 }
 
 export function buildKeyframe(keyframe: MarionetterAnimationClipKeyframe): MarionetterCurveKeyframe {
+    const [v0 = 0, v1 = 0, v2 = 0, v3 = 0] = keyframe;
     return {
-        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]: keyframe[0],
-        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE]: keyframe[1],
-        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_IN_TANGENT]: keyframe[2],
-        // [MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT]: keyframe[3],
+        // // // TODO: うまいことproperty名をまとめられるはず
+        // ['time']: keyframe[0],
+        // ['value']: keyframe[1],
+        // ['inTangent']: keyframe[2],
+        // ['outTangent']: keyframe[3],
+        // // shorten
+        // ['t']: keyframe[0],
+        // ['v']: keyframe[1],
+        // ['i']: keyframe[2],
+        // ['o']: keyframe[3],
         // // TODO: うまいことproperty名をまとめられるはず
-        ['time']: keyframe[0],
-        ['value']: keyframe[1],
-        ['inTangent']: keyframe[2],
-        ['outTangent']: keyframe[3],
+        ['time']: v0,
+        ['value']: v1,
+        ['inTangent']: v2,
+        ['outTangent']: v3,
         // shorten
-        ['t']: keyframe[0],
-        ['v']: keyframe[1],
-        ['i']: keyframe[2],
-        ['o']: keyframe[3],
+        ['t']: v0,
+        ['v']: v1,
+        ['i']: v2,
+        ['o']: v3,
     } as MarionetterCurveKeyframe;
 }
 
@@ -115,7 +120,7 @@ export function curveUtilityEvaluateCurve(
     if (t < firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
         return firstK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
-    
+
     if (t >= lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_TIME]) {
         return lastK[MARIONETTER_CURVE_KEYFRAME_PROPERTY_VALUE];
     }
