@@ -160,7 +160,6 @@ export const createProceduralAtmosphereSkybox: (
     const updateParameters = () => {
         if (skyboxMesh.cubeMapWithUpdateContext) {
             const targetMaterialUniforms = skyboxMesh.cubeMapWithUpdateContext.updateContext.material.uniforms!;
-            console.log(targetMaterialUniforms);
             // console.log("======================");
             // console.log(skyboxMesh);
             // console.log(sunPosition);
@@ -195,7 +194,7 @@ export const createProceduralAtmosphereSkybox: (
         if (skyboxMesh.cubeMapWithUpdateContext) {
             frameCount++;
             if (frameCount % skyboxMesh.cubeMapWithUpdateContext.updateContext.updateInterval === 0) {
-                // updateParameters();
+                updateParameters();
                 updateProceduralCubeMap(
                     renderer,
                     skyboxMesh.cubeMapWithUpdateContext.cubeMap,
