@@ -264,6 +264,7 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
                 volumetricLightPass.spotLightFrustumMaterial
             );
         }
+        console.log("hogehoge", spotLight.shadowCamera)
     });
 
     setMaterialUniformValue(
@@ -291,7 +292,6 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
     );
     setMaterialUniformValue(volumetricLightPass.material, UNIFORM_NAME_BLEND_RATE, volumetricLightPass.blendRate);
 
-    // console.log(this.material.uniforms)
 
     renderPostProcessSinglePassBehaviour(volumetricLightPass, options);
 }
