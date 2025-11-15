@@ -62,11 +62,19 @@ import {
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
-import { createQuaternion, createQuaternionFromRawVector4 } from '@/PaleGL/math/quaternion.ts';
+// import { createQuaternion, createQuaternionFromRawV4 } from '@/PaleGL/math/quaternion.ts';
 import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+// import {
+//     RAW_VECTOR4_W_INDEX,
+//     RAW_VECTOR4_X_INDEX,
+//     RAW_VECTOR4_Y_INDEX,
+//     RAW_VECTOR4_Z_INDEX,
+//     RawVector4,
+// } from '@/PaleGL/math/vector4.ts';
+import { createQuaternionFromRawVector4 } from '@/PaleGL/math/quaternion.ts';
 
 // const HOT_REBUILD_SCENE = false;
 

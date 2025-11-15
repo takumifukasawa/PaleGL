@@ -1,6 +1,13 @@
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { Color, copyColor, createColorFromHex } from '@/PaleGL/math/color.ts';
-import { RawVector3, setV3, Vector3 } from '@/PaleGL/math/vector3.ts';
+import {
+    RAW_VECTOR3_X_INDEX,
+    RAW_VECTOR3_Y_INDEX,
+    RAW_VECTOR3_Z_INDEX,
+    RawVector3,
+    setV3,
+    Vector3,
+} from '@/PaleGL/math/vector3.ts';
 import { BloomPassParametersKey, BloomPassParametersPropertyMap } from '@/PaleGL/postprocess/bloomPass.ts';
 import {
     ChromaticAberrationPassParametersKey,
@@ -43,7 +50,7 @@ type AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => voi
 const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: unknown, key: string) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore-next-line
-    setV3(prop[key] as Vector3, v.x, v.y, v.z);
+    setV3(prop[key] as Vector3, v[RAW_VECTOR3_X_INDEX], v[RAW_VECTOR3_Y_INDEX], v[RAW_VECTOR3_Z_INDEX]);
 };
 type AssignColorConverter = (c: string, prop: unknown, key: string) => void;
 const assignColorConverter: AssignColorConverter = (hex: string, prop: unknown, key: string) => {

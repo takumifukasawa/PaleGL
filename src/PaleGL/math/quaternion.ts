@@ -1,39 +1,35 @@
 import {
     copyMat4WithElem,
     createMatrix4,
-    mat4m00, mat4m01,
-    mat4m02, mat4m10,
+    mat4m00,
+    mat4m01,
+    mat4m02,
+    mat4m10,
     mat4m11,
     mat4m12,
     mat4m20,
     mat4m21,
     mat4m22,
-    Matrix4, multiplyMat4Elem,
+    Matrix4,
+    multiplyMat4Elem,
 } from '@/PaleGL/math/matrix4.ts';
-import {createVector3, v3x, v3y, v3z, Vector3} from "@/PaleGL/math/vector3.ts";
-import {
-    RAW_VECTOR4_W_INDEX,
-    RAW_VECTOR4_X_INDEX,
-    RAW_VECTOR4_Y_INDEX,
-    RAW_VECTOR4_Z_INDEX,
-    RawVector4,
-} from '@/PaleGL/math/vector4.ts';
+import { createVector3, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { RAW_VECTOR4_X_INDEX, RAW_VECTOR4_Y_INDEX, RAW_VECTOR4_Z_INDEX, RawVector4 } from '@/PaleGL/math/vector4.ts';
 
 export type Quaternion = Float32Array;
 
 export const createQuaternion = (x: number, y: number, z: number, w: number) => {
     return new Float32Array([x, y, z, w]);
-}
+};
 
 export const createQuaternionFromRawVector4 = (v: RawVector4) => {
-    return new Float32Array([
-        // prettier-ignore
+    return createQuaternion(
         v[RAW_VECTOR4_X_INDEX],
         v[RAW_VECTOR4_Y_INDEX],
         v[RAW_VECTOR4_Z_INDEX],
-        v[RAW_VECTOR4_W_INDEX]
-    ])
-}
+        v[RAW_VECTOR4_Z_INDEX]
+    );
+};
 
 export const qx = (q: Quaternion) => q[0];
 export const qy = (q: Quaternion) => q[1];
@@ -46,7 +42,7 @@ export const copyQuaternion = (sq: Quaternion, tq: Quaternion) => {
     sq[2] = tq[2];
     sq[3] = tq[3];
     return sq;
-}
+};
 
 // ref:
 // https://zenn.dev/mebiusbox/books/132b654aa02124/viewer/2966c7
@@ -63,27 +59,27 @@ function createRotationMatrixFromQuaternionInternal(q: Quaternion, refMat?: Matr
     // const yw2 = this.y * this.w * 2;
     // const zw2 = this.z * this.w * 2;
     // // const ww2 = this.w * this.w * 2;
-    // 
+    //
     // const m00 = w * w + x * x - y * y - z * z;
     // const m01 = xy2 - zw2;
     // const m02 = xz2 + yw2;
     // const m03 = 0;
-    // 
+    //
     // const m10 = xy2 + zw2;
     // const m11 = w * w - x * x + y * y - z * z;
     // const m12 = yz2 - xw2;
     // const m13 = 0;
-    // 
+    //
     // const m20 = xz2 - yw2;
     // const m21 = yz2 + xw2;
     // const m22 = w * w - x * x - y * y + z * z;
     // const m23 = 0;
-    // 
+    //
     // const m30 = 0;
     // const m31 = 0;
     // const m32 = 0;
     // const m33 = 1;
-    // 
+    //
     // return new Matrix4(
     //     m00, m01, m02, m03,
     //     m10, m11, m12, m13,
@@ -122,8 +118,8 @@ function createRotationMatrixFromQuaternionInternal(q: Quaternion, refMat?: Matr
                 m30, m31, m32, m33
             );
         } else {
-        // prettier-ignore
-        return copyMat4WithElem(
+            // prettier-ignore
+            return copyMat4WithElem(
             refMat,
             m00, m01, m02, m03,
             m10, m11, m12, m13,
@@ -132,26 +128,21 @@ function createRotationMatrixFromQuaternionInternal(q: Quaternion, refMat?: Matr
         );
         }
     } else {
-        return createMatrix4(
-            m00, m01, m02, m03,
-            m10, m11, m12, m13,
-            m20, m21, m22, m23,
-            m30, m31, m32, m33
-        );
+        return createMatrix4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
     }
 }
 
 export const createRotationMatrixFromQuaternion = (q: Quaternion) => {
     return createRotationMatrixFromQuaternionInternal(q);
-}
+};
 
 export const createRotationMatrixFromQuaternionRef = (refMat: Matrix4, q: Quaternion) => {
-    return createRotationMatrixFromQuaternionInternal(q, refMat)
-}
+    return createRotationMatrixFromQuaternionInternal(q, refMat);
+};
 
 export const multiplyRotationMatrixFromQuaternion = (srcMat: Matrix4, q: Quaternion) => {
     return createRotationMatrixFromQuaternionInternal(q, srcMat, true);
-}
+};
 
 export const rotationMatrixToQuaternion = (mat: Matrix4) => {
     const m00 = mat4m00(mat);
@@ -192,7 +183,7 @@ export const rotationMatrixToQuaternion = (mat: Matrix4) => {
     }
 
     return createQuaternion(x, y, z, w);
-}
+};
 
 // ref:
 // - https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_conversion
@@ -235,7 +226,7 @@ export const toEulerRadianFromQuaternion = (q: Quaternion) => {
             ? Math.atan2(-(2 * xy - 2 * wz), 2 * ww + 2 * yy - 1)
             : Math.atan2(2 * xy + 2 * wz, 2 * ww + 2 * xx - 1),
     };
-}
+};
 
 export const toEulerDegreeFromQuaternion = (q: Quaternion) => {
     const rad = toEulerRadianFromQuaternion(q);
@@ -244,7 +235,7 @@ export const toEulerDegreeFromQuaternion = (q: Quaternion) => {
         y: (rad.y * 180) / Math.PI,
         z: (rad.z * 180) / Math.PI,
     };
-}
+};
 
 // zxy
 export const createQuaternionFromEulerRadians = (x: number, y: number, z: number) => {
@@ -261,18 +252,18 @@ export const createQuaternionFromEulerRadians = (x: number, y: number, z: number
     // const qz = sx * sy * cz + cx * cy * sz;
     // const qw = -sx * sy * sz + cx * cy * cz;
 
-    // left hand zxy   
+    // left hand zxy
     const qw = cx * cy * cz - sx * sy * sz;
     const qx = sx * cy * cz + cx * sy * sz;
     const qy = cx * sy * cz - sx * cy * sz;
     const qz = cx * cy * sz + sx * sy * cz;
 
     return createQuaternion(qx, qy, qz, qw);
-}
+};
 
 export const createQuaternionFromEulerDegrees = (x: number, y: number, z: number) => {
     return createQuaternionFromEulerRadians((x * Math.PI) / 180, (y * Math.PI) / 180, (z * Math.PI) / 180);
-}
+};
 
 export const createMatrix4FromQuaternion = (q: Quaternion) => {
     const x = qx(q);
@@ -297,15 +288,15 @@ export const createMatrix4FromQuaternion = (q: Quaternion) => {
         2 * (xz - wy), 2 * (yz + wx), 1 - 2 * (xx + yy), 0,
         0, 0, 0, 1
     );
-}
+};
 
 export const createQuaternionInvertAxis = (q: Quaternion) => {
     return createQuaternion(-qx(q), -qy(q), -qz(q), qw(q));
-}
+};
 
 export const createQuaternionIdentity = () => {
     return createQuaternion(0, 0, 0, 1);
-}
+};
 
 // TODO: バグがあるかもしれない
 export const rotateVectorByQuaternion = (v: Vector3, q: Quaternion) => {
@@ -313,7 +304,7 @@ export const rotateVectorByQuaternion = (v: Vector3, q: Quaternion) => {
     const y = qy(q);
     const z = qz(q);
     const w = qw(q);
-    
+
     const vx = v3x(v);
     const vy = v3y(v);
     const vz = v3z(v);
@@ -330,4 +321,4 @@ export const rotateVectorByQuaternion = (v: Vector3, q: Quaternion) => {
 
     // 回転後のベクトルを生成して返す
     return createVector3(rx, ry, rz);
-}
+};
