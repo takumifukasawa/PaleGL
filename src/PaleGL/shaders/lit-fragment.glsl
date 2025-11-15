@@ -86,8 +86,8 @@ void main() {
     surface.smWorldNormal = worldNormal;
     surface.smBaseColor = baseColor;
     
-    // #include <alpha_test_f>
-    #include ./partial/alpha-test-fragment.partial.glsl
+    #include <alpha_test_f>
+    // #include ./partial/alpha-test-fragment.partial.glsl
 
     baseColor.rgb = fGamma(baseColor.rgb);
    
