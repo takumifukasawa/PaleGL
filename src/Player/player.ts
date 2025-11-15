@@ -75,6 +75,7 @@ import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 //     RawVector4,
 // } from '@/PaleGL/math/vector4.ts';
 import { createQuaternionFromRawVector4 } from '@/PaleGL/math/quaternion.ts';
+import { cachedDataVersionTag } from 'node:v8';
 
 // const HOT_REBUILD_SCENE = false;
 

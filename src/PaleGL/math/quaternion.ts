@@ -14,7 +14,13 @@ import {
     multiplyMat4Elem,
 } from '@/PaleGL/math/matrix4.ts';
 import { createVector3, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
-import { RAW_VECTOR4_X_INDEX, RAW_VECTOR4_Y_INDEX, RAW_VECTOR4_Z_INDEX, RawVector4 } from '@/PaleGL/math/vector4.ts';
+import {
+    RAW_VECTOR4_W_INDEX,
+    RAW_VECTOR4_X_INDEX,
+    RAW_VECTOR4_Y_INDEX,
+    RAW_VECTOR4_Z_INDEX,
+    RawVector4,
+} from '@/PaleGL/math/vector4.ts';
 
 export type Quaternion = Float32Array;
 
@@ -27,7 +33,7 @@ export const createQuaternionFromRawVector4 = (v: RawVector4) => {
         v[RAW_VECTOR4_X_INDEX],
         v[RAW_VECTOR4_Y_INDEX],
         v[RAW_VECTOR4_Z_INDEX],
-        v[RAW_VECTOR4_Z_INDEX]
+        v[RAW_VECTOR4_W_INDEX]
     );
 };
 
