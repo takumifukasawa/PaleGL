@@ -167,35 +167,31 @@ export type MarionetterTrackInfoType =
     | typeof MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK
     | typeof MARIONETTER_TRACK_INFO_TYPE_OBJECT_MOVE_AND_LOOK_AT_TRACK;
 
-export type MarionetterTrackInfoBase = {
-    name: string;
-    type: MarionetterTrackInfoType;
-    // shorten
-    n: string;
-    t: MarionetterTrackInfoType;
-};
+// [name, type]
+export type MarionetterTrackInfoBase = [string, MarionetterTrackInfoType];
 
-export const MARIONETTER_TRACK_INFO_BASE_NAME = NeedsShorten ? 'n' : 'name';
-export const MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
+export const MARIONETTER_TRACK_INFO_BASE_NAME_INDEX = 0;
+export const MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX = 1;
 
-export type MarionetterDefaultTrackInfo = MarionetterTrackInfoBase & {
-    targetName: string;
-    clips: MarionetterClipInfoKinds[];
-    // shorten
-    tn: string;
-    cs: MarionetterClipInfoKinds[];
-};
+// [name, type, targetName, clips]
+export type MarionetterDefaultTrackInfo = [
+    string,
+    MarionetterTrackInfoType,
+    string,
+    MarionetterClipInfoKinds[]
+];
 
-export const MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME = NeedsShorten ? 'tn' : 'targetName';
-export const MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS = NeedsShorten ? 'cs' : 'clips';
+export const MARIONETTER_DEFAULT_TRACK_INFO_NAME_INDEX = 0;
+export const MARIONETTER_DEFAULT_TRACK_INFO_TYPE_INDEX = 1;
+export const MARIONETTER_DEFAULT_TRACK_INFO_TARGET_NAME_INDEX = 2;
+export const MARIONETTER_DEFAULT_TRACK_INFO_CLIPS_INDEX = 3;
 
-export type MarionetterMarkerTrackInfo = MarionetterTrackInfoBase & {
-    signalEmitters: MarionetterSignalEmitter[];
-    // shorten
-    ses: MarionetterSignalEmitter[];
-};
+// [name, type, signalEmitters]
+export type MarionetterMarkerTrackInfo = [string, MarionetterTrackInfoType, MarionetterSignalEmitter[]];
 
-export const MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS = NeedsShorten ? 'ses' : 'signalEmitters';
+export const MARIONETTER_MARKER_TRACK_INFO_NAME_INDEX = 0;
+export const MARIONETTER_MARKER_TRACK_INFO_TYPE_INDEX = 1;
+export const MARIONETTER_MARKER_TRACK_INFO_SIGNAL_EMITTERS_INDEX = 2;
 
 export type MarionetterTrackInfoKinds = MarionetterDefaultTrackInfo | MarionetterMarkerTrackInfo;
 

@@ -40,9 +40,13 @@ import {
     MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
     MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
     MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
-    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS,
-    MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME,
-    MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS,
+    MARIONETTER_DEFAULT_TRACK_INFO_CLIPS_INDEX,
+    MARIONETTER_DEFAULT_TRACK_INFO_NAME_INDEX,
+    MARIONETTER_DEFAULT_TRACK_INFO_TARGET_NAME_INDEX,
+    MARIONETTER_DEFAULT_TRACK_INFO_TYPE_INDEX,
+    MARIONETTER_MARKER_TRACK_INFO_NAME_INDEX,
+    MARIONETTER_MARKER_TRACK_INFO_SIGNAL_EMITTERS_INDEX,
+    MARIONETTER_MARKER_TRACK_INFO_TYPE_INDEX,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
@@ -50,8 +54,8 @@ import {
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
     MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME,
     MARIONETTER_SIGNAL_EMITTER_PROPERTY_TIME,
-    MARIONETTER_TRACK_INFO_BASE_NAME,
-    MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE,
+    MARIONETTER_TRACK_INFO_BASE_NAME_INDEX,
+    MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX,
     MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK,
     MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK,
     MARIONETTER_TRACK_TYPE_DEFAULT,
@@ -192,12 +196,12 @@ export function buildMarionetterTimeline(
         const track =
             marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
 
-        if (track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
+        if (track[MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
             const signalEmitters = (track as MarionetterMarkerTrackInfo)[
-                MARIONETTER_MARKER_TRACK_INFO_PROPERTY_SIGNAL_EMITTERS
+                MARIONETTER_MARKER_TRACK_INFO_SIGNAL_EMITTERS_INDEX
             ];
             const data = {
-                name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
+                name: track[MARIONETTER_TRACK_INFO_BASE_NAME_INDEX],
                 trackType: MARIONETTER_TRACK_TYPE_MARKER,
                 signalEmitters: signalEmitters.map((signalEmitter) => {
                     return buildSignalEmitter(signalEmitter);
@@ -207,9 +211,9 @@ export function buildMarionetterTimeline(
             tracks.push(data);
         } else {
             const targetName = (track as MarionetterDefaultTrackInfo)[
-                MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_TARGET_NAME
+                MARIONETTER_DEFAULT_TRACK_INFO_TARGET_NAME_INDEX
             ];
-            const clips = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_PROPERTY_CLIPS];
+            const clips = (track as MarionetterDefaultTrackInfo)[MARIONETTER_DEFAULT_TRACK_INFO_CLIPS_INDEX];
             // const targetActors = [
             //     findActorByName(marionetterActors, targetName),
             //     // Scene.find(placedScene.children, targetName),
@@ -223,7 +227,7 @@ export function buildMarionetterTimeline(
             targetActor = targetActor as Actor;
 
             const data: MarionetterTimelineDefaultTrack = {
-                name: track[MARIONETTER_TRACK_INFO_BASE_NAME],
+                name: track[MARIONETTER_TRACK_INFO_BASE_NAME_INDEX],
                 trackType: MARIONETTER_TRACK_TYPE_DEFAULT,
                 targetName,
                 targetActor,
@@ -293,7 +297,7 @@ export function buildMarionetterTimeline(
                 }
 
                 if (
-                    track[MARIONETTER_TRACK_INFO_BASE_PROPERTY_TYPE] ===
+                    track[MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX] ===
                     MARIONETTER_TRACK_INFO_TYPE_ACTIVATION_CONTROL_TRACK
                 ) {
                     if (targetActor) {
