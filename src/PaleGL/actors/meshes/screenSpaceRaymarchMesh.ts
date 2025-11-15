@@ -87,16 +87,10 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         uniformBlockNames: [UNIFORM_BLOCK_NAME_TIMELINE],
         fragmentShaderModifiers: [
-            {
-                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-                value: args.fragmentShaderContent,
-            }
+            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.fragmentShaderContent]
         ],
         depthFragmentShaderModifiers: [
-            {
-                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-                value: args.depthFragmentShaderContent,
-            }
+            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent]
         ],
     });
 

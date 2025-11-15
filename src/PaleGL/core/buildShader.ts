@@ -390,11 +390,11 @@ export const buildVertexShader = (
         VERTEX_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     ].forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            const modifierIndex = vertexShaderModifiers.findIndex((elem) => elem.pragma === pragma);
+            const modifierIndex = vertexShaderModifiers.findIndex((elem) => elem[0] === pragma);
             if (modifierIndex < 0) {
                 return '';
             }
-            return vertexShaderModifiers[modifierIndex].value || '';
+            return vertexShaderModifiers[modifierIndex][1] || '';
         });
     });
 
@@ -438,11 +438,11 @@ export const buildFragmentShader = (
         FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
     ].forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
-            const modifierIndex = fragmentShaderModifiers.findIndex((elem) => elem.pragma === pragma);
+            const modifierIndex = fragmentShaderModifiers.findIndex((elem) => elem[0] === pragma);
             if (modifierIndex < 0) {
                 return '';
             }
-            return fragmentShaderModifiers[modifierIndex].value || '';
+            return fragmentShaderModifiers[modifierIndex][1] || '';
         });
     });
 

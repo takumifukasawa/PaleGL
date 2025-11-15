@@ -28,7 +28,7 @@ export const JSON_OPTIMIZER_EXCLUDE_KEYS = [
 // JSON最適化のデフォルト設定
 export const JSON_OPTIMIZER_DEFAULT_OPTIONS = {
     enableRound: false,
-    decimalPlaces: 10,
+    decimalPlaces: 5,
     verbose: false,
     excludeKeys: JSON_OPTIMIZER_EXCLUDE_KEYS,
 } as const;

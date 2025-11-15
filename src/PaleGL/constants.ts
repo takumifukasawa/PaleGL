@@ -781,12 +781,15 @@ export type FragmentShaderModifierPragmas =
     | typeof FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_INITIALIZE
     | typeof FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE;
 
-// TODO: key to type
-export type VertexShaderModifiers = { pragma: VertexShaderModifierPragmas; value: string }[];
+// Tuple-based shader modifiers (optimized for size)
+export type VertexShaderModifier = [VertexShaderModifierPragmas, string];
+export type VertexShaderModifiers = VertexShaderModifier[];
 
-export type FragmentShaderModifiers = { pragma: FragmentShaderModifierPragmas; value: string }[];
+export type FragmentShaderModifier = [FragmentShaderModifierPragmas, string];
+export type FragmentShaderModifiers = FragmentShaderModifier[];
 
-export type DepthFragmentShaderModifiers = { pragma: FragmentShaderModifierPragmas; value: string }[];
+export type DepthFragmentShaderModifier = [FragmentShaderModifierPragmas, string];
+export type DepthFragmentShaderModifiers = DepthFragmentShaderModifier[];
 
 // ShaderPartialPragmas - 現在は空（将来の拡張用）
 // export const SHADER_PARTIAL_PRAGMA_ENGINE_UNIFORMS = 'ENGINE_UNIFORMS';

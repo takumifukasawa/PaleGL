@@ -164,17 +164,11 @@ export const createObjectSpaceRaymarchMaterial = ({
         ],
 
         fragmentShaderModifiers: [
-            {
-                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-                value: fragmentShaderContent,
-            },
+            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, fragmentShaderContent],
             ...(materialArgs.fragmentShaderModifiers ?? []),
         ],
         depthFragmentShaderModifiers: [
-            {
-                pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-                value: depthFragmentShaderContent,
-            },
+            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, depthFragmentShaderContent],
             ...(materialArgs.depthFragmentShaderModifiers ?? []),
         ],
     });
