@@ -32,7 +32,9 @@ void main() {
     
     vec4 vertexColor = aColor;
 
-    #pragma VERTEX_COLOR_POST_PROCESS
+    // CUSTOM_BEGIN comment out
+    // #pragma VERTEX_COLOR_POST_PROCESS
+    // CUSTOM_END
 
     vVertexColor = vertexColor;
 

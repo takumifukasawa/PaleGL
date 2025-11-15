@@ -29,8 +29,10 @@ void main() {
     #pragma LOCAL_POSITION_POST_PROCESS
 
     vUv = aUv; 
-    
-    #pragma VERTEX_COLOR_POST_PROCESS
+   
+    // CUSTOM_BEGIN comment out
+    // #pragma VERTEX_COLOR_POST_PROCESS
+    // CUSTOM_END
 
     vec4 worldPosition = uWorldMatrix * localPosition;
   

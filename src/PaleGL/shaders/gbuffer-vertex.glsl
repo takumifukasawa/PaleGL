@@ -371,11 +371,13 @@ void main() {
 
     worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 
-    // TODO:
-    // vInstanceState = aInstanceState;
-    #ifdef USE_VERTEX_COLOR
-        vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
-    #endif
+    // CUSTOM_BEGIN comment out
+    // // TODO:
+    // // vInstanceState = aInstanceState;
+    // #ifdef USE_VERTEX_COLOR
+    //     vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+    // #endif
+    // CUSTOM_END
 #endif
 
     // --- normal matrix
@@ -432,15 +434,17 @@ void main() {
 
     // --- vertex color
 
-#if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
-    // vVertexColor = aInstanceVertexColor;
-    vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
-    #if defined(USE_INSTANCING)
-        vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
-    #else
-        vVertexEmissiveColor = mix(aVertexEmissiveColor, uEmissiveColor, uEmissiveMixer);
-    #endif
-#endif
+// CUSTOM_BEGIN comment out
+// #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
+//     // vVertexColor = aInstanceVertexColor;
+//     vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
+//     #if defined(USE_INSTANCING)
+//         vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
+//     #else
+//         vVertexEmissiveColor = mix(aVertexEmissiveColor, uEmissiveColor, uEmissiveMixer);
+//     #endif
+// #endif
+// CUSTOM_END
 
     // --- end
 

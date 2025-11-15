@@ -88,9 +88,11 @@ void main() {
 
     #include <normal_map_f>
 
-    #ifdef USE_VERTEX_COLOR
-    baseColor *= vVertexColor;
-    #endif
+    // CUSTOM_BEGIN comment out
+    // #ifdef USE_VERTEX_COLOR
+    // baseColor *= vVertexColor;
+    // #endif
+    // CUSTOM_END
     
     // baseColor = vec4(1.);
 

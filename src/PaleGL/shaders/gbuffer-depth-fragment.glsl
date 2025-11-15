@@ -9,19 +9,17 @@ uniform sampler2D uHeightMap;
 uniform vec4 uHeightMapTiling;
 #endif
 
-#ifdef USE_ALPHA_TEST
-uniform float uAlphaTestThreshold;
-#endif
+#include <alpha_test>
 
 in vec2 vUv;
 
-#ifdef USE_VERTEX_COLOR
-in vec4 vVertexColor;
-#endif
+// CUSTOM_BEGIN comment out
+// #ifdef USE_VERTEX_COLOR
+// in vec4 vVertexColor;
+// #endif
+// CUSTOM_END
 
 out vec4 outColor;
-
-#include <alpha_test>
 
 void main() {
     vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
@@ -30,11 +28,13 @@ void main() {
     vec4 baseMapColor = texture(uBaseMap, uv);
    
     // 後半はuvを最適化の過程で消されないようにする対策 
-    vec4 baseColor = uColor * baseMapColor + vec4(uv.xy, 1., 1.) * 0.;
+    vec4 baseColor = uColor * baseMapColor + vec4(uv.xyxy) * 1;
 
-#ifdef USE_VERTEX_COLOR
-    baseColor *= vVertexColor;
-#endif   
+// CUSTOM_BEGIN
+// #ifdef USE_VERTEX_COLOR
+//     baseColor *= vVertexColor;
+// #endif   
+// CUSTOM_END
 
     // TODO: fbase color を渡して alpha をかける
     vec4 resultColor = baseColor;
@@ -44,7 +44,8 @@ void main() {
     
     #pragma BEFORE_OUT
     
-    outColor = vec4(1., 1., 1., 1.);
+    // baseColorを最適化の過程で消されないようにする対策のmix
+    outColor = mix(vec4(1., 1., 1., 1.), resultColor, 0.);
 
     #pragma AFTER_OUT
 }

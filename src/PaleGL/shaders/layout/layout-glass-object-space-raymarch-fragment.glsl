@@ -93,9 +93,11 @@ void main() {
     vec4 baseMapColor = texture(uBaseMap, uv);
     vec4 baseColor = uBaseColor * baseMapColor;
 
-#ifdef USE_VERTEX_COLOR
-    baseColor *= vVertexColor;
-#endif
+// CUSTOM_BEGIN
+// #ifdef USE_VERTEX_COLOR
+//     baseColor *= vVertexColor;
+// #endif
+// CUSTOM_END
     
     vec3 emissiveColor = uEmissiveColor.rgb;
 #ifdef USE_INSTANCING

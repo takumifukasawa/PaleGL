@@ -31,7 +31,9 @@ import {
     VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_OUT_CLIP_POSITION_PRE_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-    VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+    // CUSTOM_BEGIN comment out
+    // VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+    // CUSTOM_END
     VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
     VertexShaderModifiers,
@@ -140,7 +142,9 @@ const buildShaderDefines = ({
     gpuSkinning,
     useNormalMap,
     useEnvMap,
-    useVertexColor,
+    // CUSTOM_BEGIN comment out
+    // useVertexColor,
+    // CUSTOM_END
     useAlphaTest,
     isInstancing,
     useInstanceLookDirection,
@@ -166,9 +170,11 @@ const buildShaderDefines = ({
     if (useEnvMap) {
         arr.push('#define USE_ENV_MAP');
     }
-    if (useVertexColor) {
-        arr.push('#define USE_VERTEX_COLOR');
-    }
+    // CUSTOM_BEGIN comment out
+    // if (useVertexColor) {
+    //     arr.push('#define USE_VERTEX_COLOR');
+    // }
+    // CUSTOM_END
     if (useAlphaTest) {
         arr.push('#define USE_ALPHA_TEST');
     }
@@ -359,7 +365,9 @@ export const buildVertexShader = (
     // replace shader block
     [
         VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
-        VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+        // CUSTOM_BEGIN comment out
+        // VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
+        // CUSTOM_END
         VERTEX_SHADER_MODIFIER_PRAGMA_INSTANCE_TRANSFORM_PRE_PROCESS,
         VERTEX_SHADER_MODIFIER_PRAGMA_WORLD_POSITION_POST_PROCESS,
         VERTEX_SHADER_MODIFIER_PRAGMA_VIEW_POSITION_POST_PROCESS,

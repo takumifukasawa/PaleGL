@@ -7,9 +7,11 @@ uniform vec4 uFontTiling;
 
 in vec2 vUv;
 
-#ifdef USE_VERTEX_COLOR
-in vec4 vVertexColor;
-#endif
+// CUSTOM_BEGIN comment out
+// #ifdef USE_VERTEX_COLOR
+// in vec4 vVertexColor;
+// #endif
+// CUSTOM_END
 
 out vec4 outColor;
 

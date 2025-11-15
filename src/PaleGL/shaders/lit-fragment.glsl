@@ -70,14 +70,20 @@ void main() {
     // #include <normal_map_f>
     #include ./partial/normal-map-fragment.partial.glsl
 
-#ifdef USE_VERTEX_COLOR
-    // 頂点カラーでuniformのcolorは計算済み
-    baseColor *= vVertexColor;
-    emissiveColor = vVertexEmissiveColor;
-#else
+// CUSTOM_BEGIN comment out
+// #ifdef USE_VERTEX_COLOR
+//     // 頂点カラーでuniformのcolorは計算済み
+//     baseColor *= vVertexColor;
+//     emissiveColor = vVertexEmissiveColor;
+// #else
+// CUSTOM_END
     baseColor *= uBaseColor;
     emissiveColor = uEmissiveColor;
-#endif
+// CUSTOM_BEGIN comment out
+// #endif
+// CUSTOM_END
+
+
 
     // surface.smSpecularAmount = uSpecularAmount;
 

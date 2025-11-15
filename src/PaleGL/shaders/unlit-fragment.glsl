@@ -42,9 +42,11 @@ void main() {
     worldNormal = normalize(vNormal);
 #endif
 
-#ifdef USE_VERTEX_COLOR
-    baseColor *= vVertexColor;
-#endif
+// CUSTOM_BEGIN comment out
+// #ifdef USE_VERTEX_COLOR
+//     baseColor *= vVertexColor;
+// #endif
+// CUSTOM_END
 
     vec4 resultColor = baseColor;
 
