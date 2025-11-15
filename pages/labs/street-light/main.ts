@@ -970,14 +970,11 @@ const main = async () => {
     setScaling(streetFloorActor.transform, createVector3Fill(1));
     const streetFloorMaterial = (streetFloorActor?.children[0] as Mesh).materials[0];
     streetFloorMaterial.fragmentShaderModifiers = [
-        {
-            pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT,
-            value: `
+        [FRAGMENT_SHADER_MODIFIER_PRAGMA_BEFORE_OUT, `
 float d = 1. - smoothstep(4., 7., length(uv));
 baseColor *= d;
 emissiveColor *= d;
-`,
-        },
+`],
     ];
     console.log(streetFloorMaterial);
     setUniformValue(streetFloorMaterial.uniforms, UNIFORM_NAME_METALLIC, 0.5);

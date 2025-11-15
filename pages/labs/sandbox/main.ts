@@ -129,6 +129,7 @@ import {
     VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
     VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
     VertexShaderModifierPragmas,
+    VertexShaderModifiers,
 } from '@/PaleGL/constants';
 
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -370,8 +371,12 @@ const createTestGPUParticle = (gpu: Gpu) => {
         //         position: [Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5, 1],
         //     };
         // },
-        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
-        updateFragmentShader: testGPUParticleUpdateFragmentShader,
+        shaders: [
+            {
+                initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+                updateFragmentShader: testGPUParticleUpdateFragmentShader,
+            },
+        ],
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -412,8 +417,12 @@ const createTestGPUPlaneTrailParticle = (gpu: Gpu) => {
         instanceCount: vatWidth,
         vatWidth,
         vatHeight,
-        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
-        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+        shaders: [
+            {
+                initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+                updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+            },
+        ],
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -483,8 +492,12 @@ const createTestGPUCylinderTrailParticle = (gpu: Gpu) => {
         instanceCount: vatWidth,
         vatWidth,
         vatHeight,
-        initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
-        updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+        shaders: [
+            {
+                initializeFragmentShader: testGPUTrailParticleInitializeFragmentShader,
+                updateFragmentShader: testGPUTrailParticleUpdateFragmentShader,
+            },
+        ],
     });
     addActorToScene(captureScene, vatGPUParticle);
 
@@ -1978,28 +1991,19 @@ const main = async () => {
         particleMap,
         vertexShaderModifiers: [
             ...(isMinifyShader()
-                ? []
+                ? ([] as VertexShaderModifiers)
                 : ([
-                      {
-                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
-                          value: `
+                      [VERTEX_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN, `
 cycleSpeed = .33;
-                `,
-                      },
-                      {
-                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS,
-                          value: `
+                `],
+                      [VERTEX_SHADER_MODIFIER_PRAGMA_LOCAL_POSITION_POST_PROCESS, `
 localPosition.x += mix(0., 4., r) * mix(.4, .8, cycleOffset);
 localPosition.z += mix(0., 4., r) * mix(-.4, -.8, cycleOffset);
-                `,
-                      },
-                      {
-                          pragma: VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS,
-                          value: `
+                `],
+                      [VERTEX_SHADER_MODIFIER_PRAGMA_VERTEX_COLOR_POST_PROCESS, `
 vertexColor.a *= (smoothstep(0., .2, r) * (1. - smoothstep(.2, 1., r)));
-                `,
-                      },
-                  ] as { pragma: VertexShaderModifierPragmas; value: string }[])),
+                `],
+                  ] as VertexShaderModifiers)),
         ],
     });
 

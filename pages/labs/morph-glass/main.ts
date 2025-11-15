@@ -544,10 +544,7 @@ const main = async () => {
     const replaceGlassMaterial = (content: string) => {
         replaceAllMeshMaterialsByArgs(objectSpaceRaymarchMesh, gpu, {
             fragmentShaderModifiers: [
-                {
-                    pragma: FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
-                    value: content,
-                },
+                [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, content],
             ],
         });
         console.log("hogehoge", objectSpaceRaymarchMesh);
