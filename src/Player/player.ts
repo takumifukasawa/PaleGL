@@ -62,9 +62,9 @@ import {
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
-import { createQuaternion } from '@/PaleGL/math/quaternion.ts';
+import { createQuaternion, createQuaternionFromRawVector4 } from '@/PaleGL/math/quaternion.ts';
 import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
-import { createVector3 } from '@/PaleGL/math/vector3.ts';
+import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
@@ -187,20 +187,12 @@ export function createPlayer(
                     if (sceneViewCameraEntity.cameraType === CAMERA_TYPE_PERSPECTIVE) {
                         (sceneViewCameraEntity as PerspectiveCamera).fov = data.cameraFov;
                     }
-                    setTranslation(
-                        sceneViewCameraEntity.transform,
-                        createVector3(data.cameraPosition.x, data.cameraPosition.y, data.cameraPosition.z)
-                    );
+                    setTranslation(sceneViewCameraEntity.transform, createVector3FromRaw(data.cameraPosition));
                     setRotation(
                         sceneViewCameraEntity.transform,
                         createRotatorFromQuaternion(
                             resolveInvertRotationLeftHandAxisToRightHandAxis(
-                                createQuaternion(
-                                    data.cameraRotation.x,
-                                    data.cameraRotation.y,
-                                    data.cameraRotation.z,
-                                    data.cameraRotation.w
-                                ),
+                                createQuaternionFromRawVector4(data.cameraRotation),
                                 sceneViewCameraEntity,
                                 true
                             )
