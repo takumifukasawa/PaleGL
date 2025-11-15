@@ -264,7 +264,6 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
                 volumetricLightPass.spotLightFrustumMaterial
             );
         }
-        console.log("hogehoge", spotLight.shadowCamera)
     });
 
     setMaterialUniformValue(
