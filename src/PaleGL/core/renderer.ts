@@ -226,7 +226,9 @@ import {
     LightShaftPass,
     setLightShaftPassDirectionalLight,
 } from '@/PaleGL/postprocess/lightShaftPass.ts';
-import { createMotionBlurPass, MotionBlurPass } from '@/PaleGL/postprocess/motionBlurPass.ts';
+// CUSTOM_BEGIN comment out
+// import { createMotionBlurPass, MotionBlurPass } from '@/PaleGL/postprocess/motionBlurPass.ts';
+// CUSTOM_END
 import {
     addPostProcessPass,
     createPostProcess,
@@ -348,7 +350,9 @@ export type Renderer = {
     fogPass: FogPass;
     depthOfFieldPass: DepthOfFieldPass;
     bloomPass: BloomPass;
-    motionBlurPass: MotionBlurPass;
+    // CUSTOM_BEGIN comment out
+    // motionBlurPass: MotionBlurPass;
+    // CUSTOM_END
     streakPass: StreakPass;
     toneMappingPass: ToneMappingPass;
     chromaticAberrationPass: ChromaticAberrationPass;
@@ -457,7 +461,9 @@ export function createRenderer({
     const fogPass = createFogPass({ gpu });
     const depthOfFieldPass = createDepthOfFieldPass({ gpu });
     const bloomPass = createBloomPass({ gpu });
-    const motionBlurPass = createMotionBlurPass({ gpu, enabled: false }); // motion blur 一旦使わない
+    // CUSTOM_BEGIN comment out
+    // const motionBlurPass = createMotionBlurPass({ gpu, enabled: false }); // motion blur 一旦使わない
+    // CUSTOM_END
     const streakPass = createStreakPass({ gpu });
     const toneMappingPass = createToneMappingPass({ gpu });
     const chromaticAberrationPass = createChromaticAberrationPass({ gpu });
@@ -466,7 +472,10 @@ export function createRenderer({
     const fxaaPass = createFXAAPass({ gpu });
     const colorCurtainPass = createColorCurtainPass({ gpu, name: 'ColorCurtain' });
 
-    addPostProcessPass(scenePostProcess, motionBlurPass);
+    // CUSTOM_BEGIN comment out
+    // addPostProcessPass(scenePostProcess, motionBlurPass);
+    // CUSTOM_END
+    
     addPostProcessPass(scenePostProcess, fxaaPass);
     addPostProcessPass(scenePostProcess, depthOfFieldPass);
     addPostProcessPass(scenePostProcess, bloomPass);
@@ -672,7 +681,9 @@ export function createRenderer({
         fogPass,
         depthOfFieldPass,
         bloomPass,
-        motionBlurPass,
+        // CUSTOM_BEGIN comment out
+        // motionBlurPass,
+        // CUSTOM_END
         streakPass,
         toneMappingPass,
         chromaticAberrationPass,
@@ -764,7 +775,9 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setPostProcessPassSize(renderer.fogPass, w, h);
     setPostProcessPassSize(renderer.depthOfFieldPass, w, h);
     setPostProcessPassSize(renderer.bloomPass, w, h);
-    setPostProcessPassSize(renderer.motionBlurPass, w, h);
+    // CUSTOM_BEGIN comment out
+    // setPostProcessPassSize(renderer.motionBlurPass, w, h);
+    // CUSTOM_END
     setPostProcessPassSize(renderer.streakPass, w, h);
     setPostProcessPassSize(renderer.toneMappingPass, w, h);
     setPostProcessPassSize(renderer.chromaticAberrationPass, w, h);
