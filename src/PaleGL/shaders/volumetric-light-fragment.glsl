@@ -208,7 +208,7 @@ void main() {
     outColor = accColor;
     
     // for debug
-    outColor = vec4(worldPositionFrustum , 1.);
+    // outColor = vec4(worldPositionFrustum , 1.);
     // outColor = texture(uSrcTexture, vUv);
     // outColor = vec4(vec3(rayOrigin), 1.);
     // outColor = vec4(worldPositionFrustum.xyz, 1.);
