@@ -69,8 +69,8 @@ import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.p
 import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 // CUSTOM_BEGIN
-import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
 import raymarchHumanFunctionsPostPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions-post.partial.glsl';
+import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
 // CUSTOM_END
 
 export type ShaderDefines = {
@@ -85,52 +85,57 @@ export type ShaderDefines = {
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
     useVAT: boolean;
-    useVATLookForward: boolean
+    useVATLookForward: boolean;
     isTrail: boolean;
     useHeightMap: boolean;
 };
 
 const includesDict = new Map<string, string>([
-    ['common', commonPartialContent],
-    ['buffer_visualizer_h', isDevelopment() ? bufferVisualizerHeaderContent : ''],
-    ['lighting', lightingPartialContent],
-    ['ub', uniformBlockPartialContent],
-    ['rand', randPartialContent],
-    ['tone', toneMappingPartialContent],
-    ['depth', depthPartialContent],
-    ['gbuffer', gbufferPartialContent],
-    ['gbuffer_o', gbufferOutPartialContent],
-    ['etex', effectTexturePartialContent],
-    ['raymarch_df', raymarchDistanceFunctionsPartialContent],
-    ['raymarch_sf', raymarchSceneFunctionsPartialContent],
-    ['alpha_test', alphaTestPartialContent],
-    ['alpha_test_f', alphaTestFragmentPartialContent],
-    ['shape_font_h', shapeFontHeaderPartialContent],
-    ['shape_font_f', shapeFontFragmentPartialContent],
-    ['vcolor_vh', vertexColorVertexHeaderPartialContent],
-    ['vcolor_fh', vertexColorFragmentHeaderPartialContent],
-    ['normal_map_fh', normalMapFragmentHeaderPartialContent],
-    ['normal_map_f', normalMapFragmentPartialContent],
-    ['env_map', envMapPartialContent],
-    ['skybox_h', skyboxHeaderPartialContent],
-    ['geometry_h', geometryHeaderPartialContent],
-    ['os_raymarch_f', objectSpaceRaymarchFunctionsPartialContent],
-    ['perlin', perlinPartialContent],
-    ['curl_noise', curlNoisePartialContent],
+    ['<common>', commonPartialContent],
+    ['<buffer_visualizer_h>', isDevelopment() ? bufferVisualizerHeaderContent : ''],
+    ['<lighting>', lightingPartialContent],
+    ['<ub>', uniformBlockPartialContent],
+    ['<rand>', randPartialContent],
+    ['<tone>', toneMappingPartialContent],
+    ['<depth>', depthPartialContent],
+    ['<gbuffer>', gbufferPartialContent],
+    ['<gbuffer_o>', gbufferOutPartialContent],
+    ['<etex>', effectTexturePartialContent],
+    ['<raymarch_df>', raymarchDistanceFunctionsPartialContent],
+    ['<raymarch_sf>', raymarchSceneFunctionsPartialContent],
+    ['<alpha_test>', alphaTestPartialContent],
+    ['<alpha_test_f>', alphaTestFragmentPartialContent],
+    ['<shape_font_h>', shapeFontHeaderPartialContent],
+    ['<shape_font_f>', shapeFontFragmentPartialContent],
+    ['<vcolor_vh>', vertexColorVertexHeaderPartialContent],
+    ['<vcolor_fh>', vertexColorFragmentHeaderPartialContent],
+    ['<normal_map_fh>', normalMapFragmentHeaderPartialContent],
+    ['<normal_map_f>', normalMapFragmentPartialContent],
+    ['<env_map>', envMapPartialContent],
+    ['<skybox_h>', skyboxHeaderPartialContent],
+    ['<geometry_h>', geometryHeaderPartialContent],
+    ['<os_raymarch_f>', objectSpaceRaymarchFunctionsPartialContent],
+    ['<perlin>', perlinPartialContent],
+    ['<curl_noise>', curlNoisePartialContent],
     // CUSTOM_BEGIN
-    ['human_df', raymarchHumanFunctionsPartialContent],
-    ['human_dfp', raymarchHumanFunctionsPostPartialContent]
+    ['<human_df>', raymarchHumanFunctionsPartialContent],
+    ['<human_dfp>', raymarchHumanFunctionsPostPartialContent],
     // CUSTOM_END
 ]);
 
 export const replaceShaderIncludes = (src: string) => {
     // TODO: include先もreplace対象にし、ネスト状態も対応
     // const expandedIncludes = new Set<string>();
-    src = src.replaceAll(/#include\s?<([a-zA-Z_]*)>/g, (_, p1: string) => {
+    src = src.replaceAll(/#include\s?(<[a-zA-Z_]*>)/g, (_, p1: string) => {
         // if (expandedIncludes.has(p1)) {
         //     return '';
         // }
         // expandedIncludes.add(p1);
+
+        // return includesDict.get(p1) || '';
+
+        // <lighting> -> lighting
+        // const id = p1.slice(1, p1.length - 1);
         return includesDict.get(p1) || '';
     });
     return src;
