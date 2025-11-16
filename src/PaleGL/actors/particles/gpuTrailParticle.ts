@@ -298,12 +298,14 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
 
     const gpuParticle: GPUTrailParticle = {
         ...instancingParticle,
+        gpu,
         mrtDoubleBuffer,
         vatWidth,
         vatHeight,
         prevUpdaterIndex: initialUpdaterIndex,
         updaterIndex: initialUpdaterIndex,
         updaters,
+        needsReplaceUpdaterInfo: []
     };
 
     overrideGPUTrailParticleMaterialSettings(gpuParticle);

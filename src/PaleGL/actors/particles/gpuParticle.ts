@@ -41,7 +41,11 @@ import {
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createGraphicsDoubleBufferMaterial } from '@/PaleGL/core/graphicsDoubleBuffer.ts';
 import { Renderer, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
-import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { deleteProgram } from '@/PaleGL/core/shader.ts';
+import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+
+const UPDATER_FOR_INITIALIZE_INDEX = 0;
+const UPDATER_FOR_UPDATE_INDEX = 1;
 
 export type GPUParticleArgsBase = InstancingParticleArgs & {
     gpu: Gpu;
@@ -71,6 +75,7 @@ export type GPUParticleUpdaterShaders = {
 export type GPUParticleUpdater = [Material, Material];
 
 export type GpuParticleBase = Mesh & {
+    gpu: Gpu;
     mrtDoubleBuffer: MRTDoubleBuffer;
     // materialForInitialize: Material;
     // materialForUpdate: Material;
@@ -81,6 +86,8 @@ export type GpuParticleBase = Mesh & {
     prevUpdaterIndex: number;
     updaterIndex: number;
     updaters: GPUParticleUpdater[];
+    //
+    needsReplaceUpdaterInfo: [number, [string, string]][]; // updater index, material for initialize, material for update
 };
 
 export type GpuParticle = GpuParticleBase & {
@@ -142,8 +149,6 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         initialUpdaterIndex = 0,
         useVATLookForward = false,
     } = args;
-    
-    console.log(args)
 
     const instancingParticle = createInstancingParticle({ ...args, meshType: MESH_TYPE_GPU_PARTICLE });
 
@@ -196,6 +201,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
 
     const gpuParticle: GpuParticle = {
         ...instancingParticle,
+        gpu,
         mrtDoubleBuffer,
         // materialForInitialize,
         // materialForUpdate,
@@ -204,6 +210,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
         prevUpdaterIndex: initialUpdaterIndex,
         updaterIndex: initialUpdaterIndex,
         updaters,
+        needsReplaceUpdaterInfo: [],
         useVATLookForward,
     };
 
@@ -224,7 +231,21 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     let tmpReadPositionMap;
     let tmpReadUpMap;
 
-    subscribeActorOnUpdate(gpuParticle, ({ renderer }) => {
+    subscribeActorOnUpdate(gpuParticle, ({ gpu, renderer }) => {
+        // 更新すべきupdaterがあったら更新
+        while (gpuParticle.needsReplaceUpdaterInfo.length) {
+            const elem = gpuParticle.needsReplaceUpdaterInfo.pop();
+            console.log("hogehoge", elem)
+            if (elem) {
+                const [updaterIndex, [fragmentShaderForInitialize, fragmentShaderForUpdate]] = elem;
+                replaceGPUParticleUpdaterByArgsInternal(gpu, renderer, gpuParticle, updaterIndex, [
+                    fragmentShaderForInitialize,
+                    fragmentShaderForUpdate,
+                ]);
+                resetGPUParticleByInitialize(renderer, gpuParticle);
+            }
+        }
+
         const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
         renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
 
@@ -279,4 +300,72 @@ export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: Gp
 
 export const switchGPUParticleUpdater = (gpuParticle: GpuParticleBase, index: number) => {
     gpuParticle.updaterIndex = index;
+};
+
+// 更新用のマテリアルを差し替え。shaderのcompileなどはupdateで行う
+export const replaceGPUParticleMaterial = (gpuParticle: GpuParticle, index: number, updaters: [Material, Material]) => {
+    gpuParticle.updaters[index] = updaters;
+};
+
+export const replaceGPUParticleUpdater = (
+    gpuParticle: GpuParticleBase,
+    updaterIndex: number,
+    fragmentShaders: [string, string]
+) => {
+    gpuParticle.needsReplaceUpdaterInfo.push([updaterIndex, fragmentShaders]);
+};
+
+// private ---
+
+const replaceGPUParticleUpdaterByArgsInternal = (
+    gpu: Gpu,
+    renderer: Renderer,
+    gpuParticle: GpuParticle,
+    updaterIndex: number,
+    [fragmentShaderForInitialize, fragmentShaderForUpdate]: [string, string]
+    // needsStart = true
+) => {
+    // TODO: uniformsの中身を引き継いだ方がいいと思われる
+    replaceGPUParticleUpdaterMaterialInternal(
+        gpu,
+        renderer,
+        gpuParticle,
+        updaterIndex,
+        UPDATER_FOR_INITIALIZE_INDEX,
+        fragmentShaderForInitialize
+    );
+    replaceGPUParticleUpdaterMaterialInternal(
+        gpu,
+        renderer,
+        gpuParticle,
+        updaterIndex,
+        UPDATER_FOR_UPDATE_INDEX,
+        fragmentShaderForUpdate
+    );
+};
+
+const replaceGPUParticleUpdaterMaterialInternal = (
+    gpu: Gpu,
+    renderer: Renderer,
+    gpuParticle: GpuParticle,
+    updaterIndex: number,
+    materialIndex: number,
+    fragmentShader: string
+) => {
+    const oldMaterial = gpuParticle.updaters[updaterIndex][materialIndex];
+
+    if (oldMaterial.shader) {
+        deleteProgram(gpu.gl, oldMaterial.shader.glObject);
+    }
+
+    gpuParticle.updaters[updaterIndex][materialIndex] = createMaterial({
+        ...oldMaterial.cachedArgs,
+        ...{
+            fragmentShader,
+        },
+    });
+
+    const newMaterial = gpuParticle.updaters[updaterIndex][materialIndex];
+
+    tryStartMaterial(gpu, renderer, renderer.sharedQuad, newMaterial);
 };
