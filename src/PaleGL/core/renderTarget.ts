@@ -71,8 +71,8 @@ export type RenderTarget = RenderTargetBase & {
     height: number;
     framebuffer: Framebuffer;
     depthRenderbuffer: Renderbuffer | null;
-    texture: Texture | null;
-    depthTexture: Texture | null;
+    texture: Texture | undefined;
+    depthTexture: Texture | undefined;
 };
 
 // ref: https://webgl2fundamentals.org/webgl/lessons/webgl-data-textures.html
@@ -112,8 +112,8 @@ export function createRenderTarget({
 
     const framebuffer = createFramebuffer({ gpu });
     let depthRenderbuffer: Renderbuffer | null = null;
-    let texture: Texture | null = null;
-    let depthTexture: Texture | null = null;
+    let texture: Texture | undefined = undefined;
+    let depthTexture: Texture | undefined = undefined;
 
     bindFramebuffer(framebuffer);
 
@@ -423,11 +423,11 @@ export function disposeRenderTarget(renderTarget: RenderTarget) {
     const { gpu, framebuffer, texture, depthTexture, depthRenderbuffer } = renderTarget;
     if (texture) {
         disposeTexture(texture);
-        renderTarget.texture = null;
+        renderTarget.texture = undefined;
     }
     if (depthTexture) {
         disposeTexture(depthTexture);
-        renderTarget.depthTexture = null;
+        renderTarget.depthTexture = undefined;
     }
     if (depthRenderbuffer) {
         gpu.gl.deleteRenderbuffer(depthRenderbuffer.glObject);

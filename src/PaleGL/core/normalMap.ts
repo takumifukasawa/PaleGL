@@ -56,7 +56,7 @@ export const createNormalMapConverter: (
             vertexShader,
             fragmentShader,
             uniforms: [
-                [uniformNameSrcMap, UNIFORM_TYPE_TEXTURE, null],
+                [uniformNameSrcMap, UNIFORM_TYPE_TEXTURE],
                 ['uParallaxScale', UNIFORM_TYPE_FLOAT, 0.001],
                 ['uNormalScale', UNIFORM_TYPE_FLOAT, 1.0],
                 [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2(1, 1)],

@@ -49,7 +49,7 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
     } = args;
 
     const baseUniforms: UniformsData = [
-        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_UNLIT],
@@ -58,7 +58,7 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
     const mergedUniforms: UniformsData = [...baseUniforms, ...uniforms];
 
     const depthUniforms: UniformsData = [
-        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         ...uniforms,

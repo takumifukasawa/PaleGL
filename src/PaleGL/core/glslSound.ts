@@ -28,7 +28,7 @@ export type GLSLSound = {
     gainNode: GainNode | null;
     analyserNode: AnalyserNode | null;
     audioBuffer: AudioBuffer | null;
-    audioTexture: Texture | null;
+    audioTexture: Texture | undefined;
     volume: number;
     startTime: number;
     offsetTime: number;

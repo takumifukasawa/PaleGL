@@ -43,7 +43,7 @@ export type BillboardParticleArgs = {
 export const createBillboardParticle = (args: BillboardParticleArgs) => {
     const {
         gpu,
-        particleMap = null,
+        particleMap,
         vertexShader,
         fragmentShader,
         particleNum,
@@ -194,7 +194,7 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                 createVector2(1, 1),
                 createVector2(1, -1),
             ]],
-            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
         // blendType: BlendTypes.Additive

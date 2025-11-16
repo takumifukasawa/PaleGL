@@ -104,8 +104,8 @@ export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
         gpu,
         fragmentShader: dofCircleOfConfusionFragmentShader,
         uniforms: [
-            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
             ['uFocusDistance', UNIFORM_TYPE_FLOAT, focusDistance],
             ['uFocusRange', UNIFORM_TYPE_FLOAT, focusRange],
             ['uBokehRadius', UNIFORM_TYPE_FLOAT, bokehRadius],
@@ -153,7 +153,7 @@ export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
             //     type: UNIFORM_TYPE_FLOAT,
             //     value: this.focusRange,
             // }
-            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE],
             [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
             ...getPostProcessCommonUniforms(),
         ],
@@ -212,8 +212,8 @@ export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
         fragmentShader: dofCompositeFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-            [UNIFORM_NAME_DOF_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_COC_TEXTURE, UNIFORM_TYPE_TEXTURE],
+            [UNIFORM_NAME_DOF_TEXTURE, UNIFORM_TYPE_TEXTURE],
         ],
     });
 

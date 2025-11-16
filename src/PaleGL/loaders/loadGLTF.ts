@@ -561,8 +561,8 @@ export async function loadGLTF({ gpu, dir = '', path }: Args) {
 
             const baseMap = hasBaseMap
                 ? preloadTextures[targetMaterial.pbrMetallicRoughness.baseColorTexture!.index]
-                : null;
-            const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : null;
+                : undefined;
+            const normalMap = hasNormalMap ? preloadTextures[targetMaterial.normalTexture!.index] : undefined;
 
             let emissiveColor = createColorBlack();
             // eslint-disable-next-line no-prototype-builtins

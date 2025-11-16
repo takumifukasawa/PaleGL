@@ -960,24 +960,14 @@ export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FA
 // gbuffer material controller component
 
 export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterComponentInfoBase & {
-    baseColor: string;
-    emissiveColor: string;
-    metallic: number;
-    roughness: number;
+    d: [string, number, number, string]; // [baseColor, metallic, roughness, emissiveColor]
 };
 
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_BASE_COLOR = NeedsShorten
-    ? 'gm_bc'
-    : 'baseColor';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_EMISSIVE_COLOR = NeedsShorten
-    ? 'gm_ec'
-    : 'emissiveColor';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_METALLIC = NeedsShorten
-    ? 'gm_m'
-    : 'metallic';
-export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_ROUGHNESS = NeedsShorten
-    ? 'gm_r'
-    : 'roughness';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_DATA = NeedsShorten ? 'd' : 'data';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX = 0;
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX = 1;
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX = 2;
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX = 3;
 
 // //
 // // post process component properties

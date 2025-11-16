@@ -119,10 +119,10 @@ export const createFogPass = (args: FogPassArgs) => {
             uniforms: [
                 [UNIFORM_FOG_COLOR, UNIFORM_TYPE_COLOR, createColorWhite()],
                 // TODO: defaultはblacktextureを渡す。lightshaftがない場合もあるので. もしくはboolを渡す
-                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [volumetricLightTextureUniformName, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [volumetricLightTextureUniformName, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_FOG_STRENGTH, UNIFORM_TYPE_FLOAT, fogStrength],
                 [UNIFORM_FOG_DENSITY, UNIFORM_TYPE_FLOAT, fogDensity],
                 [UNIFORM_FOG_DENSITY_ATTENUATION, UNIFORM_TYPE_FLOAT, fogDensityAttenuation],
@@ -132,7 +132,7 @@ export const createFogPass = (args: FogPassArgs) => {
                 [UNIFORM_DISTANCE_FOG_POWER, UNIFORM_TYPE_FLOAT, distanceFogPower],
                 [UNIFORM_SSS_FOG_RATE, UNIFORM_TYPE_FLOAT, sssFogRate],
                 [UNIFORM_SSS_FOG_COLOR, UNIFORM_TYPE_COLOR, createColorWhite()],
-                [UNIFORM_NOISE_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NOISE_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 1],
                 // ...PostProcessPassBaseDEPRECATED.commonUniforms,
             ],

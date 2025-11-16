@@ -31,8 +31,10 @@ import {
     renderMesh,
     setRendererSize,
     setRendererStats,
+    setRenderTargetToRendererAndClear,
     tryStartMaterial,
 } from '@/PaleGL/core/renderer.ts';
+import { createRenderTarget, disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
@@ -387,15 +389,45 @@ export async function warmRender(
     const renderer = engine.renderer;
     const gpu = renderer.gpu;
 
+    // ダミーのレンダーターゲットを作成(1x1の小さいサイズで高速化)
+    const dummyRenderTarget = createRenderTarget({
+        gpu,
+        name: 'warmup-dummy',
+        width: 1,
+        height: 1,
+        useDepthBuffer: true,
+    });
+
+    // 共通ユニフォームを更新
+    beforeRenderRenderer(renderer, 0, 0);
+
+    // 元のレンダーターゲットを保存
+    const originalRenderTarget = renderer.renderTarget;
+
     // 各メッシュを1つずつ処理
     for (let i = 0; i < meshes.length; i++) {
         const mesh = meshes[i];
         mesh.enabled = true;
 
+        // beforeRenderActorを呼び出してマテリアルの動的設定を反映
+        beforeRenderActor(mesh, {
+            gpu,
+            renderer,
+            scene: engine.scene!,
+            time: 0,
+            deltaTime: 0,
+        });
+        
+        // ダミーレンダーターゲットに切り替えて実際に描画
+        setRenderTargetToRendererAndClear(renderer, dummyRenderTarget, false, true);
+
         // materials をレンダリング
         mesh.materials.forEach((material) => {
             if (material) {
+                // beforeRenderActor後にマテリアルが変更されている可能性があるため再度コンパイル
                 tryStartMaterial(gpu, renderer, mesh.geometry, material);
+                // UBO バインディングも確認
+                checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
                 renderMesh(renderer, mesh.geometry, material);
             }
         });
@@ -404,6 +436,7 @@ export async function warmRender(
         mesh.depthMaterials.forEach((material) => {
             if (material) {
                 tryStartMaterial(gpu, renderer, mesh.geometry, material);
+                checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
                 renderMesh(renderer, mesh.geometry, material);
             }
         });
@@ -427,6 +460,12 @@ export async function warmRender(
 
         await wait(waitTime);
     }
+
+    // レンダーターゲットを元に戻す
+    setRenderTargetToRendererAndClear(renderer, originalRenderTarget, false, false);
+
+    // ダミーレンダーターゲットを破棄
+    disposeRenderTarget(dummyRenderTarget);
 
     // すべてのアクターの enabled 状態を復元
     actors.forEach((actor) => {

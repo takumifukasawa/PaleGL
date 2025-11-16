@@ -117,7 +117,7 @@ export const createEffectTextureSystem: (
         });
 
         const uniforms: UniformsData = [
-            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
             ['uTilingEnabled', UNIFORM_TYPE_FLOAT, tilingEnabled ? 1 : 0],
             ['uEdgeMaskMix', UNIFORM_TYPE_FLOAT, edgeMaskMix],
             ['uRemapMin', UNIFORM_TYPE_FLOAT, remapMin!],

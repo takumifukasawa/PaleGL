@@ -41,10 +41,10 @@ export type ScreenSpaceRaymarchMaterialArgs = {
     baseMap?: Texture;
     baseMapTiling?: Vector4;
     metallic?: number;
-    metallicMap?: Texture | null;
+    metallicMap?: Texture;
     metallicMapTiling?: Vector4;
     roughness?: number;
-    roughnessMap?: Texture | null;
+    roughnessMap?: Texture;
     roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
     fragmentShader?: string;
@@ -72,19 +72,19 @@ export const createScreenSpaceRaymarchMaterial = ({
     uniformBlockNames,
     ...options
 }: ScreenSpaceRaymarchMaterialArgs) => {
-    const _baseMap = baseMap || null;
+    const _baseMap = baseMap;
     const _baseColor = baseColor || createColorWhite();
     const _baseMapTiling = baseMapTiling || createVector4(1, 1, 0, 0);
-    const _roughnessMap = roughnessMap || null;
+    const _roughnessMap = roughnessMap;
     const _roughnessMapTiling = roughnessMapTiling || createVector4(1, 1, 0, 0);
     const _roughness = roughness || 0;
     const _metallic = metallic || 0;
-    const _metallicMap = metallicMap || null;
+    const _metallicMap = metallicMap;
     const _metallicMapTiling = metallicMapTiling || createVector4(1, 1, 0, 0);
     const _emissiveColor = emissiveColor || createColorBlack();
 
     const commonUniforms: UniformsData = [
-        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_CAMERA_FOV, UNIFORM_TYPE_FLOAT, 0],
         [UNIFORM_NAME_CAMERA_ASPECT, UNIFORM_TYPE_FLOAT, 0],
 

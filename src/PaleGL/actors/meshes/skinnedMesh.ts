@@ -63,7 +63,7 @@ export type SkinnedMesh = Mesh & {
     boneOffsetMatrices: Matrix4[];
     boneIndicesForLines: number[];
     boneOrderedIndex: Bone[];
-    jointTexture: Texture | null;
+    jointTexture: Texture | undefined;
     gpuSkinning: boolean | null;
     animationClips: AnimationClip[];
     jointTextureColNum: number;
@@ -88,7 +88,7 @@ export function createSkinnedMesh({ bones, debugBoneView, ...options }: SkinnedM
             boneOffsetMatrices: [],
             boneIndicesForLines: [],
             boneOrderedIndex: [],
-            jointTexture: null,
+            jointTexture: undefined,
             gpuSkinning: null,
             animationClips: [],
             jointTextureColNum: 1,
@@ -106,7 +106,7 @@ export function createSkinnedMesh({ bones, debugBoneView, ...options }: SkinnedM
 
     const boneIndicesForLines: number[] = [];
 
-    const jointTexture: Texture | null = null;
+    const jointTexture: Texture | undefined = undefined;
 
     // gpuSkinning: boolean = false;
     const gpuSkinning: boolean | null = null;
@@ -423,7 +423,7 @@ const generateSkinningUniforms = (skinnedMesh: SkinnedMesh): UniformsData => {
         //     type: UNIFORM_TYPE_MATRIX4_ARRAY,
         //     value: new Array(this.boneCount).fill(0).map(i => Matrix4.identity),
         // };
-        [UNIFORM_NAME_JOINT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_JOINT_TEXTURE, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_JOINT_TEXTURE_COL_NUM, UNIFORM_TYPE_INT, skinnedMesh.jointTextureColNum],
         ...(skinnedMesh.gpuSkinning
             ? ([

@@ -51,7 +51,7 @@ export type GBufferRenderTargets = RenderTargetBase & {
     gBufferBTexture: Texture;
     gBufferCTexture: Texture;
     gBufferDTexture: Texture;
-    depthTexture: Texture | null;
+    depthTexture: Texture | undefined;
 };
 
 // TODO: depth texture を resize しなくていいようにしたい。なぜなら depthprepassでリサイズしてるから
@@ -69,7 +69,7 @@ export function createGBufferRenderTargets({
     generateDepth: boolean;
 }): GBufferRenderTargets {
     const gBufferTextures: Texture[] = [];
-    let depthTexture: Texture | null = null;
+    let depthTexture: Texture | undefined = undefined;
 
     const minFilter = TEXTURE_FILTER_TYPE_LINEAR;
     const magFilter = TEXTURE_FILTER_TYPE_LINEAR;

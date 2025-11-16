@@ -123,7 +123,7 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
         gpu,
         fragmentShader: streakPrefilterFragmentShader,
         uniforms: [
-            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
             [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
             ['uThreshold', UNIFORM_TYPE_FLOAT, threshold],
             ['uVerticalScale', UNIFORM_TYPE_FLOAT, verticalScale],
@@ -140,7 +140,7 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
             fragmentShader: streakDownSampleFragmentShader,
             uniforms: [
                 [UNIFORM_NAME_TEXEL_SIZE, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
-                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_NAME_HORIZONTAL_SCALE, UNIFORM_TYPE_FLOAT, horizontalScale],
                 ...getPostProcessCommonUniforms(),
             ],
@@ -162,8 +162,8 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
             gpu,
             fragmentShader: streakUpSampleFragmentShader,
             uniforms: [
-                [UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_DOWN_SAMPLE_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_PREV_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_NAME_STRETCH, UNIFORM_TYPE_FLOAT, stretch],
                 ...getPostProcessCommonUniforms(),
             ],
@@ -186,7 +186,7 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
         gpu,
         fragmentShader: streakCompositeFragmentShader,
         uniforms: [
-            [UNIFORM_NAME_STREAK_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_STREAK_TEXTURE, UNIFORM_TYPE_TEXTURE],
             [UNIFORM_NAME_COLOR, UNIFORM_TYPE_COLOR, color],
             [UNIFORM_NAME_INTENSITY, UNIFORM_TYPE_FLOAT, intensity],
             ...getPostProcessCommonUniforms(),

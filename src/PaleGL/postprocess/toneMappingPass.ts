@@ -15,7 +15,7 @@ export const createToneMappingPass = (args: ToneMappingPassArgs): ToneMappingPas
     const { gpu, enabled } = args;
 
     const uniforms: UniformsData = [
-        [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
         // uSrcTexture: {
     ];
 

@@ -1478,7 +1478,7 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     // )
 
     if (cb) cb();
-
+    
     // draw
     drawGPU(
         renderer.gpu,

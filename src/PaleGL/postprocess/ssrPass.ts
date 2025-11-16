@@ -137,10 +137,10 @@ export const createSSRPass = (args: SSRPassArgs): SsrPass => {
     const blendRate = args.blendRate ?? 1;
 
     const baseUniforms: UniformsData = [
-        [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-        [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-        [UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE],
+        [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE],
+        [UNIFORM_NAME_GBUFFER_C_TEXTURE, UNIFORM_TYPE_TEXTURE],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         ['uRayDepthBias', UNIFORM_TYPE_FLOAT, 0],
         ['uRayNearestDistance', UNIFORM_TYPE_FLOAT, 0],
         ['uRayMaxDistance', UNIFORM_TYPE_FLOAT, 0],

@@ -71,7 +71,7 @@ export const createObjectSpaceRaymarchGlassMaterial = (
     
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
-        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor],
         [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],

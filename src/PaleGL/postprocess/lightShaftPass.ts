@@ -102,7 +102,7 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         // renderTargetType: RENDER_TARGET_TYPE_R16F,
         uniforms: [
-            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
             ...getPostProcessCommonUniforms(),
         ],
         // uniforms: {}
@@ -172,7 +172,7 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
         fragmentShader: lightShaftCompositeFragmentShader,
         renderTargetType: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         uniforms: [
-            [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+            [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE],
             [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, blendRate],
         ],
     });

@@ -172,8 +172,8 @@ export const createSSAOPass = (args: SSAOPassParametersArgs): SsaoPass => {
             type: POST_PROCESS_PASS_TYPE_SSAO,
             fragmentShader,
             uniforms: [
-                [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 ['uSamplingRotations', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(samplingRotations)],
                 ['uSamplingDistances', UNIFORM_TYPE_FLOAT_ARRAY, new Float32Array(samplingDistances)],
                 ['uSamplingTexture', UNIFORM_TYPE_TEXTURE, samplingTexture],

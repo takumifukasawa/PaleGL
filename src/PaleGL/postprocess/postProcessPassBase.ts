@@ -153,7 +153,7 @@ export const createPostProcessSinglePass = (args: {
             ...uniforms,
             ...getPostProcessCommonUniforms(),
             ...(srcTextureEnabled
-                ? ([[UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE, null]] as UniformsData)
+                ? ([[UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE]] as UniformsData)
                 : []),
         ] as UniformsData,
         uniformBlockNames,

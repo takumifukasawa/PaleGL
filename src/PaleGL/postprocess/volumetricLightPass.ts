@@ -154,9 +154,9 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
         depthTest: true,
         faceSide: FACE_SIDE_DOUBLE, // TODO: doubleである必要ない？
         uniforms: [
-            [UNIFORM_NAME_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4, null],
-            [UNIFORM_NAME_VIEW_MATRIX, UNIFORM_TYPE_MATRIX4, null],
-            [UNIFORM_NAME_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4, null],
+            [UNIFORM_NAME_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4],
+            [UNIFORM_NAME_VIEW_MATRIX, UNIFORM_TYPE_MATRIX4],
+            [UNIFORM_NAME_PROJECTION_MATRIX, UNIFORM_TYPE_MATRIX4],
         ],
     });
     // TODO: このmaterialは多分pushしなくていいよね
@@ -168,13 +168,13 @@ out vec4 o; void main(){o=vec4(1.,0.,0.,1.);}`,
             type: POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT,
             fragmentShader,
             uniforms: [
-                [UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP, UNIFORM_TYPE_TEXTURE_ARRAY, maton.range(MAX_SPOT_LIGHT_COUNT).map(() => null)],
+                [UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP, UNIFORM_TYPE_TEXTURE_ARRAY, Array(MAX_SPOT_LIGHT_COUNT)],
                 [UNIFORM_NAME_RAY_STEP, UNIFORM_TYPE_FLOAT, 0],
                 [UNIFORM_NAME_DENSITY_MULTIPLIER, UNIFORM_TYPE_FLOAT, 0],
                 [UNIFORM_NAME_RAY_JITTER_SIZE, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
-                [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_VOLUME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_GBUFFER_A_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_VOLUME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 1],
             ],
             uniformBlockNames: [
@@ -270,7 +270,7 @@ export function renderVolumetricLightPass(postProcessPass: PostProcessPassBase, 
         volumetricLightPass.material,
         UNIFORM_NAME_SPOT_LIGHT_SHADOW_MAP,
         volumetricLightPass.spotLights.map((spotLight) =>
-            spotLight.shadowMap ? spotLight.shadowMap?.depthTexture : null
+            spotLight.shadowMap?.depthTexture
         )
     );
     setMaterialUniformValue(

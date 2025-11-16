@@ -41,18 +41,18 @@ import litFrag from '@/PaleGL/shaders/lit-fragment.glsl';
 
 export type GBufferMaterialIndividualParameters = {
     baseColor?: Color;
-    baseMap?: Texture | null;
+    baseMap?: Texture;
     baseMapTiling?: Vector4;
     metallic?: number;
-    metallicMap?: Texture | null;
+    metallicMap?: Texture;
     metallicMapTiling?: Vector4;
     roughness?: number;
-    roughnessMap?: Texture | null;
+    roughnessMap?: Texture;
     roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
-    normalMap?: Texture | null;
+    normalMap?: Texture;
     normalMapTiling?: Vector4;
-    heightMap?: Texture | null;
+    heightMap?: Texture;
     heightMapTiling?: Vector4;
     heightScale?: number;
 };
@@ -79,24 +79,24 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
     }: GBufferMaterialArgs = args;
 
     const baseColor: Color = args.baseColor || createColorWhite();
-    const baseMap: Texture | null = args.baseMap || null;
+    const baseMap: Texture | undefined = args.baseMap;
     const baseMapTiling: Vector4 = args.baseMapTiling || createVector4(1, 1, 0, 0);
     const metallic: number = args.metallic || 0;
-    const metallicMap: Texture | null = args.metallicMap || null;
+    const metallicMap: Texture | undefined = args.metallicMap;
     const metallicMapTiling: Vector4 = args.metallicMapTiling || createVector4(1, 1, 0, 0);
     const roughness: number = args.roughness !== undefined ? args.roughness : 0;
-    const roughnessMap: Texture | null = args.roughnessMap || null;
+    const roughnessMap: Texture | undefined = args.roughnessMap;
     const roughnessMapTiling: Vector4 = args.roughnessMapTiling || createVector4(1, 1, 0, 0);
-    const normalMap: Texture | null = args.normalMap || null;
+    const normalMap: Texture | undefined = args.normalMap;
     const normalMapTiling: Vector4 = args.normalMapTiling || createVector4(1, 1, 0, 0);
-    const heightMap: Texture | null = args.heightMap || null;
+    const heightMap: Texture | undefined = args.heightMap;
     const heightScale: number = args.heightScale || 1.0;
     const heightMapTiling: Vector4 = args.heightMapTiling || createVector4(1, 1, 0, 0);
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || SHADING_MODEL_ID_LIT;
 
     const commonUniforms: UniformsData = [
-        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap || null],
+        [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
         [UNIFORM_NAME_HEIGHT_MAP, UNIFORM_TYPE_TEXTURE, heightMap],
         [UNIFORM_NAME_HEIGHT_MAP_TILING, UNIFORM_TYPE_VECTOR4, heightMapTiling],

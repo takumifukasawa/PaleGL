@@ -275,7 +275,7 @@ export const getPostProcessPassRenderTarget = (postProcessPass: PostProcessPassB
 
 // get render target texture ------------------------------------
 
-type GetPostProcessPassRenderTargetTextureBehaviour = (postProcessPass: PostProcessPassBase) => Texture | null;
+type GetPostProcessPassRenderTargetTextureBehaviour = (postProcessPass: PostProcessPassBase) => Texture | undefined;
 
 const getPostProcessPassRenderTargetTextureBehaviour: Partial<
     Record<PostProcessPassType, GetPostProcessPassRenderTargetTextureBehaviour>
@@ -283,7 +283,7 @@ const getPostProcessPassRenderTargetTextureBehaviour: Partial<
     [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: getScreenSpaceShadowRenderTargetTexture,
 };
 
-export const getPostProcessPassRenderTargetTexture = (postProcessPass: PostProcessPassBase): Texture | null => {
+export const getPostProcessPassRenderTargetTexture = (postProcessPass: PostProcessPassBase): Texture | undefined => {
     if (getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]) {
         const f = getPostProcessPassRenderTargetTextureBehaviour[postProcessPass.type]!;
         return f(postProcessPass);

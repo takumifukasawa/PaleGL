@@ -18,7 +18,7 @@
     RENDER_QUEUE_TYPE_SKYBOX,
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderQueue,
-    RenderQueueType,
+    RenderQueueType, UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_INDEX_NAME,
     UNIFORM_INDEX_TYPE,
     UNIFORM_INDEX_VALUE,
@@ -147,7 +147,7 @@ export const setMaterialUniformValue = (material: Material, name: string, value:
     setUniformValue(material.uniforms, name, value, log);
 };
 
-export const addMaterialUniformValue = (material: Material, name: string, type: UniformTypes, value: UniformValue) => {
+export const addMaterialUniformValue = (material: Material, name: string, type: UniformTypes, value?: UniformValue) => {
     addUniformValue(material.uniforms, name, type, value);
 };
 
@@ -286,7 +286,10 @@ export const createMaterial = (args: MaterialArgs): Material => {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 
-    const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
+    // CUSTOM_BEGIN replace
+    // const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
+    const uniformBlockNames: UniformBlockName[] = uniqFunc([UNIFORM_BLOCK_NAME_TIMELINE, ...(args.uniformBlockNames || [])]);
+    // CUSTOM_END
 
     depthTest = !!depthTest;
     depthWrite = !!depthWrite;

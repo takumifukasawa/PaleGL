@@ -84,8 +84,8 @@ export const createScreenSpaceShadowPass = (args: ScreenSpaceShadowPassArgs) => 
             type: POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW,
             fragmentShader,
             uniforms: [
-                [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
+                [UNIFORM_NAME_GBUFFER_B_TEXTURE, UNIFORM_TYPE_TEXTURE],
+                [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
                 [UNIFORM_BIAS_NAME, UNIFORM_TYPE_FLOAT, 0],
                 [UNIFORM_JITTER_SIZE_NAME, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
                 [UNIFORM_SHARPNESS_NAME, UNIFORM_TYPE_FLOAT, 0],

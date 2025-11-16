@@ -17,7 +17,7 @@ import { Vector4 } from '@/PaleGL/math/vector4.ts';
 // uniform values
 //
 
-type UniformData = [name: string, type: UniformTypes, value: UniformValue];
+type UniformData = [name: string, type: UniformTypes, value?: UniformValue];
 
 export type UniformStructValue = UniformData[];
 
@@ -44,9 +44,8 @@ export type UniformValue =
     | Float32Array
     | UniformStructValue
     | UniformStructArrayValue
-    | null
-    | null[]
-    | (Texture | null)[];
+    | (Texture | undefined)[]
+    | undefined;
 
 export type UniformsData = UniformData[];
 
@@ -128,7 +127,7 @@ export const findUniformByName = (uniforms: Uniforms, name: string) => {
 };
 
 // 新しい要素を追加
-export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value: UniformValue) => {
+export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value?: UniformValue) => {
     uniforms.data.push([name, type, value]);
 };
 

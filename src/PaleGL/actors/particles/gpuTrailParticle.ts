@@ -268,9 +268,9 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     const createUniforms = (): UniformsData => [
-        [UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null],
-        [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null],
-        [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null],
+        [UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE],
+        [UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE],
+        [UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, createVector2(vatWidth, vatHeight)],
     ];
 
@@ -358,13 +358,13 @@ export const overrideGPUTrailParticleMaterialSettings = (gpuTrailParticle: GPUTr
         mat.cachedArgs.isTrail = true;
         // depthが作られる前なのでdepthUniformsにも設定する
         const vatResolution = createVector2(gpuTrailParticle.vatWidth, gpuTrailParticle.vatHeight);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE);
+        addUniformValue(mat.uniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE);
         addUniformValue(mat.uniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE, null);
-        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE, null);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_VELOCITY_MAP, UNIFORM_TYPE_TEXTURE);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_POSITION_MAP, UNIFORM_TYPE_TEXTURE);
+        addUniformValue(mat.depthUniforms, UNIFORM_NAME_UP_MAP, UNIFORM_TYPE_TEXTURE);
         addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 };
