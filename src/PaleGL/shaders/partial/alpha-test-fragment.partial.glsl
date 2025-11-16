@@ -1,4 +1,4 @@
 
 #ifdef USE_ALPHA_TEST
-fCheckAlphaTest(resultColor, uAlphaTestThreshold);
+fCheckAlphaTest(outColor, uAlphaTestThreshold);
 #endif    

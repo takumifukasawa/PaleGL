@@ -1,7 +1,3 @@
-import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
-import { Color } from '@/PaleGL/math/color.ts';
-import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     DEPTH_FUNC_TYPE_EQUAL,
@@ -20,16 +16,24 @@ import {
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
 } from '@/PaleGL/constants.ts';
-import { createVector4 } from '@/PaleGL/math/vector4.ts';
+import { Gpu } from '@/PaleGL/core/gpu.ts';
+import { Texture } from '@/PaleGL/core/texture.ts';
+import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
 import { createMaterial } from '@/PaleGL/materials/material.ts';
-import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
-import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
+import { Color } from '@/PaleGL/math/color.ts';
+import { createVector4 } from '@/PaleGL/math/vector4.ts';
+import gBufferVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
+
+// memo default
+// import unlitTextFrag from '@/PaleGL/shaders/unlit-text-fragment.glsl';
+// import unlitTextDepthFrag from '@/PaleGL/shaders/unlit-text-depth-fragment.glsl';
 
 type CharMeshArgs = {
     gpu: Gpu;
     name?: string;
+    fragmentShader: string;
+    depthFragmentShader: string;
     uniforms?: UniformsData;
     color: Color;
     fontTexture: Texture;
@@ -67,6 +71,8 @@ export function createCharMesh({
     atlasInfo,
     charInfo,
     castShadow,
+    fragmentShader,
+    depthFragmentShader,
     uniforms = [],
 }: CharMeshArgs) {
     const w = atlasInfo.width;
@@ -112,8 +118,10 @@ export function createCharMesh({
     const material = createMaterial({
         name: 'charMeshMaterial',
         vertexShader: gBufferVert,
-        fragmentShader: unlitTextFrag,
-        depthFragmentShader: unlitTextDepthFrag,
+        // fragmentShader: unlitTextFrag,
+        // depthFragmentShader: unlitTextDepthFrag,
+        fragmentShader,
+        depthFragmentShader,
         uniforms: mergedUniforms,
         depthUniforms,
         alphaTest: 0.5,
