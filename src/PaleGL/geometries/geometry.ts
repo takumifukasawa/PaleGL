@@ -68,7 +68,7 @@ export const createGeometry = (args: GeometryArgs) => {
     // const _gpu: Gpu = gpu;
     // vertexCount: number = 0;
     const attributes: Attribute[] = [];
-    const indices = args.indices || null;
+    const { indices } = args;
     // const drawCount: number = drawCount;
     const instanceCount: number | null = typeof args.instanceCount == 'number' ? args.instanceCount : null;
 

@@ -26,7 +26,7 @@ export type FrustumVectors = {
     [key in FrustumDirectionType]: Vector3;
 };
 
-export type GetFrustumVectorsFunc = (camera: Camera) => FrustumVectors | null;
+export type GetFrustumVectorsFunc = (camera: Camera) => FrustumVectors | undefined;
 
 export type UpdateProjectionMatrixFunc = (camera: Camera) => void;
 

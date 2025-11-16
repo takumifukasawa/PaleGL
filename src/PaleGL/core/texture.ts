@@ -155,10 +155,9 @@ export function createTexture({
     // if (!texture) {
     //     console.error('[Texture.constructor] invalid texture');
     // }
-    img = img || null;
 
     // imgがあるがwidth, heightが指定されていない場合はimgのwidth, heightを使う
-    if (img !== null) {
+    if (img) {
         if (width === undefined) {
             width = img.width;
         }
@@ -174,10 +173,6 @@ export function createTexture({
 
     depthPrecision = type === TEXTURE_TYPE_DEPTH && depthPrecision !== undefined ? depthPrecision : undefined;
 
-    if (img === null) {
-        // this._img = createWhite1x1();
-        // console.error("invalid img");
-    }
 
     if (!img && !arraybuffer && (!width || !height)) {
         console.error('[Texture.constructor] invalid width or height');

@@ -95,7 +95,7 @@ export function findActorInSceneByName(scene: Scene, name: string) {
             result = actor;
         }
     });
-    return result || null;
+    return result;
 }
 
 // export function disposeScene(scene: Scene) {

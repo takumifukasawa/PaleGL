@@ -19,7 +19,7 @@ export const createObjectMoveAndLookAtController = (args: {
 }): ObjectMoveAndLookAtController => {
     const initialLocalPosition = args.localPosition;
     const lookAtTargetName = args.lookAtTargetName;
-    let lookAtTargetActor: Actor | null = null;
+    let lookAtTargetActor: Actor | undefined;
     let offset: Vector3 = createVector3Zero();
     let currentLocalPosition = createVector3Zero();
 

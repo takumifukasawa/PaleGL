@@ -421,12 +421,12 @@ export const getFrustumLocalPositionBehaviour: Partial<Record<CameraType, GetFru
 };
 
 export const getFrustumLocalPositions: GetFrustumVectorsFunc = (camera: Camera) => {
-    return getFrustumLocalPositionBehaviour[camera.cameraType]?.(camera) || null;
+    return getFrustumLocalPositionBehaviour[camera.cameraType]?.(camera);
 };
 
 // get frustum world ---------------------------------------------------------
 
-export const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera): FrustumVectors | null => {
+export const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera): FrustumVectors | undefined => {
     const worldPositions: {
         [key in FrustumDirectionType]: Vector3;
     } = {
@@ -447,7 +447,5 @@ export const getFrustumWorldPositions: GetFrustumVectorsFunc = (camera: Camera):
             worldPositions[key] = wp;
         }
         return worldPositions;
-    } else {
-        return null;
     }
 };

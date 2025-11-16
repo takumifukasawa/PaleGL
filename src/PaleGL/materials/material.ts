@@ -168,7 +168,7 @@ export type Material = {
     alphaTest: number | null;
     faceSide: FaceSide;
     receiveShadow: boolean;
-    queue: RenderQueue | null;
+    queue: RenderQueue | undefined;
     useNormalMap: boolean;
     useEnvMap: boolean;
     isSkinning: boolean;
@@ -183,9 +183,9 @@ export type Material = {
     useVertexColor: boolean;
     vertexShader: string;
     fragmentShader: string;
-    depthFragmentShader: string | null;
-    rawVertexShader: string | null;
-    rawFragmentShader: string | null;
+    depthFragmentShader: string | undefined;
+    rawVertexShader: string | undefined;
+    rawFragmentShader: string | undefined;
     showLog: boolean;
     boundUniformBufferObjects: boolean;
     vertexShaderGenerator: VertexShaderGenerator | null;
@@ -296,16 +296,9 @@ export const createMaterial = (args: MaterialArgs): Material => {
 
     // TODO: useAlphaTestのフラグがあった方がよい. あとからalphaTestを追加した場合に対応できる
 
-    const queue: RenderQueue | null = args.queue || null;
+    const { queue, vertexShader = '', fragmentShader = '', depthFragmentShader, rawVertexShader, rawFragmentShader } = args;
 
     const jointNum: number | null = typeof args.jointNum === 'number' ? args.jointNum : null;
-
-    const vertexShader: string = args.vertexShader || '';
-    const fragmentShader: string = args.fragmentShader || '';
-    const depthFragmentShader: string | null = args.depthFragmentShader || null;
-
-    const rawVertexShader: string | null = args.rawVertexShader || null;
-    const rawFragmentShader: string | null = args.rawFragmentShader || null;
 
     const boundUniformBufferObjects: boolean = false;
 
