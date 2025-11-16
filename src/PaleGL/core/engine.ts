@@ -398,6 +398,10 @@ export async function warmRender(
         useDepthBuffer: true,
     });
 
+    // 最初に一回engineを空回し
+    fixedUpdateEngine(engine, 0, 0);
+    updateEngine(engine, 0, 0);
+
     // 共通ユニフォームを更新
     beforeRenderRenderer(renderer, 0, 0);
 
