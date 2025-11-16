@@ -34,6 +34,7 @@ import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 import {
+    checkNeedsReplaceGPUParticleUpdater,
     GPUParticleArgsBase,
     GpuParticleBase,
     GPUParticleUpdater,
@@ -324,6 +325,8 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     subscribeActorOnUpdate(gpuParticle, ({ renderer }) => {
+        checkNeedsReplaceGPUParticleUpdater(gpu, renderer, gpuParticle);
+
         const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
         renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
 
@@ -370,9 +373,3 @@ export const overrideGPUTrailParticleMaterialSettings = (gpuTrailParticle: GPUTr
         addUniformValue(mat.depthUniforms, UNIFORM_NAME_VAT_RESOLUTION, UNIFORM_TYPE_VECTOR2, vatResolution);
     });
 };
-
-// export const resetGPUTrailParticleByInitialize = (renderer: Renderer, gpuTrailParticle: GPUTrailParticle) => {
-//     const { mrtDoubleBuffer, materialForInitialize } = gpuTrailParticle;
-//     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-//     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
-// };

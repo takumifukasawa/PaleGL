@@ -232,19 +232,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     let tmpReadUpMap;
 
     subscribeActorOnUpdate(gpuParticle, ({ gpu, renderer }) => {
-        // 更新すべきupdaterがあったら更新
-        while (gpuParticle.needsReplaceUpdaterInfo.length) {
-            const elem = gpuParticle.needsReplaceUpdaterInfo.pop();
-            console.log("hogehoge", elem)
-            if (elem) {
-                const [updaterIndex, [fragmentShaderForInitialize, fragmentShaderForUpdate]] = elem;
-                replaceGPUParticleUpdaterByArgsInternal(gpu, renderer, gpuParticle, updaterIndex, [
-                    fragmentShaderForInitialize,
-                    fragmentShaderForUpdate,
-                ]);
-                resetGPUParticleByInitialize(renderer, gpuParticle);
-            }
-        }
+        checkNeedsReplaceGPUParticleUpdater(gpu, renderer, gpuParticle);
 
         const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
         renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForUpdate);
@@ -315,12 +303,25 @@ export const replaceGPUParticleUpdater = (
     gpuParticle.needsReplaceUpdaterInfo.push([updaterIndex, fragmentShaders]);
 };
 
-// private ---
+// 更新すべきupdaterがあったら更新
+export const checkNeedsReplaceGPUParticleUpdater = (gpu: Gpu, renderer: Renderer, gpuParticle: GpuParticleBase) => {
+    while (gpuParticle.needsReplaceUpdaterInfo.length) {
+        const elem = gpuParticle.needsReplaceUpdaterInfo.pop();
+        if (elem) {
+            const [updaterIndex, [fragmentShaderForInitialize, fragmentShaderForUpdate]] = elem;
+            replaceGPUParticleUpdaterByArgsInternal(gpu, renderer, gpuParticle, updaterIndex, [
+                fragmentShaderForInitialize,
+                fragmentShaderForUpdate,
+            ]);
+            resetGPUParticleByInitialize(renderer, gpuParticle);
+        }
+    }
+};
 
-const replaceGPUParticleUpdaterByArgsInternal = (
+export const replaceGPUParticleUpdaterByArgsInternal = (
     gpu: Gpu,
     renderer: Renderer,
-    gpuParticle: GpuParticle,
+    gpuParticle: GpuParticleBase,
     updaterIndex: number,
     [fragmentShaderForInitialize, fragmentShaderForUpdate]: [string, string]
     // needsStart = true
@@ -344,10 +345,10 @@ const replaceGPUParticleUpdaterByArgsInternal = (
     );
 };
 
-const replaceGPUParticleUpdaterMaterialInternal = (
+export const replaceGPUParticleUpdaterMaterialInternal = (
     gpu: Gpu,
     renderer: Renderer,
-    gpuParticle: GpuParticle,
+    gpuParticle: GpuParticleBase,
     updaterIndex: number,
     materialIndex: number,
     fragmentShader: string
