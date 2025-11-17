@@ -365,6 +365,12 @@ export async function warmRender(
         return;
     }
 
+
+    // 最初に一回engineを空回し
+    fixedUpdateEngine(engine, 0, 0);
+    updateEngine(engine, 0, 0);
+
+
     const actors: Actor[] = [];
     const actorOriginalEnabled = new Map<Actor, boolean>();
 
@@ -397,11 +403,7 @@ export async function warmRender(
         height: 1,
         useDepthBuffer: true,
     });
-
-    // 最初に一回engineを空回し
-    fixedUpdateEngine(engine, 0, 0);
-    updateEngine(engine, 0, 0);
-
+    
     // 共通ユニフォームを更新
     beforeRenderRenderer(renderer, 0, 0);
 
