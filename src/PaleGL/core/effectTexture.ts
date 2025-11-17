@@ -55,6 +55,13 @@ export type EffectTextureSystem = {
     needsUpdate: boolean;
 };
 
+export type EffectTextureCompositeParameters = {
+    tilingEnabled?: boolean;
+    edgeMaskMix?: number;
+    remapMin?: number;
+    remapMax?: number;
+};
+
 export type EffectTextureInfo = {
     width: number;
     height: number;
@@ -62,12 +69,13 @@ export type EffectTextureInfo = {
     effectUniforms: UniformsData;
     minFilter?: TextureFilterType;
     magFilter?: TextureFilterType;
+    compositeParameters: EffectTextureCompositeParameters;
     // useComposite: boolean;
     // composite settings
-    tilingEnabled?: boolean;
-    edgeMaskMix?: number;
-    remapMin?: number;
-    remapMax?: number;
+    // tilingEnabled?: boolean;
+    // edgeMaskMix?: number;
+    // remapMin?: number;
+    // remapMax?: number;
 };
 
 export const createEffectTextureSystem: (
@@ -81,15 +89,18 @@ export const createEffectTextureSystem: (
         height,
         effectFragmentShader,
         effectUniforms,
+        minFilter,
+        magFilter,
+        compositeParameters,
+        // update,
+        // useComposite,
+    } = effectTextureInfo;
+    const {
         tilingEnabled,
         edgeMaskMix = 1,
         remapMin,
         remapMax,
-        minFilter,
-        magFilter,
-        // update,
-        // useComposite,
-    } = effectTextureInfo;
+    } = compositeParameters;
 
     const effectRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
     let compositeRenderTarget: RenderTarget | null = null;
@@ -106,6 +117,8 @@ export const createEffectTextureSystem: (
     const useComposite = tilingEnabled !== undefined || remapMin !== undefined || remapMax !== undefined;
 
     tryStartMaterial(gpu, renderer, renderer.sharedQuad, effectMaterial);
+
+    console.log(effectTextureInfo, useComposite);
 
     if (useComposite) {
         compositeRenderTarget = createEffectTextureTarget({
