@@ -18,7 +18,7 @@ import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer, renderMesh, setRenderTargetToRendererAndClear, tryStartMaterial } from '@/PaleGL/core/renderer.ts';
 import { createRenderTarget, RenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
-import { UniformsData } from '@/PaleGL/core/uniforms.ts';
+import { setUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createMaterial, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { getPostProcessBaseVertexShader } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import effectTexturePostProcessFragment from '@/PaleGL/shaders/effect-texture-postprocess-fragment.glsl';
@@ -58,7 +58,7 @@ export type EffectTextureSystem = {
     // useComposite: boolean;
     texture: Texture;
     needsUpdate: boolean;
-    compositeParameters: EffectTextureCompositeParameters;
+    compositeParameters: Required<EffectTextureCompositeParameters>;
 };
 
 export type EffectTextureCompositeParameters = {
@@ -112,6 +112,15 @@ export const createEffectTextureSystem: (
         oneMinus = 0,
     } = compositeParameters;
 
+    const assignedCompositeParameters: Required<EffectTextureCompositeParameters> = {
+        useComposite,
+        tilingEnabled,
+        edgeMaskMix,
+        remapMin,
+        remapMax,
+        oneMinus,
+    };
+
     const effectRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
     let compositeRenderTarget: RenderTarget | null = null;
 
@@ -155,6 +164,7 @@ export const createEffectTextureSystem: (
 
         tryStartMaterial(gpu, renderer, renderer.sharedQuad, compositeMaterial);
         setMaterialUniformValue(compositeMaterial, UNIFORM_NAME_SRC_TEXTURE, effectRenderTarget.texture);
+        updateCompositeMaterialUniforms(compositeMaterial, assignedCompositeParameters);
     }
 
     return {
@@ -165,14 +175,7 @@ export const createEffectTextureSystem: (
         needsUpdate: false,
         // useComposite,
         texture: useComposite ? compositeRenderTarget!.texture! : effectRenderTarget.texture!,
-        compositeParameters: {
-            useComposite,
-            tilingEnabled,
-            edgeMaskMix,
-            remapMin,
-            remapMax,
-            oneMinus,
-        },
+        compositeParameters: assignedCompositeParameters,
     };
 };
 
@@ -182,13 +185,28 @@ const renderEffectTextureInternal = (renderer: Renderer, renderTarget: RenderTar
     setRenderTargetToRendererAndClear(renderer, null);
 };
 
+const updateCompositeMaterialUniforms = (
+    material: Material,
+    parameters: Required<EffectTextureCompositeParameters>
+) => {
+    const { tilingEnabled, edgeMaskMix, remapMin, remapMax, oneMinus } = parameters;
+    setUniformValue(material.uniforms, UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_TILING_ENABLED, tilingEnabled);
+    setUniformValue(material.uniforms, UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_EDGE_MASK_MIX, edgeMaskMix);
+    setUniformValue(material.uniforms, UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MIN, remapMin);
+    setUniformValue(material.uniforms, UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MAX, remapMax);
+    setUniformValue(material.uniforms, UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_ONE_MINUS, oneMinus);
+};
+
 export const renderEffectTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem) => {
     renderEffectTextureInternal(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
     if (effectTextureSystem.compositeParameters.useComposite) {
-        renderEffectTextureInternal(
-            renderer,
-            effectTextureSystem.compositeRenderTarget!,
-            effectTextureSystem.compositeMaterial!
-        );
+        const material = effectTextureSystem.compositeMaterial!;
+        updateCompositeMaterialUniforms(material, effectTextureSystem.compositeParameters);
+        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_TILING_ENABLED, UNIFORM_TYPE_FLOAT, tilingEnabled],
+        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_EDGE_MASK_MIX, UNIFORM_TYPE_FLOAT, edgeMaskMix],
+        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MIN, UNIFORM_TYPE_FLOAT, remapMin],
+        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MAX, UNIFORM_TYPE_FLOAT, remapMax],
+        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_ONE_MINUS, UNIFORM_TYPE_FLOAT, oneMinus],
+        renderEffectTextureInternal(renderer, effectTextureSystem.compositeRenderTarget!, material);
     }
 };
