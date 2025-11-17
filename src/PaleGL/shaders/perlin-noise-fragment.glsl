@@ -10,7 +10,7 @@ void main() {
     vec2 gridSize = uGridSize;
     vec2 uv = vUv;
 
-    float result = fPerlinNoise(uv * gridSize + uTime, uIsImproved);
+    float result = fPerlinNoise(uv * gridSize + uTime * uSpeed, uIsImproved);
 
     outColor = vec4(vec3(result), 1.);
 }

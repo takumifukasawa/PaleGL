@@ -5,6 +5,11 @@ import {
     TEXTURE_WRAP_TYPE_REPEAT,
     TextureFilterType,
     UNIFORM_BLOCK_NAME_COMMON,
+    UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_EDGE_MASK_MIX,
+    UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_ONE_MINUS,
+    UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MAX,
+    UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MIN,
+    UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_TILING_ENABLED,
     UNIFORM_NAME_SRC_TEXTURE,
     UNIFORM_TYPE_FLOAT,
     UNIFORM_TYPE_TEXTURE,
@@ -50,9 +55,10 @@ export type EffectTextureSystem = {
     effectRenderTarget: RenderTarget;
     compositeMaterial: Material | null;
     compositeRenderTarget: RenderTarget | null;
-    useComposite: boolean;
+    // useComposite: boolean;
     texture: Texture;
     needsUpdate: boolean;
+    compositeParameters: EffectTextureCompositeParameters;
 };
 
 export type EffectTextureCompositeParameters = {
@@ -133,11 +139,11 @@ export const createEffectTextureSystem: (
 
         const uniforms: UniformsData = [
             [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
-            ['uTilingEnabled', UNIFORM_TYPE_FLOAT, tilingEnabled],
-            ['uEdgeMaskMix', UNIFORM_TYPE_FLOAT, edgeMaskMix],
-            ['uRemapMin', UNIFORM_TYPE_FLOAT, remapMin],
-            ['uRemapMax', UNIFORM_TYPE_FLOAT, remapMax],
-            ['uOneMinus', UNIFORM_TYPE_FLOAT, oneMinus],
+            [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_TILING_ENABLED, UNIFORM_TYPE_FLOAT, tilingEnabled],
+            [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_EDGE_MASK_MIX, UNIFORM_TYPE_FLOAT, edgeMaskMix],
+            [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MIN, UNIFORM_TYPE_FLOAT, remapMin],
+            [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MAX, UNIFORM_TYPE_FLOAT, remapMax],
+            [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_ONE_MINUS, UNIFORM_TYPE_FLOAT, oneMinus],
         ];
 
         compositeMaterial = createMaterial({
@@ -157,8 +163,16 @@ export const createEffectTextureSystem: (
         compositeMaterial,
         compositeRenderTarget,
         needsUpdate: false,
-        useComposite,
+        // useComposite,
         texture: useComposite ? compositeRenderTarget!.texture! : effectRenderTarget.texture!,
+        compositeParameters: {
+            useComposite,
+            tilingEnabled,
+            edgeMaskMix,
+            remapMin,
+            remapMax,
+            oneMinus,
+        },
     };
 };
 
@@ -170,7 +184,7 @@ const renderEffectTextureInternal = (renderer: Renderer, renderTarget: RenderTar
 
 export const renderEffectTexture = (renderer: Renderer, effectTextureSystem: EffectTextureSystem) => {
     renderEffectTextureInternal(renderer, effectTextureSystem.effectRenderTarget, effectTextureSystem.effectMaterial);
-    if (effectTextureSystem.useComposite) {
+    if (effectTextureSystem.compositeParameters.useComposite) {
         renderEffectTextureInternal(
             renderer,
             effectTextureSystem.compositeRenderTarget!,
