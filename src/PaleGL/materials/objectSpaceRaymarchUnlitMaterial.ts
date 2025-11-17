@@ -60,12 +60,11 @@ export const createObjectSpaceRaymarchUnlitMaterial = (
         shadingModelId = SHADING_MODEL_ID_UNLIT,
         uniforms = [],
         uniformBlockNames,
+        baseMap,
+        baseColor = createColorWhite(),
+        baseMapTiling = createVector4(1, 1, 0, 0),
+        emissiveColor = createColorBlack(),
     } = args;
-
-    const baseMap = args.baseMap ?? null;
-    const baseColor = args.baseColor ?? createColorWhite();
-    const baseMapTiling = args.baseMapTiling ?? createVector4(1, 1, 0, 0);
-    const emissiveColor = args.emissiveColor ?? createColorBlack();
 
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],

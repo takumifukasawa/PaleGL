@@ -87,18 +87,21 @@ export const createObjectSpaceRaymarchMaterial = ({
     depthFragmentShaderContent: string;
     materialArgs: ObjectSpaceRaymarchMaterialArgs;
 }) => {
-    const { shadingModelId = SHADING_MODEL_ID_LIT, uniforms = [], uniformBlockNames } = materialArgs;
-
-    const baseMap = materialArgs.baseMap ?? null;
-    const baseColor = materialArgs.baseColor ?? createColorWhite();
-    const baseMapTiling = materialArgs.baseMapTiling ?? createVector4(1, 1, 0, 0);
-    const roughnessMap = materialArgs.roughnessMap ?? null;
-    const roughnessMapTiling = materialArgs.roughnessMapTiling ?? createVector4(1, 1, 0, 0);
-    const roughness = materialArgs.roughness ?? 0;
-    const metallic = materialArgs.metallic ?? 0;
-    const metallicMap = materialArgs.metallicMap ?? null;
-    const metallicMapTiling = materialArgs.metallicMapTiling ?? createVector4(1, 1, 0, 0);
-    const emissiveColor = materialArgs.emissiveColor ?? createColorBlack();
+    const {
+        shadingModelId = SHADING_MODEL_ID_LIT,
+        uniforms = [],
+        uniformBlockNames,
+        baseMap,
+        baseColor = createColorWhite(),
+        baseMapTiling = createVector4(1, 1, 0, 0),
+        roughnessMap,
+        roughnessMapTiling = createVector4(1, 1, 0, 0),
+        roughness = 0,
+        metallic = 0,
+        metallicMap,
+        metallicMapTiling = createVector4(1, 1, 0, 0),
+        emissiveColor = createColorBlack(),
+    } = materialArgs;
 
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],

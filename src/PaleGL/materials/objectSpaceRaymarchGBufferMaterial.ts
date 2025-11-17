@@ -96,17 +96,6 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
         uniformBlockNames,
     } = args;
 
-    // const baseMap = args.baseMap ?? null;
-    // const baseColor = args.baseColor ?? createColorWhite();
-    // const baseMapTiling = args.baseMapTiling ?? createVector4(1, 1, 0, 0);
-    // const roughnessMap = args.roughnessMap ?? null;
-    // const roughnessMapTiling = args.roughnessMapTiling ?? createVector4(1, 1, 0, 0);
-    // const roughness = args.roughness ?? 0;
-    // const metallic = args.metallic ?? 0;
-    // const metallicMap = args.metallicMap ?? null;
-    // const metallicMapTiling = args.metallicMapTiling ?? createVector4(1, 1, 0, 0);
-    // const emissiveColor = args.emissiveColor ?? createColorBlack();
-
     const baseColor: Color = args.baseColor || createColorWhite();
     const baseMap: Texture | undefined = args.baseMap;
     const baseMapTiling: Vector4 = args.baseMapTiling || createVector4(1, 1, 0, 0);
