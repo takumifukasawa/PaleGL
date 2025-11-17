@@ -47,6 +47,7 @@ import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import curlNoisePartialContent from '@/PaleGL/shaders/partial/curl-noise.partial.glsl';
+import msdfHeadreContent from '@/PaleGL/shaders/partial/msdf-header.glsl';
 import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
 import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
 import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
@@ -117,6 +118,7 @@ const includesDict = new Map<string, string>([
     ['<os_raymarch_f>', objectSpaceRaymarchFunctionsPartialContent],
     ['<perlin>', perlinPartialContent],
     ['<curl_noise>', curlNoisePartialContent],
+    ['<msdf_h>', msdfHeadreContent],
     // CUSTOM_BEGIN
     ['<human_df>', raymarchHumanFunctionsPartialContent],
     ['<human_dfp>', raymarchHumanFunctionsPostPartialContent],
