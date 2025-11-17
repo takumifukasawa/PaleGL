@@ -202,11 +202,6 @@ export const renderEffectTexture = (renderer: Renderer, effectTextureSystem: Eff
     if (effectTextureSystem.compositeParameters.useComposite) {
         const material = effectTextureSystem.compositeMaterial!;
         updateCompositeMaterialUniforms(material, effectTextureSystem.compositeParameters);
-        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_TILING_ENABLED, UNIFORM_TYPE_FLOAT, tilingEnabled],
-        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_EDGE_MASK_MIX, UNIFORM_TYPE_FLOAT, edgeMaskMix],
-        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MIN, UNIFORM_TYPE_FLOAT, remapMin],
-        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_REMAP_MAX, UNIFORM_TYPE_FLOAT, remapMax],
-        // [UNIFORM_NAME_EFFECT_TEXTURE_COMPOSITE_ONE_MINUS, UNIFORM_TYPE_FLOAT, oneMinus],
         renderEffectTextureInternal(renderer, effectTextureSystem.compositeRenderTarget!, material);
     }
 };
