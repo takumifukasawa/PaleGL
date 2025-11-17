@@ -56,10 +56,12 @@ export type EffectTextureSystem = {
 };
 
 export type EffectTextureCompositeParameters = {
+    useComposite?: boolean;
     tilingEnabled?: boolean;
     edgeMaskMix?: number;
     remapMin?: number;
     remapMax?: number;
+    oneMinus?: number;
 };
 
 export type EffectTextureInfo = {
@@ -96,10 +98,12 @@ export const createEffectTextureSystem: (
         // useComposite,
     } = effectTextureInfo;
     const {
-        tilingEnabled,
+        useComposite = false,
+        tilingEnabled = false,
         edgeMaskMix = 1,
-        remapMin,
-        remapMax,
+        remapMin = 0,
+        remapMax = 1,
+        oneMinus = 0,
     } = compositeParameters;
 
     const effectRenderTarget = createEffectTextureTarget({ gpu, width, height, minFilter, magFilter });
@@ -114,11 +118,9 @@ export const createEffectTextureSystem: (
 
     let compositeMaterial: Material | null = null;
 
-    const useComposite = tilingEnabled !== undefined || remapMin !== undefined || remapMax !== undefined;
+    // const useComposite = tilingEnabled !== undefined || remapMin !== undefined || remapMax !== undefined;
 
     tryStartMaterial(gpu, renderer, renderer.sharedQuad, effectMaterial);
-
-    console.log(effectTextureInfo, useComposite);
 
     if (useComposite) {
         compositeRenderTarget = createEffectTextureTarget({
@@ -131,10 +133,11 @@ export const createEffectTextureSystem: (
 
         const uniforms: UniformsData = [
             [UNIFORM_NAME_SRC_TEXTURE, UNIFORM_TYPE_TEXTURE],
-            ['uTilingEnabled', UNIFORM_TYPE_FLOAT, tilingEnabled ? 1 : 0],
+            ['uTilingEnabled', UNIFORM_TYPE_FLOAT, tilingEnabled],
             ['uEdgeMaskMix', UNIFORM_TYPE_FLOAT, edgeMaskMix],
-            ['uRemapMin', UNIFORM_TYPE_FLOAT, remapMin!],
-            ['uRemapMax', UNIFORM_TYPE_FLOAT, remapMax!],
+            ['uRemapMin', UNIFORM_TYPE_FLOAT, remapMin],
+            ['uRemapMax', UNIFORM_TYPE_FLOAT, remapMax],
+            ['uOneMinus', UNIFORM_TYPE_FLOAT, oneMinus],
         ];
 
         compositeMaterial = createMaterial({

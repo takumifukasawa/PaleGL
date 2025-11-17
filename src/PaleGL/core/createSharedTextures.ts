@@ -17,7 +17,7 @@ import {
 } from '@/PaleGL/core/effectTexture.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
-import { createVector2 } from '@/PaleGL/math/vector2.ts';
+import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
 import fbmNoiseFragment from '@/PaleGL/shaders/fbm-noise.glsl';
 import perlinNoiseFragment from '@/PaleGL/shaders/perlin-noise-fragment.glsl';
 import randomNoiseFragment from '@/PaleGL/shaders/random-noise-fragment.glsl';
@@ -59,17 +59,22 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             [UNIFORM_NAME_AMPLITUDE, UNIFORM_TYPE_FLOAT, 0.307],
             [UNIFORM_NAME_FREQUENCY, UNIFORM_TYPE_FLOAT, 1.357],
             [UNIFORM_NAME_FACTOR, UNIFORM_TYPE_FLOAT, 0.597],
-            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
         ],
-        tilingEnabled: true,
-        edgeMaskMix: 1,
-        remapMin: 0,
-        remapMax: 1,
+        compositeParameters: {
+            useComposite: true,
+            tilingEnabled: true,
+            edgeMaskMix: 1,
+            remapMin: 0,
+            remapMax: 1,
+        },
     } as SharedTextureInfo,
     {
         key: SharedTexturesTypes.RANDOM_NOISE,
         width: TEXTURE_SIZE,
         height: TEXTURE_SIZE,
+        minFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        magFilter: TEXTURE_FILTER_TYPE_NEAREST,
         effectFragmentShader: randomNoiseFragment,
         effectUniforms: [
             // {
@@ -78,14 +83,15 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             //     value: 0,
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(TEXTURE_SIZE, TEXTURE_SIZE)],
-            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
         ],
-        tilingEnabled: true,
-        edgeMaskMix: 1,
-        remapMin: 0,
-        remapMax: 1,
-        minFilter: TEXTURE_FILTER_TYPE_NEAREST,
-        magFilter: TEXTURE_FILTER_TYPE_NEAREST,
+        compositeParameters: {
+            useComposite: true,
+            tilingEnabled: true,
+            edgeMaskMix: 1,
+            remapMin: 0,
+            remapMax: 1,
+        },
     } as SharedTextureInfo,
     {
         key: SharedTexturesTypes.PERLIN_NOISE,
@@ -100,12 +106,15 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
             ['uIsImproved', UNIFORM_TYPE_FLOAT, 0],
-            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
         ],
-        tilingEnabled: true,
-        edgeMaskMix: 1,
-        remapMin: 0,
-        remapMax: 1,
+        compositeParameters: {
+            useComposite: true,
+            tilingEnabled: true,
+            edgeMaskMix: 1,
+            remapMin: 0,
+            remapMax: 1,
+        },
     } as SharedTextureInfo,
     {
         key: SharedTexturesTypes.IMPROVE_NOISE,
@@ -120,12 +129,15 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
             ['uIsImproved', UNIFORM_TYPE_FLOAT, 1],
-            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
         ],
-        tilingEnabled: true,
-        edgeMaskMix: 1,
-        remapMin: 0,
-        remapMax: 1,
+        compositeParameters: {
+            useComposite: true,
+            tilingEnabled: true,
+            edgeMaskMix: 1,
+            remapMin: 0,
+            remapMax: 1,
+        },
     } as SharedTextureInfo,
     {
         key: SharedTexturesTypes.SIMPLEX_NOISE,
@@ -139,12 +151,15 @@ const sharedTextureInfos: SharedTextureInfo[] = [
             //     value: 0,
             // },
             [gridUniformName, UNIFORM_TYPE_VECTOR2, createVector2(4, 4)],
-            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_FLOAT, 0],
+            [UNIFORM_NAME_SPEED, UNIFORM_TYPE_VECTOR2, createVector2Zero()],
         ],
-        tilingEnabled: true,
-        edgeMaskMix: 1,
-        remapMin: 0,
-        remapMax: 1,
+        compositeParameters: {
+            useComposite: true,
+            tilingEnabled: true,
+            edgeMaskMix: 1,
+            remapMin: 0,
+            remapMax: 1,
+        },
     } as SharedTextureInfo,
 ];
 
