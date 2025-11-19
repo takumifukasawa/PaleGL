@@ -55,6 +55,10 @@ vec3 fOpTr(vec3 p, vec3 t) {
     return p - t;
 }
 
+void fOpTrOut(out vec3 p, vec3 t) {
+    p = p - t;
+}
+
 // NOTE: sが1以下だとおかしくなることに注意
 vec3 fOpSc(vec3 p, vec3 s) {
     return p * (1. / s);
@@ -101,6 +105,10 @@ float fOpSm( float d1, float d2, float k )
 // smooth subtracgion
 float fOpSmSub(float d1, float d2, float k) {
     return -fOpSm(d1, d2, k);
+}
+
+vec3 fOpLimRep(vec3 p, float s, vec3 l) {
+    return p - s*clamp(round(p/s),-l,l);
 }
 
 //
