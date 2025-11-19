@@ -22,7 +22,7 @@ struct sGBufferD {
 };
 
 vec4 fEncodeGBufferA(vec3 baseColor) {
-    return vec4(baseColor, 1.);
+    return vec4(fGamma(baseColor), 1.);
 }
 
 vec4 fEncodeGBufferB(vec3 normal, int shadingModelId) {
@@ -36,7 +36,7 @@ vec4 fEncodeGBufferC(float metallic, float roughness) {
 }
 
 vec4 fEncodeGBufferD(vec3 emissiveColor) {
-    return vec4(emissiveColor, 1.);
+    return vec4(fGamma(emissiveColor.rgb), 1.);
 }
 
 sGBufferA fDecodeGBufferA(sampler2D gBufferATexture, vec2 uv) {

@@ -33,7 +33,7 @@ void main() {
     vec3 envMapColor = textureLod(uCubeTexture, skyboxSampleDir, 0.).xyz;
 
     // NOTE: テクスチャはhdrじゃなくてsrgb想定
-    envMapColor = fGamma(envMapColor);
+    // envMapColor = fGamma(envMapColor);
 
     outGBufferA = fEncodeGBufferA(envMapColor);
     outGBufferB = fEncodeGBufferB(vec3(0.), uShadingModelId);

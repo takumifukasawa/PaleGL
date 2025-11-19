@@ -95,7 +95,7 @@ void main() {
     #include <alpha_test_f>
     // #include ./partial/alpha-test-fragment.partial.glsl
 
-    baseColor.rgb = fGamma(baseColor.rgb);
+    // baseColor.rgb = fGamma(baseColor.rgb);
    
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
@@ -103,7 +103,7 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
-    emissiveColor.rgb = fGamma(emissiveColor.rgb);
+    // emissiveColor.rgb = fGamma(emissiveColor.rgb);
     
     #pragma BEFORE_OUT
 

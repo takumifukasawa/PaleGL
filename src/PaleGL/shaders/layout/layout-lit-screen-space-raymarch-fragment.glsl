@@ -100,7 +100,7 @@ void main() {
     // #include <alpha_test_f>
     #include ../partial/alpha-test-fragment.partial.glsl
 
-    resultColor.rgb = fGamma(resultColor.rgb);
+    // resultColor.rgb = fGamma(resultColor.rgb);
 
     outGBufferA = fEncodeGBufferA(resultColor.rgb);
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);

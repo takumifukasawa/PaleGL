@@ -152,13 +152,15 @@ void main() {
     float alpha = resultColor.a;
     #include <alpha_test_f>
 
-    resultColor.rgb = fGamma(resultColor.rgb);
+    // resultColor.rgb = fGamma(resultColor.rgb);
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
     metallic *= texture(uMetallicMap, uv * uMetallicMapTiling.xy).r;
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
+    
+    #pragma BEFORE_OUT
 
     outGBufferA = fEncodeGBufferA(resultColor.rgb);
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);

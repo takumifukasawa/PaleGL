@@ -58,7 +58,7 @@ void main() {
     // resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);
     // resultColor.rgb = mix(vec3(1., 0., 0.), resultColor.rgb, resultColor.a);
     
-    resultColor.rgb = fGamma(resultColor.rgb);
+    // resultColor.rgb = fGamma(resultColor.rgb);
     
     outGBufferA = fEncodeGBufferA(vec3(0.));
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
