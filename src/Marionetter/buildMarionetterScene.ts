@@ -370,7 +370,7 @@ export function buildMarionetterScene(
                     });
                     break;
                 case LIGHT_TYPE_SPOT:
-                    const spotLightInfo = light as MarionetterSpotLightComponentInfo;
+                    const spotLightInfo = light as unknown as MarionetterSpotLightComponentInfo;
                     const spotData = spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
                     // angleは半分にする必要があることに注意
                     actor = createSpotLight({
