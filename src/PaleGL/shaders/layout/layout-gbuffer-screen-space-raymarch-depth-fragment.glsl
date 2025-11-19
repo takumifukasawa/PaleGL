@@ -29,34 +29,57 @@ void main() {
     vec4 baseMapColor = texture(uBaseMap, uv);
 
     vec4 baseColor = uBaseColor * baseMapColor;
-
+    
     // CUSTOM_BEGIN comment out
     // #ifdef USE_VERTEX_COLOR
     // baseColor *= vVertexColor;
     // #endif
     // CUSTOM_END
+    
+    // outColor = vec4(1.);
+    // return;
 
     //
     // raymarch start
     //
 
+    // vec3 rayOrigin = uViewPosition;
+    // vec3 rayDirection = vec3(0., 0., -1.);
+    // // vec3 rayDirection = normalize(vWorldPosition - uViewPosition);
+    // vec2 result = vec2(0.);
+    // float accLen = 0.;
+    // vec3 currentRayPosition = rayOrigin;
+    // float minDistance = EPS;
+    // for(int i = 0; i < SI; i++) {
+    //     currentRayPosition = rayOrigin + rayDirection * accLen;
+    //     result = fDfScene(currentRayPosition);
+    //     accLen += result.x;
+    //     if(result.x <= minDistance) {
+    //         break;
+    //     }
+    // }
+    // if(result.x > minDistance) {
+    //     discard;
+    // }
+   
+   
     vec3 rayOrigin = uViewPosition;
-    vec3 rayDirection = vec3(0., 0., -1.);
-    // vec3 rayDirection = normalize(vWorldPosition - uViewPosition);
+    vec3 rayDirection = fGetPerspectiveCameraRayDir(vUv, uViewDirection, uFov, uAspect);
+
     vec2 result = vec2(0.);
-    float accLen = 0.;
+    float accLen = uNearClip;
     vec3 currentRayPosition = rayOrigin;
     float minDistance = EPS;
-    for(int i = 0; i < SI; i++) {
+    for (int i = 0; i < SI; i++) {
         currentRayPosition = rayOrigin + rayDirection * accLen;
         result = fDfScene(currentRayPosition);
         accLen += result.x;
-        if(result.x <= minDistance) {
+        if (accLen > uFarClip || result.x <= minDistance) {
             break;
         }
     }
-    
-    if(result.x > minDistance) {
+
+    if (result.x > minDistance) {
         discard;
     }
 
@@ -64,20 +87,22 @@ void main() {
     // raymarch end
     //
 
-    // 既存の深度値と比較して、奥にある場合は破棄する
-    float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
-    float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
-    float currentDepth = fViewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
-    // equal許容しない
-    // if(currentDepth >= sceneDepth) {
-    // equal許容
-    if(currentDepth > sceneDepth) {
-        discard;
-    }
+    // shadow cast ではいらないはず
+    // // 既存の深度値と比較して、奥にある場合は破棄する
+    // float rawDepth = texelFetch(uDepthTexture, ivec2(gl_FragCoord.xy), 0).x;
+    // float sceneDepth = fPerspectiveDepthToLinearDepth(rawDepth, uNearClip, uFarClip);
+    // float currentDepth = fViewZToLinearDepth((uViewMatrix * vec4(currentRayPosition, 1.)).z, uNearClip, uFarClip);
+    // // equal許容しない
+    // // if(currentDepth >= sceneDepth) {
+    // // equal許容
+    // if(currentDepth > sceneDepth) {
+    //     discard;
+    // }
 
     vec4 resultColor = baseColor;
-    // #include <alpha_test_f>
-    #include ../partial/alpha-test-fragment.partial.glsl
+    #include <alpha_test_f>
+    // #include ../partial/alpha-test-fragment.partial.glsl
 
     outColor = vec4(1., 1., 1., 1.);
+    // outColor = vec4(0.);
 }

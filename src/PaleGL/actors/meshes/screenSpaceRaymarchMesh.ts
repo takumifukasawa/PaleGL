@@ -9,7 +9,7 @@ import {
     UNIFORM_NAME_TARGET_HEIGHT,
     UNIFORM_TYPE_VECTOR3,
 } from '@/PaleGL/constants.ts';
-import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createMesh, Mesh, MeshArgs, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -27,7 +27,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { getPostProcessCommonUniforms } from '@/PaleGL/postprocess/postProcessPassBase.ts';
 import { createVector3Zero } from '@/PaleGL/math/vector3.ts';
 
-type ScreenSpaceRaymarchMeshArgs = {
+export type ScreenSpaceRaymarchMeshArgs = {
     gpu: Gpu;
     name?: string;
     geometry?: Geometry;
@@ -37,12 +37,13 @@ type ScreenSpaceRaymarchMeshArgs = {
     depthFragmentShaderTemplate?: string;
     depthFragmentShaderContent: string;
     materialArgs: ScreenSpaceRaymarchMaterialArgs;
-} & MaterialArgs;
+    // } & MaterialArgs;
+} & MeshOptionsArgs;
 
 export type ScreenSpaceRaymarchMesh = Mesh;
 
 export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs) {
-    const { gpu, name = '', uniforms = [], materialArgs } = args;
+    const { gpu, name = '', uniforms = [], materialArgs, castShadow } = args;
 
     const mergedUniforms: UniformsData = [
         [UNIFORM_NAME_VIEW_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
@@ -56,7 +57,7 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
     //     args.fragmentShaderContent
     // );
     // const depthFragmentShader = (
-    //     args.depthFragmentShaderTemplate ?? 
+    //     args.depthFragmentShaderTemplate ??
     // ).replace(
     //     pragmaKey,
     //     args.depthFragmentShaderContent
@@ -73,8 +74,6 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
     //     args.depthFragmentShaderContent
     // );
 
-
-
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = args.geometry ?? createPlaneGeometry({ gpu });
     const material = createScreenSpaceRaymarchMaterial({
@@ -86,15 +85,13 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
         uniformBlockNames: [UNIFORM_BLOCK_NAME_TIMELINE],
-        fragmentShaderModifiers: [
-            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.fragmentShaderContent]
-        ],
+        fragmentShaderModifiers: [[FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.fragmentShaderContent]],
         depthFragmentShaderModifiers: [
-            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent]
+            [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent],
         ],
     });
 
-    const mesh = createMesh({ name, geometry, material, meshType: MESH_TYPE_SCREEN_SPACE_RAYMARCH });
+    const mesh = createMesh({ name, geometry, material, meshType: MESH_TYPE_SCREEN_SPACE_RAYMARCH, castShadow });
 
     return {
         ...mesh,
