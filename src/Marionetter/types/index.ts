@@ -524,46 +524,43 @@ export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_NAME = NeedsS
 export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
 export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS = NeedsShorten ? 'ts' : 'tracks';
 
+// Light component info is now stored as an array:
+// Directional: [lightType, intensity, color]
+// Spot: [lightType, intensity, color, range, innerSpotAngle, spotAngle]
+// lightType is a number: 0=Directional, 1=Spot, 2=Point
 export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
-    lightType: 'Directional' | 'Point' | 'Spot';
-    intensity: number;
-    color: string;
+    lightData: [number, number, string]; // [lightType, intensity, color]
     // shorten
-    l: 'Directional' | 'Point' | 'Spot';
-    i: number;
-    c: string; // hex string
+    l: [number, number, string];
 };
 
-export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE = NeedsShorten ? 'l' : 'lightType';
-export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY = NeedsShorten ? 'i' : 'intensity';
-export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR = NeedsShorten ? 'c' : 'color';
+export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA = NeedsShorten ? 'l' : 'lightData';
+
+// Array indices for light component data
+export const MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE = 0;
+export const MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY = 1;
+export const MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR = 2;
 
 // light: directional light
 
-export type MarionetterDirectionalLightComponentInfo = MarionetterLightComponentInfo & {
-    lightType: 'Directional';
+export type MarionetterDirectionalLightComponentInfo = MarionetterComponentInfoBase & {
+    lightData: [0, number, string]; // [LIGHT_TYPE_DIRECTIONAL, intensity, color]
     // shorten
-    l: 'Directional';
+    l: [0, number, string];
 };
 
 // light: spotlight
 
-export type MarionetterSpotLightComponentInfo = MarionetterLightComponentInfo & {
-    lightType: 'Spot';
-    range: number;
-    innerSpotAngle: number;
-    spotAngle: number;
+export type MarionetterSpotLightComponentInfo = MarionetterComponentInfoBase & {
+    lightData: [1, number, string, number, number, number]; // [LIGHT_TYPE_SPOT, intensity, color, range, innerSpotAngle, spotAngle]
     // shorten
-    l: 'Spot';
-    r: number;
-    isa: number;
-    sa: number;
+    l: [1, number, string, number, number, number];
 };
 
-export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE = NeedsShorten ? 'l' : 'lightType';
-export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE = NeedsShorten ? 'r' : 'range';
-export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE = NeedsShorten ? 'isa' : 'innerSpotAngle';
-export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE = NeedsShorten ? 'sa' : 'spotAngle';
+// Array indices for spot light component data (indices 0-2 are same as base light)
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_RANGE = 3;
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_INNER_SPOT_ANGLE = 4;
+export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_SPOT_ANGLE = 5;
 
 // // volume: postprocess
 //

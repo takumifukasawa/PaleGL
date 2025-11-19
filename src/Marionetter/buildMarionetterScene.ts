@@ -12,9 +12,10 @@ import {
     MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
     MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
     MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE,
+    MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR,
+    MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY,
+    MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE,
+    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA,
     MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX,
     MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX,
     MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX,
@@ -33,9 +34,9 @@ import {
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME,
     MARIONETTER_SCENE_PROPERTY_OBJECTS,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE,
-    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_INNER_SPOT_ANGLE,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_RANGE,
+    MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_SPOT_ANGLE,
     // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION,
     // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION,
     // MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE,
@@ -65,7 +66,7 @@ import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
-import { ACTOR_TYPE_LIGHT, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
+import { ACTOR_TYPE_LIGHT, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Renderer } from '@/PaleGL/core/renderer.ts';
 import { setRotation, setScaling } from '@/PaleGL/core/transform.ts';
@@ -273,7 +274,7 @@ export function buildMarionetterScene(
         //
         // component情報
         //
-
+        
         // mesh actor
         if (mrComponent && mfComponent) {
             const meshFilter = mfComponent;
@@ -357,33 +358,33 @@ export function buildMarionetterScene(
         } else if (lightComponent) {
             // light
             const light = lightComponent;
-            switch (light[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE]) {
-                case 'Directional':
+            const lightData = light[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+            switch (lightData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE]) {
+                case LIGHT_TYPE_DIRECTIONAL:
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
+                    const directionalData = directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
                     actor = createDirectionalLight({
                         name,
-                        intensity: directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY],
-                        color: createColorFromHex(
-                            directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR]
-                        ),
+                        intensity: directionalData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY],
+                        color: createColorFromHex(directionalData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR]),
                     });
                     break;
-                case 'Spot':
+                case LIGHT_TYPE_SPOT:
                     const spotLightInfo = light as MarionetterSpotLightComponentInfo;
+                    const spotData = spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
                     // angleは半分にする必要があることに注意
                     actor = createSpotLight({
                         name,
-                        color: createColorFromHex(spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_COLOR]),
-                        intensity: spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_INTENSITY],
-                        distance: spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_RANGE],
-                        coneAngle: spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_SPOT_ANGLE] / 2,
-                        penumbraAngle:
-                            spotLightInfo[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_PROPERTY_INNER_SPOT_ANGLE] / 2,
+                        color: createColorFromHex(spotData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR]),
+                        intensity: spotData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY],
+                        distance: spotData[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_RANGE],
+                        coneAngle: spotData[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_SPOT_ANGLE] / 2,
+                        penumbraAngle: spotData[MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_INNER_SPOT_ANGLE] / 2,
                     });
                     break;
                 default:
                     console.error(
-                        `[buildMarionetterActors] invalid light type: ${light[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_LIGHT_TYPE]}`
+                        `[buildMarionetterActors] invalid light type: ${lightData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE]}`
                     );
             }
             // ORIGINAL: volumeも一旦生のactorとみなす
