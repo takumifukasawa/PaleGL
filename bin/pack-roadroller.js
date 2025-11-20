@@ -55,6 +55,7 @@ const pack = async (filePath) => {
 
         // Dictionary size (larger = better compression but slower)
         numAbbreviations: [2048, 512, 128],
+        // numAbbreviations: [4096, 1024, 256],
 
         // Other options
         // maxMemoryMB: 150, // Memory limit
