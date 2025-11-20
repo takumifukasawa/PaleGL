@@ -569,7 +569,7 @@ function createMarionetterAnimationClip(
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
-            const [propertyName, keyframes] = binding;
+            const [propertyName, keyframes = [[]]] = binding;
             const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
@@ -809,7 +809,7 @@ function createMarionetterLightControlClip(
         bindings.forEach((binding) => {
             // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
             // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
-            const [propertyName, keyframes] = binding;
+            const [propertyName, keyframes = [[]]] = binding;
             const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
             switch (propertyName) {
@@ -945,7 +945,7 @@ function createMarionetterObjectMoveAndLookAtClip(
             bindings.forEach((binding) => {
                 // const propertyName = binding[MARIONETTER_CLIP_BINDING_PROPERTY_PROPERTY_NAME];
                 // const keyframes = binding[MARIONETTER_CLIP_BINDING_PROPERTY_KEYFRAMES];
-                const [propertyName, keyframes] = binding;
+                const [propertyName, keyframes = [[]]] = binding;
                 const value = curveUtilityEvaluateCurve(timeInClip, duration, keyframes, postExtrapolation);
 
                 switch (propertyName) {
