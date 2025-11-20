@@ -279,11 +279,13 @@ export function createPlayer(
     //     }
     // });
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'p') {
-            isRenderEnabled = !isRenderEnabled;
-        }
-    });
+    if (isDevelopment()) {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'p') {
+                isRenderEnabled = !isRenderEnabled;
+            }
+        });
+    }
 
     setOnRenderEngine(engine, (time) => {
         updateTimelineUniforms(player.renderer, player.timelineTime, player.timelineDeltaTime);
