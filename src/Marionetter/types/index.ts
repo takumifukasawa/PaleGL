@@ -103,22 +103,20 @@ export type MarionetterScene = {
 
 export const MARIONETTER_SCENE_PROPERTY_OBJECTS = NeedsShorten ? 'o' : 'objects';
 
-export type MarionetterObjectInfo = {
-    name: string;
-    transform: MarionetterTransformInfo;
-    components: MarionetterComponentInfoKinds[] | undefined;
-    children: MarionetterObjectInfo[] | undefined;
-    // shorten
-    n: string;
-    t: MarionetterTransformInfo;
-    co: MarionetterComponentInfoKinds[] | undefined;
-    ch: MarionetterObjectInfo[] | undefined;
-};
+// ObjectInfo は配列形式でシリアライズされる
+// [name, transform, components?, children?]
+// components と children は省略可能（末尾のnullは省略される）
+export type MarionetterObjectInfo = [
+    string, // name
+    MarionetterTransformInfo, // transform
+    MarionetterComponentInfoKinds[]?, // components (optional)
+    MarionetterObjectInfo[]? // children (optional)
+];
 
-export const MARIONETTER_OBJECT_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
-export const MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM = NeedsShorten ? 't' : 'transform';
-export const MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS = NeedsShorten ? 'co' : 'components';
-export const MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN = NeedsShorten ? 'ch' : 'children';
+export const MARIONETTER_OBJECT_INFO_INDEX_NAME = 0;
+export const MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM = 1;
+export const MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS = 2;
+export const MARIONETTER_OBJECT_INFO_INDEX_CHILDREN = 3;
 
 // export type MarionetterTransformInfo = {
 //     localPosition: { x: number; y: number; z: number };

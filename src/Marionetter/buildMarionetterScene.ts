@@ -27,10 +27,10 @@ import {
     MARIONETTER_MATERIAL_TYPE_UNLIT,
     MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
     MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL,
-    MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN,
-    MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS,
-    MARIONETTER_OBJECT_INFO_PROPERTY_NAME,
-    MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM,
+    MARIONETTER_OBJECT_INFO_INDEX_CHILDREN,
+    MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS,
+    MARIONETTER_OBJECT_INFO_INDEX_NAME,
+    MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME,
     MARIONETTER_SCENE_PROPERTY_OBJECTS,
@@ -138,11 +138,11 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 
 // export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
 export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
-    const co = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS];
+    const co = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS];
     if (co) {
         return (
             // @ts-ignore
-            (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
+            (obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
                 (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
             ) as T) || null
         );
@@ -153,7 +153,7 @@ export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componen
 
 // export function findMarionetterComponentAsNumber<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
 //     return (
-//         (obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS].find(
+//         (obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
 //             (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
 //         ) as T) || null
 //     );
@@ -223,7 +223,7 @@ export function buildMarionetterScene(
         parentActor: Actor | null = null,
         needsFlip: boolean = false
     ) {
-        const name = obj[MARIONETTER_OBJECT_INFO_PROPERTY_NAME];
+        const name = obj[MARIONETTER_OBJECT_INFO_INDEX_NAME];
         const mfComponent = findMarionetterComponent<MarionetterMeshFilterComponentInfo>(
             obj,
             MARIONETTER_COMPONENT_TYPE_MESH_FILTER
@@ -445,7 +445,7 @@ export function buildMarionetterScene(
             //
 
             // actors.push(actor);
-            const transformScale = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2];
+            const transformScale = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][2];
             const scale = transformScale.length === 0
                 ? createVector3(1, 1, 1) // デフォルト: Vector3.one
                 : createVector3(transformScale[0], transformScale[1], transformScale[2]);
@@ -473,7 +473,7 @@ export function buildMarionetterScene(
             //         obj.transform.localRotation.w
             //     )
             // );
-            const transformRotation = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1];
+            const transformRotation = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][1];
             const quaternion = transformRotation.length === 0
                 ? createQuaternion(0, 0, 0, 1) // デフォルト: Quaternion.identity
                 : createQuaternion(transformRotation[0], transformRotation[1], transformRotation[2], transformRotation[3]);
@@ -487,7 +487,7 @@ export function buildMarionetterScene(
                     )
                 )
             );
-            const transformPosition = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0];
+            const transformPosition = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][0];
             actor.transform.position = transformPosition.length === 0
                 ? createVector3(0, 0, 0) // デフォルト: Vector3.zero
                 : createVector3(transformPosition[0], transformPosition[1], transformPosition[2]);
@@ -502,7 +502,7 @@ export function buildMarionetterScene(
             }
 
             // 子要素があれば再帰的に処理
-            const ch = obj[MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN];
+            const ch = obj[MARIONETTER_OBJECT_INFO_INDEX_CHILDREN];
             if (ch) {
                 for (let i = 0; i < ch.length; i++) {
                     recursiveBuildActor(ch[i], actor, needsFlip);
@@ -512,7 +512,7 @@ export function buildMarionetterScene(
             return;
         }
 
-        console.error(`[recursiveBuildActor] actor is null - name: ${obj[MARIONETTER_OBJECT_INFO_PROPERTY_NAME]}`);
+        console.error(`[recursiveBuildActor] actor is null - name: ${obj[MARIONETTER_OBJECT_INFO_INDEX_NAME]}`);
     }
 
     //
@@ -551,7 +551,7 @@ export function buildMarionetterTimelineFromScene(
 ): MarionetterTimeline | null {
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MARIONETTER_SCENE_PROPERTY_OBJECTS].forEach((obj) => {
-        const co = obj[MARIONETTER_OBJECT_INFO_PROPERTY_COMPONENTS];
+        const co = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS];
         if (co) {
             const timelineComponent = co.find(
                 (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
