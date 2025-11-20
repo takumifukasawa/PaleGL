@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-#pragma ATTRIBUTES
+#pragma BASE_ATTRIBUTES
 
 #include <lighting>
 #include <ub>

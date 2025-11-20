@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-#pragma ATTRIBUTES
+#pragma BASE_ATTRIBUTES
 
 out vec2 vUv;
 

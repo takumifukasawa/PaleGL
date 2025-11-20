@@ -19,7 +19,7 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     FragmentShaderModifiers,
-    SHADER_PRAGMA_ATTRIBUTES,
+    SHADER_PRAGMA_BASE_ATTRIBUTES,
     SHADER_PRAGMA_DEFINES,
     VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
     VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_INCLUDE,
@@ -368,7 +368,7 @@ export const buildVertexShader = (
     let replacedShader: string = shader;
 
     // replace attributes
-    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${SHADER_PRAGMA_ATTRIBUTES}`, 'g'), () => {
+    replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${SHADER_PRAGMA_BASE_ATTRIBUTES}`, 'g'), () => {
         const attributes = buildVertexAttributeLayouts(attributeDescriptors);
         return attributes.join('\n');
     });

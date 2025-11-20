@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-#pragma ATTRIBUTES
+#pragma BASE_ATTRIBUTES
 
 #pragma APPEND_ATTRIBUTES
 

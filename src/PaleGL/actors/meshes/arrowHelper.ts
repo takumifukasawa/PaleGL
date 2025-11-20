@@ -250,7 +250,7 @@ export function createArrowHelper({ gpu }: { gpu: Gpu }): Mesh {
         // gpu,
         vertexShader: `
 #pragma DEFINES
-#pragma ATTRIBUTES
+#pragma BASE_ATTRIBUTES
 #include <lighting>
 #include <ub>
 precision highp float;
