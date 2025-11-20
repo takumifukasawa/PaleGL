@@ -445,17 +445,11 @@ export function buildMarionetterScene(
             //
 
             // actors.push(actor);
-            setScaling(
-                actor.transform,
-                createVector3(
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][7],
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][8],
-                    obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][9]
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].x,
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].y,
-                    // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_SCALE].z
-                )
-            );
+            const transformScale = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2];
+            const scale = transformScale.length === 0
+                ? createVector3(1, 1, 1) // デフォルト: Vector3.one
+                : createVector3(transformScale[0], transformScale[1], transformScale[2]);
+            setScaling(actor.transform, scale);
             // euler ver
             // actor.transform.rotation.setV(
             //     new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
@@ -479,41 +473,24 @@ export function buildMarionetterScene(
             //         obj.transform.localRotation.w
             //     )
             // );
+            const transformRotation = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1];
+            const quaternion = transformRotation.length === 0
+                ? createQuaternion(0, 0, 0, 1) // デフォルト: Quaternion.identity
+                : createQuaternion(transformRotation[0], transformRotation[1], transformRotation[2], transformRotation[3]);
             setRotation(
                 actor.transform,
                 createRotatorFromQuaternion(
                     resolveInvertRotationLeftHandAxisToRightHandAxis(
-                        createQuaternion(
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            // ].x,
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            // ].y,
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            // ].z,
-                            // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][
-                            //     MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_ROTATION
-                            // ].w
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][3],
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][4],
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][5],
-                            obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][6]
-                        ),
+                        quaternion,
                         actor,
                         needsFlip
                     )
                 )
             );
-            actor.transform.position = createVector3(
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].x,
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].y,
-                // obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][MARIONETTER_TRANSFORM_INFO_PROPERTY_LOCAL_POSITION].z
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0],
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][1],
-                obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][2]
-            );
+            const transformPosition = obj[MARIONETTER_OBJECT_INFO_PROPERTY_TRANSFORM][0];
+            actor.transform.position = transformPosition.length === 0
+                ? createVector3(0, 0, 0) // デフォルト: Vector3.zero
+                : createVector3(transformPosition[0], transformPosition[1], transformPosition[2]);
 
             generatedActorHook?.(gpu, actor);
 

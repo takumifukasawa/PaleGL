@@ -131,11 +131,11 @@ export const MARIONETTER_OBJECT_INFO_PROPERTY_CHILDREN = NeedsShorten ? 'ch' : '
 // };
 
 // [
-//      lp.x, lp.y, lp.z, // 0,1,2
-//      lr.x, lr.y, lr.z, lr.w, // 3,4,5,6
-//      ls.x, ls.y, ls.z // 7,8,9
+//      [lp.x, lp.y, lp.z], // position
+//      [lr.x, lr.y, lr.z, lr.w], // rotation (quaternion)
+//      [ls.x, ls.y, ls.z] // scale
 // ]
-export type MarionetterTransformInfo = number[];
+export type MarionetterTransformInfo = [number[], number[], number[]];
 
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_X_INDEX = 0;
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Y_INDEX = 1;
