@@ -160,10 +160,15 @@ void main() {
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
     
+    // TODO: raymarchの結果をBEFORE_OUTで使えるように無理矢理キャッシュ
+    outGBufferA.xy = result.xy;
+    
     #pragma BEFORE_OUT
 
     outGBufferA = fEncodeGBufferA(resultColor.rgb);
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = fEncodeGBufferC(metallic, roughness);
     outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
+    
+    #pragma END_MAIN
 }
