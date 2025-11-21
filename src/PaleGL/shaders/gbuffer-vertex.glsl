@@ -309,9 +309,9 @@ void main() {
     mat4 instanceRotationY = fGetRotationYMat(aInstanceRotation.y);
     mat4 instanceRotationZ = fGetRotationZMat(aInstanceRotation.z);
     mat4 instanceRotation =
-        instanceRotationY *
+        instanceRotationZ *
         instanceRotationX *
-        instanceRotationZ;
+        instanceRotationY;
 
     // --- vat
 

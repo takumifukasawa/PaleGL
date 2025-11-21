@@ -26,7 +26,7 @@ import {
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
 import { sampleSplinePoints } from '@/PaleGL/utilities/splineUtilities.ts';
-import { createMatrix4 } from '@/PaleGL/math/matrix4.ts';
+import { createLookAtMatrix } from '@/PaleGL/math/matrix4.ts';
 import { rotationMatrixToQuaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 
 export type SplineInstancingMesh = Mesh & {
@@ -119,65 +119,65 @@ const calculateSplineInstances = (
         const tangentInterpolated = createVector3(tx, ty, tz);
         const forward = normalizeVector3(cloneVector3(tangentInterpolated));
 
-        // worldUpを基準にrightを計算
-        const worldUp = createVector3Up(); // (0, 1, 0)
-        const dotUp = Math.abs(v3y(forward));
+        // Rotation Minimizing Frame アルゴリズムでrightを計算
+        let right: Vector3;
 
-        let right;
-        if (dotUp > 0.999) {
-            // forwardがY軸とほぼ平行 → Z軸を参照
-            right = crossVectorsV3(createVector3(0, 0, 1), forward);
+        if (prevRight === null) {
+            // 最初のインスタンス: 初期rightを設定
+            const worldUp = createVector3Up();
+            const dotUp = Math.abs(v3y(forward));
+
+            if (dotUp > 0.99) {
+                right = normalizeVector3(crossVectorsV3(forward, createVector3(0, 0, 1)));
+            } else {
+                right = normalizeVector3(crossVectorsV3(forward, worldUp));
+            }
         } else {
-            // 通常: worldUpとforwardの外積
-            right = crossVectorsV3(worldUp, forward);
-        }
-        right = normalizeVector3(right);
+            // 2個目以降: prevRightをforwardに垂直な平面上に射影
+            // Gram-Schmidt直交化により、滑らかな変化を実現
+            const dot = dotVector3(prevRight, forward);
+            const perpX = v3x(prevRight) - dot * v3x(forward);
+            const perpY = v3y(prevRight) - dot * v3y(forward);
+            const perpZ = v3z(prevRight) - dot * v3z(forward);
 
-        // rightの急な反転を防ぐ
-        if (prevRight !== null) {
-            const dot = dotVector3(right, prevRight);
-            if (dot < 0) {
-                right = scaleVector3ByScalar(right, -1);
+            const length = Math.sqrt(perpX * perpX + perpY * perpY + perpZ * perpZ);
+
+            if (length > 0.001) {
+                right = createVector3(perpX / length, perpY / length, perpZ / length);
+            } else {
+                // 例外: forwardが急激に変化した場合
+                const worldUp = createVector3Up();
+                right = normalizeVector3(crossVectorsV3(forward, worldUp));
             }
         }
 
-        // upをforwardとrightの外積から計算
-        const up = normalizeVector3(crossVectorsV3(forward, right));
-
-        // x=右, y=上, z=進行方向
-        const x = right;
-        const y = up;
-        const z = forward;
-
-        const rotMat = createMatrix4(
-            v3x(x),
-            v3x(y),
-            v3x(z),
-            0,
-            v3y(x),
-            v3y(y),
-            v3y(z),
-            0,
-            v3z(x),
-            v3z(y),
-            v3z(z),
-            0,
-            0,
-            0,
-            0,
-            1
+        // createLookAtMatrix を使って回転行列を生成
+        // eye: 現在の位置
+        // center: forward方向を向く点
+        // up: 上方向（ワールドのY軸）
+        const eye = createVector3(px, py, pz);
+        const center = createVector3(
+            px + v3x(forward),
+            py + v3y(forward),
+            pz + v3z(forward)
         );
+        const up = createVector3Up();
 
-        // 回転行列からクォータニオンに変換し、オイラー角（ラジアン）を取得
-        const quat = rotationMatrixToQuaternion(rotMat);
+        // lookAt行列を生成（inverseForward=false: カメラではなくオブジェクトの向き）
+        const lookAtMat = createLookAtMatrix(eye, center, up, false);
+
+        // lookAt行列からクォータニオンに変換し、euler radians を取得
+        const quat = rotationMatrixToQuaternion(lookAtMat);
         const euler = toEulerRadianFromQuaternion(quat);
 
-        // デバッグ出力
-        if (i === 0 || i === 1 || i === 2 || i === 3 || i === 10 || i === 15 || i === 16 || i === 17) {
-            console.log(`[${i}] euler:`, [euler.x, euler.y, euler.z]);
-        }
-
         rotations.push([euler.x, euler.y, euler.z]);
+
+        // デバッグ: 全区間の値を出力
+        console.log(`[Instance ${i}] position: (${px.toFixed(2)}, ${py.toFixed(2)}, ${pz.toFixed(2)})`);
+        console.log(`  forward: (${v3x(forward).toFixed(3)}, ${v3y(forward).toFixed(3)}, ${v3z(forward).toFixed(3)})`);
+        console.log(`  right:   (${v3x(right).toFixed(3)}, ${v3y(right).toFixed(3)}, ${v3z(right).toFixed(3)})`);
+        console.log(`  up:      (${v3x(up).toFixed(3)}, ${v3y(up).toFixed(3)}, ${v3z(up).toFixed(3)})`);
+        console.log(`  euler:   (${euler.x.toFixed(3)}, ${euler.y.toFixed(3)}, ${euler.z.toFixed(3)})`);
 
         // 次のループ用に保存
         prevRight = right;
