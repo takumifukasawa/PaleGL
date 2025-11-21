@@ -44,7 +44,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         shapeFontRenderer,
     } = options;
 
-    const actor = options.actor || createActor({
+    const actor = options.parentActor || createActor({
         // CUSTOM_BEGIN comment out
         // name: 'unlit-shape-text-mesh'
         // CUSTOM_END
@@ -85,7 +85,7 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
 
     const shapeText = createShapeTextMeshBase({
         ...options,
-        actor,
+        parentActor: actor,
         createCharMeshFunc: createUnlitShapeCharMesh,
         uiQueueType: UI_QUEUE_TYPE_NONE,
         meshType: MESH_TYPE_TEXT,
