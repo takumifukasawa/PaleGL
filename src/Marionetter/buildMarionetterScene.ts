@@ -12,6 +12,10 @@ import {
     MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
     MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
     MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE,
@@ -63,7 +67,10 @@ import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { createGBufferMaterialController } from '@/PaleGL/components/gbufferMaterialController.ts';
+import {
+    createGBufferMaterialController,
+    GBufferMaterialControllerInitialValues,
+} from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
 import { ACTOR_TYPE_LIGHT, LIGHT_TYPE_DIRECTIONAL, LIGHT_TYPE_SPOT } from '@/PaleGL/constants.ts';
@@ -76,7 +83,7 @@ import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
 import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
-import { createColorFromHex, createEmissiveColorFromHex } from '@/PaleGL/math/color.ts';
+import { createColorFromHex, createEmissiveColorFromHex, Color } from '@/PaleGL/math/color.ts';
 import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
@@ -436,7 +443,18 @@ export function buildMarionetterScene(
         }
 
         if (gBufferMaterialControllerComponent && actor) {
-            addActorComponent(actor, createGBufferMaterialController());
+            const data = gBufferMaterialControllerComponent.d;
+            const initialValues: GBufferMaterialControllerInitialValues = {
+                baseColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX]
+                    ? createColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX])
+                    : undefined,
+                metallic: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX],
+                roughness: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX],
+                emissiveColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX]
+                    ? createEmissiveColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX])
+                    : undefined,
+            };
+            addActorComponent(actor, createGBufferMaterialController(initialValues));
         }
 
         if (actor) {
