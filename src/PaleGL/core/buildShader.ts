@@ -20,6 +20,7 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_INITIALIZE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
+    FragmentShaderModifierPragmas,
     FragmentShaderModifiers,
     SHADER_DEFINE_ALPHA_TEST,
     SHADER_DEFINE_ENV_MAP,
@@ -430,7 +431,8 @@ export const buildVertexShader = (
 export const buildFragmentShader = (
     shader: string,
     defineOptions: ShaderDefines,
-    fragmentShaderModifiers: FragmentShaderModifiers
+    fragmentShaderModifiers: FragmentShaderModifiers,
+    deletePragmas: FragmentShaderModifierPragmas[]
 ) => {
     // 型チェックとエラーハンドリング
     if (typeof shader !== 'string') {
@@ -439,6 +441,11 @@ export const buildFragmentShader = (
     }
 
     let replacedShader: string = shader;
+ 
+    // 消したいmodifierは全部消す
+    deletePragmas.forEach((pragma) => {
+        replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), '');
+    })
 
     // 必ず必要なもの
     // TODO: 定数としてまとめられそう

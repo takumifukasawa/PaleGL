@@ -1,5 +1,6 @@
 import {
     DEPTH_FUNC_TYPE_LEQUAL,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     SHADING_MODEL_ID_LIT,
@@ -40,14 +41,17 @@ import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.t
 import { createVector3One } from '@/PaleGL/math/vector3.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
-import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
+import litObjectSpaceRaymarchFragmentLayout
+    from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
+import objectSpaceRaymarchDepthFragmentLayout
+    from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 
 type ObjectSpaceRaymarchGBufferArgs = {
     fragmentShaderTemplate?: string;
     fragmentShaderContent: string;
     depthFragmentShaderTemplate?: string;
     depthFragmentShaderContent: string;
+    deleteGBufferBuilderPragma?: boolean;
 } & {
     shadingModelId?: ShadingModelIds;
     // gbuffer共通
@@ -94,6 +98,7 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
         // shadingModelId = SHADING_MODEL_ID_LIT,
         uniforms = [],
         uniformBlockNames,
+        deleteFragmentShaderPragmas = []
     } = args;
 
     const baseColor: Color = args.baseColor || createColorWhite();
@@ -180,6 +185,11 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
     ) {
         console.warn(`difference template!`);
     }
+   
+    // gbuffer builder を消すオプションを適用してるなら消しちゃう
+    if (args.deleteGBufferBuilderPragma) {
+        deleteFragmentShaderPragmas.push(FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH);
+    }
 
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
@@ -193,6 +203,8 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
         vertexShader: raymarchVert,
         fragmentShader: fragmentShaderTemplate || litObjectSpaceRaymarchFragmentLayout,
         depthFragmentShader: depthFragmentShaderTemplate || objectSpaceRaymarchDepthFragmentLayout,
+
+        deleteFragmentShaderPragmas,
 
         // NOTE: GBufferMaterialの設定
         // useNormalMap: !!normalMap,

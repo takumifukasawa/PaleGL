@@ -3,9 +3,13 @@
 #include <common>
 #include <lighting>
 #include <ub>
+#include <tone>
 #include <depth>
+#include <gbuffer>
 #include <alpha_test>
 #include <vcolor_fh>
+
+
 
 #ifdef D_INSTANCING
 in float vInstanceId;

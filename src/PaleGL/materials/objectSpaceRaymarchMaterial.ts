@@ -102,7 +102,7 @@ export const createObjectSpaceRaymarchMaterial = ({
         metallicMapTiling = createVector4(1, 1, 0, 0),
         emissiveColor = createColorBlack(),
     } = materialArgs;
-
+    
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
         [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
