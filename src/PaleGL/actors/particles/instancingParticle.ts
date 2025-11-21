@@ -1,8 +1,5 @@
-import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { createAttribute } from '@/PaleGL/core/attribute.ts';
-import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import { maton } from '@/PaleGL/utilities/maton.ts';
 import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     ActorType,
     ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
@@ -16,8 +13,11 @@ import {
     MESH_TYPE_INSTANCING_PARTICLE,
     MeshType,
 } from '@/PaleGL/constants.ts';
+import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
+import { setGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 
 type DataPerInstance = {
     position?: number[];
@@ -45,6 +45,7 @@ export type InstancingParticleArgs = {
     color?: number[][];
     emissiveColor?: number[][];
     animationOffset?: number[];
+    castShadow?: boolean;
     // vat
     // vatData?: VATData;
 };
@@ -66,8 +67,8 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         // vat
         // vatData,
         makeDataPerInstanceFunction,
+        castShadow,
     } = args;
-    console.log(args);
 
     const mesh =
         args.mesh ||
@@ -81,7 +82,7 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
 
     mesh.name = args.name || '';
     mesh.meshType = args.meshType || MESH_TYPE_INSTANCING_PARTICLE;
-    mesh.castShadow = true; // TODO: 出し分け
+    mesh.castShadow = !!castShadow; // TODO: 出し分け
     mesh.geometry.instanceCount = instanceCount;
 
     const instanceInfo: {
