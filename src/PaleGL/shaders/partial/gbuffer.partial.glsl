@@ -21,6 +21,15 @@ struct sGBufferD {
     // a
 };
 
+struct sGBufferSurface {
+    vec3 smWorldNormal;
+    vec3 smBaseColor;
+    float smMetallic;
+    float smRoughness;
+    vec3 smEmissiveColor;
+    // uShadingModelId);
+};
+
 vec4 fEncodeGBufferA(vec3 baseColor) {
     return vec4(fGamma(baseColor), 1.);
 }

@@ -15,6 +15,8 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_BEGIN_MAIN,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_END_MAIN,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_DEFAULT,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_INITIALIZE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
@@ -60,6 +62,8 @@ import curlNoisePartialContent from '@/PaleGL/shaders/partial/curl-noise.partial
 import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
 import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
 import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
+import gbufferBuilderDefaultPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-default.partial.glsl';
+import gbufferBuilderRaymarchPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-raymarch.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
@@ -436,6 +440,29 @@ export const buildFragmentShader = (
 
     let replacedShader: string = shader;
 
+    // 必ず必要なもの
+    // TODO: 定数としてまとめられそう
+    if (
+        !fragmentShaderModifiers.find(
+            ([modifier]) => modifier === FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_DEFAULT
+        )
+    ) {
+        fragmentShaderModifiers.push([
+            FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_DEFAULT,
+            gbufferBuilderDefaultPartialContent,
+        ]);
+    }
+    if (
+        !fragmentShaderModifiers.find(
+            ([modifier]) => modifier === FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH
+        )
+    ) {
+        fragmentShaderModifiers.push([
+            FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
+            gbufferBuilderRaymarchPartialContent,
+        ]);
+    }
+
     // replace shader block
     [
         FRAGMENT_SHADER_MODIFIER_PRAGMA_BLOCK_BEFORE_RAYMARCH_CONTENT,
@@ -450,6 +477,8 @@ export const buildFragmentShader = (
         FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
         FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_INITIALIZE,
         FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_DEFAULT,
+        FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
     ].forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), () => {
             const modifierIndex = fragmentShaderModifiers.findIndex((elem) => elem[0] === pragma);

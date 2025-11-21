@@ -87,10 +87,10 @@ void main() {
 
     // surface.smSpecularAmount = uSpecularAmount;
 
-    sSurface surface;
-    surface.smWorldPosition = vWorldPosition;
-    surface.smWorldNormal = worldNormal;
-    surface.smBaseColor = baseColor;
+    // sSurface surface;
+    // surface.smWorldPosition = vWorldPosition;
+    // surface.smWorldNormal = worldNormal;
+    // surface.smBaseColor = baseColor;
     
     #include <alpha_test_f>
     // #include ./partial/alpha-test-fragment.partial.glsl

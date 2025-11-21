@@ -74,6 +74,8 @@ in mat4 vInverseWorldMatrix;
 // }
 // #endif
 
+#pragma GBUFFER_BUILDER_RAYMARCH
+
 #include <gbuffer_o>
 
 void main() {
@@ -159,16 +161,37 @@ void main() {
     metallic *= texture(uMetallicMap, uv * uMetallicMapTiling.xy).r;
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
+
+    // // surface情報
+    // sSurface surface;
+    // surface.smWorldPosition = vWorldPosition;
+    // surface.smWorldNormal = worldNormal;
+    // surface.smBaseColor = baseColor;
     
-    // TODO: raymarchの結果をBEFORE_OUTで使えるように無理矢理キャッシュ
-    outGBufferA.xy = result.xy;
+    // // TODO: raymarchの結果をBEFORE_OUTで使えるように無理矢理キャッシュ
+    // outGBufferA.xy = result.xy;
     
+    sGBufferSurface gBufferSurface = fBuildGBufferSurface(
+        currentRayPosition,
+        worldNormal,
+        resultColor.xyz,
+        metallic,
+        roughness,
+        emissiveColor,
+        result
+    );
+
     #pragma BEFORE_OUT
 
-    outGBufferA = fEncodeGBufferA(resultColor.rgb);
-    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = fEncodeGBufferC(metallic, roughness);
-    outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
+    // outGBufferA = fEncodeGBufferA(resultColor.rgb);
+    // outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    // outGBufferC = fEncodeGBufferC(metallic, roughness);
+    // outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
+    
+    outGBufferA = fEncodeGBufferA(gBufferSurface.smBaseColor.rgb);
+    outGBufferB = fEncodeGBufferB(gBufferSurface.smWorldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(gBufferSurface.smMetallic, gBufferSurface.smRoughness);
+    outGBufferD = fEncodeGBufferD(gBufferSurface.smEmissiveColor.rgb);
     
     #pragma END_MAIN
 }
