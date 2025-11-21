@@ -34,6 +34,7 @@ export type SplineInstancingMesh = Mesh & {
         controlPoints: Vector3[];
         instanceSpacing: number;
         segmentSamples: number;
+        maxInstanceCount?: number;
     };
     needsUpdateInstances: boolean;
 };
@@ -45,6 +46,7 @@ type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'instanceCoun
     controlPoints: Vector3[];
     instanceSpacing?: number;
     segmentSamples?: number;
+    maxInstanceCount?: number;
 };
 
 // スプライン上の等間隔な位置とその方向を計算する
@@ -52,7 +54,8 @@ type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'instanceCoun
 const calculateSplineInstances = (
     controlPoints: Vector3[],
     segmentSamples: number,
-    instanceSpacing: number
+    instanceSpacing: number,
+    maxInstanceCount?: number
 ): { positions: number[][]; rotations: number[][]; count: number } => {
     const splinePoints = sampleSplinePoints(controlPoints, segmentSamples);
 
@@ -72,7 +75,12 @@ const calculateSplineInstances = (
     }
 
     // 配置するインスタンス数を決定（0からtotalLengthまでinstanceSpacing間隔で配置）
-    const instanceCount = Math.max(1, Math.floor(totalLength / instanceSpacing) + 1);
+    let instanceCount = Math.max(1, Math.floor(totalLength / instanceSpacing) + 1);
+
+    // maxInstanceCount が指定されている場合、それを超えないように制限
+    if (maxInstanceCount !== undefined) {
+        instanceCount = Math.min(instanceCount, maxInstanceCount);
+    }
 
     const positions: number[][] = [];
     const rotations: number[][] = [];
@@ -180,10 +188,10 @@ const calculateSplineInstances = (
 };
 
 export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
-    const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20 } = args;
-    
+    const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount } = args;
+
     // スプライン上の等間隔な位置を計算
-    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing);
+    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
 
     // InstancingParticleを使ってインスタンス属性を設定
     // こうすることで、マテリアル設定やインスタンス属性の管理を既存の仕組みに任せられる
@@ -205,6 +213,7 @@ export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs)
         controlPoints,
         instanceSpacing,
         segmentSamples,
+        maxInstanceCount,
     };
     mesh.needsUpdateInstances = false;
 
@@ -232,9 +241,9 @@ export const setSplineInstancingMeshControlPoints = (
 
 // 制御点が変わったときにインスタンス位置を再計算
 const updateSplineInstancingMeshInstances = (mesh: SplineInstancingMesh): void => {
-    const { controlPoints, segmentSamples, instanceSpacing } = mesh.splineInstancingData;
+    const { controlPoints, segmentSamples, instanceSpacing, maxInstanceCount } = mesh.splineInstancingData;
 
-    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing);
+    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
 
     // インスタンス数が変わる可能性もあるので、念のため全部作り直す
     // TODO: 最適化するならインスタンス数が同じ場合は属性だけ更新する
