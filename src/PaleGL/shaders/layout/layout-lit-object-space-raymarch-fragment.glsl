@@ -177,9 +177,10 @@ void main() {
         resultColor.xyz,
         metallic,
         roughness,
-        emissiveColor,
-        result
+        emissiveColor
+        // result
     );
+    fOverrideGBufferSurface(gBufferSurface, result);
 
     #pragma BEFORE_OUT
 

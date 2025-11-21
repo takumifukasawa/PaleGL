@@ -7,7 +7,7 @@
     DepthFragmentShaderModifiers,
     DepthFuncType,
     FACE_SIDE_FRONT,
-    FaceSide,
+    FaceSide, FragmentShaderModifierPragmas,
     FragmentShaderModifiers,
     MATERIAL_TYPE_MISC,
     MaterialType,
@@ -18,7 +18,8 @@
     RENDER_QUEUE_TYPE_SKYBOX,
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderQueue,
-    RenderQueueType, UNIFORM_BLOCK_NAME_TIMELINE,
+    RenderQueueType,
+    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_INDEX_NAME,
     UNIFORM_INDEX_TYPE,
     UNIFORM_INDEX_VALUE,
@@ -73,6 +74,8 @@ export type MaterialArgs = {
     vertexShaderModifiers?: VertexShaderModifiers;
     fragmentShaderModifiers?: FragmentShaderModifiers;
     depthFragmentShaderModifiers?: DepthFragmentShaderModifiers;
+
+    deleteFragmentShaderPragmas?: FragmentShaderModifierPragmas[];
 
     primitiveType?: PrimitiveType;
     depthTest?: boolean;
@@ -194,6 +197,7 @@ export type Material = {
     vertexShaderModifiers: VertexShaderModifiers;
     fragmentShaderModifiers: FragmentShaderModifiers;
     depthFragmentShaderModifiers: DepthFragmentShaderModifiers;
+    deleteFragmentShaderPragmas: FragmentShaderModifierPragmas[];
     uniforms: Uniforms;
     depthUniforms: Uniforms;
     //
@@ -217,6 +221,8 @@ export const createMaterial = (args: MaterialArgs): Material => {
         vertexShaderModifiers = [],
         fragmentShaderModifiers = [],
         depthFragmentShaderModifiers = [],
+        
+        deleteFragmentShaderPragmas = [],
 
         skipDepthPrePass = false,
         depthFuncType = DEPTH_FUNC_TYPE_LEQUAL,
@@ -381,6 +387,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         vertexShaderModifiers,
         fragmentShaderModifiers,
         depthFragmentShaderModifiers,
+        deleteFragmentShaderPragmas,
 
         // renderEnabled,
 
@@ -451,7 +458,8 @@ export const startMaterial = (
         const rawFragmentShader = buildFragmentShader(
             material.fragmentShader,
             shaderDefineOptions,
-            material.fragmentShaderModifiers
+            material.fragmentShaderModifiers,
+            material.deleteFragmentShaderPragmas
         );
         material.rawFragmentShader = rawFragmentShader;
     }
