@@ -130,7 +130,6 @@ export type ActorType =
 
 export const MESH_TYPE_DEFAULT = 0;
 export const MESH_TYPE_SKINNED = 1;
-export const MESH_TYPE_OBJECT_SPACE_RAYMARCH = 2;
 export const MESH_TYPE_SCREEN_SPACE_RAYMARCH = 3;
 export const MESH_TYPE_TEXT = 4;
 // UI: 5,
@@ -144,7 +143,6 @@ export const MESH_TYPE_INSTANCING_PARTICLE = 11;
 export type MeshType =
     | typeof MESH_TYPE_DEFAULT
     | typeof MESH_TYPE_SKINNED
-    | typeof MESH_TYPE_OBJECT_SPACE_RAYMARCH
     | typeof MESH_TYPE_SCREEN_SPACE_RAYMARCH
     | typeof MESH_TYPE_TEXT
     | typeof MESH_TYPE_SPRITE_ATLAS

@@ -1,26 +1,23 @@
 import { Actor, ActorStartArgs, ActorUpdateArgs } from '@/PaleGL/actors/actor.ts';
 import { startActorBehaviourBase, UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Camera } from '@/PaleGL/actors/cameras/camera.ts';
-import { updateSplineMeshBehaviour } from '@/PaleGL/actors/meshes/createSplineMesh.ts';
+import { isPerspectiveCamera } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { updateSplineInstancingMeshBehaviour } from '@/PaleGL/actors/meshes/createSplineInstancingMesh.ts';
+import { updateSplineMeshBehaviour } from '@/PaleGL/actors/meshes/createSplineMesh.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import {
-    updateObjectSpaceRaymarchDepthMaterial,
-    updateObjectSpaceRaymarchMesh,
-    updateObjectSpaceRaymarchMeshMaterial,
-} from '@/PaleGL/actors/meshes/objectSpaceRaymarchMeshBehaviour.ts';
 import { setSizeScreenSpaceRaymarchMesh } from '@/PaleGL/actors/meshes/screenSpaceRaymarchMesh.ts';
 import { startSkinnedMesh, updateSkinnedMesh } from '@/PaleGL/actors/meshes/skinnedMesh.ts';
 import { Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import {
     ActorType,
     DEPTH_FUNC_TYPE_LEQUAL,
-    MESH_TYPE_OBJECT_SPACE_RAYMARCH,
+    MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     MESH_TYPE_SKINNED,
     MESH_TYPE_SPLINE,
     MESH_TYPE_SPLINE_INSTANCING,
     MeshType,
+    UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
 } from '@/PaleGL/constants.ts';
 import { defaultDepthFragmentShader } from '@/PaleGL/core/buildShader.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -36,6 +33,10 @@ import {
     startMaterial,
 } from '@/PaleGL/materials/material.ts';
 import { updateMaterial } from '@/PaleGL/materials/materialBehaviours.ts';
+import { updateMaterialSkyboxUniforms } from '@/PaleGL/postprocess/deferredShadingPass.ts';
+
+// Uniform name constants
+const UNIFORM_NAME_PERSPECTIVE_FLAG = 'uIsPerspective';
 
 // start actor -------------------------------------------------------
 
@@ -84,7 +85,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 isInstancing: material.isInstancing,
                 useInstanceLookDirection: material.useInstanceLookDirection,
                 useVertexColor: material.useVertexColor,
-                
+
                 useHeightMap: material.useHeightMap,
 
                 uniformBlockNames: material.uniformBlockNames, // TODO: 外側からも追加して渡せるほうがいいかもしれない
@@ -235,14 +236,39 @@ export function setSizeMesh(actor: Actor, width: number, height: number) {
 export const updateMeshBehaviour: Partial<Record<MeshType, UpdateActorFunc>> = {
     // [MeshTypes.Default]: () => console.log('updateMeshBehaviour: [MeshTypes.Default] is not implemented.'),
     [MESH_TYPE_SKINNED]: updateSkinnedMesh,
-    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchMesh,
     [MESH_TYPE_SPLINE]: updateSplineMeshBehaviour,
     [MESH_TYPE_SPLINE_INSTANCING]: updateSplineInstancingMeshBehaviour,
 };
 
 export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
     const mesh = actor as Mesh;
+
+    // MeshType 固有の処理 (既存)
     updateMeshBehaviour[mesh.meshType]?.(actor, args);
+
+    // MaterialType に応じた処理 (新規追加)
+    const hasObjectSpaceRaymarch = mesh.materials.some((m) => m.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH);
+    if (hasObjectSpaceRaymarch) {
+        // ObjectSpaceRaymarch の bounds scale を設定
+        mesh.materials.forEach((material) => {
+            if (material.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH) {
+                setMaterialUniformValue(
+                    material,
+                    UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
+                    mesh.transform.scale
+                );
+            }
+        });
+        mesh.depthMaterials.forEach((material) => {
+            if (material.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH) {
+                setMaterialUniformValue(
+                    material,
+                    UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
+                    mesh.transform.scale
+                );
+            }
+        });
+    }
 }
 
 // update mesh material -------------------------------------------------------
@@ -255,25 +281,42 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 
 export type UpdateMeshMaterial = (mesh: Mesh, args: { camera: Camera; skybox?: Skybox | null }) => void;
 
-export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
-    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchMeshMaterial,
-};
+export const updateMeshMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {};
 
 // update materials
 
 // TODO: render前の方がよい気がする
 export const updateMeshMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.materials.forEach((material) => updateMaterial(material));
+
+    // MeshType 固有の処理 (既存、互換性のため残す)
     updateMeshMaterialBehaviour[mesh.meshType]?.(mesh, args);
+
+    // MaterialType に応じた処理 (新規追加)
+    mesh.materials.forEach((material) => {
+        if (material.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH) {
+            if (args.skybox) {
+                updateMaterialSkyboxUniforms(material, args.skybox);
+            }
+            setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, isPerspectiveCamera(args.camera) ? 1 : 0);
+        }
+    });
 };
 
-export const updateMeshDepthMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {
-    [MESH_TYPE_OBJECT_SPACE_RAYMARCH]: updateObjectSpaceRaymarchDepthMaterial,
-};
+export const updateMeshDepthMaterialBehaviour: Partial<Record<MeshType, UpdateMeshMaterial>> = {};
 
 export const updateMeshDepthMaterial: UpdateMeshMaterial = (mesh, args) => {
     mesh.depthMaterials.forEach((material) => updateMaterial(material));
+
+    // MeshType 固有の処理 (既存)
     updateMeshDepthMaterialBehaviour[mesh.meshType]?.(mesh, args);
+
+    // MaterialType に応じた処理 (新規追加)
+    mesh.depthMaterials.forEach((material) => {
+        if (material.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH) {
+            setMaterialUniformValue(material, UNIFORM_NAME_PERSPECTIVE_FLAG, isPerspectiveCamera(args.camera) ? 1 : 0);
+        }
+    });
 };
 
 // -------------------------------------------------------

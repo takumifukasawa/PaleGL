@@ -1,5 +1,4 @@
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { MESH_TYPE_OBJECT_SPACE_RAYMARCH } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 // import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import {
@@ -61,5 +60,5 @@ export function createObjectSpaceRaymarchMesh(args: ObjectSpaceRaymarchMeshArgs)
     //     primitiveType: PrimitiveTypes.Triangles,
     // });
 
-    return createMesh({ name, geometry, materials, castShadow, meshType: MESH_TYPE_OBJECT_SPACE_RAYMARCH });
+    return createMesh({ name, geometry, materials, castShadow });
 }
