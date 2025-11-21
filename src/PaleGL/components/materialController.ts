@@ -1,6 +1,6 @@
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
-import { Component, createComponent } from '@/PaleGL/components/component.ts';
+import { Component, ComponentArgs, createComponent } from '@/PaleGL/components/component.ts';
 import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
 
 export type MaterialController = Component;
@@ -8,8 +8,9 @@ export type MaterialController = Component;
 type Bindings = Map<string, string>; // propertyName, uniformName
 
 // timeline から操作される
-export const createMaterialController = (name: string, bindings: Bindings): MaterialController => {
+export const createMaterialController = (name: string, bindings: Bindings, componentArgs: ComponentArgs): MaterialController => {
     return createComponent({
+        ...componentArgs,
         // CUSTOM_BEGIN
         name: isNeededCompact() ? undefined : name,
         // CUSTOM_END

@@ -1,11 +1,7 @@
 import {
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME,
 } from '@/Marionetter/types';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
@@ -25,18 +21,9 @@ const bindings = new Map([
         MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
         UNIFORM_NAME_BASE_COLOR
     ],
-    [
-        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME,
-        UNIFORM_NAME_METALLIC,
-    ],
-    [
-        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME,
-        UNIFORM_NAME_ROUGHNESS,
-    ],
-    [
-        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME,
-        UNIFORM_NAME_EMISSIVE_COLOR,
-    ],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME, UNIFORM_NAME_METALLIC],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME, UNIFORM_NAME_ROUGHNESS],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME, UNIFORM_NAME_EMISSIVE_COLOR],
 ]);
 
 export type GBufferMaterialControllerInitialValues = {
@@ -48,30 +35,27 @@ export type GBufferMaterialControllerInitialValues = {
 
 // timeline から操作される
 export const createGBufferMaterialController = (
-    initialValues?: GBufferMaterialControllerInitialValues
+    // initialValues?: GBufferMaterialControllerInitialValues
 ): MaterialController => {
-    const controller = createMaterialController('GBufferMaterialController', bindings);
-
-    if (initialValues) {
-        const originalOnStart = controller[1].onStart;
-        controller[1].onStart = (actor) => {
-            originalOnStart?.(actor);
-
-            const mesh = actor as Mesh;
-            if (initialValues.baseColor) {
-                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_BASE_COLOR, initialValues.baseColor);
-            }
-            if (initialValues.metallic !== undefined) {
-                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_METALLIC, initialValues.metallic);
-            }
-            if (initialValues.roughness !== undefined) {
-                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_ROUGHNESS, initialValues.roughness);
-            }
-            if (initialValues.emissiveColor) {
-                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_EMISSIVE_COLOR, initialValues.emissiveColor);
-            }
-        };
-    }
+    const controller = createMaterialController('GBufferMaterialController', bindings, {
+        // onStartCallback: (actor, componentModel, gpu, scene) => {
+        //     if (initialValues) {
+        //         const mesh = actor as Mesh;
+        //         if (initialValues.baseColor) {
+        //             setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_BASE_COLOR, initialValues.baseColor);
+        //         }
+        //         if (initialValues.metallic !== undefined) {
+        //             setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_METALLIC, initialValues.metallic);
+        //         }
+        //         if (initialValues.roughness !== undefined) {
+        //             setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_ROUGHNESS, initialValues.roughness);
+        //         }
+        //         if (initialValues.emissiveColor) {
+        //             setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_EMISSIVE_COLOR, initialValues.emissiveColor);
+        //         }
+        //     }
+        // },
+    });
 
     return controller;
 };
