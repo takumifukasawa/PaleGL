@@ -1,11 +1,3 @@
-import {
-    AnimationTextureData,
-    UNIFORM_NAME_ANIMATION_FPS,
-    UNIFORM_NAME_ANIMATION_TIME,
-    UNIFORM_NAME_CLIP_FRAME_COUNT,
-    UNIFORM_NAME_CLIP_START_ROW,
-    UNIFORM_VALUE_ANIMATION_FPS,
-} from '../../../../src/pages/scripts/createHumanAnimationTexture.ts';
 import { MarionetterClipKinds, MarionetterTimelineDefaultTrack, NeedsShorten } from '@/Marionetter/types';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
@@ -19,6 +11,14 @@ import {
     OnProcessPropertyBinderCallback,
 } from '@/PaleGL/components/component.ts';
 import { COMPONENT_TYPE_ANIMATION_CLIP_CONTROLLER } from '@/PaleGL/constants.ts';
+import {
+    AnimationTextureData,
+    UNIFORM_NAME_ANIMATION_FPS,
+    UNIFORM_NAME_ANIMATION_TIME,
+    UNIFORM_NAME_CLIP_FRAME_COUNT,
+    UNIFORM_NAME_CLIP_START_ROW,
+    UNIFORM_VALUE_ANIMATION_FPS,
+} from '../../../../src/pages/scripts/createHumanAnimationTexture.ts';
 
 const Property = {
     clipIndex: NeedsShorten ? 'ac_ci' : 'clipIndex',

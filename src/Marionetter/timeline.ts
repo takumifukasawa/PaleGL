@@ -308,6 +308,8 @@ export function buildMarionetterTimeline(
                         }
                     }
                 } else {
+                    // // 非アクティブなactorはclipの処理は走らせない
+                    // if (targetActor && targetActor.enabled && clipAtTime) {
                     if (targetActor && clipAtTime) {
                         clipAtTime.execute({ actor: targetActor, time, scene });
                     }
