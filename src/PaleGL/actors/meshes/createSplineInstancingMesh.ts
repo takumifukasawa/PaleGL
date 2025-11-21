@@ -2,7 +2,11 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { UpdateActorFunc } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { createInstancingParticle, InstancingParticleArgs } from '@/PaleGL/actors/particles/instancingParticle.ts';
-import { MESH_TYPE_SPLINE_INSTANCING } from '@/PaleGL/constants.ts';
+import {
+    ATTRIBUTE_NAME_INSTANCE_POSITION,
+    ATTRIBUTE_NAME_INSTANCE_ROTATION,
+    MESH_TYPE_SPLINE_INSTANCING,
+} from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
@@ -184,10 +188,9 @@ const calculateSplineInstances = (
 
 export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
     const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20 } = args;
-
+    
     // スプライン上の等間隔な位置を計算
     const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing);
-    console.log("hogehoge", positions, rotations, count);
 
     // InstancingParticleを使ってインスタンス属性を設定
     // こうすることで、マテリアル設定やインスタンス属性の管理を既存の仕組みに任せられる
@@ -200,7 +203,7 @@ export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs)
             scale: [1, 1, 1],
         }),
     });
-
+    
     const mesh = instancingParticle as SplineInstancingMesh;
     mesh.meshType = MESH_TYPE_SPLINE_INSTANCING;
 
@@ -246,8 +249,8 @@ const updateSplineInstancingMeshInstances = (mesh: SplineInstancingMesh): void =
 
     // インスタンス属性を更新
     // updateGeometryAttributeを使うことでVAOのバッファも自動で更新される
-    updateGeometryAttribute(mesh.geometry, 'aInstancePosition', new Float32Array(positions.flat()));
-    updateGeometryAttribute(mesh.geometry, 'aInstanceRotation', new Float32Array(rotations.flat()));
+    updateGeometryAttribute(mesh.geometry, ATTRIBUTE_NAME_INSTANCE_POSITION, new Float32Array(positions.flat()));
+    updateGeometryAttribute(mesh.geometry, ATTRIBUTE_NAME_INSTANCE_ROTATION, new Float32Array(rotations.flat()));
 };
 
 export const updateSplineInstancingMeshBehaviour: UpdateActorFunc = (actor: Actor) => {
