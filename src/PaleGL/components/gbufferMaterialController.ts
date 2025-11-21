@@ -8,6 +8,8 @@ import {
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME,
 } from '@/Marionetter/types';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { createMaterialController, MaterialController } from '@/PaleGL/components/materialController.ts';
 import {
     UNIFORM_NAME_BASE_COLOR,
@@ -15,6 +17,7 @@ import {
     UNIFORM_NAME_METALLIC,
     UNIFORM_NAME_ROUGHNESS,
 } from '@/PaleGL/constants';
+import { Color } from '@/PaleGL/math/color.ts';
 
 const bindings = new Map([
     // prettier-ignore
@@ -36,7 +39,39 @@ const bindings = new Map([
     ],
 ]);
 
+export type GBufferMaterialControllerInitialValues = {
+    baseColor?: Color;
+    metallic?: number;
+    roughness?: number;
+    emissiveColor?: Color;
+};
+
 // timeline から操作される
-export const createGBufferMaterialController = (): MaterialController => {
-    return createMaterialController('GBufferMaterialController', bindings);
+export const createGBufferMaterialController = (
+    initialValues?: GBufferMaterialControllerInitialValues
+): MaterialController => {
+    const controller = createMaterialController('GBufferMaterialController', bindings);
+
+    if (initialValues) {
+        const originalOnStart = controller[1].onStart;
+        controller[1].onStart = (actor) => {
+            originalOnStart?.(actor);
+
+            const mesh = actor as Mesh;
+            if (initialValues.baseColor) {
+                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_BASE_COLOR, initialValues.baseColor);
+            }
+            if (initialValues.metallic !== undefined) {
+                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_METALLIC, initialValues.metallic);
+            }
+            if (initialValues.roughness !== undefined) {
+                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_ROUGHNESS, initialValues.roughness);
+            }
+            if (initialValues.emissiveColor) {
+                setUniformValueToAllMeshMaterials(mesh, UNIFORM_NAME_EMISSIVE_COLOR, initialValues.emissiveColor);
+            }
+        };
+    }
+
+    return controller;
 };
