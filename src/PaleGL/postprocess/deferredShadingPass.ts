@@ -71,7 +71,9 @@ export const createDeferredShadingPass = (args: DeferredShadingPassArgs): Deferr
         ...createPostProcessSinglePass({
             gpu,
             type: POST_PROCESS_PASS_TYPE_DEFERRED_SHADING,
-            name: 'DeferredShadingPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'DeferredShadingPass',
+            // CUSTOM_END
             fragmentShader: deferredShadingFragmentShader,
             uniforms,
             useEnvMap: true, // TODO: これはいらないようにしたい. 確実にshadingするので

@@ -133,7 +133,9 @@ export function createSkybox({
 
     const material = createMaterial({
         // gpu,
-        name: 'Skybox',
+        // CUSTOM_BEGIN comment out
+        // name: 'Skybox',
+        // CUSTOM_END
         vertexShader: skyboxVertexShader,
         fragmentShader: skyboxFragmentShader,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,

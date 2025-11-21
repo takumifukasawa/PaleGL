@@ -195,7 +195,9 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
     return createMaterial({
         ...args,
         // ...options,
-        name: 'ObjectSpaceRaymarchGBufferMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'ObjectSpaceRaymarchGBufferMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         // faceSide: FaceSide.Double,

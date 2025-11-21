@@ -405,14 +405,18 @@ export function createRenderer({
         type: RENDER_TARGET_TYPE_DEPTH,
         width: 1,
         height: 1,
-        name: 'depth pre-pass render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'depth pre-pass render target',
+        // CUSTOM_END
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const gBufferRenderTargets = createGBufferRenderTargets({
         gpu,
         width: 1,
         height: 1,
-        name: 'g-buffer render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'g-buffer render target',
+        // CUSTOM_END
         generateDepth: !useDepthPrepass,
     });
     const afterDeferredShadingRenderTarget = createRenderTarget({
@@ -420,14 +424,18 @@ export function createRenderer({
         type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
-        name: 'after g-buffer render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'after g-buffer render target',
+        // CUSTOM_END
     });
     const copyDepthSourceRenderTarget: RenderTarget = createRenderTarget({
         gpu,
         type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
-        name: 'copy depth source render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'copy depth source render target',
+        // CUSTOM_END
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const copyDepthDestRenderTarget = createRenderTarget({
@@ -435,7 +443,9 @@ export function createRenderer({
         type: RENDER_TARGET_TYPE_DEPTH,
         width: 1,
         height: 1,
-        name: 'copy depth dest render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'copy depth dest render target',
+        // CUSTOM_END
         depthPrecision: TEXTURE_DEPTH_PRECISION_TYPE_HIGH, // 低精度だとマッハバンドのような見た目になるので高精度にしておく
     });
     const copySceneSourceRenderTarget = createRenderTarget({
@@ -443,14 +453,18 @@ export function createRenderer({
         type: RENDER_TARGET_TYPE_EMPTY,
         width: 1,
         height: 1,
-        name: 'copy scene source render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'copy scene source render target',
+        // CUSTOM_END
     });
     const copySceneDestRenderTarget = createRenderTarget({
         gpu,
         type: RENDER_TARGET_TYPE_R11F_G11F_B10F,
         width: 1,
         height: 1,
-        name: 'copy scene dest render target',
+        // CUSTOM_BEGIN comment out
+        // name: 'copy scene dest render target',
+        // CUSTOM_END
     });
     const screenSpaceShadowPass = createScreenSpaceShadowPass({ gpu });
     const ambientOcclusionPass = createSSAOPass({ gpu });
@@ -470,7 +484,12 @@ export function createRenderer({
     const glitchPass = createGlitchPass({ gpu });
     const vignettePass = createVignettePass({ gpu });
     const fxaaPass = createFXAAPass({ gpu });
-    const colorCurtainPass = createColorCurtainPass({ gpu, name: 'ColorCurtain' });
+    const colorCurtainPass = createColorCurtainPass({
+        gpu,
+        // CUSTOM_BEGIN comment out
+        // name: 'ColorCurtain'
+        // CUSTOM_END
+    });
 
     // CUSTOM_BEGIN comment out
     // addPostProcessPass(scenePostProcess, motionBlurPass);

@@ -182,7 +182,9 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
     return {
         ...createPostProcessPassBase({
             gpu,
-            name: 'LightShaftPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'LightShaftPass',
+            // CUSTOM_END
             type: POST_PROCESS_PASS_TYPE_LIGHT_SHAFT,
             geometry,
             materials,

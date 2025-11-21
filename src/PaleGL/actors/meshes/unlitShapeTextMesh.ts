@@ -44,7 +44,11 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         shapeFontRenderer,
     } = options;
 
-    const actor = options.actor || createActor({ name: 'unlit-shape-text-mesh' });
+    const actor = options.actor || createActor({
+        // CUSTOM_BEGIN comment out
+        // name: 'unlit-shape-text-mesh'
+        // CUSTOM_END
+    });
 
     const baseUniforms: UniformsData = [
         ['uColor', UNIFORM_TYPE_COLOR, color],
@@ -62,7 +66,9 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
     const depthUniforms: UniformsData = [...baseUniforms, ...(uniforms || [])];
 
     const material = createMaterial({
-        name: 'shapeCharMeshMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'shapeCharMeshMaterial',
+        // CUSTOM_END
         vertexShader: gBufferVert,
         fragmentShader: unlitShapeTextFrag,
         depthFragmentShader: unlitShapeTextDepthFrag,

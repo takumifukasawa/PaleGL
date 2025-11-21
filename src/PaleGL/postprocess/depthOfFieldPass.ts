@@ -100,7 +100,9 @@ export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
 
     // TODO: RHalf format
     const circleOfConfusionPass = createFragmentPass({
-        name: 'circleOfConfusionPass',
+        // CUSTOM_BEGIN comment out
+        // name: 'circleOfConfusionPass',
+        // CUSTOM_END
         gpu,
         fragmentShader: dofCircleOfConfusionFragmentShader,
         uniforms: [
@@ -222,7 +224,9 @@ export const createDepthOfFieldPass = (args: DepthOfFieldPassArgs) => {
     return {
         ...createPostProcessPassBase({
             gpu,
-            name: 'DepthOfFieldPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'DepthOfFieldPass',
+            // CUSTOM_END
             type: POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD,
             geometry,
             materials,

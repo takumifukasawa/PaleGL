@@ -260,7 +260,9 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
 
     const mrtDoubleBuffer = createMRTDoubleBuffer({
         gpu,
-        name: 'mrt',
+        // CUSTOM_BEGIN comment out
+        // name: 'mrt',
+        // CUSTOM_END
         width: vatWidth,
         height: vatHeight,
         minFilter: TEXTURE_FILTER_TYPE_NEAREST,

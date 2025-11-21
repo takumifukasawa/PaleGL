@@ -65,7 +65,9 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
     ];
 
     const material = createMaterial({
-        name: 'UnlitMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'UnlitMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_UNLIT,
         vertexShaderModifiers,
         vertexShader: gBufferVert,

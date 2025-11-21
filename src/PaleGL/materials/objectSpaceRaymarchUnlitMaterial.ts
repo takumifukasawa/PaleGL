@@ -87,7 +87,9 @@ export const createObjectSpaceRaymarchUnlitMaterial = (
     return createMaterial({
         ...args,
         // ...options,
-        name: 'ObjectSpaceRaymarchUnlitMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'ObjectSpaceRaymarchUnlitMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,

@@ -69,7 +69,9 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
             // console.log(this.material, this.materials)
             // TODO: depth material から clone した方がいい気がする
             mesh.depthMaterials[i] = createMaterial({
-                name: `${material.name}/depth`,
+                // CUSTOM_BEGIN comment out
+                // name: `${material.name}/depth`,
+                // CUSTOM_END
                 vertexShader: material.rawVertexShader!, // TODO: rawじゃだめじゃん？
                 fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
                 fragmentShaderModifiers: material.depthFragmentShaderModifiers, // TODO: ややこしいけど、depthのときはfragmentShaderModifiersを使う

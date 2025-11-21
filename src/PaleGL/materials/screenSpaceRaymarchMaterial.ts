@@ -111,7 +111,9 @@ export const createScreenSpaceRaymarchMaterial = ({
     // TODO: できるだけconstructorの直後に持っていきたい
     const material = createMaterial({
         ...options,
-        name: 'ScreenSpaceRaymarchMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'ScreenSpaceRaymarchMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_SCREEN_SPACE_RAYMARCH,
         vertexShader: postprocessVert,
         fragmentShader,

@@ -454,7 +454,9 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
 
     const compositePass = createFragmentPass({
         gpu,
-        name: 'BufferVisualizerPass',
+        // CUSTOM_BEGIN comment out
+        // name: 'BufferVisualizerPass',
+        // CUSTOM_END
         fragmentShader: bufferVisualizerCompositePassFragmentShader,
         srcTextureEnabled: false,
         uniforms: [
@@ -588,7 +590,9 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
     const bufferVisualizerPass: BufferVisualizerPass = {
         ...createPostProcessPassBase({
             gpu,
-            name: 'BufferVisualizerPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'BufferVisualizerPass',
+            // CUSTOM_END
             type: POST_PROCESS_PASS_TYPE_BUFFER_VISUALIZER,
             geometry,
             materials,

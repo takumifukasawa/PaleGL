@@ -88,7 +88,9 @@ export function createUIShapeTextMesh<T, U extends ShapeFontBase<T>>(
     ];
 
     const material = createMaterial({
-        name: 'uiShapeCharMeshMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'uiShapeCharMeshMaterial',
+        // CUSTOM_END
         vertexShader: uiVert,
         fragmentShader: uiShapeTextFrag,
         depthFragmentShader: depthFrag,

@@ -135,7 +135,9 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
 
     const downSamplePassInfos = [2, 4, 8, 16, 32].map((downScale) => {
         const pass = createFragmentPass({
-            name: `DownSampleMip${downScale}Pass`,
+            // CUSTOM_BEGIN comment out
+            // name: `DownSampleMip${downScale}Pass`,
+            // CUSTOM_END
             gpu,
             fragmentShader: streakDownSampleFragmentShader,
             uniforms: [
@@ -158,7 +160,9 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
 
     const upSamplePassInfos = maton.range(5).map((_, index) => {
         const pass = createFragmentPass({
-            name: `UpSampleMip${index}Pass`,
+            // CUSTOM_BEGIN comment out
+            // name: `UpSampleMip${index}Pass`,
+            // CUSTOM_END
             gpu,
             fragmentShader: streakUpSampleFragmentShader,
             uniforms: [
@@ -198,7 +202,9 @@ export const createStreakPass = (args: StreakPassArgs): StreakPass => {
     return {
         ...createPostProcessPassBase({
             gpu,
-            name: 'StreakPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'StreakPass',
+            // CUSTOM_END
             type: POST_PROCESS_PASS_TYPE_STREAK,
             geometry,
             materials,

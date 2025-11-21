@@ -23,7 +23,9 @@ export const createToneMappingPass = (args: ToneMappingPassArgs): ToneMappingPas
         ...createPostProcessSinglePass({
             gpu,
             type: POST_PROCESS_PASS_TYPE_TONE_MAPPING,
-            name: 'ToneMappingPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'ToneMappingPass',
+            // CUSTOM_END
             fragmentShader: toneMappingFragmentShader,
             uniforms,
             // useEnvMap: false,

@@ -41,7 +41,9 @@ export const createGaussianBlurPass = (args: GaussianBlurPassParametersArgs): Ga
     const blurWeights = getGaussianBlurWeights(BLUR_PIXEL_NUM, Math.floor(BLUR_PIXEL_NUM / 2));
 
     const horizontalBlurPass = createFragmentPass({
-        name: 'horizontal blur pass',
+        // CUSTOM_BEGIN comment out
+        // name: 'horizontal blur pass',
+        // CUSTOM_END
         gpu,
         fragmentShader: gaussianBlurFragmentShader,
         // fragmentShader: gaussianBlurFragmentShader({
@@ -60,7 +62,9 @@ export const createGaussianBlurPass = (args: GaussianBlurPassParametersArgs): Ga
     materials.push(...horizontalBlurPass.materials);
 
     const verticalBlurPass = createFragmentPass({
-        name: 'vertical blur pass',
+        // CUSTOM_BEGIN comment out
+        // name: 'vertical blur pass',
+        // CUSTOM_END
         gpu,
         fragmentShader: gaussianBlurFragmentShader,
         // fragmentShader: gaussianBlurFragmentShader({
@@ -81,7 +85,9 @@ export const createGaussianBlurPass = (args: GaussianBlurPassParametersArgs): Ga
     return {
         ...createPostProcessPassBase({
             gpu,
-            name: 'GaussianBlurPass',
+            // CUSTOM_BEGIN comment out
+            // name: 'GaussianBlurPass',
+            // CUSTOM_END
             type: POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR,
             geometry,
             materials,

@@ -155,7 +155,7 @@ export const addMaterialUniformValue = (material: Material, name: string, type: 
 };
 
 export type Material = {
-    name: string;
+    name?: string;
     canRender: boolean;
     type: MaterialType;
     shader: Shader | null;

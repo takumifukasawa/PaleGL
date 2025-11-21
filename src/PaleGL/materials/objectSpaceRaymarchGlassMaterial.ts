@@ -90,7 +90,9 @@ export const createObjectSpaceRaymarchGlassMaterial = (
     return createMaterial({
         ...args,
         // ...options,
-        name: 'ObjectSpaceRaymarchGlassMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'ObjectSpaceRaymarchGlassMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,

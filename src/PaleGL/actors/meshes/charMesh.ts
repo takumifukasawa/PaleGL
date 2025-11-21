@@ -116,7 +116,9 @@ export function createCharMesh({
         // offset: new Vector3(offsetX, offsetY, 0),
     });
     const material = createMaterial({
-        name: 'charMeshMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'charMeshMaterial',
+        // CUSTOM_END
         vertexShader: gBufferVert,
         // fragmentShader: unlitTextFrag,
         // depthFragmentShader: unlitTextDepthFrag,

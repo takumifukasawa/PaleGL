@@ -133,7 +133,9 @@ export const createObjectSpaceRaymarchMaterial = ({
     return createMaterial({
         ...materialArgs, // TODO: 上書きするためにできるだけ後ろに持っていきたい
         // ...options,
-        name: 'ObjectSpaceRaymarchMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'ObjectSpaceRaymarchMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH,
 
         vertexShader: raymarchVert,

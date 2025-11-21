@@ -398,7 +398,9 @@ export async function warmRender(
     // ダミーのレンダーターゲットを作成(1x1の小さいサイズで高速化)
     const dummyRenderTarget = createRenderTarget({
         gpu,
-        name: 'warmup-dummy',
+        // CUSTOM_BEGIN comment out
+        // name: 'warmup-dummy',
+        // CUSTOM_END
         width: 1,
         height: 1,
         useDepthBuffer: true,

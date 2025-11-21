@@ -125,7 +125,9 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
     const depthUniforms: UniformsData = [...commonUniforms, ...uniforms];
 
     const material = createMaterial({
-        name: 'GBufferMaterial',
+        // CUSTOM_BEGIN comment out
+        // name: 'GBufferMaterial',
+        // CUSTOM_END
         type: MATERIAL_TYPE_G_BUFFER,
         vertexShader: gBufferVert,
         fragmentShader: args.fragmentShader || litFrag,
