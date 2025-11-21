@@ -362,6 +362,15 @@ export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITI
 export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z = NeedsShorten
     ? 'lp.z'
     : 'LocalPosition.z';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_X = NeedsShorten
+    ? 'uv.x'
+    : 'UpVector.x';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Y = NeedsShorten
+    ? 'uv.y'
+    : 'UpVector.y';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Z = NeedsShorten
+    ? 'uv.z'
+    : 'UpVector.z';
 
 // export type MarionetterObjectMoveAndLookAtClipInfoProperty =
 //     | typeof MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION
@@ -910,9 +919,11 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
 export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterComponentInfoBase & {
     localPosition: RawVector3;
     lookAtTargetName: string;
+    upVector: RawVector3;
     // shorten
     lp: RawVector3;
     tn: string;
+    uv: RawVector3;
 };
 
 // wip
@@ -929,6 +940,9 @@ export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPE
 export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME = NeedsShorten
     ? 'tn'
     : 'lookAtTargetName';
+export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_UP_VECTOR = NeedsShorten
+    ? 'uv'
+    : 'upVector';
 
 // fbm noise texture controller component
 

@@ -54,6 +54,7 @@ export type Transform = {
     scale: Vector3;
     lookAtTarget: Vector3 | null;
     lookAtTargetActor: Actor | null;
+    upVector: Vector3;
     normalMatrix: Matrix4;
     // TODO: engineでちゃんと更新されるようにする
     forward: Vector3;
@@ -85,6 +86,7 @@ export function createTransform() {
         scale,
         lookAtTarget,
         lookAtTargetActor,
+        upVector: createVector3Up(),
         normalMatrix,
         forward: createForwardV3(),
         up: createUpV3(),
@@ -174,10 +176,10 @@ export const updateActorTransformMatrix = (actor: Actor) => {
                       actor.transform.localMatrix,
                       actor.transform.position,
                       lookAtTarget,
-                      createVector3Up(),
+                      actor.transform.upVector,
                       true
                   )
-                : createLookAtMatrixRef(actor.transform.localMatrix, actor.transform.position, lookAtTarget);
+                : createLookAtMatrixRef(actor.transform.localMatrix, actor.transform.position, lookAtTarget, actor.transform.upVector);
         actor.transform.localMatrix = multiplyScalingMatrix(lookAtMatrix, actor.transform.scale);
     } else {
         // tmp

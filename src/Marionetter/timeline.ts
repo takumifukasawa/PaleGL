@@ -50,6 +50,9 @@ import {
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_X,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Y,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_X,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Y,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Z,
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION,
     MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS,
     MARIONETTER_SIGNAL_EMITTER_PROPERTY_NAME,
@@ -940,6 +943,7 @@ function createMarionetterObjectMoveAndLookAtClip(
             // const bindings = animationClip.b;
 
             const localPosition: Vector3 = createVector3Zero();
+            const upVector: Vector3 = createVector3(0, 1, 0);
 
             // const start = objectMoveAndLookAtClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
             // const bindings = objectMoveAndLookAtClip[MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_BINDINGS];
@@ -961,6 +965,15 @@ function createMarionetterObjectMoveAndLookAtClip(
                     case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_LOCAL_POSITION_Z:
                         setV3z(localPosition, value);
                         break;
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_X:
+                        setV3x(upVector, value);
+                        break;
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Y:
+                        setV3y(upVector, value);
+                        break;
+                    case MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CLIP_INFO_PROPERTY_UP_VECTOR_Z:
+                        setV3z(upVector, value);
+                        break;
                     default:
                         // propertyが紐づいていない場合はエラーにする
                         console.error(
@@ -972,7 +985,7 @@ function createMarionetterObjectMoveAndLookAtClip(
             const component = getActorComponent<ObjectMoveAndLookAtController>(actor);
             if (component) {
                 const [, behaviour] = component;
-                behaviour?.execute({ actor, scene, localPosition });
+                behaviour?.execute({ actor, scene, localPosition, upVector });
             }
         },
     };

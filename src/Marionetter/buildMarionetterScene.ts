@@ -37,6 +37,7 @@ import {
     MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION,
     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME,
+    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_UP_VECTOR,
     MARIONETTER_SCENE_PROPERTY_OBJECTS,
     MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_INNER_SPOT_ANGLE,
     MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_RANGE,
@@ -419,12 +420,17 @@ export function buildMarionetterScene(
         }
 
         if (objectMoveAndLookAtControllerComponent) {
+            const upVectorRaw =
+                objectMoveAndLookAtControllerComponent[
+                    MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_UP_VECTOR
+                ];
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
                 localPosition: createVector3FromRaw(
                     objectMoveAndLookAtControllerComponent[
                         MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION
                     ]
                 ),
+                upVector: upVectorRaw ? createVector3FromRaw(upVectorRaw) : createVector3(0, 1, 0),
                 lookAtTargetName:
                     objectMoveAndLookAtControllerComponent[
                         MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME
@@ -443,18 +449,20 @@ export function buildMarionetterScene(
         }
 
         if (gBufferMaterialControllerComponent && actor) {
-            const data = gBufferMaterialControllerComponent.d;
-            const initialValues: GBufferMaterialControllerInitialValues = {
-                baseColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX]
-                    ? createColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX])
-                    : undefined,
-                metallic: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX],
-                roughness: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX],
-                emissiveColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX]
-                    ? createEmissiveColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX])
-                    : undefined,
-            };
-            addActorComponent(actor, createGBufferMaterialController(initialValues));
+            // WIP: 初期値
+            // const data = gBufferMaterialControllerComponent.d;
+            // const initialValues: GBufferMaterialControllerInitialValues = {
+            //     baseColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX]
+            //         ? createColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX])
+            //         : undefined,
+            //     metallic: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX],
+            //     roughness: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX],
+            //     emissiveColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX]
+            //         ? createEmissiveColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX])
+            //         : undefined,
+            // };
+            // addActorComponent(actor, createGBufferMaterialController(initialValues));
+            addActorComponent(actor, createGBufferMaterialController());
         }
 
         if (actor) {

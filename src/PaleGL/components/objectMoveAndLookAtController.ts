@@ -6,7 +6,7 @@ import { setLookAtActor } from '@/PaleGL/core/transform.ts';
 import { addVector3AndVector3, copyVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export type ObjectMoveAndLookAtControllerBehaviour = ComponentBehaviour & {
-    execute: (args: { actor: Actor; localPosition: Vector3; scene: Scene }) => void;
+    execute: (args: { actor: Actor; localPosition: Vector3; upVector: Vector3; scene: Scene }) => void;
     setOffset: (v: Vector3) => void;
 };
 
@@ -15,21 +15,24 @@ export type ObjectMoveAndLookAtController = [ComponentModel, ObjectMoveAndLookAt
 // timeline から操作される
 export const createObjectMoveAndLookAtController = (args: {
     localPosition: Vector3;
+    upVector: Vector3;
     lookAtTargetName: string;
 }): ObjectMoveAndLookAtController => {
     const initialLocalPosition = args.localPosition;
+    const initialUpVector = args.upVector;
     const lookAtTargetName = args.lookAtTargetName;
     let lookAtTargetActor: Actor | undefined;
-    let offset: Vector3 = createVector3Zero();
+    const offset: Vector3 = createVector3Zero();
     let currentLocalPosition = createVector3Zero();
 
-    const update = (actor: Actor, scene: Scene, localPosition: Vector3) => {
+    const update = (actor: Actor, scene: Scene, localPosition: Vector3, upVector: Vector3) => {
         lookAtTargetActor = findActorInSceneByName(scene, lookAtTargetName);
         copyVector3(currentLocalPosition, localPosition);
         currentLocalPosition = addVector3AndVector3(localPosition, offset);
 
         // actor.transform.position = localPosition;
         actor.transform.position = currentLocalPosition;
+        copyVector3(actor.transform.upVector, upVector);
 
         if (lookAtTargetActor) {
             setLookAtActor(actor.transform, lookAtTargetActor);
@@ -42,7 +45,7 @@ export const createObjectMoveAndLookAtController = (args: {
         // CUSTOM_END
         type: COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
         onStartCallback: (actor, _model, _gpu, scene) => {
-            update(actor, scene, initialLocalPosition);
+            update(actor, scene, initialLocalPosition, initialUpVector);
         },
     });
 
@@ -51,8 +54,8 @@ export const createObjectMoveAndLookAtController = (args: {
         {
             ...componentBehaviour,
             execute: (args) => {
-                const { actor, scene, localPosition } = args;
-                update(actor, scene, localPosition);
+                const { actor, scene, localPosition, upVector } = args;
+                update(actor, scene, localPosition, upVector);
             },
             setOffset: (v: Vector3) => {
                 copyVector3(v, offset);
