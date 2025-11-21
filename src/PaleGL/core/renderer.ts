@@ -970,6 +970,7 @@ export function renderRenderer(
                         return;
                     }
                     if ((mesh as UIMesh).uiQueueType === UI_QUEUE_TYPE_OVERLAY) {
+                        // console.log("hogehoge", mesh)
                         renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OVERLAY].push(
                             buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_AFTER_TONE, i)
                         );

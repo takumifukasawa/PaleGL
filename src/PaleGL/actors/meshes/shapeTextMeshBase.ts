@@ -15,7 +15,7 @@ import {UniformsData} from "@/PaleGL/core/uniforms.ts";
 type ShapeTextMeshBaseArgs<T, U extends ShapeFontBase<T>> = {
     gpu: Gpu;
     name?: string;
-    actor?: Actor;
+    parentActor?: Actor;
     text: string;
     color?: Color;
     shapeFontTexture: Texture;
@@ -56,7 +56,7 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
     const {
         gpu,
         // name,
-        actor,
+        parentActor,
         text,
         // color,
         // shapeFontTexture,
@@ -74,8 +74,8 @@ export function createShapeTextMeshBase<T, U extends ShapeFontBase<T>>(
 
     const container = createActor();
 
-    if (actor) {
-        addChildActor(actor, container);
+    if (parentActor) {
+        addChildActor(parentActor, container);
     }
 
     const [shapeFont] = shapeFontService;
