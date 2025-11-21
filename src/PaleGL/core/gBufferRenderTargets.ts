@@ -42,7 +42,7 @@ import { createTexture, setTextureSize, Texture } from '@/PaleGL/core/texture.ts
 
 export type GBufferRenderTargets = RenderTargetBase & {
     gpu: Gpu;
-    name: string;
+    name?: string;
     width: number;
     height: number;
     framebuffer: Framebuffer;
@@ -63,7 +63,7 @@ export function createGBufferRenderTargets({
     generateDepth = false,
 }: {
     gpu: Gpu;
-    name: string;
+    name?: string;
     width: number;
     height: number;
     generateDepth: boolean;

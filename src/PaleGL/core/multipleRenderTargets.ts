@@ -21,7 +21,7 @@ import { createTexture, Texture } from '@/PaleGL/core/texture.ts';
 
 export type MultipleRenderTargetOptions = {
     gpu: Gpu;
-    name: string;
+    name?: string;
     width: number;
     height: number;
     minFilter?: TextureFilterType;
@@ -31,7 +31,7 @@ export type MultipleRenderTargetOptions = {
 
 export type MultipleRenderTarget = RenderTargetBase & {
     gpu: Gpu;
-    name: string;
+    name?: string;
     width: number;
     height: number;
     framebuffer: Framebuffer;

@@ -51,7 +51,7 @@ type OnProcessTimeline = (timelineTime: number) => void;
 export type ActorArgs = { name?: string; type?: ActorType };
 
 export type Actor = {
-    name: string;
+    name?: string;
     type: ActorType;
     uuid: number;
     isStarted: boolean;
@@ -73,7 +73,7 @@ export type Actor = {
     enabled: boolean;
 };
 
-export const createActor = ({ name = '', type = ACTOR_TYPE_NULL }: ActorArgs = {}): Actor => {
+export const createActor = ({ name, type = ACTOR_TYPE_NULL }: ActorArgs = {}): Actor => {
     const uuid: number = uuidv4();
     const isStarted: boolean = false;
     const transform = createTransform();

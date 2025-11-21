@@ -121,7 +121,7 @@ export type TextureBase = {
 
 export type Texture = GLObjectBase<WebGLTexture> & TextureBase & {
     type: TextureType;
-    name: string;
+    name?: string;
     img: HTMLImageElement | HTMLCanvasElement | null;
     minFilter: TextureFilterType;
     magFilter: TextureFilterType;
@@ -505,7 +505,7 @@ export function createTexture({
 
     return {
         ...createGLObject(gpu, texture),
-        name: name ?? '',
+        name,
         img,
         type,
         minFilter,

@@ -1588,7 +1588,7 @@ export function depthPrePass(renderer: Renderer, depthPrePassRenderMeshInfos: Re
             renderMesh(renderer, actor.geometry, depthMaterial, cb);
 
             if (isDevelopment() && renderer.stats) {
-                addPassInfoStats(renderer.stats, 'depth pre pass', actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, 'depth pre pass', actor.name ?? '', actor.geometry);
             }
         });
     });
@@ -1686,7 +1686,7 @@ function shadowPass(
 
                 renderMesh(renderer, actor.geometry, depthMaterial, cb);
                 if (isDevelopment() && renderer.stats) {
-                    addPassInfoStats(renderer.stats, 'shadow pass', actor.name, actor.geometry);
+                    addPassInfoStats(renderer.stats, 'shadow pass', actor.name ?? '', actor.geometry);
                 }
             });
         });
@@ -1722,7 +1722,7 @@ function skyboxPass(renderer: Renderer, sortedSkyboxPassRenderMeshInfos: RenderM
             renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (isDevelopment() && renderer.stats) {
-                addPassInfoStats(renderer.stats, 'skybox pass', actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, 'skybox pass', actor.name ?? '', actor.geometry);
             }
         });
     });
@@ -1810,7 +1810,7 @@ function renderBasePass(
             renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (isDevelopment() && renderer.stats) {
-                addPassInfoStats(renderer.stats, 'scene pass', actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, 'scene pass', actor.name ?? '', actor.geometry);
             }
         });
     });
@@ -1857,7 +1857,7 @@ function renderTransparentPass(
             renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (isDevelopment() && renderer.stats) {
-                addPassInfoStats(renderer.stats, 'transparent pass', actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, 'transparent pass', actor.name ?? '', actor.geometry);
             }
         });
     });
@@ -1928,7 +1928,7 @@ function renderUIPass(
             renderMesh(renderer, actor.geometry, targetMaterial, cb);
 
             if (isDevelopment() && renderer.stats) {
-                addPassInfoStats(renderer.stats, passName, actor.name, actor.geometry);
+                addPassInfoStats(renderer.stats, passName, actor.name ?? '', actor.geometry);
             }
         });
     });

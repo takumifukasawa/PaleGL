@@ -331,7 +331,7 @@ export const renderPostProcess = (
         // });
 
         if (stats && groupLabel) {
-            addPassInfoStats(stats, groupLabel, pass.name, pass.geometry);
+            addPassInfoStats(stats, groupLabel, pass.name ?? '', pass.geometry);
         }
 
         renderPass({

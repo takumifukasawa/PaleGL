@@ -32,7 +32,7 @@ export function createDoubleBuffer(renderTargetOptions: RenderTargetOptions): Do
     const renderTargets: RenderTarget[] = [];
 
     for (let i = 0; i < 2; i++) {
-        const options: RenderTargetOptions = { ...renderTargetOptions, ...{ name: `double-buffer_${i}` } };
+        const options: RenderTargetOptions = { ...renderTargetOptions, ...{ name: `db${i}` } };
         renderTargets.push(createRenderTarget(options));
     }
 
@@ -47,7 +47,7 @@ export function createMRTDoubleBuffer(renderTargetOptions: MultipleRenderTargetO
     const multipleRenderTargets: MultipleRenderTarget[] = [];
 
     for (let i = 0; i < 2; i++) {
-        const options: MultipleRenderTargetOptions = { ...renderTargetOptions, ...{ name: `mrt-double-buffer_${i}` } };
+        const options: MultipleRenderTargetOptions = { ...renderTargetOptions, ...{ name: `mdb${i}` } };
         multipleRenderTargets.push(createMultipleRenderTargets(options));
     }
 

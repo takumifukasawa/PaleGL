@@ -52,7 +52,7 @@ export type PostProcessPassRenderArgs = {
 
 export type PostProcessPassBase = {
     gpu: Gpu;
-    name: string;
+    name?: string;
     type: PostProcessPassType;
     width: number;
     height: number;

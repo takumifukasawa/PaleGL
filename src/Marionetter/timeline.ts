@@ -425,6 +425,7 @@ export function buildMarionetterTimeline(
     const bindActors = (actors: Actor[]) => {
         actors.forEach((actor) => {
             const targetName = actor.name;
+            if (!targetName) return;
             tracks.forEach((track) => {
                 // TODO: ここなんかうまいことやりたい
                 if (Object.hasOwn(track, 'targetName')) {
