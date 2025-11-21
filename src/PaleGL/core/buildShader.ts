@@ -153,6 +153,8 @@ export const replaceShaderIncludes = (src: string) => {
     return src;
 };
 
+const d = (str: string) => `#define ${str}`;
+
 const buildShaderDefines = ({
     receiveShadow,
     // CUSTOM_BEGIN comment out
@@ -174,48 +176,48 @@ const buildShaderDefines = ({
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
-        arr.push(`#define ${SHADER_DEFINE_RECEIVE_SHADOW}`);
+        arr.push(d(SHADER_DEFINE_RECEIVE_SHADOW));
     }
     // CUSTOM_BEGIN comment out
     // if (isSkinning) {
     //     if (gpuSkinning) {
-    //         arr.push(`#define ${SHADER_DEFINE_SKINNING_GPU}`);
+    //         arr.push(d(SHADER_DEFINE_SKINNING_GPU));
     //     } else {
-    //         arr.push(`#define ${SHADER_DEFINE_SKINNING_CPU}`);
+    //         arr.push(d(SHADER_DEFINE_SKINNING_CPU));
     //     }
     // }
     // CUSTOM_END
     if (useNormalMap) {
-        arr.push(`#define ${SHADER_DEFINE_NORMAL_MAP}`);
+        arr.push(d(SHADER_DEFINE_NORMAL_MAP));
     }
     if (useEnvMap) {
-        arr.push(`#define ${SHADER_DEFINE_ENV_MAP}`);
+        arr.push(d(SHADER_DEFINE_ENV_MAP));
     }
     // CUSTOM_BEGIN comment out
     // if (useVertexColor) {
-    //     arr.push(`#define ${SHADER_DEFINE_VERTEX_COLOR}`);
+    //     arr.push(d(SHADER_DEFINE_VERTEX_COLOR));
     // }
     // CUSTOM_END
     if (useAlphaTest) {
-        arr.push(`#define ${SHADER_DEFINE_ALPHA_TEST}`);
+        arr.push(d(SHADER_DEFINE_ALPHA_TEST));
     }
     if (isInstancing) {
-        arr.push(`#define ${SHADER_DEFINE_INSTANCING}`);
+        arr.push(d(SHADER_DEFINE_INSTANCING));
     }
     if (useInstanceLookDirection) {
-        arr.push(`#define ${SHADER_DEFINE_INSTANCE_LOOK_DIRECTION}`);
+        arr.push(d(SHADER_DEFINE_INSTANCE_LOOK_DIRECTION));
     }
     if (useVAT) {
-        arr.push(`#define ${SHADER_DEFINE_VAT}`);
+        arr.push(d(SHADER_DEFINE_VAT));
     }
     if (useVATLookForward) {
-        arr.push(`#define ${SHADER_DEFINE_VAT_LOOK_FORWARD}`);
+        arr.push(d(SHADER_DEFINE_VAT_LOOK_FORWARD));
     }
     if (isTrail) {
-        arr.push(`#define ${SHADER_DEFINE_TRAIL}`);
+        arr.push(d(SHADER_DEFINE_TRAIL));
     }
     if (useHeightMap) {
-        arr.push(`#define ${SHADER_DEFINE_HEIGHT_MAP}`);
+        arr.push(d(SHADER_DEFINE_HEIGHT_MAP));
     }
 
     return arr;
