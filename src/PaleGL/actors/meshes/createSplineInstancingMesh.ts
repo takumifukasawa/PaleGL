@@ -172,13 +172,6 @@ const calculateSplineInstances = (
 
         rotations.push([euler.x, euler.y, euler.z]);
 
-        // デバッグ: 全区間の値を出力
-        console.log(`[Instance ${i}] position: (${px.toFixed(2)}, ${py.toFixed(2)}, ${pz.toFixed(2)})`);
-        console.log(`  forward: (${v3x(forward).toFixed(3)}, ${v3y(forward).toFixed(3)}, ${v3z(forward).toFixed(3)})`);
-        console.log(`  right:   (${v3x(right).toFixed(3)}, ${v3y(right).toFixed(3)}, ${v3z(right).toFixed(3)})`);
-        console.log(`  up:      (${v3x(up).toFixed(3)}, ${v3y(up).toFixed(3)}, ${v3z(up).toFixed(3)})`);
-        console.log(`  euler:   (${euler.x.toFixed(3)}, ${euler.y.toFixed(3)}, ${euler.z.toFixed(3)})`);
-
         // 次のループ用に保存
         prevRight = right;
     }
