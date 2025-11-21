@@ -1,5 +1,5 @@
 
-#ifdef USE_ALPHA_TEST
+#ifdef D_ALPHA_TEST
 uniform float uAlphaTestThreshold;
 #endif
 

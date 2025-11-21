@@ -26,7 +26,7 @@ void main() {
     // skyboxの中心 = カメラの中心なので、こちらでもよい
     // vec3 reflectDir = normalize(vWorldPosition - uViewPosition);
 
-    // USE_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
+    // D_ENV_MAP が定義されているシェーダーなのでこの関数はあるはず
     vec3 skyboxSampleDir = fCalcEnvMapSampleDir(reflectDir, uRotationOffset);
     // vec3 envMapColor = calcEnvMap(uCubeTexture);
     // vec3 envMapColor = texture(uCubeTexture, skyboxSampleDir).xyz;

@@ -8,7 +8,7 @@
 #include <alpha_test>
 #include <vcolor_fh>
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
 in float vInstanceId;
 in vec4 vInstanceColor;
 in vec4 vInstanceEmissiveColor;
@@ -94,13 +94,13 @@ void main() {
     vec4 baseColor = uBaseColor * baseMapColor;
 
 // CUSTOM_BEGIN
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 //     baseColor *= vVertexColor;
 // #endif
 // CUSTOM_END
     
     vec3 emissiveColor = uEmissiveColor.rgb;
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
     emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
 #endif
 

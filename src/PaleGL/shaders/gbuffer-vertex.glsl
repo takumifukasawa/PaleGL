@@ -17,7 +17,7 @@ out vec3 vNormal;
 out mat4 vWorldMatrix;
 out mat4 vInverseWorldMatrix;
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
 out float vInstanceId;
 out vec4 vInstanceColor;
 out vec4 vInstanceEmissiveColor;
@@ -29,19 +29,19 @@ uniform vec4 uEmissiveColor;
 uniform float uEmissiveMixer;
 #endif
 
-#ifdef USE_VAT
+#ifdef D_VAT
 uniform sampler2D uVelocityMap;
 uniform sampler2D uPositionMap;
 uniform sampler2D uUpMap;
 uniform vec2 uVATResolution;
 #endif
 
-#ifdef USE_NORMAL_MAP
+#ifdef D_NORMAL_MAP
 out vec3 vTangent;
 out vec3 vBinormal;
 #endif
 
-#ifdef USE_HEIGHT_MAP
+#ifdef D_HEIGHT_MAP
 uniform sampler2D uHeightMap;
 uniform vec4 uHeightMapTiling;
 uniform float uHeightScale;
@@ -166,7 +166,7 @@ mat4 fGetIdentityMat() {
 // --- start skinning
 
 // CUSTOM_BEGIN comment out
-// #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
+// #if defined(D_SKINNING_GPU) || defined(D_SKINNING_CPU)
 // // tmp for cpu skinning
 // // uniform mat4[${jointNum}] uJointMatrices;
 // // uniform sampler2D ${UniformNames.JointTexture};
@@ -250,14 +250,14 @@ void main() {
 
     // --- start calc skinning
     // CUSTOM_BEGIN comment out
-    // #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
+    // #if defined(D_SKINNING_GPU) || defined(D_SKINNING_CPU)
     //     mat4 skinMatrix = mat4(
     //         1., 0., 0., 0.,
     //         0., 1., 0., 0.,
     //         0., 0., 1., 0.,
     //         0., 0., 0., 1.
     //     );
-    //     #ifdef USE_SKINNING_GPU
+    //     #ifdef D_SKINNING_GPU
     //         float fps = 30.;
     //         mat4 jointMatrix0 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[0], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
     //         mat4 jointMatrix1 = fGetJointMatrixGPUSkinning(uJointTexture, aBoneIndices[1], uBoneCount, 0, uJointTextureColNum, uTotalFrameCount, uTime * fps, aInstanceAnimationOffset);
@@ -271,7 +271,7 @@ void main() {
     //             aBoneWeights
     //         );
     //     #endif
-    //     #ifdef USE_SKINNING_CPU
+    //     #ifdef D_SKINNING_CPU
     //         mat4 jointMatrix0 = fGetJointMatrix(uJointTexture, aBoneIndices[0], uJointTextureColNum);
     //         mat4 jointMatrix1 = fGetJointMatrix(uJointTexture, aBoneIndices[1], uJointTextureColNum);
     //         mat4 jointMatrix2 = fGetJointMatrix(uJointTexture, aBoneIndices[2], uJointTextureColNum);
@@ -297,7 +297,7 @@ void main() {
 
     mat4 worldMatrix = uWorldMatrix;
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
     float fid = float(gl_InstanceID);
     vInstanceId = fid;
     
@@ -315,9 +315,9 @@ void main() {
 
     // --- vat
 
-    #ifdef USE_VAT
+    #ifdef D_VAT
         #pragma INSTANCE_TRANSFORM_PRE_PROCESS
-        #if defined(USE_TRAIL)
+        #if defined(D_TRAIL)
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),
                 aTrailIndex
@@ -334,7 +334,7 @@ void main() {
             );
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
             instanceTranslation = fGetTranslationMat(vatPosition);
-            #if defined(USE_VAT_LOOK_FORWARD)
+            #if defined(D_VAT_LOOK_FORWARD)
                 vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
                 vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
                 instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
@@ -350,7 +350,7 @@ void main() {
 
     // instanceごとのvelocityが必要なことに注意
     // TODO: 追従率をuniformで渡したい
-    #ifdef USE_INSTANCE_LOOK_DIRECTION
+    #ifdef D_INSTANCE_LOOK_DIRECTION
         // pattern_1: 速度ベクトルを使って回転
         instanceRotation = fGetLookAtPMat(aInstancePosition + aInstanceVelocity * 1000., aInstancePosition);
         // pattern_2: 速度ベクトルをnormalizeして使って回転
@@ -377,7 +377,7 @@ void main() {
     // CUSTOM_BEGIN comment out
     // // TODO:
     // // vInstanceState = aInstanceState;
-    // #ifdef USE_VERTEX_COLOR
+    // #ifdef D_VERTEX_COLOR
     //     vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
     // #endif
     // CUSTOM_END
@@ -386,17 +386,17 @@ void main() {
     // --- normal matrix
 
     mat3 normalMatrix;
-    #ifdef USE_NORMAL_MAP
+    #ifdef D_NORMAL_MAP
         // CUSTOM_BEGIN comment out
-        // #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
-        //     #ifdef USE_INSTANCING
+        // #if defined(D_SKINNING_GPU) || defined(D_SKINNING_CPU)
+        //     #ifdef D_INSTANCING
         //         normalMatrix = mat3(transpose(inverse(worldMatrix))) * mat3(skinMatrix);
         //     #else
         //         normalMatrix = mat3(uNormalMatrix) * mat3(skinMatrix);
         //     #endif
         // #else
         // CUSTOM_END
-            #ifdef USE_INSTANCING
+            #ifdef D_INSTANCING
                 normalMatrix = mat3(transpose(inverse(worldMatrix)));
             #else
                 normalMatrix = mat3(uNormalMatrix);
@@ -409,15 +409,15 @@ void main() {
         vBinormal = normalMatrix * aBinormal;
     #else
         // CUSTOM_BEGIN comment out
-        // #if defined(USE_SKINNING_GPU) || defined(USE_SKINNING_CPU)
-        //     #ifdef USE_INSTANCING
+        // #if defined(D_SKINNING_GPU) || defined(D_SKINNING_CPU)
+        //     #ifdef D_INSTANCING
         //         normalMatrix = mat3(transpose(inverse(worldMatrix))) * mat3(skinMatrix);
         //     #else
         //         normalMatrix = mat3(uNormalMatrix);
         //     #endif
         // #else
         // CUSTOM_END
-            #ifdef USE_INSTANCING
+            #ifdef D_INSTANCING
                 normalMatrix = mat3(transpose(inverse(worldMatrix)));
             #else
                 normalMatrix = mat3(uNormalMatrix);
@@ -431,7 +431,7 @@ void main() {
     // --- height map
 
     vec4 worldPosition;
-#ifdef USE_HEIGHT_MAP
+#ifdef D_HEIGHT_MAP
     // height map
     vec2 heightMapUv = aUv * uHeightMapTiling.xy + uHeightMapTiling.zw;
     float height = texture(uHeightMap, heightMapUv).r * uHeightScale;
@@ -446,10 +446,10 @@ void main() {
     // --- vertex color
 
 // CUSTOM_BEGIN comment out
-// #if defined(USE_INSTANCING) && defined(USE_VERTEX_COLOR)
+// #if defined(D_INSTANCING) && defined(D_VERTEX_COLOR)
 //     // vVertexColor = aInstanceVertexColor;
 //     vVertexColor = mix(aInstanceVertexColor, uBaseColor, uBaseMixer);
-//     #if defined(USE_INSTANCING)
+//     #if defined(D_INSTANCING)
 //         vVertexEmissiveColor = mix(aInstanceEmissiveColor, uEmissiveColor, uEmissiveMixer);
 //     #else
 //         vVertexEmissiveColor = mix(aVertexEmissiveColor, uEmissiveColor, uEmissiveMixer);

@@ -443,7 +443,7 @@ float fCalcsSpotLightShadowAttenuation(
 // receive shadow
 // -----------------------------------------------------------
 
-// #ifdef USE_RECEIVE_SHADOW
+// #ifdef D_RECEIVE_SHADOW
 uniform float uShadowBias;
 // #endif
 
@@ -510,7 +510,7 @@ void main() {
     if (1.5 < shadingModelId && shadingModelId < 2.5) {
         resultColor = vec4(emissiveColor, 1.);
         // TODO: unlitの場合って receive shadow なくてもいいよね？
-        // #ifdef USE_RECEIVE_SHADOW
+        // #ifdef D_RECEIVE_SHADOW
         //         vec4 shadowMapProjectionUv = uShadowMapProjectionMatrix * vec4(worldPosition, 1.);
         //         if(dot(surface.smWorldNormal, uDirectionalLight.smDirection) > 0.) {
         //             resultColor = applyShadow(resultColor, uShadowMap, shadowMapProjectionUv, uShadowBias, vec4(0., 0., 0., 1.), 0.5);
@@ -586,7 +586,7 @@ void main() {
 
     // TODO: 影を落としたいmaterialとそうじゃないmaterialで出し分けたい
     // TODO: shadow map の枚数
-    // #ifdef USE_RECEIVE_SHADOW
+    // #ifdef D_RECEIVE_SHADOW
 
     //
     // directional light
@@ -648,7 +648,7 @@ void main() {
     // ambient light
     //
 
-#ifdef USE_ENV_MAP
+#ifdef D_ENV_MAP
     sSkyboxLight skyboxLight;
     skyboxLight.smDiffuseIntensity = uSkybox.smDiffuseIntensity;
     skyboxLight.smSpecularIntensity = uSkybox.smSpecularIntensity;

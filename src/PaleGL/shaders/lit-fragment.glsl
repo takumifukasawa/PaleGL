@@ -24,7 +24,7 @@ uniform vec4 uRoughnessMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
-#ifdef USE_HEIGHT_MAP
+#ifdef D_HEIGHT_MAP
 uniform sampler2D uHeightMap;
 uniform vec4 uHeightMapTiling;
 #endif
@@ -36,7 +36,7 @@ in vec3 vNormal;
 
 in vec3 vWorldPosition;
 
-// #ifdef USE_NORMAL_MAP
+// #ifdef D_NORMAL_MAP
 // vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
 //     vec3 n = normalize(normal);
 //     vec3 t = normalize(tangent);
@@ -71,7 +71,7 @@ void main() {
     #include ./partial/normal-map-fragment.partial.glsl
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 //     // 頂点カラーでuniformのcolorは計算済み
 //     baseColor *= vVertexColor;
 //     emissiveColor = vVertexEmissiveColor;
@@ -112,12 +112,12 @@ void main() {
     outGBufferC = fEncodeGBufferC(metallic, roughness);
     outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
    
-// #ifdef USE_NORMAL_MAP
+// #ifdef D_NORMAL_MAP
 //     // outGBufferA = fEncodeGBufferA(texture(uNormalMap, uv).xyz);
 // #endif
 //     outGBufferA = vec4(uv, 1., 1.);
     
-    // #ifdef USE_HEIGHT_MAP
+    // #ifdef D_HEIGHT_MAP
     // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);
     // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * .5).rgb);
     // outGBufferD = fEncodeGBufferD(texture(uNormalMap, uv * 1.).rgb);

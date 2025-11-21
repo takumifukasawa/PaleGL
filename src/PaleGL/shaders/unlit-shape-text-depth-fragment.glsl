@@ -6,7 +6,7 @@
 in vec2 vUv;
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 // in vec4 vVertexColor;
 // #endif
 // CUSTOM_END
@@ -22,7 +22,7 @@ void main() {
    
     // #include <alpha_test_f>
 // result color がなぜか minify されちゃうので一旦明示的に
-#ifdef USE_ALPHA_TEST
+#ifdef D_ALPHA_TEST
     fCheckAlphaTest(resultColor, uAlphaTestThreshold);
 #endif
 

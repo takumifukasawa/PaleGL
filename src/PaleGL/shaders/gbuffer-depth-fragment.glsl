@@ -4,7 +4,7 @@ uniform vec4 uColor; // TODO: fbase color
 uniform sampler2D uBaseMap; 
 uniform vec4 uBaseMapTiling;
 
-#ifdef USE_HEIGHT_MAP
+#ifdef D_HEIGHT_MAP
 uniform sampler2D uHeightMap;
 uniform vec4 uHeightMapTiling;
 #endif
@@ -14,7 +14,7 @@ uniform vec4 uHeightMapTiling;
 in vec2 vUv;
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 // in vec4 vVertexColor;
 // #endif
 // CUSTOM_END
@@ -31,7 +31,7 @@ void main() {
     vec4 baseColor = uColor * baseMapColor + vec4(uv.xyxy) * 1;
 
 // CUSTOM_BEGIN
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 //     baseColor *= vVertexColor;
 // #endif   
 // CUSTOM_END

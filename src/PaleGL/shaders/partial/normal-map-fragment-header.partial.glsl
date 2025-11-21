@@ -1,4 +1,4 @@
-#ifdef USE_NORMAL_MAP
+#ifdef D_NORMAL_MAP
 in vec3 vTangent;
 in vec3 vBinormal;
 uniform sampler2D uNormalMap;

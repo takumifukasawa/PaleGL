@@ -7,7 +7,7 @@
 #include <alpha_test>
 #include <vcolor_fh>
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
 in float vInstanceId;
 in vec4 vInstanceState;
 #endif
@@ -46,7 +46,7 @@ void main() {
     vec4 baseColor = uBaseColor * baseMapColor;
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 //     baseColor *= vVertexColor;
 // #endif
 // CUSTOM_END

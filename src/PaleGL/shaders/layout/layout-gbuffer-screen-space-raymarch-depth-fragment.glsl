@@ -31,7 +31,7 @@ void main() {
     vec4 baseColor = uBaseColor * baseMapColor;
     
     // CUSTOM_BEGIN comment out
-    // #ifdef USE_VERTEX_COLOR
+    // #ifdef D_VERTEX_COLOR
     // baseColor *= vVertexColor;
     // #endif
     // CUSTOM_END

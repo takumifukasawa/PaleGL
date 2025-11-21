@@ -10,7 +10,7 @@
 #include <vcolor_fh>
 #include <normal_map_fh>
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
 in float vInstanceId;
 in vec4 vInstanceColor;
 in vec4 vInstanceEmissiveColor;
@@ -55,7 +55,7 @@ in mat4 vWorldMatrix;
 in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
 
-// #ifdef USE_NORMAL_MAP
+// #ifdef D_NORMAL_MAP
 // vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
 //     vec3 n = normalize(normal);
 //     vec3 t = normalize(tangent);
@@ -89,7 +89,7 @@ void main() {
     #include <normal_map_f>
 
     // CUSTOM_BEGIN comment out
-    // #ifdef USE_VERTEX_COLOR
+    // #ifdef D_VERTEX_COLOR
     // baseColor *= vVertexColor;
     // #endif
     // CUSTOM_END
@@ -99,7 +99,7 @@ void main() {
     // surface.smSpecularAmount = uSpecularAmount;
 
     vec3 emissiveColor = uEmissiveColor.rgb;
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
     emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
 #endif
 

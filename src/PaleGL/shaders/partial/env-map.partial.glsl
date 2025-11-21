@@ -1,5 +1,5 @@
 ﻿
-// #ifdef USE_ENV_MAP
+// #ifdef D_ENV_MAP
 
 vec3 fCalcEnvMapSampleDir(vec3 reflectDir, float rotationOffset) {
     reflectDir.x *= -1.;

@@ -8,7 +8,7 @@ uniform vec4 uFontTiling;
 in vec2 vUv;
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 // in vec4 vVertexColor;
 // #endif
 // CUSTOM_END

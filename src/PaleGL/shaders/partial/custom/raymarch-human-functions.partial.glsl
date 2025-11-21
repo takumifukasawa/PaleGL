@@ -23,7 +23,7 @@ vec3 fGetJointInfo(int jointIndex) {
     // テクスチャのY座標 = クリップ開始行 + ジョイントインデックス
     int rowIndex = uClipStartRow + jointIndex;
 
-#ifdef USE_INSTANCING
+#ifdef D_INSTANCING
     // インスタンシング時は各インスタンスで時間をずらす
     frameIndex = int(mod((uAnimationTime + vInstanceId * 0.1) * uAnimationFPS, float(uClipFrameCount)));
 #endif

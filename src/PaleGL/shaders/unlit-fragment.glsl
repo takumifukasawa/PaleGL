@@ -36,14 +36,14 @@ void main() {
 
     vec3 worldNormal = vNormal;
 
-#ifdef USE_NORMAL_MAP
+#ifdef D_NORMAL_MAP
     worldNormal = fCalcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
 #else
     worldNormal = normalize(vNormal);
 #endif
 
 // CUSTOM_BEGIN comment out
-// #ifdef USE_VERTEX_COLOR
+// #ifdef D_VERTEX_COLOR
 //     baseColor *= vVertexColor;
 // #endif
 // CUSTOM_END
