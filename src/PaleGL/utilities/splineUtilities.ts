@@ -1,4 +1,4 @@
-import { Vector3, createVector3, addVector3AndVector3, scaleVector3ByScalar, normalizeVector3, crossVectorsV3, getVector3Magnitude, cloneVector3, subVectorsV3 } from '@/PaleGL/math/vector3.ts';
+import { Vector3, createVector3, addVector3AndVector3, scaleVector3ByScalar, normalizeVector3, crossVectorsV3, getVector3Magnitude, cloneVector3, subVectorsV3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
 
 type SplinePoint = {
     position: Vector3;
@@ -93,9 +93,9 @@ export const getCatmullRomSplineTangent = (
         3 * t2
     );
 
-    return normalizeVector3(
-        scaleVector3ByScalar(addVector3AndVector3(addVector3AndVector3(v0, v1), v2), 0.5)
-    );
+    const rawTangent = scaleVector3ByScalar(addVector3AndVector3(addVector3AndVector3(v0, v1), v2), 0.5);
+
+    return normalizeVector3(rawTangent);
 };
 
 export const getFrenetFrame = (tangent: Vector3, upHint: Vector3 = createVector3(0, 1, 0)): { normal: Vector3; binormal: Vector3 } => {

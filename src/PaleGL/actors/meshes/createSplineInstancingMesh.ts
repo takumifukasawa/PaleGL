@@ -6,8 +6,24 @@ import { MESH_TYPE_SPLINE_INSTANCING } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
-import { copyVector3, v3x, v3y, v3z, Vector3 } from '@/PaleGL/math/vector3.ts';
+import {
+    cloneVector3,
+    copyVector3,
+    createVector3,
+    createVector3Up,
+    crossVectorsV3,
+    dotVector3,
+    negateVector3,
+    normalizeVector3,
+    scaleVector3ByScalar,
+    v3x,
+    v3y,
+    v3z,
+    Vector3,
+} from '@/PaleGL/math/vector3.ts';
 import { sampleSplinePoints } from '@/PaleGL/utilities/splineUtilities.ts';
+import { createMatrix4 } from '@/PaleGL/math/matrix4.ts';
+import { rotationMatrixToQuaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 
 export type SplineInstancingMesh = Mesh & {
     splineInstancingData: {
@@ -57,6 +73,9 @@ const calculateSplineInstances = (
     const positions: number[][] = [];
     const rotations: number[][] = [];
 
+    // 前フレームのrightを保持
+    let prevRight: Vector3 | null = null;
+
     // 各インスタンスの理想的な配置距離（0.0, 0.3, 0.6, ...）に対して
     // スプライン上の対応する位置を線形補間で求める
     for (let i = 0; i < instanceCount; i++) {
@@ -92,13 +111,72 @@ const calculateSplineInstances = (
         const ty = v3y(tangent0) + (v3y(tangent1) - v3y(tangent0)) * t;
         const tz = v3z(tangent0) + (v3z(tangent1) - v3z(tangent0)) * t;
 
-        // 接線方向からオイラー角を計算
-        // ちゃんとやるなら回転行列からオイラー角に変換すべきだけど、
-        // とりあえず簡易的にatanで近似
-        const rotX = Math.atan2(ty, tz);
-        const rotY = Math.atan2(tx, tz);
-        const rotZ = 0; // とりあえず回転なし
-        rotations.push([rotX, rotY, rotZ]);
+        // 接線方向から回転ベクトルを作成
+        const tangentInterpolated = createVector3(tx, ty, tz);
+        const forward = normalizeVector3(cloneVector3(tangentInterpolated));
+
+        // worldUpを基準にrightを計算
+        const worldUp = createVector3Up(); // (0, 1, 0)
+        const dotUp = Math.abs(v3y(forward));
+
+        let right;
+        if (dotUp > 0.999) {
+            // forwardがY軸とほぼ平行 → Z軸を参照
+            right = crossVectorsV3(createVector3(0, 0, 1), forward);
+        } else {
+            // 通常: worldUpとforwardの外積
+            right = crossVectorsV3(worldUp, forward);
+        }
+        right = normalizeVector3(right);
+
+        // rightの急な反転を防ぐ
+        if (prevRight !== null) {
+            const dot = dotVector3(right, prevRight);
+            if (dot < 0) {
+                right = scaleVector3ByScalar(right, -1);
+            }
+        }
+
+        // upをforwardとrightの外積から計算
+        const up = normalizeVector3(crossVectorsV3(forward, right));
+
+        // x=右, y=上, z=進行方向
+        const x = right;
+        const y = up;
+        const z = forward;
+
+        const rotMat = createMatrix4(
+            v3x(x),
+            v3x(y),
+            v3x(z),
+            0,
+            v3y(x),
+            v3y(y),
+            v3y(z),
+            0,
+            v3z(x),
+            v3z(y),
+            v3z(z),
+            0,
+            0,
+            0,
+            0,
+            1
+        );
+
+        // 回転行列からクォータニオンに変換し、オイラー角（ラジアン）を取得
+        const quat = rotationMatrixToQuaternion(rotMat);
+        const euler = toEulerRadianFromQuaternion(quat);
+
+        // デバッグ出力
+        if (i === 0 || i === 1 || i === 2 || i === 3 || i === 10 || i === 15 || i === 16 || i === 17) {
+            console.log(`[${i}] euler:`, [euler.x, euler.y, euler.z]);
+        }
+
+        rotations.push([euler.x, euler.y, euler.z]);
+
+        // 次のループ用に保存
+        prevRight = right;
     }
 
     return { positions, rotations, count: instanceCount };
@@ -109,6 +187,7 @@ export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs)
 
     // スプライン上の等間隔な位置を計算
     const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing);
+    console.log("hogehoge", positions, rotations, count);
 
     // InstancingParticleを使ってインスタンス属性を設定
     // こうすることで、マテリアル設定やインスタンス属性の管理を既存の仕組みに任せられる
