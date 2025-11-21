@@ -5,6 +5,7 @@
 #define OP_ID(p,r) round(p/r)
 #define OP_RE(p,r) p-r*round(p/r)
 #define OP_LI_RE(p,r,l) p-r*clamp(round(p/r),-l,l)
+#define SW(a,b,l) l>.5?b:a
 
 #define EPS .0001 // general eps
 #define OI 99 // object space iteration
