@@ -19,6 +19,16 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_GPU_PARTICLE_MODIFY_UPDATE,
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     FragmentShaderModifiers,
+    SHADER_DEFINE_ALPHA_TEST,
+    SHADER_DEFINE_ENV_MAP,
+    SHADER_DEFINE_HEIGHT_MAP,
+    SHADER_DEFINE_INSTANCE_LOOK_DIRECTION,
+    SHADER_DEFINE_INSTANCING,
+    SHADER_DEFINE_NORMAL_MAP,
+    SHADER_DEFINE_RECEIVE_SHADOW,
+    SHADER_DEFINE_TRAIL,
+    SHADER_DEFINE_VAT,
+    SHADER_DEFINE_VAT_LOOK_FORWARD,
     SHADER_PRAGMA_BASE_ATTRIBUTES,
     SHADER_PRAGMA_DEFINES,
     VERTEX_SHADER_MODIFIER_PRAGMA_APPEND_ATTRIBUTES,
@@ -47,7 +57,6 @@ import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import curlNoisePartialContent from '@/PaleGL/shaders/partial/curl-noise.partial.glsl';
-import msdfHeadreContent from '@/PaleGL/shaders/partial/msdf-header.glsl';
 import depthPartialContent from '@/PaleGL/shaders/partial/depth.partial.glsl';
 import effectTexturePartialContent from '@/PaleGL/shaders/partial/effect-texture.partial.glsl';
 import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl';
@@ -55,6 +64,7 @@ import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.parti
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
+import msdfHeadreContent from '@/PaleGL/shaders/partial/msdf-header.glsl';
 import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
@@ -164,48 +174,48 @@ const buildShaderDefines = ({
 }: ShaderDefines): string[] => {
     const arr: string[] = [];
     if (receiveShadow) {
-        arr.push('#define USE_RECEIVE_SHADOW');
+        arr.push(`#define ${SHADER_DEFINE_RECEIVE_SHADOW}`);
     }
     // CUSTOM_BEGIN comment out
     // if (isSkinning) {
     //     if (gpuSkinning) {
-    //         arr.push('#define USE_SKINNING_GPU');
+    //         arr.push(`#define ${SHADER_DEFINE_SKINNING_GPU}`);
     //     } else {
-    //         arr.push('#define USE_SKINNING_CPU');
+    //         arr.push(`#define ${SHADER_DEFINE_SKINNING_CPU}`);
     //     }
     // }
     // CUSTOM_END
     if (useNormalMap) {
-        arr.push('#define USE_NORMAL_MAP');
+        arr.push(`#define ${SHADER_DEFINE_NORMAL_MAP}`);
     }
     if (useEnvMap) {
-        arr.push('#define USE_ENV_MAP');
+        arr.push(`#define ${SHADER_DEFINE_ENV_MAP}`);
     }
     // CUSTOM_BEGIN comment out
     // if (useVertexColor) {
-    //     arr.push('#define USE_VERTEX_COLOR');
+    //     arr.push(`#define ${SHADER_DEFINE_VERTEX_COLOR}`);
     // }
     // CUSTOM_END
     if (useAlphaTest) {
-        arr.push('#define USE_ALPHA_TEST');
+        arr.push(`#define ${SHADER_DEFINE_ALPHA_TEST}`);
     }
     if (isInstancing) {
-        arr.push('#define USE_INSTANCING');
+        arr.push(`#define ${SHADER_DEFINE_INSTANCING}`);
     }
     if (useInstanceLookDirection) {
-        arr.push('#define USE_INSTANCE_LOOK_DIRECTION');
+        arr.push(`#define ${SHADER_DEFINE_INSTANCE_LOOK_DIRECTION}`);
     }
     if (useVAT) {
-        arr.push('#define USE_VAT');
+        arr.push(`#define ${SHADER_DEFINE_VAT}`);
     }
     if (useVATLookForward) {
-        arr.push('#define USE_VAT_LOOK_FORWARD');
+        arr.push(`#define ${SHADER_DEFINE_VAT_LOOK_FORWARD}`);
     }
     if (isTrail) {
-        arr.push('#define USE_TRAIL');
+        arr.push(`#define ${SHADER_DEFINE_TRAIL}`);
     }
     if (useHeightMap) {
-        arr.push('#define USE_HEIGHT_MAP');
+        arr.push(`#define ${SHADER_DEFINE_HEIGHT_MAP}`);
     }
 
     return arr;
