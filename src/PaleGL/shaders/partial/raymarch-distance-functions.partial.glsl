@@ -272,6 +272,7 @@ float fDfRcot(vec3 p, float h, float r1, float r2) {
     return fDfRco(p, h, r1, r2);
 }
 
+// resolved vesica
 float fDfVes(vec3 p, vec3 a, vec3 b, float w)
 {
     vec3  c = (a+b)*0.5;
@@ -285,6 +286,12 @@ float fDfVes(vec3 p, vec3 a, vec3 b, float w)
     vec3  h = (r*q.x<d*(q.y-r)) ? vec3(0.,r,0.) : vec3(-d,0.,d+w);
  
     return length(q-h.xy) - h.z;
+}
+
+// p, height, width, tube radius
+float fDfLink(vec3 p, float le, float r1, float r2) {
+  vec3 q = vec3(p.x, max(abs(p.y)-le,0.0), p.z);
+  return length(vec2(length(q.xy)-r1,q.z)) - r2;
 }
 
 // curve ------------------------
