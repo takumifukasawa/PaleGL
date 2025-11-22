@@ -326,7 +326,7 @@ void main() {
             vec3 vatPosition = texelFetch(uPositionMap, vatUv, 0).xyz;
             vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
             instanceTranslation = fGetTranslationMat(vatPosition);
-            instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
+            instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp));
         #else
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),
@@ -337,8 +337,7 @@ void main() {
             #if defined(D_VAT_LOOK_FORWARD)
                 vec3 vatVelocity = texelFetch(uVelocityMap, vatUv, 0).xyz;
                 vec3 vatUp = texelFetch(uUpMap, vatUv, 0).xyz;
-                instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp)); // TODO: これがあると表示されない
-                // instanceTranslation = vec3(0., 5., 0.);
+                instanceRotation = fGetLookMat(normalize(vatVelocity), normalize(vatUp));
             #endif
         #endif
     #else
