@@ -34,31 +34,8 @@ export const createGraphicsDoubleBufferMaterial = (
     return createMaterial({
         vertexShader: baseVertexShader,
         fragmentShader,
-        uniforms: [
-            ...uniforms,
-            // {
-            //     name: prevMapUniformName,
-            //     type: UNIFORM_TYPE_TEXTURE,
-            //     value: null,
-            // },
-            ...appendUniforms
-            // {
-            //     name: targetWidthUniformName,
-            //     type: UNIFORM_TYPE_FLOAT,
-            //     value: width,
-            // },
-            // {
-            //     name: targetHeightUniformName,
-            //     type: UNIFORM_TYPE_FLOAT,
-            //     value: height,
-            // },
-            // {
-            //     name: texelSizeUniformName,
-            //     type: UNIFORM_TYPE_VECTOR2,
-            //     value: createVector2(1 / width, 1 / height),
-            // },
-        ],
+        uniforms: [...uniforms, ...appendUniforms],
         uniformBlockNames: [...uniformBlockNames, UNIFORM_BLOCK_NAME_COMMON],
-        fragmentShaderModifiers
+        fragmentShaderModifiers,
     });
 };
