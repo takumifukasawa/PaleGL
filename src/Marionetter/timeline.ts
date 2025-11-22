@@ -142,11 +142,11 @@ import { createVector4zero, setVector4Component, v4x, v4y, v4z, Vector4 } from '
 
 // import { resolveInvertRotationLeftHandAxisToRightHandAxis } from '@/Marionetter/buildMarionetterScene.ts';
 
-export const destructureClipInfoBase = (clipInfoBase: MarionetterClipInfoBase) => {
+export const destructureClipInfoBase = (clipInfoBase: any) => {
     const start = clipInfoBase[MARIONETTER_ANIMATION_CLIP_START_INDEX];
     const duration = clipInfoBase[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
     const postExtrapolation = clipInfoBase[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
-    return [start, duration, postExtrapolation];
+    return [start, duration, postExtrapolation] as const;
 };
 
 /**
