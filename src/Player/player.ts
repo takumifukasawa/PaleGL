@@ -449,7 +449,7 @@ export function beforeUpdatePlayer(player: Player, _: number, deltaTime: number)
         const timelineDeltaTime = timelineTime - timelinePrevTime;
 
         player.timelineDeltaTime = timelineDeltaTime;
-        player.timelinePrevTime = timelinePrevTime;
+        player.timelinePrevTime = timelineTime;
     }
 }
 
