@@ -53,25 +53,6 @@ in mat4 vWorldMatrix;
 in vec3 vWorldPosition;
 in mat4 vInverseWorldMatrix;
 
-// #ifdef D_NORMAL_MAP
-// vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
-//     vec3 n = normalize(normal);
-//     vec3 t = normalize(tangent);
-//     vec3 b = normalize(binormal);
-//     mat3 tbn = mat3(t, b, n);
-//     vec3 nt = texture(normalMap, uv).xyz;
-//     nt = nt * 2. - 1.;
-// 
-//     // 2: normal from normal map
-//     vec3 resultNormal = normalize(tbn * nt);
-//     // blend mesh normal ~ normal map
-//     // vec3 normal = mix(normal, normalize(tbn * nt));
-//     // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
-// 
-//     return resultNormal;
-// }
-// #endif
-
 #pragma GBUFFER_BUILDER_RAYMARCH
 
 #include <gbuffer_o>
@@ -152,23 +133,12 @@ void main() {
     float alpha = resultColor.a;
     #include <alpha_test_f>
 
-    // resultColor.rgb = fGamma(resultColor.rgb);
-
-    // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
+    // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分ける？
     float metallic = uMetallic;
     metallic *= texture(uMetallicMap, uv).r;
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv).r;
 
-    // // surface情報
-    // sSurface surface;
-    // surface.smWorldPosition = vWorldPosition;
-    // surface.smWorldNormal = worldNormal;
-    // surface.smBaseColor = baseColor;
-    
-    // // TODO: raymarchの結果をBEFORE_OUTで使えるように無理矢理キャッシュ
-    // outGBufferA.xy = result.xy;
-    
     sGBufferSurface gBufferSurface = fBuildGBufferSurface(
         currentRayPosition,
         worldNormal,
@@ -176,7 +146,6 @@ void main() {
         metallic,
         roughness,
         emissiveColor
-        // result
     );
     fOverrideGBufferSurface(gBufferSurface, result);
 

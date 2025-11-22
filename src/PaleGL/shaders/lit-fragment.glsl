@@ -33,24 +33,7 @@ in vec3 vNormal;
 
 in vec3 vWorldPosition;
 
-// #ifdef D_NORMAL_MAP
-// vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {
-//     vec3 n = normalize(normal);
-//     vec3 t = normalize(tangent);
-//     vec3 b = normalize(binormal);
-//     mat3 tbn = mat3(t, b, n);
-//     vec3 nt = texture(normalMap, uv).xyz;
-//     nt = nt * 2. - 1.;
-// 
-//     // 2: normal from normal map
-//     vec3 resultNormal = normalize(tbn * nt);
-//     // blend mesh normal ~ normal map
-//     // vec3 resultNormal = mix(normal, normalize(tbn * nt));
-//     // vec3 normal = mix(normal, normalize(tbn * nt), 1.);
-// 
-//     return resultNormal;
-// }
-// #endif
+#pragma GBUFFER_BUILDER_DEFAULT
 
 #include <gbuffer_o>
 
@@ -80,34 +63,38 @@ void main() {
 // #endif
 // CUSTOM_END
 
-
-
-    // surface.smSpecularAmount = uSpecularAmount;
-
-    // sSurface surface;
-    // surface.smWorldPosition = vWorldPosition;
-    // surface.smWorldNormal = worldNormal;
-    // surface.smBaseColor = baseColor;
-    
     #include <alpha_test_f>
     // #include ./partial/alpha-test-fragment.partial.glsl
 
-    // baseColor.rgb = fGamma(baseColor.rgb);
-   
-    // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
+    // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分ける？
     float metallic = uMetallic;
     metallic *= texture(uMetallicMap, uv).r;
     float roughness = uRoughness;
     roughness *= texture(uRoughnessMap, uv).r;
     
-    // emissiveColor.rgb = fGamma(emissiveColor.rgb);
+    sGBufferSurface gBufferSurface = fBuildGBufferSurface(
+        vWorldPosition,
+        worldNormal,
+        baseColor.xyz,
+        metallic,
+        roughness,
+        emissiveColor.xyz
+    );
+    fOverrideGBufferSurface(gBufferSurface);
     
     #pragma BEFORE_OUT
 
-    outGBufferA = fEncodeGBufferA(baseColor.rgb);
-    outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
-    outGBufferC = fEncodeGBufferC(metallic, roughness);
-    outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
+    // outGBufferA = fEncodeGBufferA(baseColor.rgb);
+    // outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
+    // outGBufferC = fEncodeGBufferC(metallic, roughness);
+    // outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
+   
+   
+    outGBufferA = fEncodeGBufferA(gBufferSurface.smBaseColor.rgb);
+    outGBufferB = fEncodeGBufferB(gBufferSurface.smWorldNormal, uShadingModelId);
+    outGBufferC = fEncodeGBufferC(gBufferSurface.smMetallic, gBufferSurface.smRoughness);
+    outGBufferD = fEncodeGBufferD(gBufferSurface.smEmissiveColor.rgb);
+    
     
     // for debug 
     // outGBufferD = vec4(worldNormal, 1.);

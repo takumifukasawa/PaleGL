@@ -459,8 +459,8 @@ void main() {
 
     // --- end
 
-    vWorldMatrix = worldMatrix;
     vWorldPosition = worldPosition.xyz;
+    vWorldMatrix = worldMatrix;
     vInverseWorldMatrix = inverse(worldMatrix);
 
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;

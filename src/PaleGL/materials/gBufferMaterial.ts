@@ -1,5 +1,6 @@
 import {
     DEPTH_FUNC_TYPE_EQUAL,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
     MATERIAL_TYPE_G_BUFFER,
     SHADING_MODEL_ID_LIT,
     ShadingModelIds,
@@ -46,6 +47,8 @@ export type GBufferMaterialIndividualParameters = {
     normalMap?: Texture;
     heightMap?: Texture;
     heightScale?: number;
+    //
+    deleteGBufferBuilderPragma?: boolean;
 };
 
 export type GBufferMaterialArgs = MaterialArgs &
@@ -66,6 +69,7 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
         // vertexShaderModifiers = [],
         uniforms = [],
         uniformBlockNames = [],
+        deleteFragmentShaderPragmas = [],
         ...options
     }: GBufferMaterialArgs = args;
 
@@ -106,6 +110,11 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
 
     const depthUniforms: UniformsData = [...commonUniforms, ...uniforms];
 
+    // gbuffer builder を消すオプションを適用してるなら消しちゃう
+    if (args.deleteGBufferBuilderPragma) {
+        deleteFragmentShaderPragmas.push(FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH);
+    }
+
     const material = createMaterial({
         // CUSTOM_BEGIN comment out
         // name: 'GBufferMaterial',
@@ -114,6 +123,9 @@ export const createGBufferMaterial = (args: GBufferMaterialArgs): GBufferMateria
         vertexShader: gBufferVert,
         fragmentShader: args.fragmentShader || litFrag,
         depthFragmentShader: args.depthFragmentShader || gBufferDepthFrag,
+        
+        deleteFragmentShaderPragmas,
+
         // vertexShaderModifiers,
         uniforms: mergedUniforms,
         depthUniforms,

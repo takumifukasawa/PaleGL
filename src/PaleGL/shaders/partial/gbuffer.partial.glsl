@@ -22,6 +22,7 @@ struct sGBufferD {
 };
 
 struct sGBufferSurface {
+    vec3 smWorldPosition;
     vec3 smWorldNormal;
     vec3 smBaseColor;
     float smMetallic;
@@ -88,7 +89,7 @@ sGBufferSurface fBuildGBufferSurface(
     // int shadingModelId
 ) {
     sGBufferSurface gBufferSurface;
-    // gBufferSurface.smWorldPosition = worldPosition;
+    gBufferSurface.smWorldPosition = worldPosition;
     gBufferSurface.smWorldNormal = worldNormal;
     gBufferSurface.smBaseColor = baseColor;
     gBufferSurface.smMetallic = metallic;
