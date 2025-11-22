@@ -146,7 +146,14 @@ export const destructureClipInfoBase = (clipInfoBase: MarionetterClipInfoBase) =
     const start = clipInfoBase[MARIONETTER_ANIMATION_CLIP_START_INDEX];
     const duration = clipInfoBase[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
     const postExtrapolation = clipInfoBase[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
-    return [start, duration, postExtrapolation];
+    // Speed is optional and appears as the last element if != 1.0
+    // postExtrapolation is 0-4 (integer), speed is typically 0.1-10.0 (float)
+    const lastElement = clipInfoBase[clipInfoBase.length - 1];
+    const isSpeedPresent = clipInfoBase.length > 5 &&
+                          typeof lastElement === 'number' &&
+                          (lastElement < 0.9 || lastElement > 1.1);
+    const speed = isSpeedPresent ? lastElement : 1.0;
+    return [start, duration, postExtrapolation, speed];
 };
 
 /**
@@ -533,9 +540,7 @@ function createMarionetterAnimationClip(
 
     // console.log('hogehoge - clip', animationClip);
     const name = animationClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = animationClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = animationClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
-    const postExtrapolation = animationClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
+    const [start, duration, postExtrapolation, speed] = destructureClipInfoBase(animationClipInfo);
     const bindings = animationClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
 
     const animationClip: MarionetterAnimationClip = {
@@ -571,7 +576,7 @@ function createMarionetterAnimationClip(
         // const animationClipType = animationClip[MarionetterAnimationClipInfoProperty.animationClipType];
         // console.log('createMarionetterAnimationClip execute', bindings, animationClipType);
 
-        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation, speed);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -775,10 +780,8 @@ function createMarionetterLightControlClip(
     // };
 
     const name = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const [start, duration, postExtrapolation, speed] = destructureClipInfoBase(lightControlClipInfo);
     const bindings = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-    const postExtrapolation = lightControlClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
     const lightControlClip: MarionetterLightControlClip = {
         name,
@@ -809,7 +812,7 @@ function createMarionetterLightControlClip(
         // const start = lightControlClip[MARIONETTER_CLIP_INFO_BASE_PROPERTY_START];
         // const bindings = lightControlClip[MARIONETTER_LIGHT_CONTROL_CLIP_INFO_PROPERTY_BINDINGS];
 
-        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+        const timeInClip = resolveClipTime(time, start, duration, postExtrapolation, speed);
 
         // TODO: typeがあった方がよい. ex) animation clip, light control clip
         bindings.forEach((binding) => {
@@ -895,10 +898,8 @@ function createMarionetterActivationControlClip(
     activationControlClipInfo: MarionetterActivationControlClipInfo
 ): MarionetterActivationControlClip {
     const name = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const [start, duration, postExtrapolation, speed] = destructureClipInfoBase(activationControlClipInfo);
     // const bindings = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-    const postExtrapolation = activationControlClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
     const activationControlClip: MarionetterActivationControlClip = {
         name,
@@ -906,7 +907,7 @@ function createMarionetterActivationControlClip(
         clipInfo: activationControlClipInfo,
         execute: (args) => {
             const { actor, time } = args;
-            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation, speed);
             processActorPostProcessClip(actor, track, activationControlClip, timeInClip);
         },
     };
@@ -919,10 +920,8 @@ function createMarionetterObjectMoveAndLookAtClip(
     objectMoveAndLookAtClipInfo: MarionetterObjectMoveAndLookAtClipInfo
 ): MarionetterObjectMoveAndLookAtClip {
     const name = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
-    const start = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_START_INDEX];
-    const duration = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_DURATION_INDEX];
+    const [start, duration, postExtrapolation, speed] = destructureClipInfoBase(objectMoveAndLookAtClipInfo);
     const bindings = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
-    const postExtrapolation = objectMoveAndLookAtClipInfo[MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX];
 
     const objectMoveAndLookAtClip: MarionetterObjectMoveAndLookAtClip = {
         name,
@@ -931,7 +930,7 @@ function createMarionetterObjectMoveAndLookAtClip(
         execute: (args: { actor: Actor; time: number; scene: Scene }) => {
             const { actor, time, scene } = args;
 
-            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation);
+            const timeInClip = resolveClipTime(time, start, duration, postExtrapolation, speed);
             // let hasLocalPosition: boolean = false;
             // let hasLocalRotationEuler: boolean = false;
             // let hasLocalScale: boolean = false;
@@ -1064,9 +1063,11 @@ const resolveClipTime = (
     timelineTime: number,
     clipStartTime: number,
     clipDuration: number,
-    postExtrapolationMode: MARIONETTER_CLIP_POST_EXTRAPORATION_MODE
+    postExtrapolationMode: MARIONETTER_CLIP_POST_EXTRAPORATION_MODE,
+    speed: number = 1.0
 ) => {
-    let timeInClip = timelineTime - clipStartTime;
+    // Apply speed to clip time
+    let timeInClip = (timelineTime - clipStartTime) * speed;
 
     // clip が time を越していた時
     if (timeInClip >= clipDuration) {
