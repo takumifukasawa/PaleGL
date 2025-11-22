@@ -16,3 +16,5 @@ export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_MIE_SCATTERING_DIRECTION
     ? 'msd'
     : 'mieScatteringDirection';
 export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_NAME_CAMERA_ALTITUDE = NeedsShorten ? 'ca' : 'cameraAltitude';
+
+export const PROCEDURAL_ATMOSPHERE_SKYBOX_PROPERTY_RENDER_MESH_ENABLED = NeedsShorten ? 'r_on' : 'renderMeshEnabled';
