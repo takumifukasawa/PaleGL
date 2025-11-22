@@ -146,17 +146,12 @@ export function resolveInvertRotationLeftHandAxisToRightHandAxis(
 
 // export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: MarionetterComponentType): T | null {
 export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
-    const co = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS];
-    if (co) {
-        return (
-            // @ts-ignore
-            (obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
-                (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
-            ) as T) || null
-        );
-    } else {
-        return null;
-    }
+    return (
+        // @ts-ignore
+        (obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
+            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
+        ) as T) || null
+    );
 }
 
 // export function findMarionetterComponentAsNumber<T>(obj: MarionetterObjectInfo, componentType: number): T | null {
