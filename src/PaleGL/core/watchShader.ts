@@ -54,7 +54,8 @@ export const shaders = Object.fromEntries(
             shaderString = String(shader || '');
         }
         if (!isNeededCompact()) {
-            console.log(`[watchShader] Processed ${path}: ${shaderString.length} characters`);
+            // for debug
+            // console.log(`[watchShader] Processed ${path}: ${shaderString.length} characters`);
         }
         return [path, shaderString];
     })
