@@ -30,7 +30,7 @@ type OnSetSizeCallback = (
     uiCamera: OrthographicCamera | null
 ) => void;
 type OnFixedUpdateCallback = (args: { scene: Scene; gpu: Gpu; fixedTime: number; fixedDeltaTime: number }) => void;
-type OnUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
+export type OnActorUpdateCallback = (args: { scene: Scene; gpu: Gpu; renderer: Renderer; time: number; deltaTime: number }) => void;
 type OnLastUpdateCallback = (args: { scene: Scene; gpu: Gpu; time: number; deltaTime: number }) => void;
 type OnBeforeRenderCallback = (args: {
     scene: Scene;
@@ -63,7 +63,7 @@ export type Actor = {
     onStart: OnStartCallback[];
     onSetSize: OnSetSizeCallback[];
     onFixedUpdate: OnFixedUpdateCallback[];
-    onUpdate: OnUpdateCallback[];
+    onUpdate: OnActorUpdateCallback[];
     onLastUpdate: OnLastUpdateCallback[];
     onBeforeRender: OnBeforeRenderCallback[];
     onProcessPropertyBinder: OnProcessPropertyBinder[];
@@ -85,7 +85,7 @@ export const createActor = ({ name, type = ACTOR_TYPE_NULL }: ActorArgs = {}): A
     const onStart: OnStartCallback[] = [];
     const onSetSize: OnSetSizeCallback[] = [];
     const onFixedUpdate: OnFixedUpdateCallback[] = [];
-    const onUpdate: OnUpdateCallback[] = [];
+    const onUpdate: OnActorUpdateCallback[] = [];
     const onLastUpdate: OnLastUpdateCallback[] = [];
     const onBeforeRender: OnBeforeRenderCallback[] = [];
     // TODO: timeline
@@ -143,7 +143,7 @@ export const subscribeActorOnSetSize = (actor: Actor, value: OnSetSizeCallback) 
     actor.onSetSize.push(value);
 };
 
-export const subscribeActorOnUpdate = (actor: Actor, value: OnUpdateCallback) => {
+export const subscribeActorOnUpdate = (actor: Actor, value: OnActorUpdateCallback) => {
     actor.onUpdate.push(value);
 };
 
