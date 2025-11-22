@@ -1,4 +1,4 @@
-import { subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { subscribeActorBeforeRender, subscribeActorOnStart } from '@/PaleGL/actors/actor.ts';
 import { createSkybox, Skybox } from '@/PaleGL/actors/meshes/skybox.ts';
 import { UNIFORM_NAME_CUBE_TEXTURE, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VECTOR3 } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -190,7 +190,7 @@ export const createProceduralAtmosphereSkybox: (
         }
     };
 
-    subscribeActorOnUpdate(skyboxMesh, ({ renderer }) => {
+    subscribeActorBeforeRender(skyboxMesh, ({ renderer }) => {
         if (skyboxMesh.cubeMapWithUpdateContext) {
             frameCount++;
             if (frameCount % skyboxMesh.cubeMapWithUpdateContext.updateContext.updateInterval === 0) {

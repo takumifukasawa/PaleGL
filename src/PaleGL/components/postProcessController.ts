@@ -12,8 +12,8 @@ import {
     DepthOfFieldPassParametersKey,
     DepthOfFieldPassParametersPropertyMap,
 } from '@/PaleGL/postprocess/depthOfFieldPass.ts';
+import { DOF_TARGET_ACTOR_NAME } from '../../../../src/pages/scripts/sceneConstants.ts';
 
-const DOF_TARGET_ACTOR_NAME = "DofTarget";
 
 export type PostProcessController = Component;
 
