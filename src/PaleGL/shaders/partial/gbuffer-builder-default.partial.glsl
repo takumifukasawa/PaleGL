@@ -3,5 +3,5 @@ void fOverrideGBufferSurface(
 ) {}
 
 void fOverrideGBufferDepth(
-    inout vec4 baseColor
+    inout sGBufferDepth s
 ) {}

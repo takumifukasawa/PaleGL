@@ -75,6 +75,8 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 vertexShader: material.rawVertexShader!, // TODO: rawじゃだめじゃん？
                 fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
                 fragmentShaderModifiers: material.depthFragmentShaderModifiers, // TODO: ややこしいけど、depthのときはfragmentShaderModifiersを使う
+                deleteFragmentShaderPragmas: material.deleteFragmentShaderPragmas,
+                
                 uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
                 faceSide: material.faceSide,
                 depthTest: true,

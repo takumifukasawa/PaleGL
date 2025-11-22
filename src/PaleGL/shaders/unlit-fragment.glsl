@@ -53,7 +53,7 @@ void main() {
     #include <alpha_test_f>
 
     // baseColor = fGamma(baseColor); 
-
+    
     outGBufferA = fEncodeGBufferA(vec3(0.));
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = fEncodeGBufferC(0., 0.);

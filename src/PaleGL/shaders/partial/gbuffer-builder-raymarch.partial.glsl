@@ -5,6 +5,6 @@ void fOverrideGBufferSurface(
 
 // TODO: 多分いらない
 void fOverrideGBufferDepth(
-    inout vec4 baseColor,
+    inout sGBufferDepth s,
     vec2 raymarchResult
 ) {}

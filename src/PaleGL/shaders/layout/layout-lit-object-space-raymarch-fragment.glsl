@@ -142,6 +142,7 @@ void main() {
     sGBufferSurface gBufferSurface = fBuildGBufferSurface(
         currentRayPosition,
         worldNormal,
+        vec2(0.), // uv
         resultColor.xyz,
         metallic,
         roughness,

@@ -24,11 +24,18 @@ struct sGBufferD {
 struct sGBufferSurface {
     vec3 smWorldPosition;
     vec3 smWorldNormal;
+    vec2 smUv;
     vec3 smBaseColor;
     float smMetallic;
     float smRoughness;
     vec3 smEmissiveColor;
     // uShadingModelId);
+};
+
+struct sGBufferDepth {
+    vec3 smWorldPosition;
+    vec2 smUv;
+    vec4 smBaseColor;
 };
 
 vec4 fEncodeGBufferA(vec3 baseColor) {
@@ -79,9 +86,11 @@ sGBufferD fDecodeGBufferD(sampler2D gBufferDTexture, vec2 uv) {
     return gBufferD;
 }
 
+
 sGBufferSurface fBuildGBufferSurface(
     vec3 worldPosition,
     vec3 worldNormal,
+    vec2 uv,
     vec3 baseColor,
     float metallic,
     float roughness,
@@ -91,9 +100,22 @@ sGBufferSurface fBuildGBufferSurface(
     sGBufferSurface gBufferSurface;
     gBufferSurface.smWorldPosition = worldPosition;
     gBufferSurface.smWorldNormal = worldNormal;
+    gBufferSurface.smUv = uv;
     gBufferSurface.smBaseColor = baseColor;
     gBufferSurface.smMetallic = metallic;
     gBufferSurface.smRoughness = roughness;
     gBufferSurface.smEmissiveColor = emissiveColor;
     return gBufferSurface;
+}
+
+sGBufferDepth fBuildGBufferDepth(
+    vec3 worldPosition,
+    vec2 uv,
+    vec4 baseColor
+) {
+    sGBufferDepth gBufferDepth;
+    gBufferDepth.smWorldPosition = worldPosition;
+    gBufferDepth.smUv = uv;
+    gBufferDepth.smBaseColor = baseColor;
+    return gBufferDepth;
 }

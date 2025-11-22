@@ -75,6 +75,7 @@ void main() {
     sGBufferSurface gBufferSurface = fBuildGBufferSurface(
         vWorldPosition,
         worldNormal,
+        uv,
         baseColor.xyz,
         metallic,
         roughness,

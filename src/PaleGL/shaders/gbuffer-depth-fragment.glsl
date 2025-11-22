@@ -4,9 +4,17 @@ uniform vec4 uColor; // TODO: fbase color
 uniform sampler2D uBaseMap;
 uniform vec4 uMapTiling;
 
+#include <common>
+#include <lighting>
+#include <ub>
 #include <alpha_test>
+#include <tone>
+#include <gbuffer>
+
+#pragma GBUFFER_BUILDER_DEFAULT
 
 in vec2 vUv;
+in vec3 vWorldPosition;
 
 // CUSTOM_BEGIN comment out
 // #ifdef D_VERTEX_COLOR
@@ -36,7 +44,14 @@ void main() {
 
     #include <alpha_test_f>
     // #include ./partial/alpha-test-fragment.partial.glsl
-    
+
+    sGBufferDepth gBufferDepth = fBuildGBufferDepth(
+        vWorldPosition,
+        uv,
+        resultColor
+    );
+    fOverrideGBufferDepth(gBufferDepth);
+
     #pragma BEFORE_OUT
     
     // baseColorを最適化の過程で消されないようにする対策のmix
