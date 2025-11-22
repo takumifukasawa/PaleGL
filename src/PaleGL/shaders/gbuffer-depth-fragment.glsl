@@ -1,13 +1,8 @@
 #pragma DEFINES
 
 uniform vec4 uColor; // TODO: fbase color
-uniform sampler2D uBaseMap; 
-uniform vec4 uBaseMapTiling;
-
-// #ifdef D_HEIGHT_MAP
-// uniform sampler2D uHeightMap;
-// uniform vec4 uHeightMapTiling;
-// #endif
+uniform sampler2D uBaseMap;
+uniform vec4 uMapTiling;
 
 #include <alpha_test>
 
@@ -22,7 +17,7 @@ in vec2 vUv;
 out vec4 outColor;
 
 void main() {
-    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
+    vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
   
     // TODO: multiply base color
     vec4 baseMapColor = texture(uBaseMap, uv);

@@ -29,15 +29,13 @@ in vec4 vInstanceState;
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
-uniform vec4 uBaseMapTiling;
+uniform vec4 uMapTiling;
 uniform float uSpecularAmount;
 uniform float uAmbientAmount;
 uniform float uMetallic;
 uniform sampler2D uMetallicMap;
-uniform vec4 uMetallicMapTiling;
 uniform float uRoughness;
 uniform sampler2D uRoughnessMap;
-uniform vec4 uRoughnessMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
@@ -81,7 +79,7 @@ in mat4 vInverseWorldMatrix;
 void main() {
     vec4 resultColor = vec4(0, 0, 0, 1);
 
-    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
+    vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
 
     vec4 baseMapColor = texture(uBaseMap, uv);
     vec4 baseColor = uBaseColor * baseMapColor;
@@ -158,9 +156,9 @@ void main() {
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
-    metallic *= texture(uMetallicMap, uv * uMetallicMapTiling.xy).r;
+    metallic *= texture(uMetallicMap, uv).r;
     float roughness = uRoughness;
-    roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
+    roughness *= texture(uRoughnessMap, uv).r;
 
     // // surface情報
     // sSurface surface;

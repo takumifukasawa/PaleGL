@@ -10,23 +10,20 @@
 #include <normal_map_fh>
 
 uniform vec4 uBaseColor;
-uniform sampler2D uBaseMap; 
-uniform vec4 uBaseMapTiling;
+uniform sampler2D uBaseMap;
+uniform vec4 uMapTiling;
 uniform float uSpecularAmount;
 uniform samplerCube uEnvMap;
 uniform float uAmbientAmount;
 uniform float uMetallic;
 uniform sampler2D uMetallicMap;
-uniform vec4 uMetallicMapTiling;
 uniform float uRoughness;
 uniform sampler2D uRoughnessMap;
-uniform vec4 uRoughnessMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
 #ifdef D_HEIGHT_MAP
 uniform sampler2D uHeightMap;
-uniform vec4 uHeightMapTiling;
 #endif
 
 #pragma APPEND_UNIFORMS
@@ -58,7 +55,7 @@ in vec3 vWorldPosition;
 #include <gbuffer_o>
 
 void main() {
-    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
+    vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
   
     vec4 baseMapColor = texture(uBaseMap, uv);
     vec4 baseColor = baseMapColor;
@@ -99,9 +96,9 @@ void main() {
    
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分けたい
     float metallic = uMetallic;
-    metallic *= texture(uMetallicMap, uv * uMetallicMapTiling.xy).r;
+    metallic *= texture(uMetallicMap, uv).r;
     float roughness = uRoughness;
-    roughness *= texture(uRoughnessMap, uv * uRoughnessMapTiling.xy).r;
+    roughness *= texture(uRoughnessMap, uv).r;
     
     // emissiveColor.rgb = fGamma(emissiveColor.rgb);
     
@@ -111,14 +108,11 @@ void main() {
     outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
     outGBufferC = fEncodeGBufferC(metallic, roughness);
     outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
-   
-// #ifdef D_NORMAL_MAP
-//     // outGBufferA = fEncodeGBufferA(texture(uNormalMap, uv).xyz);
-// #endif
-//     outGBufferA = vec4(uv, 1., 1.);
     
+    // for debug 
+    // outGBufferD = vec4(worldNormal, 1.);
     // #ifdef D_HEIGHT_MAP
-    // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * uHeightMapTiling.xy + uHeightMapTiling.zw).rgb);
+    // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv).rgb);
     // // outGBufferD = fEncodeGBufferD(texture(uHeightMap, uv * .5).rgb);
     // outGBufferD = fEncodeGBufferD(texture(uNormalMap, uv * 1.).rgb);
     // outGBufferD = fEncodeGBufferD(-vBinormal);

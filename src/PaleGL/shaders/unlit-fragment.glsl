@@ -12,7 +12,7 @@
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
-uniform vec4 uBaseMapTiling;
+uniform vec4 uMapTiling;
 uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
@@ -30,7 +30,7 @@ in vec3 vWorldPosition;
 #pragma BEGIN_MAIN
 
 void main() {
-    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
+    vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
     
     vec4 baseColor = texture(uBaseMap, uv) * uBaseColor;
 

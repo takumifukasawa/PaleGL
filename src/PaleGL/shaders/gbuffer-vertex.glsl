@@ -43,7 +43,7 @@ out vec3 vBinormal;
 
 #ifdef D_HEIGHT_MAP
 uniform sampler2D uHeightMap;
-uniform vec4 uHeightMapTiling;
+uniform vec4 uMapTiling;
 uniform float uHeightScale;
 #endif
 
@@ -433,7 +433,7 @@ void main() {
     vec4 worldPosition;
 #ifdef D_HEIGHT_MAP
     // height map
-    vec2 heightMapUv = aUv * uHeightMapTiling.xy + uHeightMapTiling.zw;
+    vec2 heightMapUv = aUv * uMapTiling.xy + uMapTiling.zw;
     float height = texture(uHeightMap, heightMapUv).r * uHeightScale;
     // worldPosition = worldMatrix * (localPosition + vec4(vNormal.xyz * height, 0.));
     worldPosition = worldMatrix * (localPosition + vec4(aNormal.xyz * height, 0.));

@@ -7,7 +7,7 @@ import {
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
-    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR4,
@@ -28,7 +28,7 @@ import unlitFrag from '@/PaleGL/shaders/unlit-fragment.glsl';
 
 export type UnlitMaterialArgs = {
     baseMap?: Texture;
-    baseMapTiling?: Vector4;
+    mapTiling?: Vector4;
     baseColor?: Color;
     vertexShaderModifiers?: VertexShaderModifiers;
     uniforms?: UniformsData;
@@ -39,7 +39,7 @@ export type UnlitMaterial = Material;
 export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial => {
     const {
         baseMap,
-        baseMapTiling, // vec4
+        mapTiling, // vec4
         baseColor,
         // TODO: 外部化
         vertexShaderModifiers = [],
@@ -50,7 +50,7 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
 
     const baseUniforms: UniformsData = [
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, mapTiling || createVector4(1, 1, 0, 0)],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, SHADING_MODEL_ID_UNLIT],
     ];
@@ -59,7 +59,7 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
 
     const depthUniforms: UniformsData = [
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling || createVector4(1, 1, 0, 0)],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, mapTiling || createVector4(1, 1, 0, 0)],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         ...uniforms,
     ];

@@ -13,16 +13,14 @@ import {
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
-    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_NAME_EMISSIVE_COLOR,
     UNIFORM_NAME_METALLIC,
     UNIFORM_NAME_METALLIC_MAP,
-    UNIFORM_NAME_METALLIC_MAP_TILING,
     UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
     UNIFORM_NAME_ROUGHNESS,
     UNIFORM_NAME_ROUGHNESS_MAP,
-    UNIFORM_NAME_ROUGHNESS_MAP_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -59,13 +57,11 @@ export type ObjectSpaceRaymarchMaterialArgs = {
     shadingModelId?: ShadingModelIds;
     baseColor?: Color;
     baseMap?: Texture;
-    baseMapTiling?: Vector4;
+    mapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture;
-    metallicMapTiling?: Vector4;
     roughness?: number;
     roughnessMap?: Texture;
-    roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
     fragmentShader?: string;
     depthFragmentShader?: string;
@@ -93,30 +89,26 @@ export const createObjectSpaceRaymarchMaterial = ({
         uniformBlockNames,
         baseMap,
         baseColor = createColorWhite(),
-        baseMapTiling = createVector4(1, 1, 0, 0),
+        mapTiling = createVector4(1, 1, 0, 0),
         roughnessMap,
-        roughnessMapTiling = createVector4(1, 1, 0, 0),
         roughness = 0,
         metallic = 0,
         metallicMap,
-        metallicMapTiling = createVector4(1, 1, 0, 0),
         emissiveColor = createColorBlack(),
     } = materialArgs;
-    
+
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
         [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, mapTiling],
         // value: Vector2.one,
         [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, metallic],
         [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
-        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
 
         [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, roughness],
         [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, roughnessMap],
-        [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, roughnessMapTiling],
 
         [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
         ...createObjectSpaceRaymarchUniforms(),

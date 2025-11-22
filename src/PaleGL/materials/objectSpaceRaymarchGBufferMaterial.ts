@@ -10,21 +10,17 @@ import {
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
-    UNIFORM_NAME_BASE_MAP_TILING,
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_NAME_EMISSIVE_COLOR,
     UNIFORM_NAME_HEIGHT_MAP,
-    UNIFORM_NAME_HEIGHT_MAP_TILING,
     UNIFORM_NAME_HEIGHT_SCALE,
+    UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_METALLIC,
     UNIFORM_NAME_METALLIC_MAP,
-    UNIFORM_NAME_METALLIC_MAP_TILING,
     UNIFORM_NAME_NORMAL_MAP,
-    UNIFORM_NAME_NORMAL_MAP_TILING,
     UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
     UNIFORM_NAME_ROUGHNESS,
     UNIFORM_NAME_ROUGHNESS_MAP,
-    UNIFORM_NAME_ROUGHNESS_MAP_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_COLOR,
     UNIFORM_TYPE_FLOAT,
@@ -41,10 +37,8 @@ import { Color, createColorBlack, createColorWhite } from '@/PaleGL/math/color.t
 import { createVector3One } from '@/PaleGL/math/vector3.ts';
 import { createVector4, Vector4 } from '@/PaleGL/math/vector4.ts';
 import raymarchVert from '@/PaleGL/shaders/gbuffer-vertex.glsl';
-import litObjectSpaceRaymarchFragmentLayout
-    from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
-import objectSpaceRaymarchDepthFragmentLayout
-    from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
+import litObjectSpaceRaymarchFragmentLayout from '@/PaleGL/shaders/layout/layout-lit-object-space-raymarch-fragment.glsl';
+import objectSpaceRaymarchDepthFragmentLayout from '@/PaleGL/shaders/layout/layout-object-space-raymarch-depth-fragment.glsl';
 
 type ObjectSpaceRaymarchGBufferArgs = {
     fragmentShaderTemplate?: string;
@@ -54,34 +48,19 @@ type ObjectSpaceRaymarchGBufferArgs = {
     deleteGBufferBuilderPragma?: boolean;
 } & {
     shadingModelId?: ShadingModelIds;
-    // gbuffer共通
-    // baseColor?: Color;
-    // baseMap?: Texture;
-    // baseMapTiling?: Vector4;
-    // metallic?: number;
-    // metallicMap?: Texture | null;
-    // metallicMapTiling?: Vector4;
-    // roughness?: number;
-    // roughnessMap?: Texture | null;
-    // roughnessMapTiling?: Vector4;
-    // emissiveColor?: Color;
     fragmentShader?: string;
     depthFragmentShader?: string;
-    // rawFragmentShader?: string;
     baseColor?: Color;
     baseMap?: Texture;
-    baseMapTiling?: Vector4;
+    mapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture;
-    metallicMapTiling?: Vector4;
     roughness?: number;
     roughnessMap?: Texture;
-    roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
     normalMap?: Texture;
     normalMapTiling?: Vector4;
     heightMap?: Texture;
-    heightMapTiling?: Vector4;
     heightScale?: number;
 } & MaterialArgs;
 
@@ -98,26 +77,21 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
         // shadingModelId = SHADING_MODEL_ID_LIT,
         uniforms = [],
         uniformBlockNames,
-        deleteFragmentShaderPragmas = []
+        deleteFragmentShaderPragmas = [],
     } = args;
 
     const baseColor: Color = args.baseColor || createColorWhite();
     const baseMap: Texture | undefined = args.baseMap;
-    const baseMapTiling: Vector4 = args.baseMapTiling || createVector4(1, 1, 0, 0);
+    const mapTiling: Vector4 = args.mapTiling || createVector4(1, 1, 0, 0);
     const metallic: number = args.metallic || 0;
     const metallicMap: Texture | undefined = args.metallicMap;
-    const metallicMapTiling: Vector4 = args.metallicMapTiling || createVector4(1, 1, 0, 0);
     const roughness: number = args.roughness !== undefined ? args.roughness : 0;
     const roughnessMap: Texture | undefined = args.roughnessMap;
-    const roughnessMapTiling: Vector4 = args.roughnessMapTiling || createVector4(1, 1, 0, 0);
     const normalMap: Texture | undefined = args.normalMap;
-    const normalMapTiling: Vector4 = args.normalMapTiling || createVector4(1, 1, 0, 0);
     const heightMap: Texture | undefined = args.heightMap;
     const heightScale: number = args.heightScale || 1.0;
-    const heightMapTiling: Vector4 = args.heightMapTiling || createVector4(1, 1, 0, 0);
     const emissiveColor: Color = args.emissiveColor || createColorBlack();
     const shadingModelId: ShadingModelIds = args.shadingModelId || SHADING_MODEL_ID_LIT;
-
 
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
@@ -125,58 +99,37 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
 
         // gbuffer共通
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, mapTiling],
         [UNIFORM_NAME_HEIGHT_MAP, UNIFORM_TYPE_TEXTURE, heightMap],
-        [UNIFORM_NAME_HEIGHT_MAP_TILING, UNIFORM_TYPE_VECTOR4, heightMapTiling],
         [UNIFORM_NAME_HEIGHT_SCALE, UNIFORM_TYPE_FLOAT, heightScale],
 
         ...createObjectSpaceRaymarchUniforms(),
     ] as UniformsData;
 
     const gbufferUniforms: UniformsData = [
-        // gbuffer共通 
+        // gbuffer共通
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor || createColorWhite()],
         [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, metallic],
         [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
-        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
         [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, roughness],
         [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, roughnessMap],
-        [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, roughnessMapTiling],
         [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
-        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
         [UNIFORM_NAME_NORMAL_MAP, UNIFORM_TYPE_TEXTURE, normalMap],
-        [UNIFORM_NAME_NORMAL_MAP_TILING, UNIFORM_TYPE_VECTOR4, normalMapTiling],
         [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
         [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, shadingModelId],
     ];
 
-    // const commonUniforms: UniformsData = [
-    //     [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
-    //     [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE, null],
-    //     [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
-    //     [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor],
-    //     [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
-    //     // value: Vector2.one,
-    //     [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, metallic],
-    //     [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, metallicMap],
-    //     [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, metallicMapTiling],
-
-    //     [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, roughness],
-    //     [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, roughnessMap],
-    //     [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, roughnessMapTiling],
-
-    //     [UNIFORM_NAME_NORMAL_MAP, UNIFORM_TYPE_TEXTURE, normalMap],
-    //     [UNIFORM_NAME_NORMAL_MAP_TILING, UNIFORM_TYPE_VECTOR4, normalMapTiling],
-    //     
-    //     [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
-    //     ...createObjectSpaceRaymarchUniforms(),
-    // ] as UniformsData;
     const shadingUniforms: UniformsData = [
         [UNIFORM_NAME_SHADING_MODEL_ID, UNIFORM_TYPE_INT, shadingModelId],
         // float,intどちらでもいい
     ];
 
-    const mergedUniforms: UniformsData = [...commonUniforms, ...gbufferUniforms, ...shadingUniforms, ...(uniforms ? uniforms : [])];
+    const mergedUniforms: UniformsData = [
+        ...commonUniforms,
+        ...gbufferUniforms,
+        ...shadingUniforms,
+        ...(uniforms ? uniforms : []),
+    ];
 
     // templateが片方しか指定されていない場合はおそらく想定していない
     if (
@@ -185,7 +138,7 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
     ) {
         console.warn(`difference template!`);
     }
-   
+
     // gbuffer builder を消すオプションを適用してるなら消しちゃう
     if (args.deleteGBufferBuilderPragma) {
         deleteFragmentShaderPragmas.push(FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH);

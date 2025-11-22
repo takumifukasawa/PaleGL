@@ -2,7 +2,6 @@
 in vec3 vTangent;
 in vec3 vBinormal;
 uniform sampler2D uNormalMap;
-uniform vec4 uNormalMapTiling;
 uniform float uNormalStrength;
 
 vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {

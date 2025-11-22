@@ -310,11 +310,9 @@ export function buildMarionetterScene(
                     const tiling = createVector4FromRawVector4(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX]);
                     material = createGBufferMaterial({
                         baseColor: createColorFromHex(litMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
-                        baseMapTiling: tiling,
+                        mapTiling: tiling,
                         metallic: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX],
-                        metallicMapTiling: tiling,
                         roughness: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX],
-                        roughnessMapTiling: tiling,
                         emissiveColor: createEmissiveColorFromHex(
                             litMaterial[MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX]
                         ),
@@ -572,19 +570,16 @@ export function buildMarionetterTimelineFromScene(
 ): MarionetterTimeline | null {
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MARIONETTER_SCENE_PROPERTY_OBJECTS].forEach((obj) => {
-        const co = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS];
-        if (co) {
-            const timelineComponent = co.find(
-                (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
+        const timelineComponent = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
+            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
+        );
+        if (timelineComponent) {
+            marionetterTimeline = buildMarionetterTimeline(
+                marionetterSceneActors,
+                timelineComponent as MarionetterPlayableDirectorComponentInfo
+                // placedScene
+                // needsSomeActorsConvertLeftHandAxisToRightHandAxis
             );
-            if (timelineComponent) {
-                marionetterTimeline = buildMarionetterTimeline(
-                    marionetterSceneActors,
-                    timelineComponent as MarionetterPlayableDirectorComponentInfo
-                    // placedScene
-                    // needsSomeActorsConvertLeftHandAxisToRightHandAxis
-                );
-            }
         }
     });
     return marionetterTimeline;

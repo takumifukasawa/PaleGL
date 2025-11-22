@@ -9,17 +9,15 @@ import {
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
-    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_CAMERA_ASPECT,
     UNIFORM_NAME_CAMERA_FOV,
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_NAME_EMISSIVE_COLOR,
     UNIFORM_NAME_METALLIC,
     UNIFORM_NAME_METALLIC_MAP,
-    UNIFORM_NAME_METALLIC_MAP_TILING,
     UNIFORM_NAME_ROUGHNESS,
     UNIFORM_NAME_ROUGHNESS_MAP,
-    UNIFORM_NAME_ROUGHNESS_MAP_TILING,
     UNIFORM_NAME_SHADING_MODEL_ID,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_FLOAT,
@@ -39,13 +37,11 @@ export type ScreenSpaceRaymarchMaterialArgs = {
     shadingModelId?: ShadingModelIds;
     baseColor?: Color;
     baseMap?: Texture;
-    baseMapTiling?: Vector4;
+    mapTiling?: Vector4;
     metallic?: number;
     metallicMap?: Texture;
-    metallicMapTiling?: Vector4;
     roughness?: number;
     roughnessMap?: Texture;
-    roughnessMapTiling?: Vector4;
     emissiveColor?: Color;
     fragmentShader?: string;
     depthFragmentShader?: string;
@@ -61,26 +57,22 @@ export const createScreenSpaceRaymarchMaterial = ({
     uniforms = [],
     baseColor,
     baseMap,
-    baseMapTiling, // vec4
+    mapTiling, // vec4
     metallic,
     metallicMap,
-    metallicMapTiling,
     roughness,
     roughnessMap,
-    roughnessMapTiling,
     emissiveColor,
     uniformBlockNames,
     ...options
 }: ScreenSpaceRaymarchMaterialArgs) => {
     const _baseMap = baseMap;
     const _baseColor = baseColor || createColorWhite();
-    const _baseMapTiling = baseMapTiling || createVector4(1, 1, 0, 0);
+    const _mapTiling = mapTiling || createVector4(1, 1, 0, 0);
     const _roughnessMap = roughnessMap;
-    const _roughnessMapTiling = roughnessMapTiling || createVector4(1, 1, 0, 0);
     const _roughness = roughness || 0;
     const _metallic = metallic || 0;
     const _metallicMap = metallicMap;
-    const _metallicMapTiling = metallicMapTiling || createVector4(1, 1, 0, 0);
     const _emissiveColor = emissiveColor || createColorBlack();
 
     const commonUniforms: UniformsData = [
@@ -90,15 +82,13 @@ export const createScreenSpaceRaymarchMaterial = ({
 
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, _baseMap],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, _baseColor],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, _baseMapTiling],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, _mapTiling],
         // value: Vector2.one,
         [UNIFORM_NAME_METALLIC, UNIFORM_TYPE_FLOAT, _metallic],
         [UNIFORM_NAME_METALLIC_MAP, UNIFORM_TYPE_TEXTURE, _metallicMap],
-        [UNIFORM_NAME_METALLIC_MAP_TILING, UNIFORM_TYPE_VECTOR4, _metallicMapTiling],
 
         [UNIFORM_NAME_ROUGHNESS, UNIFORM_TYPE_FLOAT, _roughness],
         [UNIFORM_NAME_ROUGHNESS_MAP, UNIFORM_TYPE_TEXTURE, _roughnessMap],
-        [UNIFORM_NAME_ROUGHNESS_MAP_TILING, UNIFORM_TYPE_VECTOR4, _roughnessMapTiling],
         [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, _emissiveColor],
     ];
     const shadingUniforms: UniformsData = [

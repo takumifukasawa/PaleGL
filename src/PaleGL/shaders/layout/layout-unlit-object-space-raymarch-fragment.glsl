@@ -27,7 +27,7 @@ in vec4 vInstanceState;
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
-uniform vec4 uBaseMapTiling;
+uniform vec4 uMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
@@ -52,7 +52,7 @@ out vec4 outColor;
 void main() {
     vec4 resultColor = uBaseColor * vec4(0.);
 
-    vec2 uv = vUv * uBaseMapTiling.xy + uBaseMapTiling.zw;
+    vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
 
     vec4 baseMapColor = texture(uBaseMap, uv);
     vec4 baseColor = uBaseColor * baseMapColor;

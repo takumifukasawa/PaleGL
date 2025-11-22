@@ -10,7 +10,7 @@ import {
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_BASE_MAP,
-    UNIFORM_NAME_BASE_MAP_TILING,
+    UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_NAME_EMISSIVE_COLOR,
     UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE,
@@ -42,7 +42,7 @@ type ObjectSpaceRaymarchGlassArgs = {
     shadingModelId?: ShadingModelIds;
     baseColor?: Color;
     baseMap?: Texture;
-    baseMapTiling?: Vector4;
+    mapTiling?: Vector4;
     emissiveColor?: Color;
     fragmentShader?: string;
     depthFragmentShader?: string;
@@ -64,16 +64,16 @@ export const createObjectSpaceRaymarchGlassMaterial = (
         uniformBlockNames,
         baseMap,
         baseColor = createColorWhite(),
-        baseMapTiling = createVector4(1, 1, 0, 0),
+        mapTiling = createVector4(1, 1, 0, 0),
         emissiveColor = createColorBlack(),
     } = args;
-    
+
     const commonUniforms: UniformsData = [
         [UNIFORM_NAME_OBJECT_SPACE_RAYMARCH_BOUNDS_SCALE, UNIFORM_TYPE_VECTOR3, createVector3One()],
         [UNIFORM_NAME_DEPTH_TEXTURE, UNIFORM_TYPE_TEXTURE],
         [UNIFORM_NAME_BASE_MAP, UNIFORM_TYPE_TEXTURE, baseMap],
         [UNIFORM_NAME_BASE_COLOR, UNIFORM_TYPE_COLOR, baseColor],
-        [UNIFORM_NAME_BASE_MAP_TILING, UNIFORM_TYPE_VECTOR4, baseMapTiling],
+        [UNIFORM_NAME_MAP_TILING, UNIFORM_TYPE_VECTOR4, mapTiling],
         // value: Vector2.one,
         [UNIFORM_NAME_EMISSIVE_COLOR, UNIFORM_TYPE_COLOR, emissiveColor],
         ...createObjectSpaceRaymarchUniforms(),
