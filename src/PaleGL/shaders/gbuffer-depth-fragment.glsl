@@ -4,10 +4,10 @@ uniform vec4 uColor; // TODO: fbase color
 uniform sampler2D uBaseMap; 
 uniform vec4 uBaseMapTiling;
 
-#ifdef D_HEIGHT_MAP
-uniform sampler2D uHeightMap;
-uniform vec4 uHeightMapTiling;
-#endif
+// #ifdef D_HEIGHT_MAP
+// uniform sampler2D uHeightMap;
+// uniform vec4 uHeightMapTiling;
+// #endif
 
 #include <alpha_test>
 
