@@ -39,7 +39,7 @@ export type GBufferMaterialControllerInitialValues = {
 
 // timeline から操作される
 export const createGBufferMaterialController = (): MaterialController => {
-    const controller = createMaterialController('GBufferMaterialController', bindings, {});
+    const controller = createMaterialController(bindings, {});
 
     return controller;
 };

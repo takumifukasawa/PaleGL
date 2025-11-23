@@ -63,7 +63,6 @@ export type OnPostProcessTimelineCallback = (
 type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu, scene: Scene) => void;
 
 export type ComponentModel = {
-    name?: string;
     actor?: Actor;
     type: ComponentType;
 };
@@ -89,7 +88,6 @@ export type Component<T extends ComponentModel = ComponentModel, U extends Compo
 ];
 
 export type ComponentArgs = {
-    name?: string;
     type?: ComponentType;
     onStartCallback?: OnStartCallback;
     onFixedUpdateCallback?: OnFixedUpdateCallback;
@@ -114,7 +112,6 @@ export const createComponent = <
     additionalBehaviour: AdditionalComponentBehaviour = {}
 ): Component<T, U> => {
     const {
-        name,
         type,
         onStartCallback,
         onFixedUpdateCallback,
@@ -130,7 +127,6 @@ export const createComponent = <
     } = args;
 
     const model: ComponentModel = {
-        name: name || '',
         type: type || COMPONENT_TYPE_DEFAULT,
     };
     const behaviour: ComponentBehaviour = {

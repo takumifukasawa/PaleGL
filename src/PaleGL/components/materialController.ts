@@ -8,12 +8,9 @@ export type MaterialController = Component;
 type Bindings = Map<string, string>; // propertyName, uniformName
 
 // timeline から操作される
-export const createMaterialController = (name: string, bindings: Bindings, componentArgs: ComponentArgs): MaterialController => {
+export const createMaterialController = (bindings: Bindings, componentArgs: ComponentArgs): MaterialController => {
     return createComponent({
         ...componentArgs,
-        // CUSTOM_BEGIN
-        name: isNeededCompact() ? undefined : name,
-        // CUSTOM_END
         onFilterPropertyBinder: (key: string) => bindings.has(key),
         onProcessPropertyBinder: (actor, _, key, value) => {
             if (bindings.has(key)) {

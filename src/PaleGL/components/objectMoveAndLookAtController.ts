@@ -40,9 +40,6 @@ export const createObjectMoveAndLookAtController = (args: {
     };
 
     const [componentModel, componentBehaviour] = createComponent({
-        // CUSTOM_BEGIN comment out
-        // name: 'ObjectMoveAndLookAtController',
-        // CUSTOM_END
         type: COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT,
         onStartCallback: (actor, _model, _gpu, scene) => {
             update(actor, scene, initialLocalPosition, initialUpVector);
