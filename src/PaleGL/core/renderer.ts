@@ -12,7 +12,9 @@ import { PerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCamera.ts'
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { needsCastShadowOfLight } from '@/PaleGL/actors/lights/lightBehaviours.ts';
-import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
+// CUSTOM_BEGIN comment out
+// import { PointLight } from '@/PaleGL/actors/lights/pointLight.ts';
+// CUSTOM_END
 import { getSpotLightConeCos, getSpotLightPenumbraCos, SpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
@@ -26,26 +28,23 @@ import { SpriteAtlasMesh } from '@/PaleGL/actors/meshes/SpriteAtlasMesh.ts';
 import { UIMesh } from '@/PaleGL/actors/meshes/uiMesh.ts';
 import { PostProcessVolume } from '@/PaleGL/actors/volumes/postProcessVolume.ts';
 import {
-    // ACTOR_TYPE_GPU_PARTICLE, ACTOR_TYPE_GPU_TRAIL_PARTICLE, ACTOR_TYPE_INSTANCING_PARTICLE,
     ACTOR_TYPE_LIGHT,
-    // ActorType,
     ACTOR_TYPE_MESH,
     ACTOR_TYPE_POST_PROCESS_VOLUME,
-    // ACTOR_TYPE_CAMERA,
     ACTOR_TYPE_SKYBOX,
     BLEND_TYPE_ADDITIVE,
-    // BlendType,
     BLEND_TYPE_OPAQUE,
     BLEND_TYPE_TRANSPARENT,
     // LightType,
     LIGHT_TYPE_DIRECTIONAL,
-    LIGHT_TYPE_POINT,
+    // CUSTOM_BEGIN coment out
+    // LIGHT_TYPE_POINT,
+    // CUSTOM_END
     LIGHT_TYPE_SPOT,
-    MAX_POINT_LIGHT_COUNT,
+    // CUSTOM_BEGIN coment out
+    // MAX_POINT_LIGHT_COUNT,
+    // CUSTOM_END
     MAX_SPOT_LIGHT_COUNT,
-    // MeshType,
-    // MESH_TYPE_SKINNED,
-    // MESH_TYPE_TEXT,
     MESH_TYPE_SPRITE_ATLAS,
     RENDER_QUEUE_TYPE_AFTER_TONE,
     RENDER_QUEUE_TYPE_ALPHA_TEST,
@@ -58,13 +57,14 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     RenderQueueType,
     TEXTURE_DEPTH_PRECISION_TYPE_HIGH,
-    // UIQueueType,
     UI_QUEUE_TYPE_AFTER_TONE,
     UI_QUEUE_TYPE_OVERLAY,
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_COMMON,
     UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
-    UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    // CUSTOM_BEGIN coment out
+    // UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    // CUSTOM_END
     UNIFORM_BLOCK_NAME_SPOT_LIGHT,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_INDEX_NAME,
@@ -84,7 +84,9 @@ import {
     UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
     UNIFORM_NAME_INVERSE_WORLD_MATRIX,
     UNIFORM_NAME_NORMAL_MATRIX,
-    UNIFORM_NAME_POINT_LIGHT,
+    // CUSTOM_BEGIN coment out
+    // UNIFORM_NAME_POINT_LIGHT,
+    // CUSTOM_END
     UNIFORM_NAME_PROJECTION_MATRIX,
     UNIFORM_NAME_SCENE_TEXTURE,
     UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
@@ -267,7 +269,9 @@ type RenderMeshInfoEachQueue = {
 export type LightActors = {
     directionalLight: DirectionalLight | null;
     spotLights: SpotLight[];
-    pointLights: PointLight[];
+    // CUSTOM_BEGIN comment out
+    // pointLights: PointLight[];
+    // CUSTOM_END
 };
 
 type RenderMeshInfosEachPass = {
@@ -617,30 +621,32 @@ export function createRenderer({
         data: spotLightUniformBufferData,
     });
 
-    const pointLightUniformBufferData: UniformBufferObjectBlockData = [
-        [
-            UNIFORM_NAME_POINT_LIGHT,
-            UNIFORM_TYPE_STRUCT_ARRAY,
-            maton.range(MAX_POINT_LIGHT_COUNT).map(
-                (): UniformBufferObjectStructValue => [
-                    [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
-                    [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
-                    [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
-                    [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
-                    [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
-                ]
-            ) as UniformBufferObjectStructArrayValue,
-        ],
-    ];
-    globalUniformBufferObjects.push({
-        uniformBufferObject: createGPUUniformBufferObject(
-            gpu,
-            uniformBufferObjectShader,
-            UNIFORM_BLOCK_NAME_POINT_LIGHT,
-            pointLightUniformBufferData
-        ),
-        data: pointLightUniformBufferData,
-    });
+    // CUSTOM_BEGIN
+    // const pointLightUniformBufferData: UniformBufferObjectBlockData = [
+    //     [
+    //         UNIFORM_NAME_POINT_LIGHT,
+    //         UNIFORM_TYPE_STRUCT_ARRAY,
+    //         maton.range(MAX_POINT_LIGHT_COUNT).map(
+    //             (): UniformBufferObjectStructValue => [
+    //                 [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, createColorBlack()],
+    //                 [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
+    //                 [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, 0],
+    //                 [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, 0],
+    //                 [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, 0],
+    //             ]
+    //         ) as UniformBufferObjectStructArrayValue,
+    //     ],
+    // ];
+    // globalUniformBufferObjects.push({
+    //     uniformBufferObject: createGPUUniformBufferObject(
+    //         gpu,
+    //         uniformBufferObjectShader,
+    //         UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    //         pointLightUniformBufferData
+    //     ),
+    //     data: pointLightUniformBufferData,
+    // });
+    // CUSTOM_END
 
     // const timelineUniformBufferData: UniformBufferObjectBlockData = [
     //     [UNIFORM_NAME_TIMELINE_TIME, UNIFORM_TYPE_FLOAT, 0],
@@ -918,7 +924,9 @@ export function renderRenderer(
     const lightActors: LightActors = {
         directionalLight: null,
         spotLights: [],
-        pointLights: [],
+        // CUSTOM_BEGIN comment out
+        // pointLights: [],
+        // CUSTOM_END
     };
 
     let postProcessVolumeActor: PostProcessVolume | null = null;
@@ -1021,9 +1029,11 @@ export function renderRenderer(
                         case LIGHT_TYPE_SPOT:
                             lightActors.spotLights.push(light as SpotLight);
                             break;
-                        case LIGHT_TYPE_POINT:
-                            lightActors.pointLights.push(light as PointLight);
-                            break;
+                        // CUSTOM_BEGIN comment out
+                        // case LIGHT_TYPE_POINT:
+                        //     lightActors.pointLights.push(light as PointLight);
+                        //     break;
+                        // CUSTOM_END
                     }
                 }
                 break;
@@ -1060,10 +1070,12 @@ export function renderRenderer(
     if (lightActors.spotLights.length > 0) {
         updateSpotLightsUniforms(renderer, lightActors.spotLights);
     }
-    // TODO: このままだと point-light がなくなったときも point-light が残ることになる
-    if (lightActors.pointLights.length > 0) {
-        updatePointLightsUniforms(renderer, lightActors.pointLights);
-    }
+    // CUSTOM_BEGIN comment out
+    // // TODO: このままだと point-light がなくなったときも point-light が残ることになる
+    // if (lightActors.pointLights.length > 0) {
+    //     updatePointLightsUniforms(renderer, lightActors.pointLights);
+    // }
+    // CUSTOM_END
 
     // ------------------------------------------------------------------------------
     // depth pre-pass
@@ -2237,23 +2249,25 @@ function updateSpotLightsUniforms(renderer: Renderer, spotLights: SpotLight[]) {
     );
 }
 
-function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]) {
-    updateUniformBlockValue(
-        renderer,
-        UNIFORM_BLOCK_NAME_POINT_LIGHT,
-        UNIFORM_NAME_POINT_LIGHT,
-        pointLights.map((pointLight): UniformBufferObjectStructValue => {
-            return [
-                [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, pointLight.color],
-                [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, pointLight.transform.position],
-                [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, pointLight.intensity],
-                [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, pointLight.distance],
-                [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, pointLight.attenuation],
-            ];
-        }) as UniformBufferObjectStructArrayValue,
-        true
-    );
-}
+// CUSTOM_BEGIN
+// function updatePointLightsUniforms(renderer: Renderer, pointLights: PointLight[]) {
+//     updateUniformBlockValue(
+//         renderer,
+//         UNIFORM_BLOCK_NAME_POINT_LIGHT,
+//         UNIFORM_NAME_POINT_LIGHT,
+//         pointLights.map((pointLight): UniformBufferObjectStructValue => {
+//             return [
+//                 [UNIFORM_NAME_STRUCT_MEMBER_COLOR, UNIFORM_TYPE_COLOR, pointLight.color],
+//                 [UNIFORM_NAME_STRUCT_MEMBER_POSITION, UNIFORM_TYPE_VECTOR3, pointLight.transform.position],
+//                 [UNIFORM_NAME_STRUCT_MEMBER_INTENSITY, UNIFORM_TYPE_FLOAT, pointLight.intensity],
+//                 [UNIFORM_NAME_STRUCT_MEMBER_DISTANCE, UNIFORM_TYPE_FLOAT, pointLight.distance],
+//                 [UNIFORM_NAME_STRUCT_MEMBER_ATTENUATION, UNIFORM_TYPE_FLOAT, pointLight.attenuation],
+//             ];
+//         }) as UniformBufferObjectStructArrayValue,
+//         true
+//     );
+// }
+// CUSTOM_END
 
 // ソート用の一時変数vec3. GC対策
 let tmpSortVA = createVector3Zero();

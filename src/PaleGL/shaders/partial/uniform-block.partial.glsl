@@ -36,9 +36,11 @@ layout (std140) uniform ubSpotLight {
     sSpotLight uSpotLight[MAX_SPOT_LIGHT_COUNT];
 };
 
-layout (std140) uniform ubPointLight {
-    sPointLight uPointLight[MAX_POINT_LIGHT_COUNT];
-};
+// CUSTOM_BEGIN comment out
+// layout (std140) uniform ubPointLight {
+//     sPointLight uPointLight[MAX_POINT_LIGHT_COUNT];
+// };
+// CUSTOM_END
 
 // layout (std140) uniform ubTimeline {
 //     float uTimelineTime; // timeline time

@@ -111,31 +111,33 @@ void fGetSpotLightIrradiance(const in sSpotLight spotLight, const in sGeometricC
 // point light
 //
 
-void fGetPointLightIrradiance(const in sPointLight pointLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
-    vec3 surfaceToLight = pointLight.smPosition - geometry.smPosition;
-    float lightDistance = length(surfaceToLight);
-    vec3 L = normalize(surfaceToLight);
-
-    directLight.smDirection = L;
-    directLight.smIntensity = pointLight.smIntensity;
-
-    if (fTestLightInRange(lightDistance, pointLight.smDistance)) {
-        directLight.smColor = pointLight.smColor.xyz;
-        directLight.smColor *= fPunctualLightIntensityToIrradianceFactor(lightDistance, pointLight.smDistance, pointLight.smAttenuation);
-        directLight.smVisible = true;
-    } else {
-        directLight.smColor = vec3(0.);
-        directLight.smVisible = false;
-    }
-
-    // directLight.smColor = vec3(fTestLightInRange(lightDistance, pointLight.smDistance) ? 1. : 0.);
-
-    // for debug
-    // directLight.smColor = vec3(1.);
-    // directLight.smVisible = true;
-    // directLight.smColor = vec3(lightDistance);
-    // directLight.smColor = pointLight.smPosition;
-}
+// CUSTOM_BEGIN comment out
+// void fGetPointLightIrradiance(const in sPointLight pointLight, const in sGeometricContext geometry, out sIncidentLight directLight) {
+//     vec3 surfaceToLight = pointLight.smPosition - geometry.smPosition;
+//     float lightDistance = length(surfaceToLight);
+//     vec3 L = normalize(surfaceToLight);
+// 
+//     directLight.smDirection = L;
+//     directLight.smIntensity = pointLight.smIntensity;
+// 
+//     if (fTestLightInRange(lightDistance, pointLight.smDistance)) {
+//         directLight.smColor = pointLight.smColor.xyz;
+//         directLight.smColor *= fPunctualLightIntensityToIrradianceFactor(lightDistance, pointLight.smDistance, pointLight.smAttenuation);
+//         directLight.smVisible = true;
+//     } else {
+//         directLight.smColor = vec3(0.);
+//         directLight.smVisible = false;
+//     }
+// 
+//     // directLight.smColor = vec3(fTestLightInRange(lightDistance, pointLight.smDistance) ? 1. : 0.);
+// 
+//     // for debug
+//     // directLight.smColor = vec3(1.);
+//     // directLight.smVisible = true;
+//     // directLight.smColor = vec3(lightDistance);
+//     // directLight.smColor = pointLight.smPosition;
+// }
+// CUSTOM_END
 
 // -------------------------------------------------------------------------------
 // brdfs
@@ -641,14 +643,13 @@ void main() {
     // point light
     //
 
-    sPointLight pointLight;
-
-    // for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-    #pragma UNROLL_START MAX_POINT_LIGHT_COUNT
-       fGetPointLightIrradiance(uPointLight[UNROLL_N], geometry, directLight);
-       fRE_Direct(directLight, geometry, material, reflectedLight, sssRate * .25); // TODO: pass parameter
-    #pragma UNROLL_END
-    // }
+    // CUSTOM_BEGIN comment out
+    // sPointLight pointLight;
+    // #pragma UNROLL_START MAX_POINT_LIGHT_COUNT
+    //    fGetPointLightIrradiance(uPointLight[UNROLL_N], geometry, directLight);
+    //    fRE_Direct(directLight, geometry, material, reflectedLight, sssRate * .25); // TODO: pass parameter
+    // #pragma UNROLL_END
+    // CUSTOM_END
 
     //
     // ambient light

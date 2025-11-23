@@ -1,6 +1,8 @@
 
-#define MAX_SPOT_LIGHT_COUNT 4
-#define MAX_POINT_LIGHT_COUNT 1
+#define MAX_SPOT_LIGHT_COUNT 2
+// CUSTOM_BEGIN comment out
+// #define MAX_POINT_LIGHT_COUNT 1
+// CUSTOM_END
 
 struct sSurface {
     vec3 smWorldNormal;
@@ -29,10 +31,12 @@ struct sSpotLight {
     mat4 smShadowMapProjectionMatrix;
 };
 
-struct sPointLight {
-    vec4 smColor;
-    vec3 smPosition;
-    float smIntensity;
-    float smDistance;
-    float smAttenuation;
-};
+// CUSTOM_BEGIN comment out
+// struct sPointLight {
+//     vec4 smColor;
+//     vec3 smPosition;
+//     float smIntensity;
+//     float smDistance;
+//     float smAttenuation;
+// };
+// CUSTOM_END

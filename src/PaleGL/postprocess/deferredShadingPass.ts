@@ -11,7 +11,9 @@ import {
     RENDER_TARGET_TYPE_R11F_G11F_B10F,
     UNIFORM_BLOCK_NAME_CAMERA,
     UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
-    UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    // CUSTOM_BEGIN comment out
+    // UNIFORM_BLOCK_NAME_POINT_LIGHT,
+    // CUSTOM_END
     UNIFORM_BLOCK_NAME_SPOT_LIGHT,
     UNIFORM_NAME_AMBIENT_OCCLUSION_TEXTURE,
     UNIFORM_NAME_DEPTH_TEXTURE,
@@ -37,7 +39,6 @@ import {
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import deferredShadingFragmentShader from '@/PaleGL/shaders/deferred-shading-fragment.glsl';
-import { maton } from '@/PaleGL/utilities/maton.ts';
 
 export type DeferredShadingPassArgs = PostProcessPassParametersBaseArgs;
 
@@ -83,7 +84,9 @@ export const createDeferredShadingPass = (args: DeferredShadingPassArgs): Deferr
                 UNIFORM_BLOCK_NAME_CAMERA,
                 UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
                 UNIFORM_BLOCK_NAME_SPOT_LIGHT,
-                UNIFORM_BLOCK_NAME_POINT_LIGHT,
+                // CUSTOM_BEGIN comment out
+                // UNIFORM_BLOCK_NAME_POINT_LIGHT,
+                // CUSTOM_END
             ],
             enabled: args.enabled,
         }),
