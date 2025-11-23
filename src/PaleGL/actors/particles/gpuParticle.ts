@@ -131,19 +131,11 @@ export const renderMRTDoubleBufferAndSwap = (
     updateMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, material);
 };
 
-// const getCurrentUpdater = (gpuParticle: GpuParticle) => {
-//     return gpuParticle.updaters[gpuParticle.currentUpdaterIndex];
-// }
-
 export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     const {
         gpu,
         vatWidth,
         vatHeight,
-        // initializeFragmentShader,
-        // updateFragmentShader,
-        // initializeFragmentModifiers,
-        // updateFragmentModifiers,
         shaders,
         initialUpdaterIndex = 0,
         useVATLookForward = false,
