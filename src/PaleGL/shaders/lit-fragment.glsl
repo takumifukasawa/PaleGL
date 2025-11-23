@@ -7,9 +7,8 @@
 #include <gbuffer>
 #include <alpha_test>
 #include <vcolor_fh>
-#include <normal_map_fh>
 
-#include <surface_u>
+#include <surface_h>
 uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS

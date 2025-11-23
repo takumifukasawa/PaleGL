@@ -8,7 +8,10 @@
 #include <gbuffer>
 #include <alpha_test>
 #include <vcolor_fh>
-#include <normal_map_fh>
+#include <surface_h>
+
+uniform int uShadingModelId;
+
 
 #ifdef D_INSTANCING
 in float vInstanceId;
@@ -26,9 +29,6 @@ in vec4 vInstanceState;
 
 #include <raymarch_sf>
 #include <os_raymarch_f>
-
-#include <surface_u>
-uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 

@@ -1,7 +1,22 @@
+uniform vec4 uBaseColor;
+uniform sampler2D uBaseMap;
+uniform vec4 uMapTiling;
+uniform float uSpecularAmount;
+uniform float uAmbientAmount;
+uniform float uMetallic;
+uniform sampler2D uMetallicMap;
+uniform float uRoughness;
+uniform sampler2D uRoughnessMap;
+uniform vec4 uEmissiveColor;
+uniform sampler2D uNormalMap;
+
+#ifdef D_HEIGHT_MAP
+uniform sampler2D uHeightMap;
+#endif
+
 #ifdef D_NORMAL_MAP
 in vec3 vTangent;
 in vec3 vBinormal;
-uniform sampler2D uNormalMap;
 uniform float uNormalStrength;
 
 vec3 fCalcNormal(vec3 normal, vec3 tangent, vec3 binormal, sampler2D normalMap, vec2 uv) {

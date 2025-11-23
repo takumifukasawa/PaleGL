@@ -66,12 +66,11 @@ import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl'
 import gbufferBuilderDefaultPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-default.partial.glsl';
 import gbufferBuilderRaymarchPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-raymarch.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
-import surfaceUniformsPartialContent from '@/PaleGL/shaders/partial/surface-uniforms.partial.glsl';
+import surfaceHeaderPartialContent from '@/PaleGL/shaders/partial/surface-header.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
 import msdfHeadreContent from '@/PaleGL/shaders/partial/msdf-header.glsl';
-import normalMapFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment-header.partial.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
 import perlinPartialContent from '@/PaleGL/shaders/partial/perlin.partial.glsl';
@@ -117,7 +116,7 @@ const includesDict = new Map<string, string>([
     ['<depth>', depthPartialContent],
     ['<gbuffer>', gbufferPartialContent],
     ['<gbuffer_o>', gbufferOutPartialContent],
-    ['<surface_u>', surfaceUniformsPartialContent],
+    ['<surface_h>', surfaceHeaderPartialContent],
     ['<etex>', effectTexturePartialContent],
     ['<raymarch_df>', raymarchDistanceFunctionsPartialContent],
     ['<raymarch_sf>', raymarchSceneFunctionsPartialContent],
@@ -127,7 +126,6 @@ const includesDict = new Map<string, string>([
     ['<shape_font_f>', shapeFontFragmentPartialContent],
     ['<vcolor_vh>', vertexColorVertexHeaderPartialContent],
     ['<vcolor_fh>', vertexColorFragmentHeaderPartialContent],
-    ['<normal_map_fh>', normalMapFragmentHeaderPartialContent],
     ['<normal_map_f>', normalMapFragmentPartialContent],
     ['<env_map>', envMapPartialContent],
     ['<skybox_h>', skyboxHeaderPartialContent],

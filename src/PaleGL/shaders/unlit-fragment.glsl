@@ -6,7 +6,6 @@
 #include <tone>
 #include <gbuffer>
 #include <vcolor_fh>
-#include <normal_map_fh>
 
 #pragma APPEND_INCLUDE
 
@@ -34,13 +33,7 @@ void main() {
     
     vec4 baseColor = texture(uBaseMap, uv) * uBaseColor;
 
-    vec3 worldNormal = vNormal;
-
-#ifdef D_NORMAL_MAP
-    worldNormal = fCalcNormal(vNormal, vTangent, vBinormal, uNormalMap, uv);
-#else
-    worldNormal = normalize(vNormal);
-#endif
+    vec3 worldNormal = normalize(vNormal);
 
 // CUSTOM_BEGIN comment out
 // #ifdef D_VERTEX_COLOR

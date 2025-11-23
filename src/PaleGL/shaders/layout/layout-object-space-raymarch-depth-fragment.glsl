@@ -9,6 +9,7 @@
 #include <alpha_test>
 #include <vcolor_fh>
 
+#include <surface_h>
 
 
 #ifdef D_INSTANCING
@@ -27,9 +28,9 @@ in vec4 vInstanceState;
 #include <raymarch_sf>
 #include <os_raymarch_f>
 
-uniform vec4 uBaseColor;
-uniform sampler2D uBaseMap;
-uniform vec4 uMapTiling;
+// uniform vec4 uBaseColor;
+// uniform sampler2D uBaseMap;
+// uniform vec4 uMapTiling;
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
