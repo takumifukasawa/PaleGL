@@ -39,7 +39,7 @@ export type SplineInstancingMesh = Mesh & {
     needsUpdateInstances: boolean;
 };
 
-type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'instanceCount' | 'makeDataPerInstanceFunction'> & {
+export type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'instanceCount' | 'makeDataPerInstanceFunction'> & {
     name?: string;
     gpu: Gpu;
     geometry: Geometry; // InstancingParticleだとgeometry必須なので
