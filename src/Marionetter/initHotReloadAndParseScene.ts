@@ -8,7 +8,7 @@ export const initHotReloadAndParseScene = (
     marionetter: Marionetter,
     // _marionetterSceneStructure: MarionetterSceneStructure,
     // captureScene: Scene,
-    onHotReload: (sceneJson: MarionetterScene) => void
+    onHotReload: (sceneJson: MarionetterScene) => Promise<void>
 ) => {
     // const marionetterSceneStructure: MarionetterSceneStructure | null = _marionetterSceneStructure;
     const hotReloadScene = () => {
@@ -27,7 +27,7 @@ export const initHotReloadAndParseScene = (
                 console.log('hot reload scene', optimizedSceneJson);
                 // if (marionetterSceneStructure) {
                 // console.log('hot reload: marionetterSceneStructure', marionetterSceneStructure);
-                onHotReload(optimizedSceneJson);
+                await onHotReload(optimizedSceneJson);
                 // }
             });
         }

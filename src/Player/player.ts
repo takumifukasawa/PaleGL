@@ -62,20 +62,11 @@ import {
 import { clamp } from '@/PaleGL/utilities/mathUtilities.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
-// import { createQuaternion, createQuaternionFromRawV4 } from '@/PaleGL/math/quaternion.ts';
 import { CAMERA_TYPE_PERSPECTIVE } from '@/PaleGL/constants.ts';
-import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3.ts';
+import { createVector3FromRaw } from '@/PaleGL/math/vector3.ts';
 import { disposeActor } from '@/PaleGL/actors/actorBehaviours.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
-// import {
-//     RAW_VECTOR4_W_INDEX,
-//     RAW_VECTOR4_X_INDEX,
-//     RAW_VECTOR4_Y_INDEX,
-//     RAW_VECTOR4_Z_INDEX,
-//     RawVector4,
-// } from '@/PaleGL/math/vector4.ts';
 import { createQuaternionFromRawVector4 } from '@/PaleGL/math/quaternion.ts';
-import { cachedDataVersionTag } from 'node:v8';
 
 // const HOT_REBUILD_SCENE = false;
 
@@ -114,6 +105,7 @@ export function createPlayer(
     hotReloadJsonUrl: string,
     onHotReload: (hotReload: boolean) => Promise<void>,
     // inputController: InputController,
+    mainCameraActorName: string,
     cameraPostProcess: PostProcess,
     options: {
         fallbackGenerateActorHook?: BuildMarionetterSceneFallbackGenerateActorHook;
@@ -225,6 +217,7 @@ export function createPlayer(
         JSON.parse(sceneJson) as unknown as MarionetterScene,
         // marionetterSceneStructure,
         // inputController,
+        mainCameraActorName,
         cameraPostProcess,
         true,
         fallbackGenerateActorHook,
@@ -255,6 +248,7 @@ export function createPlayer(
                     marionetter,
                     sceneJson,
                     // inputController,
+                    mainCameraActorName,
                     cameraPostProcess,
                     false,
                     fallbackGenerateActorHook,
@@ -305,6 +299,7 @@ function buildScene(
     player: Player,
     marionetter: Marionetter | null,
     sceneJson: MarionetterScene,
+    mainCameraActorName: string,
     // inputController: InputController,
     cameraPostProcess: PostProcess,
     initialBuild: boolean,
@@ -344,7 +339,7 @@ function buildScene(
 
     // camera
     if (player.hotRebuildSceneEnabled || initialBuild) {
-        const camera = findActorByName(player.scene.children, 'MainCamera') as Camera;
+        const camera = findActorByName(player.scene.children, mainCameraActorName) as Camera;
         setMainCamera(player.scene, camera);
         createSceneUICamera(player.scene);
         setCameraPostProcess(camera, cameraPostProcess);
