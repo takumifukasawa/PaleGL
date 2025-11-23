@@ -3,7 +3,6 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     MESH_TYPE_SCREEN_SPACE_RAYMARCH,
     PRIMITIVE_TYPE_TRIANGLES,
-    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_NAME_VIEW_DIRECTION,
     UNIFORM_NAME_TARGET_WIDTH,
     UNIFORM_NAME_TARGET_HEIGHT,
@@ -84,7 +83,6 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         uniforms: mergedUniforms,
         // receiveShadow: !!receiveShadow,
         primitiveType: PRIMITIVE_TYPE_TRIANGLES,
-        uniformBlockNames: [UNIFORM_BLOCK_NAME_TIMELINE],
         fragmentShaderModifiers: [[FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.fragmentShaderContent]],
         depthFragmentShaderModifiers: [
             [FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE, args.depthFragmentShaderContent],

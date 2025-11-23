@@ -10,7 +10,6 @@ import {
     MESH_TYPE_GPU_PARTICLE,
     TEXTURE_FILTER_TYPE_NEAREST,
     TEXTURE_TYPE_RGBA16F,
-    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_NAME_POSITION_MAP,
     UNIFORM_NAME_UP_MAP,
     UNIFORM_NAME_VAT_RESOLUTION,
@@ -187,7 +186,8 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
             vatWidth,
             vatHeight,
             [...initializeUniforms, ...createUniforms()],
-            [...initializeUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
+            // [...initializeUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
+            [...initializeUniformBlockNames],
             initializeFragmentModifiers
         );
         const materialForUpdate = createGraphicsDoubleBufferMaterial(
@@ -195,7 +195,8 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
             vatWidth,
             vatHeight,
             [...updateUniforms, ...createUniforms()],
-            [...updateUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
+            // [...updateUniformBlockNames, UNIFORM_BLOCK_NAME_TIMELINE],
+            [...updateUniformBlockNames],
             updateFragmentModifiers
         );
         return [materialForInitialize, materialForUpdate];

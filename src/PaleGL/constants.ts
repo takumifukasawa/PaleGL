@@ -689,7 +689,7 @@ export const UNIFORM_BLOCK_NAME_CAMERA = 'ubCamera';
 export const UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT = 'ubDirectionalLight';
 export const UNIFORM_BLOCK_NAME_SPOT_LIGHT = 'ubSpotLight';
 export const UNIFORM_BLOCK_NAME_POINT_LIGHT = 'ubPointLight';
-export const UNIFORM_BLOCK_NAME_TIMELINE = 'ubTimeline';
+// export const UNIFORM_BLOCK_NAME_TIMELINE = 'ubTimeline';
 
 export type UniformBlockName =
     | typeof UNIFORM_BLOCK_NAME_COMMON
@@ -697,8 +697,8 @@ export type UniformBlockName =
     | typeof UNIFORM_BLOCK_NAME_CAMERA
     | typeof UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT
     | typeof UNIFORM_BLOCK_NAME_SPOT_LIGHT
-    | typeof UNIFORM_BLOCK_NAME_POINT_LIGHT
-    | typeof UNIFORM_BLOCK_NAME_TIMELINE;
+    | typeof UNIFORM_BLOCK_NAME_POINT_LIGHT;
+    // | typeof UNIFORM_BLOCK_NAME_TIMELINE;
 
 // export const PostProcessUniformNames = {
 //     TargetWidth: 'uTargetWidth',

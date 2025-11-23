@@ -7,7 +7,8 @@
     DepthFragmentShaderModifiers,
     DepthFuncType,
     FACE_SIDE_FRONT,
-    FaceSide, FragmentShaderModifierPragmas,
+    FaceSide,
+    FragmentShaderModifierPragmas,
     FragmentShaderModifiers,
     MATERIAL_TYPE_MISC,
     MaterialType,
@@ -19,7 +20,6 @@
     RENDER_QUEUE_TYPE_TRANSPARENT,
     RenderQueue,
     RenderQueueType,
-    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_INDEX_NAME,
     UNIFORM_INDEX_TYPE,
     UNIFORM_INDEX_VALUE,
@@ -221,7 +221,7 @@ export const createMaterial = (args: MaterialArgs): Material => {
         vertexShaderModifiers = [],
         fragmentShaderModifiers = [],
         depthFragmentShaderModifiers = [],
-        
+
         deleteFragmentShaderPragmas = [],
 
         skipDepthPrePass = false,
@@ -292,17 +292,24 @@ export const createMaterial = (args: MaterialArgs): Material => {
         console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
     }
 
-    // CUSTOM_BEGIN replace
-    // const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
-    const uniformBlockNames: UniformBlockName[] = uniqFunc([UNIFORM_BLOCK_NAME_TIMELINE, ...(args.uniformBlockNames || [])]);
-    // CUSTOM_END
+    const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
+    // // CUSTOM_BEGIN replace
+    // // const uniformBlockNames: UniformBlockName[] = uniqFunc([UNIFORM_BLOCK_NAME_TIMELINE, ...(args.uniformBlockNames || [])]);
+    // // CUSTOM_END
 
     depthTest = !!depthTest;
     depthWrite = !!depthWrite;
 
     // TODO: useAlphaTestのフラグがあった方がよい. あとからalphaTestを追加した場合に対応できる
 
-    const { queue, vertexShader = '', fragmentShader = '', depthFragmentShader, rawVertexShader, rawFragmentShader } = args;
+    const {
+        queue,
+        vertexShader = '',
+        fragmentShader = '',
+        depthFragmentShader,
+        rawVertexShader,
+        rawFragmentShader,
+    } = args;
 
     const jointNum: number | null = typeof args.jointNum === 'number' ? args.jointNum : null;
 

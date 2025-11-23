@@ -66,7 +66,6 @@ import {
     UNIFORM_BLOCK_NAME_DIRECTIONAL_LIGHT,
     UNIFORM_BLOCK_NAME_POINT_LIGHT,
     UNIFORM_BLOCK_NAME_SPOT_LIGHT,
-    UNIFORM_BLOCK_NAME_TIMELINE,
     UNIFORM_BLOCK_NAME_TRANSFORMATIONS,
     UNIFORM_INDEX_NAME,
     UNIFORM_INDEX_TYPE,
@@ -494,7 +493,7 @@ export function createRenderer({
     // CUSTOM_BEGIN comment out
     // addPostProcessPass(scenePostProcess, motionBlurPass);
     // CUSTOM_END
-    
+
     addPostProcessPass(scenePostProcess, fxaaPass);
     addPostProcessPass(scenePostProcess, depthOfFieldPass);
     addPostProcessPass(scenePostProcess, bloomPass);
@@ -637,24 +636,26 @@ export function createRenderer({
         data: pointLightUniformBufferData,
     });
 
-    const timelineUniformBufferData: UniformBufferObjectBlockData = [
-        [UNIFORM_NAME_TIMELINE_TIME, UNIFORM_TYPE_FLOAT, 0],
-        [UNIFORM_NAME_TIMELINE_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
-    ];
-    globalUniformBufferObjects.push({
-        uniformBufferObject: createGPUUniformBufferObject(
-            gpu,
-            uniformBufferObjectShader,
-            UNIFORM_BLOCK_NAME_TIMELINE,
-            timelineUniformBufferData
-        ),
-        data: timelineUniformBufferData,
-    });
+    // const timelineUniformBufferData: UniformBufferObjectBlockData = [
+    //     [UNIFORM_NAME_TIMELINE_TIME, UNIFORM_TYPE_FLOAT, 0],
+    //     [UNIFORM_NAME_TIMELINE_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
+    // ];
+    // globalUniformBufferObjects.push({
+    //     uniformBufferObject: createGPUUniformBufferObject(
+    //         gpu,
+    //         uniformBufferObjectShader,
+    //         UNIFORM_BLOCK_NAME_TIMELINE,
+    //         timelineUniformBufferData
+    //     ),
+    //     data: timelineUniformBufferData,
+    // });
 
     const commonUniformBlockData: UniformBufferObjectBlockData = [
         [UNIFORM_NAME_TIME, UNIFORM_TYPE_FLOAT, 0],
         [UNIFORM_NAME_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
         [UNIFORM_NAME_VIEWPORT, UNIFORM_TYPE_VECTOR4, createVector4zero()],
+        [UNIFORM_NAME_TIMELINE_TIME, UNIFORM_TYPE_FLOAT, 0],
+        [UNIFORM_NAME_TIMELINE_DELTA_TIME, UNIFORM_TYPE_FLOAT, 0],
     ];
     // TODO: 一番最初の要素としてpushするとなぜかエラーになる
     globalUniformBufferObjects.push({
@@ -729,7 +730,6 @@ export function checkNeedsBindUniformBufferObjectToMaterial(renderer: Renderer, 
     if (!material.shader) {
         return;
     }
-    // for debug
     material.uniformBlockNames.forEach((blockName) => {
         const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
             ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
@@ -1498,7 +1498,7 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     // )
 
     if (cb) cb();
-    
+
     // draw
     drawGPU(
         renderer.gpu,
@@ -2034,6 +2034,9 @@ function updateUniformBlockValue(
     const targetGlobalUniformBufferObject = renderer.globalUniformBufferObjects.find(
         ({ uniformBufferObject }) => uniformBufferObject.blockName === blockName
     );
+    // console.log('[updateUniformBlockValue] blockName:',
+    //     blockName, 'found:',
+    //     !!targetGlobalUniformBufferObject);
     if (!targetGlobalUniformBufferObject) {
         console.error(`[Renderer.setUniformBlockData] invalid uniform block object: ${blockName}`);
         return;
@@ -2159,8 +2162,8 @@ function updateCommonUniforms(renderer: Renderer, { time, deltaTime }: { time: n
 
 export function updateTimelineUniforms(renderer: Renderer, timelineTime: number, timelineDeltaTime: number) {
     // passMaterial.uniforms.setValue(UNIFORM_NAME_TIME, time);
-    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_TIMELINE, UNIFORM_NAME_TIMELINE_TIME, timelineTime);
-    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_TIMELINE, UNIFORM_NAME_TIMELINE_DELTA_TIME, timelineDeltaTime);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_COMMON, UNIFORM_NAME_TIMELINE_TIME, timelineTime);
+    updateUniformBlockValue(renderer, UNIFORM_BLOCK_NAME_COMMON, UNIFORM_NAME_TIMELINE_DELTA_TIME, timelineDeltaTime);
     // for debug
     // console.log(timelineTime, timelineDeltaTime);
 }
