@@ -12,23 +12,25 @@ import {
     MARIONETTER_COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER,
     MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR,
     MARIONETTER_COMPONENT_TYPE_POST_PROCESS_CONTROLLER,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX,
-    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX,
+    // CUSTOM_BEGIN comment out
+    // MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX,
+    // MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX,
+    // MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_INDEX,
+    // MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX,
+    // MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX,
+    // MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX,
+    // MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX,
+    // MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX,
+    // MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX,
+    // MARIONETTER_MATERIAL_INFO_COLOR_INDEX,
+    // MARIONETTER_MATERIAL_TYPE_LIT,
+    // MARIONETTER_MATERIAL_TYPE_UNLIT,
+    // CUSTOM_END
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE,
     MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA,
-    MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX,
-    MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX,
-    MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX,
-    MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX,
-    MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX,
-    MARIONETTER_MATERIAL_INFO_COLOR_INDEX,
     MARIONETTER_MATERIAL_INFO_TYPE_INDEX,
-    MARIONETTER_MATERIAL_TYPE_LIT,
-    MARIONETTER_MATERIAL_TYPE_UNLIT,
     MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
     MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL,
     MARIONETTER_OBJECT_INFO_INDEX_CHILDREN,
@@ -50,7 +52,9 @@ import {
     MarionetterFbmNoiseTextureControllerComponentInfo,
     MarionetterGBufferMaterialControllerComponentInfo,
     MarionetterLightComponentInfo,
-    MarionetterLitMaterialInfo,
+    // CUSTOM_BEGIN comment out
+    // MarionetterLitMaterialInfo,
+    // CUSTOM_END
     MarionetterMeshFilterComponentInfo,
     MarionetterMeshRendererComponentInfo,
     MarionetterObjectInfo,
@@ -70,7 +74,9 @@ import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
 import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     createGBufferMaterialController,
-    GBufferMaterialControllerInitialValues,
+    // CUSTOM_BEGIN comment out
+    // GBufferMaterialControllerInitialValues,
+    // CUSTOM_END
 } from '@/PaleGL/components/gbufferMaterialController.ts';
 import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
 import { createPostProcessController } from '@/PaleGL/components/postProcessController.ts';
@@ -83,23 +89,22 @@ import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { createGBufferMaterial } from '@/PaleGL/materials/gBufferMaterial.ts';
 import { Material } from '@/PaleGL/materials/material.ts';
-import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
-import { createColorFromHex, createEmissiveColorFromHex, Color } from '@/PaleGL/math/color.ts';
+// CUSTOM_BEGIN comment out
+// import { createUnlitMaterial } from '@/PaleGL/materials/unlitMaterial.ts';
+// CUSTOM_END
+import {
+    createColorFromHex,
+    // CUSTOM_BEGIN comment out
+    // createEmissiveColorFromHex,
+    // Color
+    // CUSTOM_END
+} from '@/PaleGL/math/color.ts';
 import { createQuaternion, Quaternion, qw, qx, qy, qz } from '@/PaleGL/math/quaternion.ts';
 import { createRotatorFromQuaternion } from '@/PaleGL/math/rotator.ts';
 import { createVector3, createVector3FromRaw } from '@/PaleGL/math/vector3';
-import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
-// import { createHuman } from '../../../src/pages/scripts/createHuman.ts';
-// // ORIGINAL
-// // import { PostProcessPassType } from '@/PaleGL/constants.ts';
-// import { Light } from '@/PaleGL/actors/Light.ts';
-// // ORIGINAL
-// // import { generateDefaultBloomPassParameters } from '@/PaleGL/postprocess/BloomPass.ts';
-// // import { maton } from '@/PaleGL/utilities/maton.ts';
-// // import { PostProcessVolume } from '@/PaleGL/actors/PostProcessVolume.ts';
-// // import { generateDepthOfFieldPassParameters } from '@/PaleGL/postprocess/DepthOfFieldPass.ts';
-
-// import { createObjectMoveAndLookAtController } from '@/PaleGL/components/objectMoveAndLookAtController.ts';
+// CUSTOM_BEGIN comment out
+// import { createVector4FromRawVector4 } from '@/PaleGL/math/vector4.ts';
+// CUSTOM_END
 
 export function tryParseJsonString<T>(str: string) {
     let json: T | null = null;
@@ -305,27 +310,29 @@ export function buildMarionetterScene(
             // build material
             const materialInfo = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
             switch (materialInfo[MARIONETTER_MATERIAL_INFO_TYPE_INDEX]) {
-                case MARIONETTER_MATERIAL_TYPE_LIT:
-                    const litMaterial = materialInfo as MarionetterLitMaterialInfo;
-                    const tiling = createVector4FromRawVector4(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX]);
-                    material = createGBufferMaterial({
-                        baseColor: createColorFromHex(litMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
-                        mapTiling: tiling,
-                        metallic: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX],
-                        roughness: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX],
-                        emissiveColor: createEmissiveColorFromHex(
-                            litMaterial[MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX]
-                        ),
-                        receiveShadow: !!litMaterial[MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX],
-                    });
-                    break;
-                case MARIONETTER_MATERIAL_TYPE_UNLIT:
-                    const unlitMaterial = materialInfo;
-                    material = createUnlitMaterial({
-                        baseColor: createColorFromHex(unlitMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
-                        receiveShadow: false,
-                    });
-                    break;
+                // CUSTOM_BEGIN comment out
+                // case MARIONETTER_MATERIAL_TYPE_LIT:
+                //     const litMaterial = materialInfo as MarionetterLitMaterialInfo;
+                //     const tiling = createVector4FromRawVector4(litMaterial[MARIONETTER_LIT_MATERIAL_INFO_TILING_INDEX]);
+                //     material = createGBufferMaterial({
+                //         baseColor: createColorFromHex(litMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
+                //         mapTiling: tiling,
+                //         metallic: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_METALLIC_INDEX],
+                //         roughness: litMaterial[MARIONETTER_LIT_MATERIAL_INFO_ROUGHNESS_INDEX],
+                //         emissiveColor: createEmissiveColorFromHex(
+                //             litMaterial[MARIONETTER_LIT_MATERIAL_INFO_EMISSION_INDEX]
+                //         ),
+                //         receiveShadow: !!litMaterial[MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX],
+                //     });
+                //     break;
+                // case MARIONETTER_MATERIAL_TYPE_UNLIT:
+                //     const unlitMaterial = materialInfo;
+                //     material = createUnlitMaterial({
+                //         baseColor: createColorFromHex(unlitMaterial[MARIONETTER_MATERIAL_INFO_COLOR_INDEX]),
+                //         receiveShadow: false,
+                //     });
+                //     break;
+                // CUSTOM_END
                 default:
                     // TODO: fallback
                     material = createGBufferMaterial({});
