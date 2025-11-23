@@ -605,7 +605,10 @@ void main() {
         uDirectionalLightShadowMap,
         uShadowBias,
         vec4(vec3(.02), 1.), // TODO: pass color
-        .5 // TODO: pass parameter
+        // CUSTOM_BEGIN replace
+        // .5 // TODO: pass parameter
+        1.
+        // CUSTOM_END
     );
     fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
     
@@ -625,7 +628,10 @@ void main() {
             uSpotLightShadowMap[UNROLL_N], // constantな必要がある
             uShadowBias,
             vec4(vec3(.02), 1.), // TODO: pass color
-            .65 // TODO: pass parameter
+            // CUSTOM_BEGIN replace
+            // .65 // TODO: pass parameter
+            1.
+            // CUSTOM_END
         );
         fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
     #pragma UNROLL_END
