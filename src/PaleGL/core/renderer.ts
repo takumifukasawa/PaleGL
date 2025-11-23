@@ -239,7 +239,9 @@ import {
     updatePostProcess,
 } from '@/PaleGL/postprocess/postProcess.ts';
 import { setPostProcessPassSize } from '@/PaleGL/postprocess/postProcessPassBehaviours.ts';
-import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+// CUSTOM_BEGIN
+// import { createScreenSpaceShadowPass, ScreenSpaceShadowPass } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+// CUSTOM_END
 import { createSSAOPass, SsaoPass } from '@/PaleGL/postprocess/ssaoPass.ts';
 import { createSSRPass, SsrPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { createStreakPass, StreakPass } from '@/PaleGL/postprocess/streakPass.ts';
@@ -340,7 +342,9 @@ export type Renderer = {
     copyDepthDestRenderTarget: RenderTarget;
     copySceneSourceRenderTarget: RenderTarget;
     copySceneDestRenderTarget: RenderTarget;
-    screenSpaceShadowPass: ScreenSpaceShadowPass;
+    // CUSTOM_BEGIN comment out
+    // screenSpaceShadowPass: ScreenSpaceShadowPass;
+    // CUSTOM_END
     ambientOcclusionPass: SsaoPass;
     deferredShadingPass: DeferredShadingPass;
     ssrPass: SsrPass;
@@ -465,7 +469,9 @@ export function createRenderer({
         // name: 'copy scene dest render target',
         // CUSTOM_END
     });
-    const screenSpaceShadowPass = createScreenSpaceShadowPass({ gpu });
+    // CUSTOM_BEGIN comment out
+    // const screenSpaceShadowPass = createScreenSpaceShadowPass({ gpu });
+    // CUSTOM_END
     const ambientOcclusionPass = createSSAOPass({ gpu });
     const deferredShadingPass = createDeferredShadingPass({ gpu });
     const ssrPass = createSSRPass({ gpu });
@@ -692,7 +698,9 @@ export function createRenderer({
         copyDepthDestRenderTarget,
         copySceneSourceRenderTarget,
         copySceneDestRenderTarget,
-        screenSpaceShadowPass,
+        // CUSTOM_BEGIN comment out
+        // screenSpaceShadowPass,
+        // CUSTOM_END
         ambientOcclusionPass,
         deferredShadingPass,
         ssrPass,
@@ -785,7 +793,9 @@ export function setRendererSize(renderer: Renderer, realWidth: number, realHeigh
     setRenderTargetSize(renderer.copySceneSourceRenderTarget, w, h);
     setRenderTargetSize(renderer.copySceneDestRenderTarget, w, h);
     // passes
-    setPostProcessPassSize(renderer.screenSpaceShadowPass, w, h);
+    // CUSTOM_BEGIN comment out
+    // setPostProcessPassSize(renderer.screenSpaceShadowPass, w, h);
+    // CUSTOM_END
     setPostProcessPassSize(renderer.ambientOcclusionPass, w, h);
     setPostProcessPassSize(renderer.deferredShadingPass, w, h);
     setPostProcessPassSize(renderer.ssrPass, w, h);
@@ -1111,25 +1121,27 @@ export function renderRenderer(
         shadowPass(renderer, camera, castShadowLightActors, renderMeshInfoEachQueue);
     }
 
+    const postProcessCamera = renderer.scenePostProcess.postProcessCamera;
+
     // ------------------------------------------------------------------------------
     // screen space shadow pass
     // ------------------------------------------------------------------------------
-
-    const postProcessCamera = renderer.scenePostProcess.postProcessCamera;
-
-    if (renderer.screenSpaceShadowPass.enabled) {
-        renderPass({
-            pass: renderer.screenSpaceShadowPass,
-            renderer,
-            targetCamera: camera,
-            gpu: renderer.gpu,
-            camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
-            prevRenderTarget: null,
-            isLastPass: false,
-            time, // TODO: engineから渡したい
-            // lightActors,
-        });
-    }
+    
+    // CUSTOM_BEGIN comment out
+    // if (renderer.screenSpaceShadowPass.enabled) {
+    //     renderPass({
+    //         pass: renderer.screenSpaceShadowPass,
+    //         renderer,
+    //         targetCamera: camera,
+    //         gpu: renderer.gpu,
+    //         camera: postProcessCamera, // TODO: いい感じにfullscreenquadなcameraを生成して渡したい
+    //         prevRenderTarget: null,
+    //         isLastPass: false,
+    //         time, // TODO: engineから渡したい
+    //         // lightActors,
+    //     });
+    // }
+    // CUSTOM_END
 
     // ------------------------------------------------------------------------------
     // ambient occlusion pass
@@ -1170,9 +1182,12 @@ export function renderRenderer(
     setMaterialUniformValue(
         renderer.deferredShadingPass.material,
         UNIFORM_NAME_SCREEN_SPACE_SHADOW_TEXTURE,
-        renderer.screenSpaceShadowPass.enabled
-            ? renderer.screenSpaceShadowPass.renderTarget.texture
-            : renderer.gpu.dummyBlackTextures[0]
+        // CUSTOM_BEGIN replace
+        // renderer.screenSpaceShadowPass.enabled
+        //     ? renderer.screenSpaceShadowPass.renderTarget.texture
+        //     : renderer.gpu.dummyBlackTextures[0]
+        renderer.gpu.dummyBlackTextures[0]
+        // CUSTOM_BEGIN
     );
 
     // set ao texture
@@ -1266,9 +1281,12 @@ export function renderRenderer(
         needsCastShadowSpotLights
             ? renderer.volumetricLightPass.renderTarget.texture!
             : getDummyBlackTexture(renderer.gpu),
-        renderer.screenSpaceShadowPass.enabled
-            ? renderer.screenSpaceShadowPass.renderTarget.texture!
-            : getDummyBlackTexture(renderer.gpu),
+        // CUSTOM_BEGIN replace
+        // renderer.screenSpaceShadowPass.enabled
+        //     ? renderer.screenSpaceShadowPass.renderTarget.texture!
+        //     : getDummyBlackTexture(renderer.gpu),
+        getDummyBlackTexture(renderer.gpu),
+        // CUSTOM_END
         sharedTextures.get(SharedTexturesTypes.FBM_NOISE)!.texture
     );
 

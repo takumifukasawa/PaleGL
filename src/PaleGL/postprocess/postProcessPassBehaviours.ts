@@ -26,11 +26,13 @@ import {
     PostProcessPassRenderArgs,
     PostProcessSinglePass,
 } from '@/PaleGL/postprocess/postProcessPassBase.ts';
-import {
-    getScreenSpaceShadowRenderTargetTexture,
-    renderScreenShadowPass,
-    setScreenSpaceShadowPassSize,
-} from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+// CUSTOM_BEGIN comment out
+// import {
+//     getScreenSpaceShadowRenderTargetTexture,
+//     renderScreenShadowPass,
+//     setScreenSpaceShadowPassSize,
+// } from '@/PaleGL/postprocess/screenSpaceShadowPass.ts';
+// CUSTOM_END
 import { renderSSAOPass } from '@/PaleGL/postprocess/ssaoPass.ts';
 import { renderSSRPass } from '@/PaleGL/postprocess/ssrPass.ts';
 import { getStreakPassRenderTarget, renderStreakPass, setStreakPassSize } from '@/PaleGL/postprocess/streakPass.ts';
@@ -90,7 +92,9 @@ const createSetPostProcessPassSizeBehaviour = (): Partial<
         [POST_PROCESS_PASS_TYPE_DEPTH_OF_FIELD]: setDepthOfFieldPassSize,
         [POST_PROCESS_PASS_TYPE_LIGHT_SHAFT]: setLightShaftPassSize,
         [POST_PROCESS_PASS_TYPE_STREAK]: setStreakPassSize,
-        [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: setScreenSpaceShadowPassSize,
+        // CUSTOM_BEGIN comment out
+        // [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: setScreenSpaceShadowPassSize,
+        // CUSTOM_END
         [POST_PROCESS_PASS_TYPE_VOLUMETRIC_LIGHT]: setVolumetricLightPassSize,
     };
 
@@ -213,7 +217,9 @@ const createRenderPostProcessPassBehaviour = (): Partial<
         [POST_PROCESS_PASS_TYPE_GAUSSIAN_BLUR]: renderGaussianBlurPass,
         [POST_PROCESS_PASS_TYPE_GLITCH]: renderGlitchPass,
         [POST_PROCESS_PASS_TYPE_LIGHT_SHAFT]: renderLightShaftPass,
-        [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: renderScreenShadowPass,
+        // CUSTOM_BEGIN comment out
+        // [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: renderScreenShadowPass,
+        // CUSTOM_END
         [POST_PROCESS_PASS_TYPE_SSAO]: renderSSAOPass,
         [POST_PROCESS_PASS_TYPE_SSR]: renderSSRPass,
         [POST_PROCESS_PASS_TYPE_STREAK]: renderStreakPass,
@@ -280,7 +286,9 @@ type GetPostProcessPassRenderTargetTextureBehaviour = (postProcessPass: PostProc
 const getPostProcessPassRenderTargetTextureBehaviour: Partial<
     Record<PostProcessPassType, GetPostProcessPassRenderTargetTextureBehaviour>
 > = {
-    [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: getScreenSpaceShadowRenderTargetTexture,
+    // CUSTOM_BEGIN comment out
+    // [POST_PROCESS_PASS_TYPE_SCREEN_SPACE_SHADOW]: getScreenSpaceShadowRenderTargetTexture,
+    // CUSTOM_END
 };
 
 export const getPostProcessPassRenderTargetTexture = (postProcessPass: PostProcessPassBase): Texture | undefined => {

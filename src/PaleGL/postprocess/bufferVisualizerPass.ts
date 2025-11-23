@@ -737,7 +737,10 @@ export function renderBufferVisualizerPass(postProcessPass: PostProcessPassBase,
             setMaterialUniformValue(
                 pass.material,
                 tiles.get(SCREEN_SPACE_SHADOW_TEXTURE_KEY)!.uniformNameTexture!,
-                renderer.screenSpaceShadowPass.renderTarget.texture
+                // CUSTOM_BEGIN replace
+                // renderer.screenSpaceShadowPass.renderTarget.texture
+                renderer.gpu.dummyBlackTextures[0]
+                // CUSTOM_END
             );
         }
 

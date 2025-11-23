@@ -70,35 +70,37 @@ export type PostProcessParameterBindingValue =
 
 export const buildPostProcessControllerEntries = (renderer: Renderer) => {
     const entries = [
-        // screen space shadow ---
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.enabled,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.enabled, numToBoolConverter],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.bias,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.bias],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.jitterSize,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.jitterSize, assignVector3Converter],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.sharpness,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.sharpness],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.strength,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.strength],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.ratio,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.ratio],
-        ],
-        [
-            ScreenSpaceShadowPassParametersPropertyMap.rayStepMultiplier,
-            [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.rayStepMultiplier],
-        ],
+        // CUSTOM_BEGIN comment out
+        // // screen space shadow ---
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.enabled,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.enabled, numToBoolConverter],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.bias,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.bias],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.jitterSize,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.jitterSize, assignVector3Converter],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.sharpness,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.sharpness],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.strength,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.strength],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.ratio,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.ratio],
+        // ],
+        // [
+        //     ScreenSpaceShadowPassParametersPropertyMap.rayStepMultiplier,
+        //     [renderer.screenSpaceShadowPass, ScreenSpaceShadowPassParametersKey.rayStepMultiplier],
+        // ],
+        // CUSTOM_END
 
         // ssao ---
 
