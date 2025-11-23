@@ -606,8 +606,8 @@ void main() {
         uShadowBias,
         vec4(vec3(.02), 1.), // TODO: pass color
         // CUSTOM_BEGIN replace
-        // .5 // TODO: pass parameter
-        1.
+        .5 // TODO: pass parameter
+        // 1.
         // CUSTOM_END
     );
     fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
@@ -629,8 +629,8 @@ void main() {
             uShadowBias,
             vec4(vec3(.02), 1.), // TODO: pass color
             // CUSTOM_BEGIN replace
-            // .65 // TODO: pass parameter
-            1.
+            .65 // TODO: pass parameter
+            // 1.
             // CUSTOM_END
         );
         fRE_Direct(directLight, geometry, material, reflectedLight, shadow);
