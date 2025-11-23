@@ -1,4 +1,4 @@
-import { MarionetterClipKinds, MarionetterTimelineDefaultTrack, MarionetterTimelineTrackKinds, TimelinePropertyValue } from '@/Marionetter/types';
+import { MarionetterClipKinds, MarionetterTimelineDefaultTrack, TimelinePropertyValue } from '@/Marionetter/types';
 import { Actor } from '@/PaleGL/actors/actor.ts';
 import { COMPONENT_TYPE_DEFAULT, ComponentType } from '@/PaleGL/constants.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
@@ -41,11 +41,7 @@ type OnLastUpdateCallback = (
     deltaTime: number
 ) => void;
 type OnFilterPropertyBinderCallback = (key: string) => boolean;
-export type OnPreProcessTimelineCallback = (
-    actor: Actor,
-    componentModel: ComponentModel,
-    timelineTime: number
-) => void;
+export type OnPreProcessTimelineCallback = (actor: Actor, componentModel: ComponentModel, timelineTime: number) => void;
 export type OnProcessPropertyBinderCallback = <T extends TimelinePropertyValue>(
     actor: Actor,
     componentModel: ComponentModel,
@@ -64,7 +60,7 @@ export type OnPostProcessTimelineCallback = (
     componentModel: ComponentModel,
     timelineTime: number
 ) => void;
-type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu) => void;
+type OnBeforeRenderCallback = (actor: Actor, componentModel: ComponentModel, gpu: Gpu, scene: Scene) => void;
 
 export type ComponentModel = {
     name?: string;

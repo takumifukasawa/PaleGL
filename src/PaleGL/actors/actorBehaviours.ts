@@ -158,12 +158,12 @@ export const lastUpdateActor = (actor: Actor, args: ActorLastUpdateArgs) => {
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const beforeRenderActor = (actor: Actor, args: ActorBeforeRenderArgs) => {
-    const { gpu } = args;
+    const { gpu, scene } = args;
     actor.onBeforeRender.forEach((cb) => {
         cb(args);
     });
     actor.components.forEach(([model, behaviour]) => {
-        behaviour.onBeforeRenderCallback?.(actor, model, gpu);
+        behaviour.onBeforeRenderCallback?.(actor, model, gpu, scene);
     });
 };
 
@@ -256,7 +256,6 @@ export const disposeActor = (actor: Actor) => {
             break;
     }
 };
-
 
 export const isActorEnabledInHierarchy = (actor: Actor) => {
     if (!actor.enabled) {
