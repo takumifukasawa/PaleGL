@@ -11,6 +11,7 @@ import { COMPONENT_TYPE_GPU_PARTICLE_CONTROLLER } from '@/PaleGL/constants.ts';
 
 const Property = {
     updaterIndex: NeedsShorten ? 'gp_ui' : 'updaterIndex',
+    instanceCount: NeedsShorten ? 'gp_ic' : 'instanceCount',
 } as const;
 
 export type GPUParticleControllerBehaviour = ComponentBehaviour & {
@@ -28,6 +29,9 @@ export const createGPUParticleController = (gpuParticle: GpuParticle): GPUPartic
         if (key === Property.updaterIndex) {
             // const index = Math.floor((value as number) + 0.001); // TODO: 念のためちょっとオフセット. 本当に必要？
             switchUpdater(value as number);
+        }
+        if (key === Property.instanceCount) {
+            gpuParticle.geometry.instanceCount = value as number;
         }
     };
 
