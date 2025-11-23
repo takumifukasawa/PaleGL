@@ -66,6 +66,7 @@ import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl'
 import gbufferBuilderDefaultPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-default.partial.glsl';
 import gbufferBuilderRaymarchPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-raymarch.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
+import surfaceUniformsPartialContent from '@/PaleGL/shaders/partial/surface-uniforms.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
@@ -116,6 +117,7 @@ const includesDict = new Map<string, string>([
     ['<depth>', depthPartialContent],
     ['<gbuffer>', gbufferPartialContent],
     ['<gbuffer_o>', gbufferOutPartialContent],
+    ['<surface_u>', surfaceUniformsPartialContent],
     ['<etex>', effectTexturePartialContent],
     ['<raymarch_df>', raymarchDistanceFunctionsPartialContent],
     ['<raymarch_sf>', raymarchSceneFunctionsPartialContent],
@@ -441,11 +443,11 @@ export const buildFragmentShader = (
     }
 
     let replacedShader: string = shader;
- 
+
     // 消したいmodifierは全部消す
     deletePragmas.forEach((pragma) => {
         replacedShader = replacedShader.replaceAll(new RegExp(`#pragma ${pragma}`, 'g'), '');
-    })
+    });
 
     // 必ず必要なもの
     // TODO: 定数としてまとめられそう

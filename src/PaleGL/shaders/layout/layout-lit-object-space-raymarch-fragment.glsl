@@ -27,16 +27,7 @@ in vec4 vInstanceState;
 #include <raymarch_sf>
 #include <os_raymarch_f>
 
-uniform vec4 uBaseColor;
-uniform sampler2D uBaseMap;
-uniform vec4 uMapTiling;
-uniform float uSpecularAmount;
-uniform float uAmbientAmount;
-uniform float uMetallic;
-uniform sampler2D uMetallicMap;
-uniform float uRoughness;
-uniform sampler2D uRoughnessMap;
-uniform vec4 uEmissiveColor;
+#include <surface_u>
 uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS

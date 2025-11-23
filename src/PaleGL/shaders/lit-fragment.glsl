@@ -9,28 +9,13 @@
 #include <vcolor_fh>
 #include <normal_map_fh>
 
-uniform vec4 uBaseColor;
-uniform sampler2D uBaseMap;
-uniform vec4 uMapTiling;
-uniform float uSpecularAmount;
-uniform samplerCube uEnvMap;
-uniform float uAmbientAmount;
-uniform float uMetallic;
-uniform sampler2D uMetallicMap;
-uniform float uRoughness;
-uniform sampler2D uRoughnessMap;
-uniform vec4 uEmissiveColor;
+#include <surface_u>
 uniform int uShadingModelId;
-
-#ifdef D_HEIGHT_MAP
-uniform sampler2D uHeightMap;
-#endif
 
 #pragma APPEND_UNIFORMS
 
 in vec2 vUv;
 in vec3 vNormal;
-
 in vec3 vWorldPosition;
 
 #pragma GBUFFER_BUILDER_DEFAULT
