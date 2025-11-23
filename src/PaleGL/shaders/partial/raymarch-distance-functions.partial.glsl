@@ -114,6 +114,7 @@ vec3 fOpLimRep(vec3 p, float s, vec3 l) {
 
 //
 // distance functions
+// 使わないものは適宜コメントアウト
 //
 
 // radius ... 半径
@@ -226,11 +227,10 @@ float fDfTorus(vec3 p, vec2 t)
 //     return d * ((q.x * c.y - q.y * c.x < 0.) ? -1. : 1.);
 // }
 
-
-float fDfCappedCylinder(vec3 p, float r, float h) {
-    vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
-    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
-}
+// float fDfCappedCylinder(vec3 p, float r, float h) {
+//     vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
+//     return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+// }
 
 // ra: 太さ
 // rb: R
