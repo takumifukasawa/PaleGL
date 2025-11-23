@@ -29,6 +29,8 @@ type DataPerInstance = {
     animationOffset?: number;
 };
 
+export type InstancingParticleMakeDataPerInstanceFunction = (index: number) => DataPerInstance;
+
 export type InstancingParticleArgs = {
     name?: string;
     mesh?: Mesh;
@@ -37,7 +39,7 @@ export type InstancingParticleArgs = {
     geometry?: Geometry;
     material?: Material;
     instanceCount: number;
-    makeDataPerInstanceFunction?: (index: number) => DataPerInstance;
+    makeDataPerInstanceFunction?: InstancingParticleMakeDataPerInstanceFunction;
     position?: number[][];
     scale?: number[][];
     rotation?: number[][];

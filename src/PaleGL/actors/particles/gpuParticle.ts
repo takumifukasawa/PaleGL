@@ -225,7 +225,7 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
     let tmpReadUpMap;
-
+    
     subscribeActorOnUpdate(gpuParticle, ({ gpu, renderer }) => {
         checkNeedsReplaceGPUParticleUpdater(gpu, renderer, gpuParticle);
 
