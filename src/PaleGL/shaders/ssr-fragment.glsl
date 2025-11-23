@@ -38,11 +38,11 @@ uniform float uReflectionRoughnessPower;
 
 uniform float uReflectionAdditionalRate;
 
+const int maxIterationNum = 16;
+const int binarySearchNum = 4;
+
 void main() {
     float eps = .001;
-
-    int maxIterationNum = 16;
-    int binarySearchNum = 4;
 
     //
 
