@@ -10,3 +10,8 @@
 #define RECIPROCAL_PI2 0.15915494
 #define LOG2 1.442695
 #define EPSILON 1e-6
+
+mat2 fRot(float a) {
+    float s = sin(a), c = cos(a);
+    return mat2(c, s, -s, c);
+}

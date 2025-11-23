@@ -22,10 +22,10 @@ vec2 fMinMat(vec2 d1, vec2 d2) {
     return (d1.x < d2.x) ? d1 : d2;
 }
 
-mat2 fRot(float a) {
-    float s = sin(a), c = cos(a);
-    return mat2(c, s, -s, c);
-}
+// mat2 fRot(float a) {
+//     float s = sin(a), c = cos(a);
+//     return mat2(c, s, -s, c);
+// }
 
 vec3 fOpRepeat(vec3 p, float s) {
     return p - s * round(p / s);
