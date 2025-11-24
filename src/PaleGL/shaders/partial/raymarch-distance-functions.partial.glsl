@@ -1,4 +1,8 @@
 //
+// 使わないものは適宜コメントアウト
+//
+
+//
 // defines
 // 
 
@@ -114,7 +118,6 @@ vec3 fOpLimRep(vec3 p, float s, vec3 l) {
 
 //
 // distance functions
-// 使わないものは適宜コメントアウト
 //
 
 // radius ... 半径
@@ -303,10 +306,24 @@ float fDfLink(vec3 p, float le, float r1, float r2) {
 
 // curve ------------------------
 
-float fExpImpulse(float x, float k) {
-    float h = k*x;
-    return h*exp(1.0-h);
+// float fAlmostUnitIdentity(float x) {
+//     return x*x*(2.0-x);
+// }
+// 
+// float fGain(float x, float k) {
+//     float a = 0.5*pow(2.0*((x<0.5)?x:1.0-x), k);
+//     return (x<0.5)?a:1.0-a;
+// }
+// 
+// float fExpImpulse(float x, float k) {
+//     float h = k*x;
+//     return h*exp(1.0-h);
+// }
+
+float fTriCurve(float x, float t) {
+	return abs(2.*fract(x*t-.5)-1.)*2.-1.;
 }
+
 
 float fParabola(float x, float k) {
     return pow( 4.0*x*(1.0-x), k );
@@ -317,45 +334,49 @@ float fPcurve(float x, float a, float b) {
     return k*pow(x,a)*pow(1.0-x,b);
 }
 
+// float fExpStep(float x, float n) {
+//     return exp2(-exp2(n)*pow(x,n));
+// }
+
 // mapping ------------------------
 
-// ref:
-// https://www.shadertoy.com/view/ws3Bzf
-vec4 fBiplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
-{
-    // grab coord derivatives for texturing
-    vec3 dpdx = dFdx(p);
-    vec3 dpdy = dFdy(p);
-    n = abs(n);
-
-    // determine major axis (in x; yz are following axis)
-    ivec3 ma = (n.x>n.y && n.x>n.z) ? ivec3(0,1,2) :
-               (n.y>n.z)            ? ivec3(1,2,0) :
-                                      ivec3(2,0,1) ;
-    // determine minor axis (in x; yz are following axis)
-    ivec3 mi = (n.x<n.y && n.x<n.z) ? ivec3(0,1,2) :
-               (n.y<n.z)            ? ivec3(1,2,0) :
-                                      ivec3(2,0,1) ;
-    // determine median axis (in x;  yz are following axis)
-    ivec3 me = ivec3(3) - mi - ma;
-    
-    // project+fetch
-    vec4 x = textureGrad( sam, vec2(   p[ma.y],   p[ma.z]), 
-                               vec2(dpdx[ma.y],dpdx[ma.z]), 
-                               vec2(dpdy[ma.y],dpdy[ma.z]) );
-    vec4 y = textureGrad( sam, vec2(   p[me.y],   p[me.z]), 
-                               vec2(dpdx[me.y],dpdx[me.z]),
-                               vec2(dpdy[me.y],dpdy[me.z]) );
-    
-    // blend factors
-    vec2 w = vec2(n[ma.x],n[me.x]);
-    // make local support
-    w = clamp( (w-0.5773)/(1.0-0.5773), 0.0, 1.0 );
-    // shape transition
-    w = pow( w, vec2(k/8.0) );
-    // blend and return
-    return (x*w.x + y*w.y) / (w.x + w.y);
-}
+// // ref:
+// // https://www.shadertoy.com/view/ws3Bzf
+// vec4 fBiplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
+// {
+//     // grab coord derivatives for texturing
+//     vec3 dpdx = dFdx(p);
+//     vec3 dpdy = dFdy(p);
+//     n = abs(n);
+// 
+//     // determine major axis (in x; yz are following axis)
+//     ivec3 ma = (n.x>n.y && n.x>n.z) ? ivec3(0,1,2) :
+//                (n.y>n.z)            ? ivec3(1,2,0) :
+//                                       ivec3(2,0,1) ;
+//     // determine minor axis (in x; yz are following axis)
+//     ivec3 mi = (n.x<n.y && n.x<n.z) ? ivec3(0,1,2) :
+//                (n.y<n.z)            ? ivec3(1,2,0) :
+//                                       ivec3(2,0,1) ;
+//     // determine median axis (in x;  yz are following axis)
+//     ivec3 me = ivec3(3) - mi - ma;
+//     
+//     // project+fetch
+//     vec4 x = textureGrad( sam, vec2(   p[ma.y],   p[ma.z]), 
+//                                vec2(dpdx[ma.y],dpdx[ma.z]), 
+//                                vec2(dpdy[ma.y],dpdy[ma.z]) );
+//     vec4 y = textureGrad( sam, vec2(   p[me.y],   p[me.z]), 
+//                                vec2(dpdx[me.y],dpdx[me.z]),
+//                                vec2(dpdy[me.y],dpdy[me.z]) );
+//     
+//     // blend factors
+//     vec2 w = vec2(n[ma.x],n[me.x]);
+//     // make local support
+//     w = clamp( (w-0.5773)/(1.0-0.5773), 0.0, 1.0 );
+//     // shape transition
+//     w = pow( w, vec2(k/8.0) );
+//     // blend and return
+//     return (x*w.x + y*w.y) / (w.x + w.y);
+// }
 
 // ref:
 // https://qiita.com/edo_m18/items/c8995fe91778895c875e
