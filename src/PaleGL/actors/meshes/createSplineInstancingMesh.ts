@@ -35,6 +35,7 @@ export type SplineInstancingMesh = Mesh & {
         instanceSpacing: number;
         segmentSamples: number;
         maxInstanceCount?: number;
+        drawCount?: number;
     };
     needsUpdateInstances: boolean;
 };
@@ -47,6 +48,7 @@ export type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'insta
     instanceSpacing?: number;
     segmentSamples?: number;
     maxInstanceCount?: number;
+    drawCount?: number;
 };
 
 // スプライン上の等間隔な位置とその方向を計算する
@@ -188,20 +190,22 @@ const calculateSplineInstances = (
 };
 
 export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
-    const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount } = args;
+    const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount, drawCount } = args;
 
     const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
 
+    const actualDrawCount = drawCount ?? count;
+
     const instancingParticle = createInstancingParticle({
         ...args,
-        instanceCount: count,
+        instanceCount: actualDrawCount,
         makeDataPerInstanceFunction: (i) => ({
             position: positions[i],
             rotation: rotations[i],
             scale: [1, 1, 1],
         }),
     });
-    
+
     const mesh = instancingParticle as SplineInstancingMesh;
     mesh.meshType = MESH_TYPE_SPLINE_INSTANCING;
 
@@ -211,6 +215,7 @@ export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs)
         instanceSpacing,
         segmentSamples,
         maxInstanceCount,
+        drawCount,
     };
     mesh.needsUpdateInstances = false;
 
@@ -238,18 +243,26 @@ export const setSplineInstancingMeshControlPoints = (
 
 // 制御点が変わったときにインスタンス位置を再計算
 const updateSplineInstancingMeshInstances = (mesh: SplineInstancingMesh): void => {
-    const { controlPoints, segmentSamples, instanceSpacing, maxInstanceCount } = mesh.splineInstancingData;
+    const { controlPoints, segmentSamples, instanceSpacing, maxInstanceCount, drawCount } = mesh.splineInstancingData;
 
     const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
 
     // インスタンス数が変わる可能性もあるので、念のため全部作り直す
     // TODO: 最適化するならインスタンス数が同じ場合は属性だけ更新する
-    mesh.geometry.instanceCount = count;
+    mesh.geometry.instanceCount = drawCount ?? count;
 
     // インスタンス属性を更新
     // updateGeometryAttributeを使うことでVAOのバッファも自動で更新される
     updateGeometryAttribute(mesh.geometry, ATTRIBUTE_NAME_INSTANCE_POSITION, new Float32Array(positions.flat()));
     updateGeometryAttribute(mesh.geometry, ATTRIBUTE_NAME_INSTANCE_ROTATION, new Float32Array(rotations.flat()));
+};
+
+export const setSplineInstancingMeshDrawCount = (
+    mesh: SplineInstancingMesh,
+    drawCount: number
+): void => {
+    mesh.splineInstancingData.drawCount = drawCount;
+    mesh.geometry.instanceCount = drawCount;
 };
 
 export const updateSplineInstancingMeshBehaviour: UpdateActorFunc = (actor: Actor) => {
