@@ -10,6 +10,8 @@ import {
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Geometry } from '@/PaleGL/geometries/geometry.ts';
 import { updateGeometryAttribute } from '@/PaleGL/geometries/geometryBehaviours.ts';
+import { createLookAtMatrix } from '@/PaleGL/math/matrix4.ts';
+import { rotationMatrixToQuaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 import {
     cloneVector3,
     copyVector3,
@@ -17,17 +19,14 @@ import {
     createVector3Up,
     crossVectorsV3,
     dotVector3,
-    negateVector3,
     normalizeVector3,
-    scaleVector3ByScalar,
     v3x,
     v3y,
     v3z,
     Vector3,
 } from '@/PaleGL/math/vector3.ts';
+import { maton } from '@/PaleGL/utilities/maton.ts';
 import { sampleSplinePoints } from '@/PaleGL/utilities/splineUtilities.ts';
-import { createLookAtMatrix } from '@/PaleGL/math/matrix4.ts';
-import { rotationMatrixToQuaternion, toEulerRadianFromQuaternion } from '@/PaleGL/math/quaternion.ts';
 
 export type SplineInstancingMesh = Mesh & {
     splineInstancingData: {
@@ -40,7 +39,10 @@ export type SplineInstancingMesh = Mesh & {
     needsUpdateInstances: boolean;
 };
 
-export type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'instanceCount' | 'makeDataPerInstanceFunction'> & {
+export type CreateSplineInstancingMeshArgs = Omit<
+    InstancingParticleArgs,
+    'instanceCount' | 'makeDataPerInstanceFunction'
+> & {
     name?: string;
     gpu: Gpu;
     geometry: Geometry; // InstancingParticleだとgeometry必須なので
@@ -49,6 +51,21 @@ export type CreateSplineInstancingMeshArgs = Omit<InstancingParticleArgs, 'insta
     segmentSamples?: number;
     maxInstanceCount?: number;
     drawCount?: number;
+};
+
+export const createSplineInitialControlPoints = (n: number) => {
+    const controlPointsRef: Vector3[] = [];
+    const controlsPoints = maton
+        .range(n)
+        .map((_, i) => {
+            // 最初meshをつくるために適当に飛ばす
+            const v = createVector3(i * 10, 0, 0);
+            controlPointsRef[i] = cloneVector3(v);
+            return v;
+        })
+        .flat();
+
+    return [controlsPoints, controlPointsRef];
 };
 
 // スプライン上の等間隔な位置とその方向を計算する
@@ -166,11 +183,7 @@ const calculateSplineInstances = (
         // center: forward方向を向く点
         // up: 上方向（ワールドのY軸）
         const eye = createVector3(px, py, pz);
-        const center = createVector3(
-            px + v3x(forward),
-            py + v3y(forward),
-            pz + v3z(forward)
-        );
+        const center = createVector3(px + v3x(forward), py + v3y(forward), pz + v3z(forward));
         const up = createVector3Up();
 
         // lookAt行列を生成（inverseForward=false: カメラではなくオブジェクトの向き）
@@ -192,7 +205,12 @@ const calculateSplineInstances = (
 export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
     const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount, drawCount } = args;
 
-    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
+    const { positions, rotations, count } = calculateSplineInstances(
+        controlPoints,
+        segmentSamples,
+        instanceSpacing,
+        maxInstanceCount
+    );
 
     const actualDrawCount = drawCount ?? count;
 
@@ -245,7 +263,12 @@ export const setSplineInstancingMeshControlPoints = (
 const updateSplineInstancingMeshInstances = (mesh: SplineInstancingMesh): void => {
     const { controlPoints, segmentSamples, instanceSpacing, maxInstanceCount, drawCount } = mesh.splineInstancingData;
 
-    const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
+    const { positions, rotations, count } = calculateSplineInstances(
+        controlPoints,
+        segmentSamples,
+        instanceSpacing,
+        maxInstanceCount
+    );
 
     // インスタンス数が変わる可能性もあるので、念のため全部作り直す
     // TODO: 最適化するならインスタンス数が同じ場合は属性だけ更新する
@@ -257,10 +280,7 @@ const updateSplineInstancingMeshInstances = (mesh: SplineInstancingMesh): void =
     updateGeometryAttribute(mesh.geometry, ATTRIBUTE_NAME_INSTANCE_ROTATION, new Float32Array(rotations.flat()));
 };
 
-export const setSplineInstancingMeshDrawCount = (
-    mesh: SplineInstancingMesh,
-    drawCount: number
-): void => {
+export const setSplineInstancingMeshDrawCount = (mesh: SplineInstancingMesh, drawCount: number): void => {
     mesh.splineInstancingData.drawCount = drawCount;
     mesh.geometry.instanceCount = drawCount;
 };
