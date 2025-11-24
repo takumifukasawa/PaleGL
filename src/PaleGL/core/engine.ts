@@ -34,8 +34,12 @@ import {
     tryStartMaterial,
 } from '@/PaleGL/core/renderer.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
+import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
+import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
+import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
+import { cloneVector3, createVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
 import {
     createTimeAccumulator,
     execTimeAccumulator,
@@ -366,6 +370,8 @@ export async function warmRender(
 
     const actors: Actor[] = [];
     const actorOriginalEnabled = new Map<Actor, boolean>();
+    const actorOriginalPosition = new Map<Actor, Vector3>();
+    const actorOriginalRotation = new Map<Actor, Rotator>();
 
     // すべてのアクター（カメラ以外）を収集し、enabled状態を保存
     traverseScene(engine.scene, (actor) => {
@@ -380,6 +386,21 @@ export async function warmRender(
         (actor) => actor.type === ACTOR_TYPE_MESH || actor.type === ACTOR_TYPE_SKYBOX
     ) as Mesh[];
 
+    // mainCameraの存在確認と元の位置/回転を保存
+    const mainCamera = engine.scene.mainCamera;
+    if (!mainCamera) {
+        console.error('mainCamera is not set');
+        return;
+    }
+    const cameraOriginalPosition = cloneVector3(mainCamera.transform.position);
+    const cameraOriginalRotation = cloneRotator(mainCamera.transform.rotation);
+
+    // 各meshの元の位置/回転を保存
+    meshes.forEach((mesh) => {
+        actorOriginalPosition.set(mesh, cloneVector3(mesh.transform.position));
+        actorOriginalRotation.set(mesh, cloneRotator(mesh.transform.rotation));
+    });
+
     // すべてのアクターを無効化
     actors.forEach((actor) => {
         actor.enabled = false;
@@ -391,7 +412,8 @@ export async function warmRender(
     // 共通ユニフォームを更新
     beforeRenderRenderer(renderer, 0, 0);
 
-    // 各メッシュを1つずつ処理
+    // 各メッシュを1つずつcompile --- 
+
     for (let i = 0; i < meshes.length; i++) {
         const mesh = meshes[i];
         mesh.enabled = true;
@@ -447,11 +469,40 @@ export async function warmRender(
 
         await wait(waitTime);
     }
+    
+    // 中央において描画 ---
+
+    // カメラとアクターを固定位置に配置して実際の描画を実行
+    setTranslation(mainCamera.transform, createVector3(0, 0, -10));
+    setRotation(mainCamera.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 0, 0)));
+
+    for (let i = 0; i < meshes.length; i++) {
+        const mesh = meshes[i];
+        mesh.enabled = true;
+        setTranslation(mesh.transform, createVector3(0, 0, 0));
+        setRotation(mesh.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 0, 0)));
+
+        fixedUpdateEngine(engine, 0, 0);
+        updateEngine(engine, 0, 0);
+
+        mesh.enabled = false;
+        await wait(waitTime);
+    }
+
+    // カメラと全メッシュの位置/回転を復元
+    setTranslation(mainCamera.transform, cameraOriginalPosition);
+    setRotation(mainCamera.transform, cameraOriginalRotation);
+    meshes.forEach((mesh) => {
+        setTranslation(mesh.transform, actorOriginalPosition.get(mesh)!);
+        setRotation(mesh.transform, actorOriginalRotation.get(mesh)!);
+    });
+
+    // ---
 
     // すべてのアクターの enabled 状態を復元
     actors.forEach((actor) => {
         actor.enabled = actorOriginalEnabled.get(actor)!;
-    });
+    })
 
     // 元の状態を反映するため、renderer内のマテリアルも含めて最後に一回描画
     fixedUpdateEngine(engine, 0, 0);
