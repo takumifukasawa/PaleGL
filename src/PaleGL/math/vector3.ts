@@ -23,11 +23,7 @@ export const RAW_VECTOR3_Y_INDEX = 1;
 export const RAW_VECTOR3_Z_INDEX = 2;
 
 export const createVector3FromRaw = (raw: RawVector3) => {
-    return createVector3(
-        raw[RAW_VECTOR3_X_INDEX],
-        raw[RAW_VECTOR3_Y_INDEX],
-        raw[RAW_VECTOR3_Z_INDEX]
-    );
+    return createVector3(raw[RAW_VECTOR3_X_INDEX], raw[RAW_VECTOR3_Y_INDEX], raw[RAW_VECTOR3_Z_INDEX]);
 };
 
 // export const createVector3Zero = () => new Vector3(0, 0, 0);
@@ -217,8 +213,13 @@ export const addVector3Array = (...vectors: Vector3[]) => {
 
 // v2 -> v1
 export const vector3SubVector3 = (v1: Vector3, v2: Vector3) => {
-    // return new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     return createVector3(v3x(v1) - v3x(v2), v3y(v1) - v3y(v2), v3z(v1) - v3z(v2));
+};
+export const vector3SubVector3Ref = (rv: Vector3, v1: Vector3, v2: Vector3) => {
+    setV3x(rv, v3x(v1) - v3x(v2));
+    setV3y(rv, v3y(v1) - v3y(v2));
+    setV3z(rv, v3z(v1) - v3z(v2));
+    return rv;
 };
 
 // v1 x v2
