@@ -190,11 +190,8 @@ const calculateSplineInstances = (
 export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
     const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount } = args;
 
-    // スプライン上の等間隔な位置を計算
     const { positions, rotations, count } = calculateSplineInstances(controlPoints, segmentSamples, instanceSpacing, maxInstanceCount);
 
-    // InstancingParticleを使ってインスタンス属性を設定
-    // こうすることで、マテリアル設定やインスタンス属性の管理を既存の仕組みに任せられる
     const instancingParticle = createInstancingParticle({
         ...args,
         instanceCount: count,
