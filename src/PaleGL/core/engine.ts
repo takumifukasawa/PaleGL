@@ -31,10 +31,8 @@ import {
     renderMesh,
     setRendererSize,
     setRendererStats,
-    setRenderTargetToRendererAndClear,
     tryStartMaterial,
 } from '@/PaleGL/core/renderer.ts';
-import { createRenderTarget, disposeRenderTarget } from '@/PaleGL/core/renderTarget.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
@@ -357,19 +355,14 @@ export async function warmRender(
     waitTime: number = 16,
     onRenderActor?: (actor: Actor, index: number, total: number) => void
 ) {
-    // for debug
-    // console.log(`[Engine.warmRender]`);
-
     if (!engine.scene) {
         console.error('scene is not set');
         return;
     }
 
-
     // 最初に一回engineを空回し
     fixedUpdateEngine(engine, 0, 0);
     updateEngine(engine, 0, 0);
-
 
     const actors: Actor[] = [];
     const actorOriginalEnabled = new Map<Actor, boolean>();
@@ -395,22 +388,8 @@ export async function warmRender(
     const renderer = engine.renderer;
     const gpu = renderer.gpu;
 
-    // ダミーのレンダーターゲットを作成(1x1の小さいサイズで高速化)
-    const dummyRenderTarget = createRenderTarget({
-        gpu,
-        // CUSTOM_BEGIN comment out
-        // name: 'warmup-dummy',
-        // CUSTOM_END
-        width: 1,
-        height: 1,
-        useDepthBuffer: true,
-    });
-    
     // 共通ユニフォームを更新
     beforeRenderRenderer(renderer, 0, 0);
-
-    // 元のレンダーターゲットを保存
-    const originalRenderTarget = renderer.renderTarget;
 
     // 各メッシュを1つずつ処理
     for (let i = 0; i < meshes.length; i++) {
@@ -425,16 +404,11 @@ export async function warmRender(
             time: 0,
             deltaTime: 0,
         });
-        
-        // ダミーレンダーターゲットに切り替えて実際に描画
-        setRenderTargetToRendererAndClear(renderer, dummyRenderTarget, false, true);
 
         // materials をレンダリング
         mesh.materials.forEach((material) => {
             if (material) {
-                // beforeRenderActor後にマテリアルが変更されている可能性があるため再度コンパイル
                 tryStartMaterial(gpu, renderer, mesh.geometry, material);
-                // UBO バインディングも確認
                 checkNeedsBindUniformBufferObjectToMaterial(renderer, material);
                 renderMesh(renderer, mesh.geometry, material);
             }
@@ -452,12 +426,17 @@ export async function warmRender(
         // GpuParticle / GpuTrailParticle の updaters もレンダリング
         if (mesh.meshType === MESH_TYPE_GPU_PARTICLE || mesh.meshType === MESH_TYPE_GPU_TRAIL_PARTICLE) {
             const gpuParticle = mesh as GpuParticle;
-            gpuParticle.updaters.forEach(([initMaterial, updateMaterial]) => {
+
+            // updaterのマテリアルをコンパイルするため、全updaterを処理
+            for (let j = 0; j < gpuParticle.updaters.length; j++) {
+                const [initMaterial, updateMaterial] = gpuParticle.updaters[j];
+
                 tryStartMaterial(gpu, renderer, renderer.sharedQuad, initMaterial);
-                renderMesh(renderer, renderer.sharedQuad, initMaterial);
+                checkNeedsBindUniformBufferObjectToMaterial(renderer, initMaterial);
+
                 tryStartMaterial(gpu, renderer, renderer.sharedQuad, updateMaterial);
-                renderMesh(renderer, renderer.sharedQuad, updateMaterial);
-            });
+                checkNeedsBindUniformBufferObjectToMaterial(renderer, updateMaterial);
+            }
         }
 
         mesh.enabled = false;
@@ -468,12 +447,6 @@ export async function warmRender(
 
         await wait(waitTime);
     }
-
-    // レンダーターゲットを元に戻す
-    setRenderTargetToRendererAndClear(renderer, originalRenderTarget, false, false);
-
-    // ダミーレンダーターゲットを破棄
-    disposeRenderTarget(dummyRenderTarget);
 
     // すべてのアクターの enabled 状態を復元
     actors.forEach((actor) => {
