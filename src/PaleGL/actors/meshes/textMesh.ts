@@ -1,6 +1,6 @@
 import { Actor, addChildActor, createActor } from '@/PaleGL/actors/actor.ts';
 import { CharMesh, createCharMesh } from '@/PaleGL/actors/meshes/charMesh.ts';
-import { replaceMeshMaterialByArgs } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { replaceAllMeshMaterialsByArgs, replaceMeshDepthMaterialByArgs, replaceMeshMaterialByArgs } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
@@ -168,10 +168,18 @@ export const replaceTextMeshMaterial = (mesh: TextMesh, fragmentShader: string, 
     const { gpu } = mesh;
     for (let i = 0; i < mesh.charMeshes.length; i++) {
         const charMesh = mesh.charMeshes[i];
-        // 一旦一個だけ想定
-        replaceMeshMaterialByArgs(charMesh, gpu, 0, {
+        replaceAllMeshMaterialsByArgs(charMesh, gpu, {
             fragmentShader,
             depthFragmentShader,
-        });
+        })
+        // 一旦一個だけ想定
+        // replaceMeshMaterialByArgs(charMesh, gpu, 0, {
+        //     fragmentShader,
+        //     depthFragmentShader,
+        // });
+        // replaceMeshDepthMaterialByArgs(charMesh, gpu, 0, {
+        //     fragmentShader: depthFragmentShader,
+        //     depthFragmentShader,
+        // })
     }
 };

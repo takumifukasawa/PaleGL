@@ -6,7 +6,9 @@
 #include <tone>
 #include <depth>
 #include <gbuffer>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -97,8 +99,10 @@ void main() {
     // NOTE: end raymarch block
     //
 
+    // CUSTOM_BEGIN comment out
     // #include <alpha_test_f>
-    #include ../partial/alpha-test-fragment.partial.glsl
+    // #include ../partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     // resultColor.rgb = fGamma(resultColor.rgb);
 

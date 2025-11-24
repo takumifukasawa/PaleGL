@@ -22,7 +22,9 @@ import {
     FRAGMENT_SHADER_MODIFIER_PRAGMA_RAYMARCH_SCENE,
     FragmentShaderModifierPragmas,
     FragmentShaderModifiers,
-    SHADER_DEFINE_ALPHA_TEST,
+    // CUSTOM_BEGIN comment out
+    // SHADER_DEFINE_ALPHA_TEST,
+    // CUSTOM_END
     SHADER_DEFINE_ENV_MAP,
     SHADER_DEFINE_HEIGHT_MAP,
     SHADER_DEFINE_INSTANCE_LOOK_DIRECTION,
@@ -55,8 +57,10 @@ import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
 
 import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
-import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
-import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
+// CUSTOM_BEGIN comment out
+// import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
+// import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
+// CUSTOM_END
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
 import curlNoisePartialContent from '@/PaleGL/shaders/partial/curl-noise.partial.glsl';
@@ -84,7 +88,7 @@ import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.par
 import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
 import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
 import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
-// CUSTOM_BEGIN
+// CUSTOM_BEGIN additional
 import raymarchHumanFunctionsPostPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions-post.partial.glsl';
 import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
 // CUSTOM_END
@@ -97,7 +101,9 @@ export type ShaderDefines = {
     useEnvMap: boolean;
     useReceiveShadow: boolean;
     useVertexColor: boolean;
-    useAlphaTest: boolean;
+    // CUSTOM_BEGIN comment out
+    // useAlphaTest: boolean;
+    // CUSTOM_END 
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
     useVAT: boolean;
@@ -120,8 +126,10 @@ const includesDict = new Map<string, string>([
     ['<etex>', effectTexturePartialContent],
     ['<raymarch_df>', raymarchDistanceFunctionsPartialContent],
     ['<raymarch_sf>', raymarchSceneFunctionsPartialContent],
-    ['<alpha_test>', alphaTestPartialContent],
-    ['<alpha_test_f>', alphaTestFragmentPartialContent],
+    // CUSTOM_BEGIN comment out
+    // ['<alpha_test>', alphaTestPartialContent],
+    // ['<alpha_test_f>', alphaTestFragmentPartialContent],
+    // CUSTOM_END
     ['<shape_font_h>', shapeFontHeaderPartialContent],
     ['<shape_font_f>', shapeFontFragmentPartialContent],
     ['<vcolor_vh>', vertexColorVertexHeaderPartialContent],
@@ -134,7 +142,7 @@ const includesDict = new Map<string, string>([
     ['<perlin>', perlinPartialContent],
     ['<curl_noise>', curlNoisePartialContent],
     ['<msdf_h>', msdfHeadreContent],
-    // CUSTOM_BEGIN
+    // CUSTOM_BEGIN additional
     ['<human_df>', raymarchHumanFunctionsPartialContent],
     ['<human_dfp>', raymarchHumanFunctionsPostPartialContent],
     // CUSTOM_END
@@ -170,8 +178,8 @@ const buildShaderDefines = ({
     useEnvMap,
     // CUSTOM_BEGIN comment out
     // useVertexColor,
+    // useAlphaTest,
     // CUSTOM_END
-    useAlphaTest,
     isInstancing,
     useInstanceLookDirection,
     useVAT,
@@ -202,10 +210,10 @@ const buildShaderDefines = ({
     // if (useVertexColor) {
     //     arr.push(d(SHADER_DEFINE_VERTEX_COLOR));
     // }
+    // if (useAlphaTest) {
+    //     arr.push(d(SHADER_DEFINE_ALPHA_TEST));
+    // }
     // CUSTOM_END
-    if (useAlphaTest) {
-        arr.push(d(SHADER_DEFINE_ALPHA_TEST));
-    }
     if (isInstancing) {
         arr.push(d(SHADER_DEFINE_INSTANCING));
     }

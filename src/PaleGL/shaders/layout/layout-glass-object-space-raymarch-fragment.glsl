@@ -5,7 +5,9 @@
 #include <ub>
 #include <tone>
 #include <depth>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <vcolor_fh>
 
 #ifdef D_INSTANCING
@@ -241,8 +243,10 @@ void main() {
         resultColor.xyz = vec3(dIn.x) * 0.; // これがないとなぜか2回反射がされない
     }
 
-    float alpha = resultColor.a;
-    #include <alpha_test_f>
+    // CUSTOM_BEGIN comment out
+    // float alpha = resultColor.a;
+    // #include <alpha_test_f>
+    // CUSTOM_END
 
     resultColor.rgb = mix(
         resultBackBufferColor,

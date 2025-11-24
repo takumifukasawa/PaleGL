@@ -14,7 +14,9 @@
     MaterialType,
     PRIMITIVE_TYPE_TRIANGLES,
     PrimitiveType,
-    RENDER_QUEUE_TYPE_ALPHA_TEST,
+    // CUSTOM_BEGIN comment out
+    // RENDER_QUEUE_TYPE_ALPHA_TEST,
+    // CUSTOM_END
     RENDER_QUEUE_TYPE_OPAQUE,
     RENDER_QUEUE_TYPE_SKYBOX,
     RENDER_QUEUE_TYPE_TRANSPARENT,
@@ -82,7 +84,9 @@ export type MaterialArgs = {
     depthWrite?: boolean;
     depthFuncType?: DepthFuncType;
     skipDepthPrePass?: boolean;
-    alphaTest?: number | null;
+    // CUSTOM_BEGIN comment out
+    // alphaTest?: number | null;
+    // CUSTOM_END
     faceSide?: FaceSide;
     receiveShadow?: boolean;
     blendType?: BlendType;
@@ -168,7 +172,9 @@ export type Material = {
     depthWrite: boolean;
     depthFuncType: DepthFuncType;
     skipDepthPrePass: boolean;
-    alphaTest: number | null;
+    // CUSTOM_BEGIN comment out
+    // alphaTest: number | null;
+    // CUSTOM_END
     faceSide: FaceSide;
     receiveShadow: boolean;
     queue: RenderQueue | undefined;
@@ -208,7 +214,9 @@ export type Material = {
 
 export const isCompiledMaterialShader = (material: Material) => material.shader !== null;
 
-export const useMaterialAlphaTest = (material: Material) => material.alphaTest !== null;
+// CUSTOM_BEGIN comment out
+// export const useMaterialAlphaTest = (material: Material) => material.alphaTest !== null;
+// CUSTOM_END
 
 export const createMaterial = (args: MaterialArgs): Material => {
     const {
@@ -257,7 +265,13 @@ export const createMaterial = (args: MaterialArgs): Material => {
         showLog = false, // depthUniforms = {},
     } = args;
 
-    let { depthTest = true, depthWrite = true, alphaTest = null } = args;
+    let {
+        depthTest = true,
+        depthWrite = true,
+        // CUSTOM_BEGIN comment out
+        // alphaTest = null
+        // CUSTOM_END
+    } = args;
 
     const canRender: boolean = true;
 
@@ -266,14 +280,18 @@ export const createMaterial = (args: MaterialArgs): Material => {
     const primitiveType: PrimitiveType = args.primitiveType ?? PRIMITIVE_TYPE_TRIANGLES;
     const blendType: BlendType = args.blendType ?? BLEND_TYPE_OPAQUE;
 
-    alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
+    // CUSTOM_BEGIN comment out
+    // alphaTest = typeof args.alphaTest === 'number' ? args.alphaTest : null;
+    // CUSTOM_END
 
     // TODO: none type が欲しい？
     let renderQueueType: RenderQueueType = args.renderQueueType ?? RENDER_QUEUE_TYPE_OPAQUE;
 
-    if (alphaTest !== null) {
-        renderQueueType = RENDER_QUEUE_TYPE_ALPHA_TEST;
-    }
+    // CUSTOM_BEGIN comment out
+    // if (alphaTest !== null) {
+    //     renderQueueType = RENDER_QUEUE_TYPE_ALPHA_TEST;
+    // }
+    // CUSTOM_END
 
     // skyboxじゃないかつrenderQueueの指定がなかったら自動で指定
     if (renderQueueType !== RENDER_QUEUE_TYPE_SKYBOX && args.renderQueueType === undefined) {
@@ -288,9 +306,11 @@ export const createMaterial = (args: MaterialArgs): Material => {
         }
     }
 
-    if (renderQueueType === RENDER_QUEUE_TYPE_ALPHA_TEST && alphaTest === null) {
-        console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
-    }
+    // CUSTOM_BEGIN comment out
+    // if (renderQueueType === RENDER_QUEUE_TYPE_ALPHA_TEST && alphaTest === null) {
+    //     console.error(`[createMaterial] invalid alpha test value - mat name: ${name}`);
+    // }
+    // CUSTOM_END
 
     const uniformBlockNames: UniformBlockName[] = uniqFunc(args.uniformBlockNames || []);
     // // CUSTOM_BEGIN replace
@@ -326,7 +346,9 @@ export const createMaterial = (args: MaterialArgs): Material => {
         [UNIFORM_NAME_INVERSE_WORLD_MATRIX, UNIFORM_TYPE_MATRIX4, createMat4Identity()],
         // TODO: commonを呼んでさえいればいらないはず
         [UNIFORM_NAME_TIME, UNIFORM_TYPE_FLOAT, 0],
-        ...(alphaTest !== null ? ([['uAlphaTestThreshold', UNIFORM_TYPE_FLOAT, alphaTest]] as UniformsData) : []),
+        // CUSTOM_BEGIN comment out
+        // ...(alphaTest !== null ? ([['uAlphaTestThreshold', UNIFORM_TYPE_FLOAT, alphaTest]] as UniformsData) : []),
+        // CUSTOM_END
     ] as UniformsData;
 
     const uniforms = createUniforms(commonUniforms, args.uniforms || []);
@@ -359,7 +381,9 @@ export const createMaterial = (args: MaterialArgs): Material => {
         depthFuncType,
         faceSide,
         skipDepthPrePass,
-        alphaTest,
+        // CUSTOM_BEGIN comment out
+        // alphaTest,
+        // CUSTOM_END
         receiveShadow,
         queue,
         useNormalMap,
@@ -432,7 +456,9 @@ export const startMaterial = (
         useVATLookForward: material.useVATLookForward,
         isTrail: material.isTrail,
         useHeightMap: material.useHeightMap,
-        useAlphaTest: material.alphaTest !== null,
+        // CUSTOM_BEGIN comment out
+        // useAlphaTest: material.alphaTest !== null,
+        // CUSTOM_END
         useInstanceLookDirection: material.useInstanceLookDirection,
     };
 

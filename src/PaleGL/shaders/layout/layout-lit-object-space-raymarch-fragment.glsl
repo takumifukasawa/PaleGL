@@ -6,7 +6,9 @@
 #include <tone>
 #include <depth>
 #include <gbuffer>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <vcolor_fh>
 #include <surface_h>
 
@@ -121,8 +123,10 @@ void main() {
 
     resultColor = baseColor;
 
-    float alpha = resultColor.a;
-    #include <alpha_test_f>
+    // CUSTOM_BEGIN comment out
+    // float alpha = resultColor.a;
+    // #include <alpha_test_f>
+    // CUSTOM_END
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分ける？
     float metallic = uMetallic;

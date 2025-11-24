@@ -47,7 +47,9 @@ import {
     MAX_SPOT_LIGHT_COUNT,
     MESH_TYPE_SPRITE_ATLAS,
     RENDER_QUEUE_TYPE_AFTER_TONE,
-    RENDER_QUEUE_TYPE_ALPHA_TEST,
+    // CUSTOM_BEGIN comment out
+    // RENDER_QUEUE_TYPE_ALPHA_TEST,
+    // CUSTOM_END
     RENDER_QUEUE_TYPE_OPAQUE,
     RENDER_QUEUE_TYPE_OVERLAY,
     RENDER_QUEUE_TYPE_SKYBOX,
@@ -914,7 +916,9 @@ export function renderRenderer(
 
     const renderMeshInfoEachQueue: RenderMeshInfoEachQueue = {
         [RENDER_QUEUE_TYPE_OPAQUE]: [],
-        [RENDER_QUEUE_TYPE_ALPHA_TEST]: [],
+        // CUSTOM_BEGIN comment out
+        // [RENDER_QUEUE_TYPE_ALPHA_TEST]: [],
+        // CUSTOM_END
         [RENDER_QUEUE_TYPE_SKYBOX]: [],
         [RENDER_QUEUE_TYPE_TRANSPARENT]: [],
         [RENDER_QUEUE_TYPE_AFTER_TONE]: [],
@@ -994,12 +998,14 @@ export function renderRenderer(
                         );
                         return;
                     }
-                    if (material.alphaTest != null) {
-                        renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_ALPHA_TEST].push(
-                            buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_ALPHA_TEST, i)
-                        );
-                        return;
-                    }
+                    // CUSTOM_BEGIN comment out
+                    // if (material.alphaTest != null) {
+                    //     renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_ALPHA_TEST].push(
+                    //         buildRenderMeshInfo(mesh, RENDER_QUEUE_TYPE_ALPHA_TEST, i)
+                    //     );
+                    //     return;
+                    // }
+                    // CUSTOM_END
                     switch (material.blendType) {
                         case BLEND_TYPE_OPAQUE:
                             renderMeshInfoEachQueue[RENDER_QUEUE_TYPE_OPAQUE].push(
@@ -1043,6 +1049,16 @@ export function renderRenderer(
                 break;
         }
     });
+    
+    // for debug
+    // console.log(
+    //     "hogehoge",
+    //     renderMeshInfoEachQueue.o.map((m) => m.actor.name),
+    //     renderMeshInfoEachQueue.s.map((m) => m.actor.name),
+    //     renderMeshInfoEachQueue.at.map((m) => m.actor.name),
+    //     renderMeshInfoEachQueue.ol.map((m) => m.actor.name),
+    //     renderMeshInfoEachQueue.t.map((m) => m.actor.name)
+    // );
 
     const currentCameraRenderMeshInfoEachPass = createRenderMeshInfosEachPass(renderMeshInfoEachQueue, camera);
 
@@ -1138,7 +1154,7 @@ export function renderRenderer(
     // ------------------------------------------------------------------------------
     // screen space shadow pass
     // ------------------------------------------------------------------------------
-    
+
     // CUSTOM_BEGIN comment out
     // if (renderer.screenSpaceShadowPass.enabled) {
     //     renderPass({
@@ -2277,7 +2293,13 @@ function createRenderMeshInfosEachPass(
     renderMeshInfoEachQueue: RenderMeshInfoEachQueue,
     camera: Camera
 ): RenderMeshInfosEachPass {
-    const basePass = [RENDER_QUEUE_TYPE_OPAQUE, RENDER_QUEUE_TYPE_ALPHA_TEST]
+    const basePass = [
+        // prettier-ignore
+        RENDER_QUEUE_TYPE_OPAQUE,
+        // CUSTOM_BEGIN comment out
+        // RENDER_QUEUE_TYPE_ALPHA_TEST
+        // CUSTOM_END
+    ]
         .map((queue) => {
             // @ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return

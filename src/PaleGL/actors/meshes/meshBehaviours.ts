@@ -82,7 +82,9 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 depthTest: true,
                 depthWrite: true,
                 depthFuncType: DEPTH_FUNC_TYPE_LEQUAL,
-                alphaTest: material.alphaTest,
+                // CUSTOM_BEGIN comment out
+                // alphaTest: material.alphaTest,
+                // CUSTOM_END
                 skipDepthPrePass: material.skipDepthPrePass,
 
                 // TODO: 手動でいろいろ追加しなきゃなのが面倒
@@ -198,7 +200,12 @@ export const replaceMeshDepthMaterialByArgs = (
     }
 };
 
+
 export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
+    // fragmentがsurfaceのケースがある
+    if (args.depthFragmentShader) {
+        args.fragmentShader = args.depthFragmentShader;
+    }
     // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
     mesh.depthMaterials.forEach((material, i) => {
         if (material.shader) {

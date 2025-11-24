@@ -6,7 +6,9 @@
 #include <tone>
 #include <depth>
 #include <gbuffer>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <vcolor_fh>
 
 #include <surface_h>
@@ -81,8 +83,10 @@ void main() {
     // NOTE: end raymarch block
     //
 
-    float alpha = baseColor.a; // TODO: fbase color を渡して alpha をかける
-    #include <alpha_test_f>
+    // CUSTOM_BEGIN comment out
+    // float alpha = baseColor.a; // TODO: fbase color を渡して alpha をかける
+    // #include <alpha_test_f>
+    // CUSTOM_END
 
     outColor = vec4(1., 1., 1., 1.);
 }

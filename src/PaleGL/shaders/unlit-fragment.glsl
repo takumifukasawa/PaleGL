@@ -16,7 +16,9 @@ uniform int uShadingModelId;
 
 #pragma APPEND_UNIFORMS
 
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 
 in vec2 vUv;
 in vec3 vNormal;
@@ -43,7 +45,9 @@ void main() {
 
     vec4 resultColor = baseColor;
 
+    // CUSTOM_BEGIN comment out
     #include <alpha_test_f>
+    // CUSTOM_END
 
     // baseColor = fGamma(baseColor); 
     

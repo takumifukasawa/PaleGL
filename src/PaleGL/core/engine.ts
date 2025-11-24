@@ -35,11 +35,11 @@ import {
 } from '@/PaleGL/core/renderer.ts';
 import { Scene, traverseScene } from '@/PaleGL/core/scene.ts';
 import { setRotation, setTranslation } from '@/PaleGL/core/transform.ts';
-import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
-import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import { createQuaternionFromEulerDegrees } from '@/PaleGL/math/quaternion.ts';
 import { cloneRotator, createRotatorFromQuaternion, Rotator } from '@/PaleGL/math/rotator.ts';
-import { cloneVector3, createVector3, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { cloneVector3, createVector3, createVector3One, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { isDevelopment } from '@/PaleGL/utilities/envUtilities.ts';
+import { clearStats, createStats, Stats, updateStats } from '@/PaleGL/utilities/stats.ts';
 import {
     createTimeAccumulator,
     execTimeAccumulator,
@@ -137,9 +137,10 @@ export function createEngine({
     const fixedUpdateFrameTimer = createTimeAccumulator(fixedUpdateFps, (lastTime, deltaTime) =>
         fixedUpdateEngine(engineBase, lastTime, deltaTime)
     );
-    const updateFrameTimer = createTimeSkipper(updateFps, (lastTime, deltaTime) =>
-        updateEngine(engineBase, lastTime, deltaTime)
-    );
+    const updateFrameTimer = createTimeSkipper(updateFps, (lastTime, deltaTime) => {
+        updateEngine(engineBase, lastTime, deltaTime);
+        renderEngine(engineBase, lastTime, deltaTime);
+    });
 
     (engineBase as Engine).fixedUpdateFrameTimer = fixedUpdateFrameTimer;
     (engineBase as Engine).updateFrameTimer = updateFrameTimer;
@@ -219,111 +220,106 @@ function fixedUpdateEngine(engine: EngineBase, fixedTime: number, fixedDeltaTime
 }
 
 function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
-    //
-    // before update
-    //
+        //
+        // before update
+        //
 
-    for (let i = 0; i < engine.onBeforeUpdate.length; i++) {
-        engine.onBeforeUpdate[i]({ time, deltaTime });
-    }
-
-    //
-    // update and before render
-    //
-
-    if (!engine.scene) {
-        console.error('scene is not set');
-        return;
-    }
-
-    // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-    // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
-    // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
-    traverseScene(engine.scene, (actor) => {
-        updateActor(actor, {
-            gpu: engine.renderer.gpu,
-            renderer: engine.renderer,
-            scene: engine.scene!,
-            time,
-            deltaTime,
-        });
-        switch (actor.type) {
-            case ACTOR_TYPE_SKYBOX:
-            case ACTOR_TYPE_MESH:
-                // case ActorTypes.UiActor:
-                // case ActorTypes.SkinnedMesh:
-                beforeRenderActor(actor, {
-                    gpu: engine.renderer.gpu,
-                    renderer: engine.renderer,
-                    scene: engine.scene!,
-                    time,
-                    deltaTime,
-                });
-                const mesh = actor as Mesh;
-                mesh.materials.forEach((mat) => {
-                    if (mat) {
-                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
-                    }
-                });
-                mesh.depthMaterials.forEach((mat) => {
-                    if (mat) {
-                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
-                    }
-                });
-                break;
-            default:
-                break;
+        for (let i = 0; i < engine.onBeforeUpdate.length; i++) {
+            engine.onBeforeUpdate[i]({ time, deltaTime });
         }
-    });
 
-    //
-    // last update
-    //
+        //
+        // update and before render
+        //
 
-    for (let i = 0; i < engine.onLastUpdate.length; i++) {
-        engine.onLastUpdate[i]({ time, deltaTime });
-    }
-    traverseScene(engine.scene, (actor) => {
-        lastUpdateActor(actor, {
-            gpu: engine.renderer.gpu,
-            renderer: engine.renderer,
-            scene: engine.scene!,
-            time,
-            deltaTime,
+        if (!engine.scene) {
+            console.error('scene is not set');
+            return;
+        }
+
+        // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
+        // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
+        // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
+        traverseScene(engine.scene, (actor) => {
+            updateActor(actor, {
+                gpu: engine.renderer.gpu,
+                renderer: engine.renderer,
+                scene: engine.scene!,
+                time,
+                deltaTime,
+            });
+            switch (actor.type) {
+                case ACTOR_TYPE_SKYBOX:
+                case ACTOR_TYPE_MESH:
+                    // case ActorTypes.UiActor:
+                    // case ActorTypes.SkinnedMesh:
+                    beforeRenderActor(actor, {
+                        gpu: engine.renderer.gpu,
+                        renderer: engine.renderer,
+                        scene: engine.scene!,
+                        time,
+                        deltaTime,
+                    });
+                    const mesh = actor as Mesh;
+                    mesh.materials.forEach((mat) => {
+                        if (mat) {
+                            checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                        }
+                    });
+                    mesh.depthMaterials.forEach((mat) => {
+                        if (mat) {
+                            checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                        }
+                    });
+                    break;
+                default:
+                    break;
+            }
         });
-    });
 
-    //
-    // update transform
-    //
+        //
+        // last update
+        //
 
-    // TODO: fixedupdateでもやっちゃってるのよくない
-    traverseScene(engine.scene, (actor) => {
-        updateActorTransform(actor);
-    });
+        for (let i = 0; i < engine.onLastUpdate.length; i++) {
+            engine.onLastUpdate[i]({ time, deltaTime });
+        }
+        traverseScene(engine.scene, (actor) => {
+            lastUpdateActor(actor, {
+                gpu: engine.renderer.gpu,
+                renderer: engine.renderer,
+                scene: engine.scene!,
+                time,
+                deltaTime,
+            });
+        });
 
-    //
-    // render
-    //
+        //
+        // update transform
+        //
 
-    renderEngine(engine, time, deltaTime);
+        // 各種updateが終わったらtransformを整理
+        // TODO: fixedupdateでもやっちゃってるのよくない
+        traverseScene(engine.scene, (actor) => {
+            updateActorTransform(actor);
+        });
 }
 
-export function lastUpdateEngine(engine: Engine, time: number, deltaTime: number) {
-    if (!engine.scene) {
-        console.error('scene is not set');
-        return;
-    }
-    traverseScene(engine.scene, (actor) =>
-        lastUpdateActor(actor, {
-            gpu: engine.renderer.gpu,
-            renderer: engine.renderer,
-            scene: engine.scene!,
-            time,
-            deltaTime,
-        })
-    );
-}
+// export function lastUpdateEngine(engine: Engine, time: number, deltaTime: number) {
+//     if (!engine.scene) {
+//         console.error('scene is not set');
+//         return;
+//     }
+//     traverseScene(engine.scene, (actor) =>
+//         lastUpdateActor(actor, {
+//             gpu: engine.renderer.gpu,
+//             renderer: engine.renderer,
+//             scene: engine.scene!,
+//             time,
+//             deltaTime,
+//         })
+//     );
+// }
 
 function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
     // for debug
@@ -412,7 +408,7 @@ export async function warmRender(
     // 共通ユニフォームを更新
     beforeRenderRenderer(renderer, 0, 0);
 
-    // 各メッシュを1つずつcompile --- 
+    // 各メッシュを1つずつcompile ---
 
     for (let i = 0; i < meshes.length; i++) {
         const mesh = meshes[i];
@@ -469,21 +465,32 @@ export async function warmRender(
 
         await wait(waitTime);
     }
-    
+
     // 中央において描画 ---
 
-    // カメラとアクターを固定位置に配置して実際の描画を実行
-    setTranslation(mainCamera.transform, createVector3(0, 0, -10));
-    setRotation(mainCamera.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 0, 0)));
+    // カメラを中央に向かせる
+    setTranslation(mainCamera.transform, createVector3(0, 0, 10));
+    mainCamera.transform.lookAtTarget = createVector3One();
+    fixedUpdateEngine(engine, 0, 0);
+    updateEngine(engine, 0, 0);
+    renderEngine(engine, 0, 0);
 
     for (let i = 0; i < meshes.length; i++) {
+        // for debug
+        // console.log('===========');
+
         const mesh = meshes[i];
         mesh.enabled = true;
         setTranslation(mesh.transform, createVector3(0, 0, 0));
         setRotation(mesh.transform, createRotatorFromQuaternion(createQuaternionFromEulerDegrees(0, 0, 0)));
 
-        fixedUpdateEngine(engine, 0, 0);
-        updateEngine(engine, 0, 0);
+        // for debug
+        // console.log('hogehoge target actor', mesh.name);
+
+        // fixedUpdateEngine(engine, 0, 0);
+        // updateEngine(engine, 0, 0);
+        // renderだけ行う
+        renderEngine(engine, 0, 0);
 
         mesh.enabled = false;
         await wait(waitTime);
@@ -492,6 +499,7 @@ export async function warmRender(
     // カメラと全メッシュの位置/回転を復元
     setTranslation(mainCamera.transform, cameraOriginalPosition);
     setRotation(mainCamera.transform, cameraOriginalRotation);
+    mainCamera.transform.lookAtTarget = null;
     meshes.forEach((mesh) => {
         setTranslation(mesh.transform, actorOriginalPosition.get(mesh)!);
         setRotation(mesh.transform, actorOriginalRotation.get(mesh)!);
@@ -502,11 +510,12 @@ export async function warmRender(
     // すべてのアクターの enabled 状態を復元
     actors.forEach((actor) => {
         actor.enabled = actorOriginalEnabled.get(actor)!;
-    })
+    });
 
     // 元の状態を反映するため、renderer内のマテリアルも含めて最後に一回描画
     fixedUpdateEngine(engine, 0, 0);
     updateEngine(engine, 0, 0);
+    renderEngine(engine, 0, 0);
 
     await wait(waitTime);
 }

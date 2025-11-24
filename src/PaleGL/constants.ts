@@ -75,7 +75,9 @@ export const RENDER_QUEUE_TYPE_OVERLAY = 'ol';
 
 export type RenderQueueType =
     | typeof RENDER_QUEUE_TYPE_OPAQUE
-    | typeof RENDER_QUEUE_TYPE_ALPHA_TEST
+    // CUSTOM_BEGIN comment out
+    // | typeof RENDER_QUEUE_TYPE_ALPHA_TEST
+    // CUSTOM_END
     | typeof RENDER_QUEUE_TYPE_SKYBOX
     | typeof RENDER_QUEUE_TYPE_TRANSPARENT
     | typeof RENDER_QUEUE_TYPE_AFTER_TONE

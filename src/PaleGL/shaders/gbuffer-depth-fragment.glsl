@@ -7,7 +7,9 @@ uniform vec4 uMapTiling;
 #include <common>
 #include <lighting>
 #include <ub>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <tone>
 #include <gbuffer>
 
@@ -42,8 +44,10 @@ void main() {
     // TODO: fbase color を渡して alpha をかける
     vec4 resultColor = baseColor;
 
-    #include <alpha_test_f>
-    // #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_BEGIN comment out
+    // #include <alpha_test_f>
+    // // #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     sGBufferDepth gBufferDepth = fBuildGBufferDepth(
         vWorldPosition,

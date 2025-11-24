@@ -5,7 +5,9 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <vcolor_fh>
 
 #include <surface_h>
@@ -47,8 +49,10 @@ void main() {
 // #endif
 // CUSTOM_END
 
-    #include <alpha_test_f>
-    // #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_BEGIN comment out
+    // #include <alpha_test_f>
+    // // #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分ける？
     float metallic = uMetallic;

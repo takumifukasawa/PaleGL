@@ -126,7 +126,9 @@ export function createCharMesh({
         depthFragmentShader,
         uniforms: mergedUniforms,
         depthUniforms,
-        alphaTest: 0.5,
+        // CUSTOM_BEGIN comment out
+        // alphaTest: 0.5,
+        // CUSTOM_END
         depthTest: true,
         depthWrite: false,
         faceSide: FACE_SIDE_DOUBLE,

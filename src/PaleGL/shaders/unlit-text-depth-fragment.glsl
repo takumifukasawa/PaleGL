@@ -1,6 +1,8 @@
 #pragma DEFINES
 
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 
 uniform sampler2D uFontMap;
 uniform vec4 uFontTiling;
@@ -47,9 +49,12 @@ void main() {
 
     float alpha = fSdf2alpha(sdf);
     resultColor.a = alpha;
-    
+   
+    // TODO: alpha test 
+    // CUSTOM_BEGIN comment out 
     // #include <alpha_test_f>
     #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     outColor = vec4(1., 1., 1., 1.);
 }

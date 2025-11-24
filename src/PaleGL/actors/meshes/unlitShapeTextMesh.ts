@@ -74,7 +74,9 @@ export function createUnlitShapeTextMesh<T, U extends ShapeFontBase<T>>(
         depthFragmentShader: unlitShapeTextDepthFrag,
         uniforms: mergedUniforms,
         depthUniforms,
-        alphaTest: 0.5,
+        // CUSTOM_BEGIN
+        // alphaTest: 0.5,
+        // CUSTOM_END
         depthTest: true,
         depthWrite: false,
         // receiveShadow: !!receiveShadow,

@@ -2,7 +2,9 @@
 
 #include <tone>
 #include <gbuffer>
-#include <alpha_test>
+// CUSTOM_BEGIN comment out
+// #include <alpha_test>
+// CUSTOM_END
 #include <vcolor_fh>
 
 uniform vec4 uColor;
@@ -50,9 +52,12 @@ void main() {
     float alpha = fSdf2alpha(sdf);
     resultColor.a = alpha;
 
+    // TODO: alpha test
+    // CUSTOM_BEGIN comment out
     // depth側でdiscardしてるのでなくてもよいが、z-fightな状況だとdiscardしてる部分がちらつく対策
     // #include <alpha_test_f>
-    #include ./partial/alpha-test-fragment.partial.glsl
+    // #include ./partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     // for debug
     // resultColor.rgb = mix(vec3(vUv, 1.), resultColor.rgb, resultColor.a);

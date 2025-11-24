@@ -4,7 +4,9 @@
 #include <lighting>
 #include <ub>
 #include <depth>
+// CUSTOM_BEGIN comment out
 #include <alpha_test>
+// CUSTOM_END
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 
@@ -99,9 +101,11 @@ void main() {
     //     discard;
     // }
 
-    vec4 resultColor = baseColor;
-    #include <alpha_test_f>
-    // #include ../partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_BEGIN comment out
+    // vec4 resultColor = baseColor;
+    // #include <alpha_test_f>
+    // // #include ../partial/alpha-test-fragment.partial.glsl
+    // CUSTOM_END
 
     outColor = vec4(1., 1., 1., 1.);
     // outColor = vec4(0.);
