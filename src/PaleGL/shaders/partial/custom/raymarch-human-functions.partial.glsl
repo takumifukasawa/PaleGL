@@ -540,6 +540,29 @@ float fDfLeg(
     return d;
 }
 
+void fDfHumanHeadMeta(inout float cd, vec3 headP, float tOffset) {
+    float t = uTimelineTime + tOffset;
+    float metaD = 2.4; // metaball head duration
+    for(int i = 0; i < 8; i++) {
+        float fi = float(i);
+        float dire = sign(sin(fi * 100.));
+        float medu = mod(t + fi * 10., metaD);
+        float ra = smoothstep(.1, 1.1, medu); // table curve in
+        float rb = smoothstep(1.3, 2.4, medu); // table curve out
+        float rr = ra * (1. - rb); // table curve in-out
+        float rc = smoothstep(0., 3., medu); // only in
+        vec3 _sp = fOpTr(
+            headP,
+            vec3(
+                sin(fi * t * dire * .5) * .05,
+                .5 * rc,
+                cos(fi * t * dire * .5) * .05
+            )
+        );
+        cd = fOpSm(cd, fDfSp(_sp, .05 * rr), .1 * rr);
+    }
+}
+
 sHuman fDfHuman(
     vec3 p,
     // ---   
