@@ -13,8 +13,9 @@ import {
     UNIFORM_TYPE_VECTOR4,
     UNIFORM_TYPE_INT,
     UNIFORM_TYPE_COLOR,
-
-    VertexShaderModifiers,
+    // CUSTOM_BEGIN comment out
+    // VertexShaderModifiers,
+    // CUSTOM_END
 } from '@/PaleGL/constants';
 import { Texture } from '@/PaleGL/core/texture.ts';
 import { createMaterial, Material, MaterialArgs } from '@/PaleGL/materials/material.ts';
@@ -30,7 +31,9 @@ export type UnlitMaterialArgs = {
     baseMap?: Texture;
     mapTiling?: Vector4;
     baseColor?: Color;
-    vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_BEGIN comment out
+    // vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_END
     uniforms?: UniformsData;
 } & MaterialArgs;
 
@@ -41,8 +44,9 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
         baseMap,
         mapTiling, // vec4
         baseColor,
-        // TODO: 外部化
-        vertexShaderModifiers = [],
+        // CUSTOM_BEGIN comment out
+        // vertexShaderModifiers = [],
+        // CUSTOM_END
         uniforms = [],
         uniformBlockNames = [],
         ...options
@@ -67,9 +71,9 @@ export const createUnlitMaterial = (args: UnlitMaterialArgs = {}): UnlitMaterial
     const material = createMaterial({
         // CUSTOM_BEGIN comment out
         // name: 'UnlitMaterial',
+        // vertexShaderModifiers,
         // CUSTOM_END
         type: MATERIAL_TYPE_UNLIT,
-        vertexShaderModifiers,
         vertexShader: gBufferVert,
         fragmentShader: unlitFrag,
         depthFragmentShader: gBufferDepthFrag,

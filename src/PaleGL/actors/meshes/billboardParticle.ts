@@ -10,7 +10,9 @@ import {
     UNIFORM_NAME_DEPTH_TEXTURE,
     UNIFORM_TYPE_TEXTURE,
     UNIFORM_TYPE_VECTOR2_ARRAY,
-    VertexShaderModifiers,
+    // CUSTOM_BEGIN comment out
+    // VertexShaderModifiers,
+    // CUSTOM_END
 } from '@/PaleGL/constants.ts';
 import { maton } from '@/PaleGL/utilities/maton.ts';
 import { Color, getColorRange } from '@/PaleGL/math/color.ts';
@@ -36,7 +38,9 @@ export type BillboardParticleArgs = {
     particleNum: number;
     particleMap?: Texture;
     blendType?: BlendType;
-    vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_BEGIN comment out
+    // vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_END
     fragmentShaderModifiers?: FragmentShaderModifiers;
 };
 
@@ -54,7 +58,9 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         minColor,
         maxColor,
         blendType = BLEND_TYPE_TRANSPARENT,
-        vertexShaderModifiers = [],
+        // CUSTOM_BEGIN comment out
+        // vertexShaderModifiers = [],
+        // CUSTOM_END
         fragmentShaderModifiers = [],
     } = args;
     const particleGeometry = createGeometry({
@@ -198,7 +204,9 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
         ],
         uniformBlockNames: [UNIFORM_BLOCK_NAME_COMMON, UNIFORM_BLOCK_NAME_CAMERA],
         // blendType: BlendTypes.Additive
-        vertexShaderModifiers,
+        // CUSTOM_BEGIN comment out
+        // vertexShaderModifiers,
+        // CUSTOM_END
         fragmentShaderModifiers,
         blendType,
         depthWrite: false,
