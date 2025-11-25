@@ -30,7 +30,6 @@ import {
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY,
     MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE,
-    MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA,
     MARIONETTER_MATERIAL_INFO_TYPE_INDEX,
     MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME,
     MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL,
@@ -367,11 +366,11 @@ export function buildMarionetterScene(
         } else if (lightComponent) {
             // light
             const light = lightComponent;
-            const lightData = light[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+            const lightData = light[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA];
             switch (lightData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE]) {
                 case LIGHT_TYPE_DIRECTIONAL:
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
-                    const directionalData = directionalLightInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+                    const directionalData = directionalLightInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA];
                     actor = createDirectionalLight({
                         name,
                         intensity: directionalData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY],
@@ -380,7 +379,7 @@ export function buildMarionetterScene(
                     break;
                 case LIGHT_TYPE_SPOT:
                     const spotLightInfo = light as unknown as MarionetterSpotLightComponentInfo;
-                    const spotData = spotLightInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+                    const spotData = spotLightInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA];
                     // angleは半分にする必要があることに注意
                     actor = createSpotLight({
                         name,
@@ -451,7 +450,7 @@ export function buildMarionetterScene(
 
         if (gBufferMaterialControllerComponent && actor) {
             // WIP: 初期値
-            // const data = gBufferMaterialControllerComponent.d;
+            // const data = gBufferMaterialControllerComponent[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA];
             // const initialValues: GBufferMaterialControllerInitialValues = {
             //     baseColor: data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX]
             //         ? createColorFromHex(data[MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX])
