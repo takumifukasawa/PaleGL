@@ -39,8 +39,7 @@ const assignProperties = (
 ) => {
     // for debug
     bindings.forEach((bindingValue, bindingKey) => {
-        const newValue =
-            postProcessControllerComponentInfo[bindingKey as keyof MarionetterPostProcessControllerComponentInfo];
+        const newValue = postProcessControllerComponentInfo[1][bindingKey as keyof MarionetterPostProcessControllerComponentInfo[1]];
         // for debug
         // console.log('Assigning property', bindingKey, bindingValue, newValue, postProcessControllerComponentInfo);
         assignPropertyInternal(bindingValue, newValue);

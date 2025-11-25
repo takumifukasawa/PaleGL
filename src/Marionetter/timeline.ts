@@ -161,7 +161,7 @@ export function buildMarionetterTimeline(
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrackKinds[] = [];
 
-    const { d } = marionetterPlayableDirectorComponentInfo;
+    const { d } = marionetterPlayableDirectorComponentInfo[1];
 
     // for debug
     // console.log(
@@ -193,11 +193,11 @@ export function buildMarionetterTimeline(
     for (
         let i = 0;
         i <
-        marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
+        marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
         i++
     ) {
         const track =
-            marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
+            marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
 
         if (track[MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
             const signalEmitters = (track as MarionetterMarkerTrackInfo)[
@@ -421,7 +421,7 @@ export function buildMarionetterTimeline(
         // pattern2: use raw time
         const frameTime =
             time %
-            marionetterPlayableDirectorComponentInfo[MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
+            marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute({ time: frameTime, scene });
         }

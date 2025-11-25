@@ -470,13 +470,18 @@ export const MARIONETTER_CURVE_KEYFRAME_PROPERTY_OUT_TANGENT = NeedsShorten ? 'o
 // components
 //
 
-export type MarionetterComponentInfoBase = {
-    type: MarionetterComponentType;
-    // shorten
-    t: MarionetterComponentType;
-};
+// ComponentInfoBase は配列形式でシリアライズされる
+// [type, {...残りのプロパティ}]
+export type MarionetterComponentInfoBase = [
+    MarionetterComponentType, // type
+    Record<string, any> // 残りのプロパティ
+];
 
-export const MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE = NeedsShorten ? 't' : 'type';
+export const MARIONETTER_COMPONENT_INFO_BASE_INDEX_TYPE = 0;
+export const MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA = 1;
+
+// 後方互換性のため残す（deprecated）
+export const MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE = MARIONETTER_COMPONENT_INFO_BASE_INDEX_TYPE;
 
 // unity側に合わせる
 export const MARIONETTER_COMPONENT_TYPE_NONE = 0;
@@ -520,30 +525,38 @@ export type MarionetterComponentInfoKinds =
 // unity側に合わせてcomponent情報を追加
 
 // playable director component
-
-export type MarionetterPlayableDirectorComponentInfo = MarionetterComponentInfoBase & {
-    name: string;
-    duration: number;
-    tracks: MarionetterTrackInfoKinds[];
-    // shorten
-    n: string;
-    d: number;
-    ts: MarionetterTrackInfoKinds[];
-};
+// [type, {n, d, ts}]
+export type MarionetterPlayableDirectorComponentInfo = [
+    MarionetterComponentType,
+    {
+        name: string;
+        duration: number;
+        tracks: MarionetterTrackInfoKinds[];
+        // shorten
+        n: string;
+        d: number;
+        ts: MarionetterTrackInfoKinds[];
+    }
+];
 
 export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_NAME = NeedsShorten ? 'n' : 'name';
 export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION = NeedsShorten ? 'd' : 'duration';
 export const MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS = NeedsShorten ? 'ts' : 'tracks';
 
 // Light component info is now stored as an array:
-// Directional: [lightType, intensity, color]
-// Spot: [lightType, intensity, color, range, innerSpotAngle, spotAngle]
+// [type, {l}]
+// l (lightData) is an array:
+//   Directional: [lightType, intensity, color]
+//   Spot: [lightType, intensity, color, range, innerSpotAngle, spotAngle]
 // lightType is a number: 0=Directional, 1=Spot, 2=Point
-export type MarionetterLightComponentInfo = MarionetterComponentInfoBase & {
-    lightData: [number, number, string]; // [lightType, intensity, color]
-    // shorten
-    l: [number, number, string];
-};
+export type MarionetterLightComponentInfo = [
+    MarionetterComponentType,
+    {
+        lightData: [number, number, string]; // [lightType, intensity, color]
+        // shorten
+        l: [number, number, string];
+    }
+];
 
 export const MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA = NeedsShorten ? 'l' : 'lightData';
 
@@ -553,20 +566,26 @@ export const MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY = 1;
 export const MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_COLOR = 2;
 
 // light: directional light
-
-export type MarionetterDirectionalLightComponentInfo = MarionetterComponentInfoBase & {
-    lightData: [0, number, string]; // [LIGHT_TYPE_DIRECTIONAL, intensity, color]
-    // shorten
-    l: [0, number, string];
-};
+// [type, {l}]
+export type MarionetterDirectionalLightComponentInfo = [
+    MarionetterComponentType,
+    {
+        lightData: [0, number, string]; // [LIGHT_TYPE_DIRECTIONAL, intensity, color]
+        // shorten
+        l: [0, number, string];
+    }
+];
 
 // light: spotlight
-
-export type MarionetterSpotLightComponentInfo = MarionetterComponentInfoBase & {
-    lightData: [1, number, string, number, number, number]; // [LIGHT_TYPE_SPOT, intensity, color, range, innerSpotAngle, spotAngle]
-    // shorten
-    l: [1, number, string, number, number, number];
-};
+// [type, {l}]
+export type MarionetterSpotLightComponentInfo = [
+    MarionetterComponentType,
+    {
+        lightData: [1, number, string, number, number, number]; // [LIGHT_TYPE_SPOT, intensity, color, range, innerSpotAngle, spotAngle]
+        // shorten
+        l: [1, number, string, number, number, number];
+    }
+];
 
 // Array indices for spot light component data (indices 0-2 are same as base light)
 export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_RANGE = 3;
@@ -642,16 +661,19 @@ export const MARIONETTER_SPOT_LIGHT_COMPONENT_INFO_INDEX_SPOT_ANGLE = 5;
 // } as const;
 
 // camera
-
-export type MarionetterCameraComponentInfo = MarionetterComponentInfoBase & {
-    cameraType: 'Perspective' | 'Orthographic';
-    isMain: boolean;
-    fov: number;
-    // shorten
-    ct: 'Perspective' | 'Orthographic';
-    im: boolean;
-    f: number;
-};
+// [type, {ct, im, f}]
+export type MarionetterCameraComponentInfo = [
+    MarionetterComponentType,
+    {
+        cameraType: 'Perspective' | 'Orthographic';
+        isMain: boolean;
+        fov: number;
+        // shorten
+        ct: 'Perspective' | 'Orthographic';
+        im: boolean;
+        f: number;
+    }
+];
 
 export const MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE = NeedsShorten ? 'ct' : 'cameraType';
 export const MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_IS_MAIN = NeedsShorten ? 'im' : 'isMain';
@@ -698,31 +720,39 @@ export const MARIONETTER_LIT_MATERIAL_INFO_RECEIVE_SHADOW_INDEX = 6;
 export type MarionetterMaterialKinds = MarionetterLitMaterialInfo | MarionetterUnlitMaterialInfo;
 
 // --- mesh renderer
-
-export type MarionetterMeshRendererComponentInfo = MarionetterComponentInfoBase & {
-    materialName: string;
-    material: MarionetterMaterialKinds;
-    // shorten
-    mn: string;
-    m: MarionetterMaterialKinds;
-};
+// [type, {mn, m}]
+export type MarionetterMeshRendererComponentInfo = [
+    MarionetterComponentType,
+    {
+        materialName: string;
+        material: MarionetterMaterialKinds;
+        // shorten
+        mn: string;
+        m: MarionetterMaterialKinds;
+    }
+];
 
 export const MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL_NAME = NeedsShorten ? 'mn' : 'materialName';
 export const MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL = NeedsShorten ? 'm' : 'material';
 
 // mesh filter
-
-export type MarionetterMeshFilterComponentInfo = MarionetterComponentInfoBase & {
-    meshName: string;
-    // shorten
-    mn: string;
-};
+// [type, {mn}]
+export type MarionetterMeshFilterComponentInfo = [
+    MarionetterComponentType,
+    {
+        meshName: string;
+        // shorten
+        mn: string;
+    }
+];
 
 export const MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME = NeedsShorten ? 'mn' : 'meshName';
 
 // post process controller component
-
-export type MarionetterPostProcessControllerComponentInfo = MarionetterComponentInfoBase & {
+// [type, {...all properties}]
+export type MarionetterPostProcessControllerComponentInfo = [
+    MarionetterComponentType,
+    {
     screenSpaceShadowEnabled: number;
     screenSpaceShadowBias: number;
     screenSpaceShadowJitterSize: RawVector3;
@@ -912,23 +942,27 @@ export type MarionetterPostProcessControllerComponentInfo = MarionetterComponent
     cc_on: number;
     cc_c: string;
     cc_br: number;
-}; 
+    }
+]; 
 
 // export const MARIONETTER_POST_PROCESS_CONTROLLER_COMPONENT_INFO_PROPERTY_BLOOM_AMOUNT = NeedsShorten
 //     ? 'bl_a'
 //     : 'bloomAmount';
 
 // object move and look at controller component
-
-export type MarionetterObjectMoveAndLookAtControllerComponentInfo = MarionetterComponentInfoBase & {
-    localPosition: RawVector3;
-    lookAtTargetName: string;
-    upVector: RawVector3;
-    // shorten
-    lp: RawVector3;
-    tn: string;
-    uv: RawVector3;
-};
+// [type, {lp, tn, uv}]
+export type MarionetterObjectMoveAndLookAtControllerComponentInfo = [
+    MarionetterComponentType,
+    {
+        localPosition: RawVector3;
+        lookAtTargetName: string;
+        upVector: RawVector3;
+        // shorten
+        lp: RawVector3;
+        tn: string;
+        uv: RawVector3;
+    }
+];
 
 // wip
 // export type MarionetterObjectMoveAndLookAtControllerComponentInfo = [
@@ -949,14 +983,17 @@ export const MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPE
     : 'upVector';
 
 // fbm noise texture controller component
-
-export type MarionetterFbmNoiseTextureControllerComponentInfo = MarionetterComponentInfoBase & {
-    gridSize: RawVector2;
-    octaves: number;
-    amplitude: number;
-    frequency: number;
-    factor: number;
-};
+// [type, {gs, o, a, f, fa}]
+export type MarionetterFbmNoiseTextureControllerComponentInfo = [
+    MarionetterComponentType,
+    {
+        gridSize: RawVector2;
+        octaves: number;
+        amplitude: number;
+        frequency: number;
+        factor: number;
+    }
+];
 
 export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_GRID_SIZE = NeedsShorten
     ? 'gs'
@@ -971,10 +1008,13 @@ export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FR
 export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FACTOR = NeedsShorten ? 'fa' : 'factor';
 
 // gbuffer material controller component
-
-export type MarionetterGBufferMaterialControllerComponentInfo = MarionetterComponentInfoBase & {
-    d: [string, number, number, string, RawVector4, number]; // [baseColor, metallic, roughness, emissiveColor, textureTilingOffset, heightScale]
-};
+// [type, {d}]
+export type MarionetterGBufferMaterialControllerComponentInfo = [
+    MarionetterComponentType,
+    {
+        d: [string, number, number, string, RawVector4, number]; // [baseColor, metallic, roughness, emissiveColor, textureTilingOffset, heightScale]
+    }
+];
 
 // export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_DATA = NeedsShorten ? 'd' : 'data';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_INDEX = 0;

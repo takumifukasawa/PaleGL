@@ -154,7 +154,7 @@ export function findMarionetterComponent<T>(obj: MarionetterObjectInfo, componen
     return (
         // @ts-ignore
         (obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
-            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === componentType
+            (c) => c[0] === componentType // component[0] is the type
         ) as T) || null
     );
 }
@@ -292,7 +292,7 @@ export function buildMarionetterScene(
             let material: Material | null = null;
 
             // build geometry
-            switch (meshFilter[MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME]) {
+            switch (meshFilter[1][MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME]) {
                 case 'Cube':
                     geometry = createBoxGeometry({ gpu });
                     break;
@@ -301,14 +301,14 @@ export function buildMarionetterScene(
                     break;
                 default:
                     console.warn(
-                        `[buildMarionetterActors] invalid mesh name: ${meshFilter[MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME]}`
+                        `[buildMarionetterActors] invalid mesh name: ${meshFilter[1][MARIONETTER_MESH_FILTER_COMPONENT_INFO_PROPERTY_MESH_NAME]}`
                     );
                     // for dummy
                     geometry = createPlaneGeometry({ gpu, width: 1, height: 1 });
             }
 
             // build material
-            const materialInfo = meshRenderer[MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
+            const materialInfo = meshRenderer[1][MARIONETTER_MESH_RENDERER_COMPONENT_INFO_PROPERTY_MATERIAL];
             switch (materialInfo[MARIONETTER_MATERIAL_INFO_TYPE_INDEX]) {
                 // CUSTOM_BEGIN comment out
                 // case MARIONETTER_MATERIAL_TYPE_LIT:
@@ -346,11 +346,11 @@ export function buildMarionetterScene(
             // camera actor
         } else if (cameraComponent) {
             const camera = cameraComponent;
-            if (camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE] === 'Perspective') {
+            if (camera[1][MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE] === 'Perspective') {
                 // TODO: near, far を受け取りたい
                 actor = createPerspectiveCamera(
-                    camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV],
-                    // rad2Deg(Math.acos(camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV])) * 2,
+                    camera[1][MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV],
+                    // rad2Deg(Math.acos(camera[1][MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_FOV])) * 2,
                     1,
                     0.1,
                     100,
@@ -358,7 +358,7 @@ export function buildMarionetterScene(
                 );
             } else {
                 console.error(
-                    `[buildMarionetterActors] invalid camera type: ${camera[MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE]}`
+                    `[buildMarionetterActors] invalid camera type: ${camera[1][MARIONETTER_CAMERA_COMPONENT_INFO_PROPERTY_CAMERA_TYPE]}`
                 );
             }
 
@@ -366,11 +366,11 @@ export function buildMarionetterScene(
         } else if (lightComponent) {
             // light
             const light = lightComponent;
-            const lightData = light[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+            const lightData = light[1][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
             switch (lightData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_LIGHT_TYPE]) {
                 case LIGHT_TYPE_DIRECTIONAL:
                     const directionalLightInfo = light as MarionetterDirectionalLightComponentInfo;
-                    const directionalData = directionalLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+                    const directionalData = directionalLightInfo[1][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
                     actor = createDirectionalLight({
                         name,
                         intensity: directionalData[MARIONETTER_LIGHT_COMPONENT_INFO_INDEX_INTENSITY],
@@ -379,7 +379,7 @@ export function buildMarionetterScene(
                     break;
                 case LIGHT_TYPE_SPOT:
                     const spotLightInfo = light as unknown as MarionetterSpotLightComponentInfo;
-                    const spotData = spotLightInfo[MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
+                    const spotData = spotLightInfo[1][MARIONETTER_LIGHT_COMPONENT_INFO_PROPERTY_DATA];
                     // angleは半分にする必要があることに注意
                     actor = createSpotLight({
                         name,
@@ -421,18 +421,18 @@ export function buildMarionetterScene(
 
         if (objectMoveAndLookAtControllerComponent) {
             const upVectorRaw =
-                objectMoveAndLookAtControllerComponent[
+                objectMoveAndLookAtControllerComponent[1][
                     MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_UP_VECTOR
                 ];
             const objectMoveAndLookAdController = createObjectMoveAndLookAtController({
                 localPosition: createVector3FromRaw(
-                    objectMoveAndLookAtControllerComponent[
+                    objectMoveAndLookAtControllerComponent[1][
                         MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOCAL_POSITION
                     ]
                 ),
                 upVector: upVectorRaw ? createVector3FromRaw(upVectorRaw) : createVector3(0, 1, 0),
                 lookAtTargetName:
-                    objectMoveAndLookAtControllerComponent[
+                    objectMoveAndLookAtControllerComponent[1][
                         MARIONETTER_OBJECT_MOVE_AND_LOOK_AT_CONTROLLER_COMPONENT_INFO_PROPERTY_LOOK_AT_TARGET_NAME
                     ],
             });
@@ -589,7 +589,7 @@ export function buildMarionetterTimelineFromScene(
     let marionetterTimeline: MarionetterTimeline | null = null;
     marionetterScene[MARIONETTER_SCENE_PROPERTY_OBJECTS].forEach((obj) => {
         const timelineComponent = obj[MARIONETTER_OBJECT_INFO_INDEX_COMPONENTS].find(
-            (c) => c[MARIONETTER_COMPONENT_INFO_BASE_PROPERTY_TYPE] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR
+            (c) => c[0] === MARIONETTER_COMPONENT_TYPE_PLAYABLE_DIRECTOR // component[0] is the type
         );
         if (timelineComponent) {
             marionetterTimeline = buildMarionetterTimeline(
