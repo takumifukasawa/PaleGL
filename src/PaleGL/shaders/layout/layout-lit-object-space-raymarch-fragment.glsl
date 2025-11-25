@@ -14,12 +14,13 @@
 
 uniform int uShadingModelId;
 
-
 #ifdef D_INSTANCING
 in float vInstanceId;
-in vec4 vInstanceColor;
-in vec4 vInstanceEmissiveColor;
-in vec4 vInstanceState;
+// CUSTOM_BEGIN comment out
+// in vec4 vInstanceColor;
+// in vec4 vInstanceEmissiveColor;
+// in vec4 vInstanceState;
+// CUSTOM_END
 #endif
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
@@ -73,9 +74,12 @@ void main() {
     // surface.smSpecularAmount = uSpecularAmount;
 
     vec3 emissiveColor = uEmissiveColor.rgb;
-#ifdef D_INSTANCING
-    emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
-#endif
+
+// CUSTOM_BEGIN comment out
+// #ifdef D_INSTANCING
+//     emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
+// #endif
+// CUSTOM_END
 
     //
     // NOTE: raymarch block

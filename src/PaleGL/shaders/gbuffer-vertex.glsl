@@ -19,14 +19,16 @@ out mat4 vInverseWorldMatrix;
 
 #ifdef D_INSTANCING
 out float vInstanceId;
-out vec4 vInstanceColor;
-out vec4 vInstanceEmissiveColor;
-out vec4 vInstanceState;
-uniform float uRotMode; // 0: velocity, 1: look direction
-uniform vec4 uBaseColor;
-uniform float uBaseMixer;
-uniform vec4 uEmissiveColor;
-uniform float uEmissiveMixer;
+// CUSTOM_BEGIN comment out
+// out vec4 vInstanceColor;
+// out vec4 vInstanceEmissiveColor;
+// uniform float uRotMode; // 0: velocity, 1: look direction
+// uniform vec4 uBaseColor;
+// uniform float uBaseMixer;
+// uniform vec4 uEmissiveColor;
+// uniform float uEmissiveMixer;
+// CUSTOM_END
+// out vec4 vInstanceState;
 #endif
 
 #ifdef D_VAT

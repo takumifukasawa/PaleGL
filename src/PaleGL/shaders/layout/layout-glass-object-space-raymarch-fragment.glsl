@@ -12,9 +12,11 @@
 
 #ifdef D_INSTANCING
 in float vInstanceId;
-in vec4 vInstanceColor;
-in vec4 vInstanceEmissiveColor;
-in vec4 vInstanceState;
+// CUSTOM_BEGIN comment out
+// in vec4 vInstanceColor;
+// in vec4 vInstanceEmissiveColor;
+// in vec4 vInstanceState;
+// CUSTOM_END
 #endif
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
@@ -95,16 +97,19 @@ void main() {
     vec4 baseMapColor = texture(uBaseMap, uv);
     vec4 baseColor = uBaseColor * baseMapColor;
 
-// CUSTOM_BEGIN
+// CUSTOM_BEGIN comment out
 // #ifdef D_VERTEX_COLOR
 //     baseColor *= vVertexColor;
 // #endif
 // CUSTOM_END
     
     vec3 emissiveColor = uEmissiveColor.rgb;
-#ifdef D_INSTANCING
-    emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
-#endif
+
+// CUSTOM_BEGIN comment out
+// #ifdef D_INSTANCING
+//     emissiveColor = vInstanceEmissiveColor.xyz; // demo用に頂点シェーダー側でblend
+// #endif
+// CUSTOM_END
 
     //
     // NOTE: raymarch block
