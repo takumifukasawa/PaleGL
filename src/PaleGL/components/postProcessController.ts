@@ -1,4 +1,4 @@
-import { MarionetterPostProcessControllerComponentInfo } from '@/Marionetter/types';
+import { MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA, MarionetterPostProcessControllerComponentInfo } from '@/Marionetter/types';
 import { Component, createComponent } from '@/PaleGL/components/component.ts';
 import {
     buildPostProcessControllerEntries,
@@ -39,7 +39,7 @@ const assignProperties = (
 ) => {
     // for debug
     bindings.forEach((bindingValue, bindingKey) => {
-        const newValue = postProcessControllerComponentInfo[1][bindingKey as keyof MarionetterPostProcessControllerComponentInfo[1]];
+        const newValue = postProcessControllerComponentInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][bindingKey as keyof MarionetterPostProcessControllerComponentInfo[typeof MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA]];
         // for debug
         // console.log('Assigning property', bindingKey, bindingValue, newValue, postProcessControllerComponentInfo);
         assignPropertyInternal(bindingValue, newValue);

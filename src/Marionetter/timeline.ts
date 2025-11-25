@@ -40,6 +40,7 @@ import {
     MARIONETTER_CLIP_TYPE_ANIMATION_CLIP,
     MARIONETTER_CLIP_TYPE_LIGHT_CONTROL_CLIP,
     MARIONETTER_CLIP_TYPE_OBJECT_MOVE_AND_LOOK_AT_CLIP,
+    MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA,
     MARIONETTER_DEFAULT_TRACK_INFO_CLIPS_INDEX,
     MARIONETTER_DEFAULT_TRACK_INFO_NAME_INDEX,
     MARIONETTER_DEFAULT_TRACK_INFO_TARGET_NAME_INDEX,
@@ -161,7 +162,7 @@ export function buildMarionetterTimeline(
 ): MarionetterTimeline {
     const tracks: MarionetterTimelineTrackKinds[] = [];
 
-    const { d } = marionetterPlayableDirectorComponentInfo[1];
+    const { d } = marionetterPlayableDirectorComponentInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA];
 
     // for debug
     // console.log(
@@ -193,11 +194,11 @@ export function buildMarionetterTimeline(
     for (
         let i = 0;
         i <
-        marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
+        marionetterPlayableDirectorComponentInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS].length;
         i++
     ) {
         const track =
-            marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
+            marionetterPlayableDirectorComponentInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_TRACKS][i];
 
         if (track[MARIONETTER_TRACK_INFO_BASE_TYPE_INDEX] === MARIONETTER_TRACK_INFO_TYPE_MARKER_TRACK) {
             const signalEmitters = (track as MarionetterMarkerTrackInfo)[
@@ -421,7 +422,7 @@ export function buildMarionetterTimeline(
         // pattern2: use raw time
         const frameTime =
             time %
-            marionetterPlayableDirectorComponentInfo[1][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
+            marionetterPlayableDirectorComponentInfo[MARIONETTER_COMPONENT_INFO_BASE_INDEX_DATA][MARIONETTER_PLAYABLE_DIRECTOR_COMPONENT_INFO_PROPERTY_DURATION];
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].execute({ time: frameTime, scene });
         }
