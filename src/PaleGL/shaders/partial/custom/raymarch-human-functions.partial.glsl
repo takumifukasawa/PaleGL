@@ -25,7 +25,7 @@ vec3 fGetJointInfo(int jointIndex) {
 
 #ifdef D_INSTANCING
     // インスタンシング時は各インスタンスで時間をずらす
-    frameIndex = int(mod((uAnimationTime + vInstanceId * 0.1) * uAnimationFPS, float(uClipFrameCount)));
+    frameIndex = int(mod((uAnimationTime + vInstanceId * 100.) * uAnimationFPS, float(uClipFrameCount)));
 #endif
 
     return texelFetch(uAnimationTexture, ivec2(frameIndex, rowIndex), 0).xyz;
