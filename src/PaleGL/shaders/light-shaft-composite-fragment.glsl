@@ -5,6 +5,8 @@ out vec4 outColor;
 uniform sampler2D uSrcTexture;
 uniform sampler2D uLightShaftTexture;
 uniform float uBlendRate;
+uniform float uLightShaftMaskFactor;
+uniform float uLightIntensity;
 
 void main() {
     vec4 sceneColor = texture(uSrcTexture, vUv);
@@ -13,8 +15,8 @@ void main() {
     float occlusion = mix(0., 1., lightShaftColor.x * lightShaftColor.x);
 
     occlusion *= uBlendRate;
-   
-    // TODO: ライトの方向とか位置とかと、カメラの方向と位置でマスク
-    
+    occlusion *= uLightShaftMaskFactor; // カメラ方向マスク
+    occlusion *= uLightIntensity;       // 光源強度
+
     outColor = vec4(vec3(occlusion), 1.);
 }           

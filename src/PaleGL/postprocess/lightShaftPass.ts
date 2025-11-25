@@ -11,12 +11,12 @@
 
 import { NeedsShorten } from '@/Marionetter/types';
 import { createShortenKit, makeLongKeyMap, ShortNamesFor } from '@/Marionetter/types/makePropMap.ts';
-import { transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
+import { getCameraForward, transformScreenPoint } from '@/PaleGL/actors/cameras/cameraBehaviours.ts';
 import { DirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
 import { Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createVector2, createVector2Zero } from '@/PaleGL/math/vector2.ts';
-import { cloneVector3, scaleVector3ByScalar, v3x, v3y } from '@/PaleGL/math/vector3.ts';
+import { cloneVector3, dotVector3, negateVector3, normalizeVector3, scaleVector3ByScalar, subVectorsV3, v3x, v3y } from '@/PaleGL/math/vector3.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
 import {
     createPostProcessPassBase,
@@ -29,6 +29,7 @@ import { renderPostProcessPass, setPostProcessPassSize } from '@/PaleGL/postproc
 import lightShaftCompositeFragmentShader from '@/PaleGL/shaders/light-shaft-composite-fragment.glsl';
 import lightShaftDownSampleFragmentShader from '@/PaleGL/shaders/light-shaft-down-sample-fragment.glsl';
 import lightShaftRadialBlurFragmentShader from '@/PaleGL/shaders/light-shaft-radial-blur-fragment.glsl';
+import { saturate } from '@/PaleGL/utilities/mathUtilities.ts';
 
 const radialBlurOriginUniformName = 'uRadialBlurOrigin';
 const radialBlurPassScaleBaseUniformName = 'uRadialBlurPassScaleBase';
@@ -44,6 +45,8 @@ export type LightShaftPassParameters = {
     blendRate: number;
     passScaleBase: number;
     rayStepStrength: number;
+    maskFadeStart: number;
+    maskFadeEnd: number;
 };
 
 // ---- Short names (唯一の真実源 / C#に一致) ----
@@ -53,6 +56,8 @@ export const LightShaft_ShortNames = {
     blendRate: 'ls_br',
     passScaleBase: 'ls_psb',
     rayStepStrength: 'ls_rss',
+    maskFadeStart: 'ls_mfs',
+    maskFadeEnd: 'ls_mfe',
 } as const satisfies ShortNamesFor<LightShaftPassParameters>;
 
 // ---- 派生（テンプレ同様）----
@@ -90,6 +95,8 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
     const blendRate = args.blendRate ?? 0.65;
     const passScaleBase = args.passScaleBase ?? 0.2;
     const rayStepStrength = args.rayStepStrength ?? 0.012;
+    const maskFadeStart = args.maskFadeStart ?? 0.0;
+    const maskFadeEnd = args.maskFadeEnd ?? 0.8;
 
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = createPlaneGeometry({ gpu });
@@ -174,6 +181,8 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
         uniforms: [
             [UNIFORM_NAME_LIGHT_SHAFT_TEXTURE, UNIFORM_TYPE_TEXTURE],
             [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, blendRate],
+            ['uLightShaftMaskFactor', UNIFORM_TYPE_FLOAT, 1.0],
+            ['uLightIntensity', UNIFORM_TYPE_FLOAT, 1.0],
         ],
     });
 
@@ -201,6 +210,8 @@ export const createLightShaftPass = (args: LightShaftPassParametersArgs): LightS
         blendRate,
         passScaleBase,
         rayStepStrength,
+        maskFadeStart,
+        maskFadeEnd,
     };
 }
 
@@ -260,9 +271,10 @@ export function renderLightShaftPass(
     // directional light の位置をそのまま使う場合
     // const lightPositionInClip = targetCamera.transformScreenPoint(this.#directionalLight!.transform.position);
     // 適当に遠いところに飛ばす場合 TODO: directionを考慮。位置だけだとダメ
+    const dummyLightPosition = scaleVector3ByScalar(cloneVector3(lightShaftPass.directionalLight!.transform.position), 10000);
     const lightPositionInClip = transformScreenPoint(
         targetCamera,
-        scaleVector3ByScalar(cloneVector3(lightShaftPass.directionalLight!.transform.position), 10000)
+        dummyLightPosition,
     );
     // 0 ~ 1
     const lightPositionInUv = createVector2(v3x(lightPositionInClip) * 0.5 + 0.5, v3y(lightPositionInClip) * 0.5 + 0.5);
@@ -345,6 +357,33 @@ export function renderLightShaftPass(
         lightShaftPass.blur3Pass.renderTarget.texture
     );
     setMaterialUniformValue(lightShaftPass.compositePass.material, UNIFORM_NAME_BLEND_RATE, lightShaftPass.blendRate);
+
+    // dot(camera forward x light dir) 
+    const cameraForward = getCameraForward(camera);
+    // ライト自体が向く方向
+    const lightDirection = normalizeVector3(negateVector3(cloneVector3(dummyLightPosition)));
+    // ライトとカメラのdot
+    const dot = dotVector3(cameraForward, lightDirection);
+
+    // // smoothstepでフェード計算（0～1にクランプ）
+    // const maskFactor = Math.max(
+    //     0.0,
+    //     Math.min(1.0, (dot - lightShaftPass.maskFadeStart) / (lightShaftPass.maskFadeEnd - lightShaftPass.maskFadeStart))
+    // );
+    // ライトとカメラの向く方向が近い場合はマスクしたいので反転
+    const maskFactor = 1. - saturate(dot);
+
+    // 光源の強度を取得
+    const lightIntensity = lightShaftPass.directionalLight!.intensity;
+
+    // compositePass に渡す
+    setMaterialUniformValue(lightShaftPass.compositePass.material, 'uLightShaftMaskFactor', maskFactor);
+    setMaterialUniformValue(lightShaftPass.compositePass.material, 'uLightIntensity', lightIntensity);
+    
+    console.log("====================")
+    console.log(targetCamera, cameraForward);
+    console.log(lightDirection, dot);
+    console.log(maskFactor, lightIntensity)
 
     renderPostProcessPass(lightShaftPass.compositePass, {
         gpu,

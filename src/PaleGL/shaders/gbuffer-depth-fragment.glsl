@@ -1,6 +1,6 @@
 #pragma DEFINES
 
-uniform vec4 uColor; // TODO: fbase color
+uniform vec4 uBaseColor; // TODO: fbase color
 uniform sampler2D uBaseMap;
 uniform vec4 uMapTiling;
 
@@ -32,8 +32,9 @@ void main() {
     // TODO: multiply base color
     vec4 baseMapColor = texture(uBaseMap, uv);
    
-    // 後半はuvを最適化の過程で消されないようにする対策 
-    vec4 baseColor = uColor * baseMapColor + vec4(uv.xyxy) * 1;
+    // // 後半はuvを最適化の過程で消されないようにする対策 
+    // vec4 baseColor = uBaseColor * baseMapColor + vec4(uv.xyxy) * 1;
+    vec4 baseColor = uBaseColor * baseMapColor;
 
 // CUSTOM_BEGIN
 // #ifdef D_VERTEX_COLOR
