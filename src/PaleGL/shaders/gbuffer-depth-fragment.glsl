@@ -41,7 +41,6 @@ void main() {
 // #endif   
 // CUSTOM_END
 
-    // TODO: fbase color を渡して alpha をかける
     vec4 resultColor = baseColor;
 
     // CUSTOM_BEGIN comment out
@@ -61,7 +60,8 @@ void main() {
     // CUSTOM_END
     
     // baseColorを最適化の過程で消されないようにする対策のmix
-    outColor = mix(vec4(1., 1., 1., 1.), resultColor, 0.);
+    // outColor = mix(vec4(1., 1., 1., 1.), resultColor, 0.);
+    outColor = vec4(1.);
 
     // CUSTOM_BEGIN comment out
     // #pragma AFTER_OUT

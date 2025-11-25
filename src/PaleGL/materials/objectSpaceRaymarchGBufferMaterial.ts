@@ -143,6 +143,8 @@ export const createObjectSpaceRaymarchGBufferMaterial = (
     if (args.deleteGBufferBuilderPragma) {
         deleteFragmentShaderPragmas.push(FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH);
     }
+    
+    console.log("hogehoge", args)
 
     // TODO: できるだけconstructorの直後に持っていきたい
     return createMaterial({
