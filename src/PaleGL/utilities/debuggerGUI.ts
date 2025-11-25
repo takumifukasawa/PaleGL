@@ -1,6 +1,9 @@
 // type OnChangeCallback = ((value: string | boolean) => void);
 // type OnInputCallback = ((value: string) => void);
 
+// デバッガースライダーの値表示の小数点桁数
+const DEBUGGER_VALUE_DECIMAL_PLACES = 4;
+
 export type DebuggerGUI = {
     rootElement: HTMLElement;
     containerElement: HTMLElement;
@@ -279,7 +282,7 @@ export const addSliderDebugger = (debuggerGUI: DebuggerGUI, {
     const sliderInput = document.createElement('input');
 
     const updateCurrentValueView = () => {
-        sliderValueView.textContent = `value: ${sliderInput.value}`;
+        sliderValueView.textContent = `value: ${Number.parseFloat(sliderInput.value).toFixed(DEBUGGER_VALUE_DECIMAL_PLACES)}`;
     };
 
     const onUpdateSlider = () => {
