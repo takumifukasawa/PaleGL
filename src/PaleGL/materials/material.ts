@@ -41,7 +41,10 @@ import { createShader, deleteProgram, Shader } from '@/PaleGL/core/shader.ts';
 import {
     addUniformValue,
     createUniforms,
+    hasUniformValue,
     setUniformValue,
+    tryAddUniformData,
+    tryAddUniformValue,
     Uniforms,
     UniformsData,
     UniformValue,
@@ -154,8 +157,29 @@ export const setMaterialUniformValue = (material: Material, name: string, value:
     setUniformValue(material.uniforms, name, value, log);
 };
 
-export const addMaterialUniformValue = (material: Material, name: string, type: UniformTypes, value?: UniformValue) => {
-    addUniformValue(material.uniforms, name, type, value);
+export const tryAddMaterialUniformValue = (
+    material: Material,
+    name: string,
+    type?: UniformTypes,
+    value?: UniformValue
+) => {
+    if (type === undefined || value === undefined) {
+        return;
+    }
+    // uniformsにデータを追加
+    tryAddUniformValue(material.uniforms, name, type, value);
+    tryAddUniformValue(material.depthUniforms, name, type, value);
+    // cachedArgsの方にないかもしれないので追加
+    if (material.cachedArgs.uniforms) {
+        tryAddUniformData(material.cachedArgs.uniforms, name, type, value);
+    }
+    if (material.cachedArgs.depthUniforms) {
+        tryAddUniformData(material.cachedArgs.depthUniforms, name, type, value);
+    }
+};
+
+export const hasMaterialUniformValue = (material: Material, name: string) => {
+    return hasUniformValue(material.uniforms, name);
 };
 
 export type Material = {

@@ -252,6 +252,7 @@ float fDfArm(
     // _pMiddleFinger.xz = fOpRo(_pMiddleFinger.xz, PI * axis * 0.);
     // _pMiddleFinger = fOpTr(_pMiddleFinger, vec3(0., .003, -.01));
     // float dMiddleFinger = fDfCaa(_pMiddleFinger, vec3(0.), .07, .01);
+ 
     
     d = fOpSm(cd, dShoulder, .02);
     d = fOpSm(d, dUpperArm, .05);
@@ -259,13 +260,12 @@ float fDfArm(
     d = fOpSm(d, dForearm, .01);
     d = fOpSm(d, dWrist, .02);
     d = fOpSm(d, dHand, .02);
-    // heroじゃない場合は指のかわりにbundleで
-    // d = fOpSm(d, dThumb, .01);
-    // d = fOpSm(d, dIndexFinger, .01);
-    // d = fOpSm(d, dMiddleFinger, .01);
-    // d = fOpSm(d, dRingFinger, .01);
-    // d = fOpSm(d, dLittleFinger, .01);
-    d = fOpSm(d, dFingerBundle, .02);
+    d = fOpSm(d, dThumb, .01);
+    d = fOpSm(d, dIndexFinger, .01);
+    d = fOpSm(d, dMiddleFinger, .01);
+    d = fOpSm(d, dRingFinger, .01);
+    d = fOpSm(d, dLittleFinger, .01);
+    // d = fOpSm(d, dFingerBundle, .02);
  
     return d;
 }

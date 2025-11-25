@@ -1,20 +1,41 @@
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
-import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import { Component, ComponentArgs, createComponent } from '@/PaleGL/components/component.ts';
-import { isNeededCompact } from '@/PaleGL/utilities/envUtilities.ts';
+import { UniformTypes } from '@/PaleGL/constants.ts';
+import { UniformValue } from '@/PaleGL/core/uniforms.ts';
+import { tryAddMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 
 export type MaterialController = Component;
 
-type Bindings = Map<string, string>; // propertyName, uniformName
+// [string, UniformTypes?, UniformValue?]
+// 配列の場合は要初期化という指示になる
+export type MaterialTimelineBindings = Map<string, [string, UniformTypes?, UniformValue?]>; // propertyName, ...
 
 // timeline から操作される
-export const createMaterialController = (bindings: Bindings, componentArgs: ComponentArgs): MaterialController => {
+export const createMaterialController = (
+    mesh: Mesh,
+    bindings: MaterialTimelineBindings,
+    componentArgs?: ComponentArgs
+): MaterialController => {
+    // 危険だが、component内でuniformを直接追加する
+    bindings.forEach((binding) => {
+        const [uniformName, uniformType, uniformValue] = binding;
+        // uniformtypeが指定されていたらuniformを追加する対象
+        // ない場合はすでにあるものとみなす
+        if (uniformType) {
+            iterateAllMeshMaterials(mesh, (material) => {
+                tryAddMaterialUniformValue(material, uniformName, uniformType, uniformValue);
+            });
+        }
+    });
+
     return createComponent({
         ...componentArgs,
         onFilterPropertyBinder: (key: string) => bindings.has(key),
         onProcessPropertyBinder: (actor, _, key, value) => {
             if (bindings.has(key)) {
-                const uniformName = bindings.get(key)!;
+                const binding = bindings.get(key)!;
+                const [uniformName] = binding;
                 setUniformValueToAllMeshMaterials(actor as Mesh, uniformName, value);
                 // // for debug
                 // console.log(
@@ -23,4 +44,4 @@ export const createMaterialController = (bindings: Bindings, componentArgs: Comp
             }
         },
     });
-}
+};

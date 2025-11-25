@@ -6,7 +6,12 @@ import {
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME,
 } from '@/Marionetter/types';
-import { createMaterialController, MaterialController } from '@/PaleGL/components/materialController.ts';
+import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import {
+    createMaterialController,
+    MaterialController,
+    MaterialTimelineBindings,
+} from '@/PaleGL/components/materialController.ts';
 import {
     UNIFORM_NAME_BASE_COLOR,
     UNIFORM_NAME_EMISSIVE_COLOR,
@@ -17,17 +22,17 @@ import {
 } from '@/PaleGL/constants';
 import { Color } from '@/PaleGL/math/color.ts';
 
-const bindings = new Map([
+const bindings: MaterialTimelineBindings = new Map([
     // prettier-ignore
     [
         MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
-        UNIFORM_NAME_BASE_COLOR
+        [UNIFORM_NAME_BASE_COLOR]
     ],
-    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME, UNIFORM_NAME_METALLIC],
-    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME, UNIFORM_NAME_ROUGHNESS],
-    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME, UNIFORM_NAME_EMISSIVE_COLOR],
-    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME, UNIFORM_NAME_MAP_TILING],
-    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME, UNIFORM_NAME_HEIGHT_SCALE],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME, [UNIFORM_NAME_METALLIC]],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME, [UNIFORM_NAME_ROUGHNESS]],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME, [UNIFORM_NAME_EMISSIVE_COLOR]],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME, [UNIFORM_NAME_MAP_TILING]],
+    [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME, [UNIFORM_NAME_HEIGHT_SCALE]],
 ]);
 
 export type GBufferMaterialControllerInitialValues = {
@@ -38,8 +43,8 @@ export type GBufferMaterialControllerInitialValues = {
 };
 
 // timeline から操作される
-export const createGBufferMaterialController = (): MaterialController => {
-    const controller = createMaterialController(bindings, {});
+export const createGBufferMaterialController = (mesh: Mesh): MaterialController => {
+    const controller = createMaterialController(mesh, bindings);
 
     return controller;
 };

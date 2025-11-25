@@ -2,7 +2,7 @@
 import { UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { getDummyBlackTexture, setGPUViewport } from '@/PaleGL/core/gpu.ts';
 import { createPlaneGeometry } from '@/PaleGL/geometries/planeGeometry.ts';
-import { addMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
+import { tryAddMaterialUniformValue, Material, setMaterialUniformValue } from '@/PaleGL/materials/material.ts';
 import { createMat4Identity } from '@/PaleGL/math/matrix4.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createFragmentPass, FragmentPass } from '@/PaleGL/postprocess/fragmentPass.ts';
@@ -475,7 +475,7 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
     rowPasses.forEach(({ pass, tiles }, i) => {
         let colIndex = 0;
         // pass.material.uniforms.addValue('uTiling', UNIFORM_TYPE_VECTOR2, new Vector2(COL_NUM, ROW_NUM));
-        addMaterialUniformValue(pass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(COL_NUM, 1));
+        tryAddMaterialUniformValue(pass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(COL_NUM, 1));
         for (const [key, tile] of tiles) {
             const uniformNameTexture = tile.uniformNamePrefix || COL_TEXTURE_UNIFORM_NAMES[colIndex];
             const uniformNameUvOffset = COL_UV_OFFSET_UNIFORM_NAMES[colIndex];
@@ -491,14 +491,14 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
             tiles.get(key)!.uniformNameUvOffset = uniformNameUvOffset;
 
             if (i === 0) {
-                addMaterialUniformValue(
+                tryAddMaterialUniformValue(
                     pass.material,
                     uniformNameUvOffset,
                     UNIFORM_TYPE_VECTOR2,
                     createVector2(colOffset, 0)
                 );
                 if (tile.type === 'Texture') {
-                    addMaterialUniformValue(
+                    tryAddMaterialUniformValue(
                         pass.material,
                         uniformNameTexture,
                         UNIFORM_TYPE_TEXTURE,
@@ -506,14 +506,14 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
                     );
                 }
             } else {
-                addMaterialUniformValue(
+                tryAddMaterialUniformValue(
                     pass.material,
                     uniformNameUvOffset,
                     UNIFORM_TYPE_VECTOR2,
                     createVector2(colOffset, 0)
                 );
                 // console.log('hogehoge', pass, key, uniformNameTexture, UNIFORM_TYPE_TEXTURE, gpu.dummyTextureBlack);
-                addMaterialUniformValue(
+                tryAddMaterialUniformValue(
                     pass.material,
                     uniformNameTexture,
                     UNIFORM_TYPE_TEXTURE,
@@ -525,7 +525,7 @@ export const createBufferVisualizerPass = (args: BufferVisualizerPassArgs): Buff
         }
     });
 
-    addMaterialUniformValue(compositePass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(1, ROW_NUM));
+    tryAddMaterialUniformValue(compositePass.material, 'uTiling', UNIFORM_TYPE_VECTOR2, createVector2(1, ROW_NUM));
 
     const styleHeader = document.createElement('style');
     styleHeader.textContent = `

@@ -17,7 +17,7 @@ import { Vector4 } from '@/PaleGL/math/vector4.ts';
 // uniform values
 //
 
-type UniformData = [name: string, type: UniformTypes, value?: UniformValue];
+export type UniformData = [name: string, type: UniformTypes, value?: UniformValue];
 
 export type UniformStructValue = UniformData[];
 
@@ -120,7 +120,7 @@ export const createUniforms = (...dataArray: UniformsData[]): Uniforms => {
         // setValue,
         // addUniformBlock,
     };
-}
+};
 
 export const findUniformByName = (uniforms: Uniforms, name: string) => {
     return uniforms.data.find(([uniformName]) => uniformName === name);
@@ -130,6 +130,16 @@ export const findUniformByName = (uniforms: Uniforms, name: string) => {
 export const addUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value?: UniformValue) => {
     uniforms.data.push([name, type, value]);
 };
+
+export const hasUniformValue = (uniforms: Uniforms, name: string) => {
+    return !!findUniformByName(uniforms, name);
+};
+
+export const tryAddUniformValue = (uniforms: Uniforms, name: string, type: UniformTypes, value?: UniformValue) => {
+    if (!hasUniformValue(uniforms, name)) {
+        addUniformValue(uniforms, name, type, value);
+    }
+}
 
 export const addUniformData = (uniforms: Uniforms, uniformsData: UniformsData) => {
     for (let i = 0; i < uniformsData.length; i++) {
@@ -175,6 +185,17 @@ export const setUniformValue = (uniforms: Uniforms, name: string, newValue: Unif
         } else {
             data[UNIFORM_INDEX_VALUE] = newValue;
         }
+    }
+};
+
+export const tryAddUniformData = (
+    uniformsData: UniformsData,
+    name: string,
+    type: UniformTypes,
+    value: UniformValue
+) => {
+    if (!uniformsData.find(([uniformName]) => uniformName === name)) {
+        uniformsData.push([name, type, value]);
     }
 };
 

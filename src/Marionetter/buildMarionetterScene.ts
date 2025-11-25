@@ -462,7 +462,7 @@ export function buildMarionetterScene(
             //         : undefined,
             // };
             // addActorComponent(actor, createGBufferMaterialController(initialValues));
-            addActorComponent(actor, createGBufferMaterialController());
+            addActorComponent(actor, createGBufferMaterialController(actor));
         }
 
         if (actor) {
