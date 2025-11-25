@@ -5,7 +5,9 @@
 #include <ub>
 #include <tone>
 #include <gbuffer>
-#include <vcolor_fh>
+// CUSTOM_BEGIN comment out
+// #include <vcolor_fh>
+// CUSTOM_END
 
 #pragma APPEND_INCLUDE
 

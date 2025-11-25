@@ -7,7 +7,9 @@
 #include <common>
 #include <lighting>
 #include <ub>
-#include <vcolor_vh>
+// CUSTOM_BEGIN comment out
+// #include <vcolor_vh>
+// CUSTOM_END
 
 // varyings
 out vec2 vUv;

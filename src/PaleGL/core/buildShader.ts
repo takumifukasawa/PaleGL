@@ -60,6 +60,8 @@ import defaultDepthFragment from '@/PaleGL/shaders/default-depth-fragment.glsl';
 // CUSTOM_BEGIN comment out
 // import alphaTestFragmentPartialContent from '@/PaleGL/shaders/partial/alpha-test-fragment.partial.glsl';
 // import alphaTestPartialContent from '@/PaleGL/shaders/partial/alpha-test.partial.glsl';
+// import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
+// import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 // CUSTOM_END
 import bufferVisualizerHeaderContent from '@/PaleGL/shaders/partial/buffer-visualizer-h.partial.glsl';
 import commonPartialContent from '@/PaleGL/shaders/partial/common.partial.glsl';
@@ -70,7 +72,6 @@ import envMapPartialContent from '@/PaleGL/shaders/partial/env-map.partial.glsl'
 import gbufferBuilderDefaultPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-default.partial.glsl';
 import gbufferBuilderRaymarchPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-raymarch.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
-import surfaceHeaderPartialContent from '@/PaleGL/shaders/partial/surface-header.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
 import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
@@ -84,10 +85,9 @@ import raymarchSceneFunctionsPartialContent from '@/PaleGL/shaders/partial/rayma
 import shapeFontFragmentPartialContent from '@/PaleGL/shaders/partial/shape-font-fragment.partial.glsl';
 import shapeFontHeaderPartialContent from '@/PaleGL/shaders/partial/shape-font-h.partial.glsl';
 import skyboxHeaderPartialContent from '@/PaleGL/shaders/partial/skybox-h.partial.glsl';
+import surfaceHeaderPartialContent from '@/PaleGL/shaders/partial/surface-header.partial.glsl';
 import toneMappingPartialContent from '@/PaleGL/shaders/partial/tone-mapping.partial.glsl';
 import uniformBlockPartialContent from '@/PaleGL/shaders/partial/uniform-block.partial.glsl';
-import vertexColorFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-fragment-header.partial.glsl';
-import vertexColorVertexHeaderPartialContent from '@/PaleGL/shaders/partial/vertex-color-vertex-header.partial.glsl';
 // CUSTOM_BEGIN additional
 import raymarchHumanFunctionsPostPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions-post.partial.glsl';
 import raymarchHumanFunctionsPartialContent from '@/PaleGL/shaders/partial/custom/raymarch-human-functions.partial.glsl';
@@ -103,7 +103,7 @@ export type ShaderDefines = {
     useVertexColor: boolean;
     // CUSTOM_BEGIN comment out
     // useAlphaTest: boolean;
-    // CUSTOM_END 
+    // CUSTOM_END
     isInstancing: boolean;
     useInstanceLookDirection: boolean;
     useVAT: boolean;
@@ -129,11 +129,11 @@ const includesDict = new Map<string, string>([
     // CUSTOM_BEGIN comment out
     // ['<alpha_test>', alphaTestPartialContent],
     // ['<alpha_test_f>', alphaTestFragmentPartialContent],
+    // ['<vcolor_vh>', vertexColorVertexHeaderPartialContent],
+    // ['<vcolor_fh>', vertexColorFragmentHeaderPartialContent],
     // CUSTOM_END
     ['<shape_font_h>', shapeFontHeaderPartialContent],
     ['<shape_font_f>', shapeFontFragmentPartialContent],
-    ['<vcolor_vh>', vertexColorVertexHeaderPartialContent],
-    ['<vcolor_fh>', vertexColorFragmentHeaderPartialContent],
     ['<normal_map_f>', normalMapFragmentPartialContent],
     ['<env_map>', envMapPartialContent],
     ['<skybox_h>', skyboxHeaderPartialContent],

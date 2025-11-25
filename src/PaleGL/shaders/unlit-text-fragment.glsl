@@ -4,8 +4,8 @@
 #include <gbuffer>
 // CUSTOM_BEGIN comment out
 // #include <alpha_test>
+// #include <vcolor_fh>
 // CUSTOM_END
-#include <vcolor_fh>
 
 uniform vec4 uColor;
 uniform int uShadingModelId;

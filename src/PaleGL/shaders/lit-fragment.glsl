@@ -7,8 +7,8 @@
 #include <gbuffer>
 // CUSTOM_BEGIN comment out
 // #include <alpha_test>
+// #include <vcolor_fh>
 // CUSTOM_END
-#include <vcolor_fh>
 
 #include <surface_h>
 uniform int uShadingModelId;

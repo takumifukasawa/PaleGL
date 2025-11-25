@@ -7,8 +7,8 @@
 #include <depth>
 // CUSTOM_BEGIN comment out
 // #include <alpha_test>
+// #include <vcolor_fh>
 // CUSTOM_END
-#include <vcolor_fh>
 
 #ifdef D_INSTANCING
 in float vInstanceId;
