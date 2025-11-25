@@ -471,52 +471,63 @@ export function buildMarionetterScene(
             //
 
             // actors.push(actor);
-            const transformScale = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][2];
-            const scale = transformScale.length === 0
-                ? createVector3(1, 1, 1) // デフォルト: Vector3.one
-                : createVector3(transformScale[0], transformScale[1], transformScale[2]);
-            setScaling(actor.transform, scale);
-            // euler ver
-            // actor.transform.rotation.setV(
-            //     new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
-            // );
-            // quaternion ver
-            // const q = new Quaternion(
-            //     obj.transform.localRotation.x,
-            //     obj.transform.localRotation.y,
-            //     obj.transform.localRotation.z,
-            //     obj.transform.localRotation.w
-            // );
-            // console.log('hogehoge', obj.transform.localRotation, q, q.toEulerDegree());
-            // if (needsSomeActorsConvertLeftHandAxisToRightHandAxis) {
-            // } else {
-            // }
-            // actor.transform.rotation = Rotator.fromQuaternion(
-            //     new Quaternion(
-            //         obj.transform.localRotation.x,
-            //         obj.transform.localRotation.y,
-            //         obj.transform.localRotation.z,
-            //         obj.transform.localRotation.w
-            //     )
-            // );
-            const transformRotation = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][1];
-            const quaternion = transformRotation.length === 0
-                ? createQuaternion(0, 0, 0, 1) // デフォルト: Quaternion.identity
-                : createQuaternion(transformRotation[0], transformRotation[1], transformRotation[2], transformRotation[3]);
-            setRotation(
-                actor.transform,
-                createRotatorFromQuaternion(
-                    resolveInvertRotationLeftHandAxisToRightHandAxis(
-                        quaternion,
-                        actor,
-                        needsFlip
+            const transform = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM];
+
+            // Transform配列全体が空の場合（ExportTransformコンポーネントなし）
+            if (transform.length === 0) {
+                // デフォルト値（原点のTRS）を設定
+                setScaling(actor.transform, createVector3(1, 1, 1));
+                setRotation(actor.transform, createRotatorFromQuaternion(createQuaternion(0, 0, 0, 1)));
+                actor.transform.position = createVector3(0, 0, 0);
+            } else {
+                // ExportTransformコンポーネントあり - Transform情報を読み込む
+                const transformScale = transform[2];
+                const scale = transformScale.length === 0
+                    ? createVector3(1, 1, 1) // デフォルト: Vector3.one
+                    : createVector3(transformScale[0], transformScale[1], transformScale[2]);
+                setScaling(actor.transform, scale);
+                // euler ver
+                // actor.transform.rotation.setV(
+                //     new Vector3(obj.transform.localRotation.x, obj.transform.localRotation.y, obj.transform.localRotation.z)
+                // );
+                // quaternion ver
+                // const q = new Quaternion(
+                //     obj.transform.localRotation.x,
+                //     obj.transform.localRotation.y,
+                //     obj.transform.localRotation.z,
+                //     obj.transform.localRotation.w
+                // );
+                // console.log('hogehoge', obj.transform.localRotation, q, q.toEulerDegree());
+                // if (needsSomeActorsConvertLeftHandAxisToRightHandAxis) {
+                // } else {
+                // }
+                // actor.transform.rotation = Rotator.fromQuaternion(
+                //     new Quaternion(
+                //         obj.transform.localRotation.x,
+                //         obj.transform.localRotation.y,
+                //         obj.transform.localRotation.z,
+                //         obj.transform.localRotation.w
+                //     )
+                // );
+                const transformRotation = transform[1];
+                const quaternion = transformRotation.length === 0
+                    ? createQuaternion(0, 0, 0, 1) // デフォルト: Quaternion.identity
+                    : createQuaternion(transformRotation[0], transformRotation[1], transformRotation[2], transformRotation[3]);
+                setRotation(
+                    actor.transform,
+                    createRotatorFromQuaternion(
+                        resolveInvertRotationLeftHandAxisToRightHandAxis(
+                            quaternion,
+                            actor,
+                            needsFlip
+                        )
                     )
-                )
-            );
-            const transformPosition = obj[MARIONETTER_OBJECT_INFO_INDEX_TRANSFORM][0];
-            actor.transform.position = transformPosition.length === 0
-                ? createVector3(0, 0, 0) // デフォルト: Vector3.zero
-                : createVector3(transformPosition[0], transformPosition[1], transformPosition[2]);
+                );
+                const transformPosition = transform[0];
+                actor.transform.position = transformPosition.length === 0
+                    ? createVector3(0, 0, 0) // デフォルト: Vector3.zero
+                    : createVector3(transformPosition[0], transformPosition[1], transformPosition[2]);
+            }
 
             generatedActorHook?.(gpu, actor);
 

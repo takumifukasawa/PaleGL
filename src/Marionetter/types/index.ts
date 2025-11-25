@@ -129,12 +129,14 @@ export const MARIONETTER_OBJECT_INFO_INDEX_CHILDREN = 3;
 //     ls: { x: number; y: number; z: number };
 // };
 
+// ExportTransformコンポーネントあり: [[x,y,z], [x,y,z,w], [x,y,z]]
+// ExportTransformコンポーネントなし: []
 // [
 //      [lp.x, lp.y, lp.z], // position
 //      [lr.x, lr.y, lr.z, lr.w], // rotation (quaternion)
 //      [ls.x, ls.y, ls.z] // scale
 // ]
-export type MarionetterTransformInfo = [number[], number[], number[]];
+export type MarionetterTransformInfo = [number[], number[], number[]] | [];
 
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_X_INDEX = 0;
 // export const MARIONETTER_TRANSFORM_LOCAL_POSITION_Y_INDEX = 1;
