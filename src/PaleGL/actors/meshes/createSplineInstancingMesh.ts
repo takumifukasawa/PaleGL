@@ -39,7 +39,16 @@ export type SplineInstancingMesh = Mesh & {
     needsUpdateInstances: boolean;
 };
 
-export type CreateSplineInstancingMeshArgs = Omit<
+
+
+export type SplineInstancingMeshArgsOptions = {
+    instanceSpacing?: number;
+    segmentSamples?: number;
+    maxInstanceCount?: number;
+    drawCount?: number;
+}
+
+export type SplineInstancingMeshArgs = Omit<
     InstancingParticleArgs,
     'instanceCount' | 'makeDataPerInstanceFunction'
 > & {
@@ -47,11 +56,11 @@ export type CreateSplineInstancingMeshArgs = Omit<
     gpu: Gpu;
     geometry: Geometry; // InstancingParticleだとgeometry必須なので
     controlPoints: Vector3[];
-    instanceSpacing?: number;
-    segmentSamples?: number;
-    maxInstanceCount?: number;
-    drawCount?: number;
-};
+    // instanceSpacing?: number;
+    // segmentSamples?: number;
+    // maxInstanceCount?: number;
+    // drawCount?: number;
+} & SplineInstancingMeshArgsOptions;
 
 export const createSplineInitialControlPoints = (n: number) => {
     const controlPointsRef: Vector3[] = [];
@@ -202,7 +211,7 @@ const calculateSplineInstances = (
     return { positions, rotations, count: instanceCount };
 };
 
-export const createSplineInstancingMesh = (args: CreateSplineInstancingMeshArgs): SplineInstancingMesh => {
+export const createSplineInstancingMesh = (args: SplineInstancingMeshArgs): SplineInstancingMesh => {
     const { controlPoints, instanceSpacing = 1.0, segmentSamples = 20, maxInstanceCount, drawCount } = args;
 
     const { positions, rotations, count } = calculateSplineInstances(

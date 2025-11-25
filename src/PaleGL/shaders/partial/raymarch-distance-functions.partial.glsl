@@ -304,40 +304,6 @@ float fDfLink(vec3 p, float le, float r1, float r2) {
   return length(vec2(length(q.xy)-r1,q.z)) - r2;
 }
 
-// curve ------------------------
-
-// float fAlmostUnitIdentity(float x) {
-//     return x*x*(2.0-x);
-// }
-// 
-// float fGain(float x, float k) {
-//     float a = 0.5*pow(2.0*((x<0.5)?x:1.0-x), k);
-//     return (x<0.5)?a:1.0-a;
-// }
-// 
-// float fExpImpulse(float x, float k) {
-//     float h = k*x;
-//     return h*exp(1.0-h);
-// }
-
-float fTriCurve(float x, float t) {
-	return abs(2.*fract(x*t-.5)-1.)*2.-1.;
-}
-
-
-float fParabola(float x, float k) {
-    return pow( 4.0*x*(1.0-x), k );
-}
-
-float fPcurve(float x, float a, float b) {
-    float k = pow(a+b,a+b)/(pow(a,a)*pow(b,b));
-    return k*pow(x,a)*pow(1.0-x,b);
-}
-
-// float fExpStep(float x, float n) {
-//     return exp2(-exp2(n)*pow(x,n));
-// }
-
 // mapping ------------------------
 
 // // ref:

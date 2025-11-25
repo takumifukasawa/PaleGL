@@ -2,7 +2,7 @@
 import { ATTRIBUTE_NAME_POSITION, ATTRIBUTE_NAME_UV, ATTRIBUTE_NAME_NORMAL } from '@/PaleGL/constants';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { createVector3One, scaleVector3ByScalar, Vector3 } from '@/PaleGL/math/vector3.ts';
+import { cloneVector3, createVector3One, scaleVector3ByScalar, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export const boxGeometryEdgePairs = [
     [0, 1],
@@ -155,7 +155,7 @@ type BoxGeometryArgs = { gpu: Gpu, size?: Vector3 };
 export const createBoxGeometry = (args: BoxGeometryArgs): BoxGeometry => {
     const { gpu, size = createVector3One() } = args; // デフォルトが長さ1
 
-    const s = scaleVector3ByScalar(size, 0.5);
+    const s = scaleVector3ByScalar(cloneVector3(size), 0.5);
     const boxPosition_0 = [-s[0], s[1], s[2]];
     const boxPosition_1 = [-s[0], -s[1], s[2]];
     const boxPosition_2 = [s[0], s[1], s[2]];

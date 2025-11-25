@@ -379,11 +379,12 @@ export function renderLightShaftPass(
     // compositePass に渡す
     setMaterialUniformValue(lightShaftPass.compositePass.material, 'uLightShaftMaskFactor', maskFactor);
     setMaterialUniformValue(lightShaftPass.compositePass.material, 'uLightIntensity', lightIntensity);
-    
-    console.log("====================")
-    console.log(targetCamera, cameraForward);
-    console.log(lightDirection, dot);
-    console.log(maskFactor, lightIntensity)
+   
+    // for debug
+    // console.log("====================")
+    // console.log(targetCamera, cameraForward);
+    // console.log(lightDirection, dot);
+    // console.log(maskFactor, lightIntensity)
 
     renderPostProcessPass(lightShaftPass.compositePass, {
         gpu,
