@@ -7,6 +7,7 @@ import {
     UNIFORM_NAME_TARGET_WIDTH,
     UNIFORM_NAME_TARGET_HEIGHT,
     UNIFORM_TYPE_VECTOR3,
+    FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH,
 } from '@/PaleGL/constants.ts';
 import { createMesh, Mesh, MeshArgs, MeshOptionsArgs } from '@/PaleGL/actors/meshes/mesh.ts';
 import { getMeshMainMaterial, getMeshMaterial } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
@@ -36,13 +37,14 @@ export type ScreenSpaceRaymarchMeshArgs = {
     depthFragmentShaderTemplate?: string;
     depthFragmentShaderContent: string;
     materialArgs: ScreenSpaceRaymarchMaterialArgs;
-    // } & MaterialArgs;
+    //
+    deleteGBufferBuilderPragma?: boolean;
 } & MeshOptionsArgs;
 
 export type ScreenSpaceRaymarchMesh = Mesh;
 
 export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs) {
-    const { gpu, name = '', uniforms = [], materialArgs, castShadow } = args;
+    const { gpu, name = '', uniforms = [], castShadow } = args;
 
     const mergedUniforms: UniformsData = [
         [UNIFORM_NAME_VIEW_DIRECTION, UNIFORM_TYPE_VECTOR3, createVector3Zero()],
@@ -50,33 +52,19 @@ export function createScreenSpaceRaymarchMesh(args: ScreenSpaceRaymarchMeshArgs)
         ...getPostProcessCommonUniforms(),
     ];
 
-    // const pragmaKey = `#pragma ${PRAGMA_RAYMARCH_SCENE}`;
-    // const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
-    //     pragmaKey,
-    //     args.fragmentShaderContent
-    // );
-    // const depthFragmentShader = (
-    //     args.depthFragmentShaderTemplate ??
-    // ).replace(
-    //     pragmaKey,
-    //     args.depthFragmentShaderContent
-    // );
-
-    // const fragmentShader = (args.fragmentShaderTemplate ?? litScreenSpaceRaymarchFragmentLayout).replace(
-    //     PRAGMA_RAYMARCH_SCENE,
-    //     args.fragmentShaderContent
-    // );
-    // const depthFragmentShader = (
-    //     args.depthFragmentShaderTemplate ?? gbufferScreenSpaceRaymarchDepthFragmentLayout
-    // ).replace(
-    //     PRAGMA_RAYMARCH_SCENE,
-    //     args.depthFragmentShaderContent
-    // );
+    // gbuffer builder を消すオプションを適用してるなら消しちゃう
+    if (args.deleteGBufferBuilderPragma) {
+        // material args になかったら配列初期化しちゃう
+        if (!args.materialArgs.deleteFragmentShaderPragmas) {
+            args.materialArgs.deleteFragmentShaderPragmas = [];
+        }
+       args.materialArgs.deleteFragmentShaderPragmas.push(FRAGMENT_SHADER_MODIFIER_PRAGMA_GBUFFER_BUILDER_RAYMARCH);
+    }
 
     // NOTE: geometryは親から渡して使いまわしてもよい
     const geometry = args.geometry ?? createPlaneGeometry({ gpu });
     const material = createScreenSpaceRaymarchMaterial({
-        ...materialArgs,
+        ...args.materialArgs,
         // overrides
         fragmentShader: litScreenSpaceRaymarchFragmentLayout,
         depthFragmentShader: gbufferScreenSpaceRaymarchDepthFragmentLayout,
