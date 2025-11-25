@@ -2,15 +2,17 @@ import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     ActorType,
-    ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
-    ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
     ATTRIBUTE_NAME_INSTANCE_POSITION,
     ATTRIBUTE_NAME_INSTANCE_ROTATION,
     ATTRIBUTE_NAME_INSTANCE_SCALE,
-    ATTRIBUTE_NAME_INSTANCE_VELOCITY,
-    ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
     ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
     MESH_TYPE_INSTANCING_PARTICLE,
+    // CUSTOM_BEGIN comment out
+    // ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
+    // ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
+    // ATTRIBUTE_NAME_INSTANCE_VELOCITY,
+    // ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
+    // CUSTOM_END
     MeshType,
 } from '@/PaleGL/constants.ts';
 import { createAttribute } from '@/PaleGL/core/attribute.ts';
@@ -23,10 +25,12 @@ type DataPerInstance = {
     position?: number[];
     scale?: number[];
     rotation?: number[];
-    velocity?: number[];
-    color?: number[];
-    emissiveColor?: number[];
-    animationOffset?: number;
+    // CUSTOM_BEGIN comment out
+    // velocity?: number[];
+    // color?: number[];
+    // emissiveColor?: number[];
+    // animationOffset?: number;
+    // CUSTOM_END
 };
 
 export type InstancingParticleMakeDataPerInstanceFunction = (index: number) => DataPerInstance;
@@ -91,27 +95,33 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
         position: number[][];
         scale: number[][];
         rotation: number[][];
-        velocity: number[][];
-        color: number[][];
-        emissiveColor: number[][];
-        animationOffset: number[];
+        // CUSTOM_BEGIN comment out
+        // velocity: number[][];
+        // color: number[][];
+        // emissiveColor: number[][];
+        // animationOffset: number[];
+        // CUSTOM_END
     } = {
         position: [],
         scale: [],
         rotation: [],
-        velocity: [],
-        color: [],
-        emissiveColor: [],
-        animationOffset: [],
+        // CUSTOM_BEGIN comment out
+        // velocity: [],
+        // color: [],
+        // emissiveColor: [],
+        // animationOffset: [],
+        // CUSTOM_END
     };
 
     let tmpPosition: number[] | undefined;
     let tmpScale: number[] | undefined;
     let tmpRotation: number[] | undefined;
-    let tmpVelocity: number[] | undefined;
-    let tmpColor: number[] | undefined;
-    let tmpEmissiveColor: number[] | undefined;
-    let tmpAnimationOffset: number | undefined;
+    // CUSTOM_BEGIN comment out
+    // let tmpVelocity: number[] | undefined;
+    // let tmpColor: number[] | undefined;
+    // let tmpEmissiveColor: number[] | undefined;
+    // let tmpAnimationOffset: number | undefined;
+    // CUSTOM_END
 
     maton.range(instanceCount).forEach((_, i) => {
         if (makeDataPerInstanceFunction) {
@@ -119,19 +129,23 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             tmpPosition = perData.position;
             tmpScale = perData.scale;
             tmpRotation = perData.rotation;
-            tmpVelocity = perData.velocity;
-            tmpColor = perData.color; // RGBA
-            tmpEmissiveColor = perData.emissiveColor; // RGBA
-            tmpAnimationOffset = perData.animationOffset;
+            // CUSTOM_BEGIN comment out
+            // tmpVelocity = perData.velocity;
+            // tmpColor = perData.color; // RGBA
+            // tmpEmissiveColor = perData.emissiveColor; // RGBA
+            // tmpAnimationOffset = perData.animationOffset;
+            // CUSTOM_END
         }
 
         instanceInfo.position.push(tmpPosition || [0, 0, 0]);
         instanceInfo.scale.push(tmpScale || [1, 1, 1]);
         instanceInfo.rotation.push(tmpRotation || [0, 0, 0]);
-        instanceInfo.velocity.push(tmpVelocity || [0, 0, 0]);
-        instanceInfo.color.push(tmpColor || [1, 1, 1, 1]);
-        instanceInfo.emissiveColor.push(tmpEmissiveColor || [0, 0, 0, 1]);
-        instanceInfo.animationOffset.push(tmpAnimationOffset || 0);
+        // CUSTOM_BEGIN comment out
+        // instanceInfo.velocity.push(tmpVelocity || [0, 0, 0]);
+        // instanceInfo.color.push(tmpColor || [1, 1, 1, 1]);
+        // instanceInfo.emissiveColor.push(tmpEmissiveColor || [0, 0, 0, 1]);
+        // instanceInfo.animationOffset.push(tmpAnimationOffset || 0);
+        // CUSTOM_END
     });
 
     // TODO: instanceのoffset回りは予約語にしてもいいかもしれない
@@ -171,55 +185,57 @@ export const createInstancingParticle = (args: InstancingParticleArgs): Instanci
             1
         )
     );
-    // aInstanceAnimationOffsetは予約語
-    setGeometryAttribute(
-        mesh.geometry,
-        createAttribute(
-            ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
-            new Float32Array(instanceInfo.animationOffset.flat()),
-            1,
-            0,
-            0,
-            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
-            1
-        )
-    );
-    setGeometryAttribute(
-        mesh.geometry,
-        createAttribute(
-            ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
-            new Float32Array(instanceInfo.color.flat()),
-            4,
-            0,
-            0,
-            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
-            1
-        )
-    );
-    setGeometryAttribute(
-        mesh.geometry,
-        createAttribute(
-            ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
-            new Float32Array(instanceInfo.emissiveColor.flat()),
-            4,
-            0,
-            0,
-            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
-            1
-        )
-    );
-    setGeometryAttribute(
-        mesh.geometry,
-        createAttribute(
-            ATTRIBUTE_NAME_INSTANCE_VELOCITY,
-            new Float32Array(instanceInfo.velocity.flat()),
-            3,
-            0,
-            0,
-            ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
-            1
-        )
-    );
+    // CUSTOM_BEGIN comment out
+    // // aInstanceAnimationOffsetは予約語
+    // setGeometryAttribute(
+    //     mesh.geometry,
+    //     createAttribute(
+    //         ATTRIBUTE_NAME_INSTANCE_ANIMATION_OFFSET,
+    //         new Float32Array(instanceInfo.animationOffset.flat()),
+    //         1,
+    //         0,
+    //         0,
+    //         ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    //         1
+    //     )
+    // );
+    // setGeometryAttribute(
+    //     mesh.geometry,
+    //     createAttribute(
+    //         ATTRIBUTE_NAME_INSTANCE_VERTEX_COLOR,
+    //         new Float32Array(instanceInfo.color.flat()),
+    //         4,
+    //         0,
+    //         0,
+    //         ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    //         1
+    //     )
+    // );
+    // setGeometryAttribute(
+    //     mesh.geometry,
+    //     createAttribute(
+    //         ATTRIBUTE_NAME_INSTANCE_EMISSIVE_COLOR,
+    //         new Float32Array(instanceInfo.emissiveColor.flat()),
+    //         4,
+    //         0,
+    //         0,
+    //         ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    //         1
+    //     )
+    // );
+    // setGeometryAttribute(
+    //     mesh.geometry,
+    //     createAttribute(
+    //         ATTRIBUTE_NAME_INSTANCE_VELOCITY,
+    //         new Float32Array(instanceInfo.velocity.flat()),
+    //         3,
+    //         0,
+    //         0,
+    //         ATTRIBUTE_USAGE_TYPE_STATIC_DRAW,
+    //         1
+    //     )
+    // );
+    // CUSTOM_END
 
     overrideInstancingParticleMaterialSettings(mesh);
 
