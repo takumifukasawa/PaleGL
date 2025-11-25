@@ -1,6 +1,15 @@
 import { subscribeActorBeforeRender, subscribeActorOnStart, subscribeActorOnUpdate } from '@/PaleGL/actors/actor.ts';
+import { isActorEnabledInHierarchy } from '@/PaleGL/actors/actorBehaviours.ts';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import { iterateAllMeshMaterials, setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import {
+    checkNeedsReplaceGPUParticleUpdater,
+    GPUParticleArgsBase,
+    GpuParticleBase,
+    GPUParticleUpdater,
+    renderMRTDoubleBufferAndSwap,
+    resetGPUParticleByInitialize,
+} from '@/PaleGL/actors/particles/gpuParticle.ts';
 import {
     createInstancingParticle,
     overrideInstancingParticleMaterialSettings,
@@ -33,14 +42,6 @@ import { addUniformValue, UniformsData } from '@/PaleGL/core/uniforms.ts';
 import { createGeometry } from '@/PaleGL/geometries/geometry.ts';
 import { createVector2 } from '@/PaleGL/math/vector2.ts';
 import { createVector3, normalizeVector3, v3x, v3y, v3z } from '@/PaleGL/math/vector3.ts';
-import {
-    checkNeedsReplaceGPUParticleUpdater,
-    GPUParticleArgsBase,
-    GpuParticleBase,
-    GPUParticleUpdater,
-    renderMRTDoubleBufferAndSwap,
-    resetGPUParticleByInitialize,
-} from '@/PaleGL/actors/particles/gpuParticle.ts';
 
 export type GPUTrailParticleArgs = GPUParticleArgsBase & {
     mesh: Mesh;
@@ -308,7 +309,7 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
         prevUpdaterIndex: initialUpdaterIndex,
         updaterIndex: initialUpdaterIndex,
         updaters,
-        needsReplaceUpdaterInfo: []
+        needsReplaceUpdaterInfo: [],
     };
 
     overrideGPUTrailParticleMaterialSettings(gpuParticle);
@@ -316,6 +317,8 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
     let tmpReadUpMap;
+    let prevIsActorEnabledInHierarchy = false;
+    let currentActorEnabledInHierarchy = false;
 
     subscribeActorOnStart(gpuParticle, ({ renderer }) => {
         for (let i = 0; i < gpuParticle.updaters.length; i++) {
@@ -327,6 +330,13 @@ export const createGPUTrailParticle = (args: GPUTrailParticleArgs) => {
     });
 
     subscribeActorOnUpdate(gpuParticle, ({ renderer }) => {
+        // particleがenabledになったら強制的に初期化
+        currentActorEnabledInHierarchy = isActorEnabledInHierarchy(gpuParticle);
+        if (currentActorEnabledInHierarchy && !prevIsActorEnabledInHierarchy) {
+            resetGPUParticleByInitialize(renderer, gpuParticle);
+        }
+        prevIsActorEnabledInHierarchy = currentActorEnabledInHierarchy;
+
         checkNeedsReplaceGPUParticleUpdater(gpu, renderer, gpuParticle);
 
         const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];

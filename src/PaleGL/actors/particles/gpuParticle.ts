@@ -30,6 +30,7 @@ import {
     subscribeActorOnStart,
     subscribeActorOnUpdate,
 } from '@/PaleGL/actors/actor.ts';
+import { isActorEnabledInHierarchy } from '@/PaleGL/actors/actorBehaviours.ts';
 import { createGPUParticleController } from '@/PaleGL/components/gpuParticleController.ts';
 import {
     createMRTDoubleBuffer,
@@ -132,14 +133,7 @@ export const renderMRTDoubleBufferAndSwap = (
 };
 
 export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
-    const {
-        gpu,
-        vatWidth,
-        vatHeight,
-        shaders,
-        initialUpdaterIndex = 0,
-        useVATLookForward = false,
-    } = args;
+    const { gpu, vatWidth, vatHeight, shaders, initialUpdaterIndex = 0, useVATLookForward = false } = args;
 
     const instancingParticle = createInstancingParticle({ ...args, meshType: MESH_TYPE_GPU_PARTICLE });
 
@@ -225,8 +219,18 @@ export const createGPUParticle = (args: GPUParticleArgs): GpuParticle => {
     let tmpReadVelocityMap;
     let tmpReadPositionMap;
     let tmpReadUpMap;
-    
+    let prevIsActorEnabledInHierarchy = false;
+    let currentActorEnabledInHierarchy = false;
+
     subscribeActorOnUpdate(gpuParticle, ({ gpu, renderer }) => {
+        // particleがenabledになったら強制的に初期化
+        currentActorEnabledInHierarchy = isActorEnabledInHierarchy(gpuParticle);
+        if (currentActorEnabledInHierarchy && !prevIsActorEnabledInHierarchy) {
+            resetGPUParticleByInitialize(renderer, gpuParticle);
+        }
+        prevIsActorEnabledInHierarchy = currentActorEnabledInHierarchy;
+
+        // 更新すべきupdaterを確認
         checkNeedsReplaceGPUParticleUpdater(gpu, renderer, gpuParticle);
 
         const [, materialForUpdate] = gpuParticle.updaters[gpuParticle.updaterIndex];
