@@ -1015,8 +1015,3 @@ export const GLColorAttachments = [
     GL_COLOR_ATTACHMENT6,
     GL_COLOR_ATTACHMENT7,
 ];
-
-// --
-
-// export const PRAGMA_RAYMARCH_SCENE = '#pragma RAYMARCH_SCENE';
-export const PRAGMA_RAYMARCH_SCENE = 'RAYMARCH_SCENE';
