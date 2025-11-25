@@ -71,7 +71,7 @@ import { createPerspectiveCamera } from '@/PaleGL/actors/cameras/perspectiveCame
 import { createDirectionalLight } from '@/PaleGL/actors/lights/directionalLight.ts';
 import { Light } from '@/PaleGL/actors/lights/light.ts';
 import { createSpotLight } from '@/PaleGL/actors/lights/spotLight.ts';
-import { createMesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { createMesh, Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
 import {
     createGBufferMaterialController,
     // CUSTOM_BEGIN comment out
@@ -462,7 +462,7 @@ export function buildMarionetterScene(
             //         : undefined,
             // };
             // addActorComponent(actor, createGBufferMaterialController(initialValues));
-            addActorComponent(actor, createGBufferMaterialController(actor));
+            addActorComponent(actor, createGBufferMaterialController(actor as Mesh));
         }
 
         if (actor) {
