@@ -415,7 +415,7 @@ float fDfArmLight(
 }
 
 
-float fdfLeg(
+float fDfLeg(
     float cd, // current distance
     vec3 pPelvis,
     float axis,
@@ -681,7 +681,7 @@ sHuman fDfHuman(
         rightWristRotation
     );
     // left leg
-    d = fdfLeg(
+    d = fDfLeg(
         d,
         pPelvis,
         -1.,
@@ -689,7 +689,7 @@ sHuman fDfHuman(
         leftKneeRotation
     );
     // right leg
-    d = fdfLeg(
+    d = fDfLeg(
         d,
         pPelvis,
         1.,
@@ -717,140 +717,140 @@ sHuman fDfHuman(
 }
 
 
-float fDfHumanGiant(
-    vec3 p,
-    // ---   
-    vec3 pelvisPosition,
-    vec3 pelvisRotation,
-    vec3 spine1Rotation,
-    vec3 spine2Rotation,
-    vec3 leftShoulderRotation,
-    vec3 leftElbowRotation,
-    vec3 rightShoulderRotation,
-    vec3 rightElbowRotation,
-    vec3 leftHipRotation,
-    vec3 leftKneeRotation,
-    vec3 rightHipRotation,
-    vec3 rightKneeRotation,
-    vec3 neckRotation,
-    vec3 leftWristRotation,
-    vec3 rightWristRotation
-    // ---    
-) {
-    vec3 q = fOpTr(p, vec3(0., -1.5, 0.)); // boundsの高さの半分、地面の高さまで手動オフセット
-    float d = 1e6;
-    
-    // - pelvis
-    // vec3 pPelvis = fOpTr(q, vec3(0., 1.05, 0.));
-    vec3 pPelvis = fOpTr(q, pelvisPosition);
-    vec3 pr = vec3(0., 0., 0.);
-    pPelvis.xz = fOpRo(pPelvis.xz, PI * -pelvisRotation.y);
-    pPelvis.xy = fOpRo(pPelvis.xy, PI * -pelvisRotation.z);
-    pPelvis.yz = fOpRo(pPelvis.yz, PI * pelvisRotation.x);
-    // pShoulder.xz = fOpRo(pShoulder.xz, PI * axis * shoulderRot.y); // ひねり
-    // pShoulder.xy = fOpRo(pShoulder.xy, PI * axis * shoulderRot.z); // 上下
-    // pShoulder.yz = fOpRo(pShoulder.yz, -PI * shoulderRot.x); // 前後
-    
-    vec3 _pPelvis = pPelvis;
-    // _pPelvis.xz *= 2.;
-    float dPelvis = fDfRBoxt(_pPelvis, vec3(.34, .32, .18), .1);
-    
-    // -- spine01
-    vec3 pSpine1 = fOpTr(pPelvis, vec3(0., .15, 0.));
-    pSpine1.xy = fOpRo(pSpine1.xy, PI * -spine1Rotation.z);
-    pSpine1.yz = fOpRo(pSpine1.yz, PI * -spine1Rotation.x);
-    pSpine1.xz = fOpRo(pSpine1.xz, PI * -spine1Rotation.y);
-    vec3 _pSpine1 = pSpine1;
-    // _pSpine1.xz *= (1. + _pSpine1.y * .8);
-    vec3 pSpine1Scale = vec3(.95, 1., .98);
-    float dSpine1 = fOpPoSc(
-        fDfRBoxt(
-            fOpPrSc(_pSpine1, pSpine1Scale), vec3(.34, .39, .2), .1
-        ),
-        pSpine1Scale
-    ); 
-
-    // -- spine02
-   
-    // pSpine1.yz = fOpRo(pSpine1.yz, sin(uTime) * PI * .5);
-    vec3 pSpine2 = fOpTr(pSpine1, vec3(0., .25, 0.));
-    pSpine2.xy = fOpRo(pSpine2.xy, PI * -spine2Rotation.z);
-    pSpine2.yz = fOpRo(pSpine2.yz, PI * -spine2Rotation.x);
-    pSpine2.xz = fOpRo(pSpine2.xz, PI * -spine2Rotation.y);
-    vec3 _pSpine2 = pSpine2;
-    _pSpine2 = fOpTr(_pSpine2, vec3(0., .03, 0.));
-    vec3 pSpine2Scale = vec3(
-        1. + max(_pSpine2.y + .1, 0.) * 1.1,
-        1.,
-        // 1. + max(_pSpine2.y + .2 - 0., 0.) * .7
-        1. + (smoothstep(-.2, 0., _pSpine2.y) * (1. - smoothstep(.02, .25, _pSpine2.y))) * .3
-    );
-    float dSpine2 = fOpPoSc(
-        fDfRBoxt(fOpPrSc(_pSpine2, pSpine2Scale), vec3(.36, .38, .19), .1),
-        pSpine2Scale
-    );
-    
-    // --- neck
-    
-    vec3 pNeck = fOpTr(pSpine2, vec3(0., .2, .005));
-    pNeck.yz = fOpRo(pNeck.yz, PI * (-.03 + neckRotation.x));
-    float dNeck = fDfCaa(pNeck, vec3(0.), .04, .06);
-
-    // --- head
-
-    vec3 pHead = fOpTr(pNeck, vec3(0., .12, 0.));
-    pHead.yz = fOpRo(pHead.yz, PI * -.05);
-
-    vec3 _pHead1 = fOpTr(pHead, vec3(0., .035, .008));
-    vec3 pHead1Scale = vec3(.95, .95, 1.1);
-    _pHead1.yz = fOpRo(_pHead1.yz, PI * -.1);
-    float dHead1 = fOpPoSc(
-        fDfSp(fOpPrSc(_pHead1, pHead1Scale), .1),
-        pHead1Scale
-    );
-    
-    vec3 pHead2Scale = vec3(1.1, 1., 1.);
-    vec3 _pHead2 = fOpTr(pHead, vec3(0., .025, .025));
-    _pHead2.yz = fOpRo(_pHead2.yz, PI * .22);
-    float dHead2 = fOpPoSc(
-        // fDfRco(fOpPrSc(_pHead2, pHead2Scale), .09, .03, .04),
-        fDfVes(fOpPrSc(_pHead2, pHead2Scale), vec3(0., -.13, 0.), vec3(.0, .1, 0.), .08),
-        pHead2Scale
-    );
-
-    float dHead = fOpSm(
-        dHead1,
-        dHead2,
-        .02
-    );
-    
-    d = fOpSm(dPelvis, dSpine1, .05);
-    d = fOpSm(d, dSpine2, .05);
-    d = fOpSm(
-        d,
-        fOpSm(dNeck, dHead, .05),
-        // dNeck,
-        .02
-    );
-    
-    // left arm 
-    d = fDfArm(
-        d,
-        pSpine2,
-        -1.,
-        leftShoulderRotation * vec3(1., 1., 1.),
-        leftElbowRotation * vec3(-1., -1., -1.),
-        leftWristRotation
-    );
-    // right arm
-    d = fDfArm(
-        d,
-        pSpine2,
-        1.,
-        rightShoulderRotation * vec3(-1., -1., -1.),
-        rightElbowRotation * vec3(1., 1., 1.),
-        rightWristRotation
-    );
-
-    return d;
-}
+// float fDfHumanGiant(
+//     vec3 p,
+//     // ---   
+//     vec3 pelvisPosition,
+//     vec3 pelvisRotation,
+//     vec3 spine1Rotation,
+//     vec3 spine2Rotation,
+//     vec3 leftShoulderRotation,
+//     vec3 leftElbowRotation,
+//     vec3 rightShoulderRotation,
+//     vec3 rightElbowRotation,
+//     vec3 leftHipRotation,
+//     vec3 leftKneeRotation,
+//     vec3 rightHipRotation,
+//     vec3 rightKneeRotation,
+//     vec3 neckRotation,
+//     vec3 leftWristRotation,
+//     vec3 rightWristRotation
+//     // ---    
+// ) {
+//     vec3 q = fOpTr(p, vec3(0., -1.5, 0.)); // boundsの高さの半分、地面の高さまで手動オフセット
+//     float d = 1e6;
+//     
+//     // - pelvis
+//     // vec3 pPelvis = fOpTr(q, vec3(0., 1.05, 0.));
+//     vec3 pPelvis = fOpTr(q, pelvisPosition);
+//     vec3 pr = vec3(0., 0., 0.);
+//     pPelvis.xz = fOpRo(pPelvis.xz, PI * -pelvisRotation.y);
+//     pPelvis.xy = fOpRo(pPelvis.xy, PI * -pelvisRotation.z);
+//     pPelvis.yz = fOpRo(pPelvis.yz, PI * pelvisRotation.x);
+//     // pShoulder.xz = fOpRo(pShoulder.xz, PI * axis * shoulderRot.y); // ひねり
+//     // pShoulder.xy = fOpRo(pShoulder.xy, PI * axis * shoulderRot.z); // 上下
+//     // pShoulder.yz = fOpRo(pShoulder.yz, -PI * shoulderRot.x); // 前後
+//     
+//     vec3 _pPelvis = pPelvis;
+//     // _pPelvis.xz *= 2.;
+//     float dPelvis = fDfRBoxt(_pPelvis, vec3(.34, .32, .18), .1);
+//     
+//     // -- spine01
+//     vec3 pSpine1 = fOpTr(pPelvis, vec3(0., .15, 0.));
+//     pSpine1.xy = fOpRo(pSpine1.xy, PI * -spine1Rotation.z);
+//     pSpine1.yz = fOpRo(pSpine1.yz, PI * -spine1Rotation.x);
+//     pSpine1.xz = fOpRo(pSpine1.xz, PI * -spine1Rotation.y);
+//     vec3 _pSpine1 = pSpine1;
+//     // _pSpine1.xz *= (1. + _pSpine1.y * .8);
+//     vec3 pSpine1Scale = vec3(.95, 1., .98);
+//     float dSpine1 = fOpPoSc(
+//         fDfRBoxt(
+//             fOpPrSc(_pSpine1, pSpine1Scale), vec3(.34, .39, .2), .1
+//         ),
+//         pSpine1Scale
+//     ); 
+// 
+//     // -- spine02
+//    
+//     // pSpine1.yz = fOpRo(pSpine1.yz, sin(uTime) * PI * .5);
+//     vec3 pSpine2 = fOpTr(pSpine1, vec3(0., .25, 0.));
+//     pSpine2.xy = fOpRo(pSpine2.xy, PI * -spine2Rotation.z);
+//     pSpine2.yz = fOpRo(pSpine2.yz, PI * -spine2Rotation.x);
+//     pSpine2.xz = fOpRo(pSpine2.xz, PI * -spine2Rotation.y);
+//     vec3 _pSpine2 = pSpine2;
+//     _pSpine2 = fOpTr(_pSpine2, vec3(0., .03, 0.));
+//     vec3 pSpine2Scale = vec3(
+//         1. + max(_pSpine2.y + .1, 0.) * 1.1,
+//         1.,
+//         // 1. + max(_pSpine2.y + .2 - 0., 0.) * .7
+//         1. + (smoothstep(-.2, 0., _pSpine2.y) * (1. - smoothstep(.02, .25, _pSpine2.y))) * .3
+//     );
+//     float dSpine2 = fOpPoSc(
+//         fDfRBoxt(fOpPrSc(_pSpine2, pSpine2Scale), vec3(.36, .38, .19), .1),
+//         pSpine2Scale
+//     );
+//     
+//     // --- neck
+//     
+//     vec3 pNeck = fOpTr(pSpine2, vec3(0., .2, .005));
+//     pNeck.yz = fOpRo(pNeck.yz, PI * (-.03 + neckRotation.x));
+//     float dNeck = fDfCaa(pNeck, vec3(0.), .04, .06);
+// 
+//     // --- head
+// 
+//     vec3 pHead = fOpTr(pNeck, vec3(0., .12, 0.));
+//     pHead.yz = fOpRo(pHead.yz, PI * -.05);
+// 
+//     vec3 _pHead1 = fOpTr(pHead, vec3(0., .035, .008));
+//     vec3 pHead1Scale = vec3(.95, .95, 1.1);
+//     _pHead1.yz = fOpRo(_pHead1.yz, PI * -.1);
+//     float dHead1 = fOpPoSc(
+//         fDfSp(fOpPrSc(_pHead1, pHead1Scale), .1),
+//         pHead1Scale
+//     );
+//     
+//     vec3 pHead2Scale = vec3(1.1, 1., 1.);
+//     vec3 _pHead2 = fOpTr(pHead, vec3(0., .025, .025));
+//     _pHead2.yz = fOpRo(_pHead2.yz, PI * .22);
+//     float dHead2 = fOpPoSc(
+//         // fDfRco(fOpPrSc(_pHead2, pHead2Scale), .09, .03, .04),
+//         fDfVes(fOpPrSc(_pHead2, pHead2Scale), vec3(0., -.13, 0.), vec3(.0, .1, 0.), .08),
+//         pHead2Scale
+//     );
+// 
+//     float dHead = fOpSm(
+//         dHead1,
+//         dHead2,
+//         .02
+//     );
+//     
+//     d = fOpSm(dPelvis, dSpine1, .05);
+//     d = fOpSm(d, dSpine2, .05);
+//     d = fOpSm(
+//         d,
+//         fOpSm(dNeck, dHead, .05),
+//         // dNeck,
+//         .02
+//     );
+//     
+//     // left arm 
+//     d = fDfArm(
+//         d,
+//         pSpine2,
+//         -1.,
+//         leftShoulderRotation * vec3(1., 1., 1.),
+//         leftElbowRotation * vec3(-1., -1., -1.),
+//         leftWristRotation
+//     );
+//     // right arm
+//     d = fDfArm(
+//         d,
+//         pSpine2,
+//         1.,
+//         rightShoulderRotation * vec3(-1., -1., -1.),
+//         rightElbowRotation * vec3(1., 1., 1.),
+//         rightWristRotation
+//     );
+// 
+//     return d;
+// }
