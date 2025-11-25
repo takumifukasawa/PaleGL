@@ -21,12 +21,16 @@ const vec2[4] billboardPositionConverters = vec2[](
 
 void main() {
     int particleId = int(mod(float(gl_VertexID), 4.));
-    
-    #pragma BEGIN_MAIN
+   
+    // CUSTOM_BEGIN comment out 
+    // #pragma BEGIN_MAIN
+    // CUSTOM_END
 
     vec4 localPosition = vec4(aPosition, 1.);
 
-    #pragma LOCAL_POSITION_POST_PROCESS
+    // CUSTOM_BEGIN comment out
+    // #pragma LOCAL_POSITION_POST_PROCESS
+    // CUSTOM_END
 
     vUv = aUv; 
    

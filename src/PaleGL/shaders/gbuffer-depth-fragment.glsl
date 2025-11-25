@@ -56,10 +56,14 @@ void main() {
     );
     fOverrideGBufferDepth(gBufferDepth);
 
-    #pragma BEFORE_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma BEFORE_OUT
+    // CUSTOM_END
     
     // baseColorを最適化の過程で消されないようにする対策のmix
     outColor = mix(vec4(1., 1., 1., 1.), resultColor, 0.);
 
-    #pragma AFTER_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma AFTER_OUT
+    // CUSTOM_END
 }

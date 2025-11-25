@@ -13,7 +13,9 @@
 #include <surface_h>
 uniform int uShadingModelId;
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 in vec2 vUv;
 in vec3 vNormal;
@@ -70,20 +72,21 @@ void main() {
         emissiveColor.xyz
     );
     fOverrideGBufferSurface(gBufferSurface);
-    
-    #pragma BEFORE_OUT
+   
+    // CUSTOM_BEGIN comment out
+    // #pragma BEFORE_OUT
+    // CUSTOM_END
 
+    // tmp
     // outGBufferA = fEncodeGBufferA(baseColor.rgb);
     // outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
     // outGBufferC = fEncodeGBufferC(metallic, roughness);
     // outGBufferD = fEncodeGBufferD(emissiveColor.rgb);
    
-   
     outGBufferA = fEncodeGBufferA(gBufferSurface.smBaseColor.rgb);
     outGBufferB = fEncodeGBufferB(gBufferSurface.smWorldNormal, uShadingModelId);
     outGBufferC = fEncodeGBufferC(gBufferSurface.smMetallic, gBufferSurface.smRoughness);
     outGBufferD = fEncodeGBufferD(gBufferSurface.smEmissiveColor.rgb);
-    
     
     // for debug 
     // outGBufferD = vec4(worldNormal, 1.);
@@ -94,6 +97,8 @@ void main() {
     // outGBufferD = fEncodeGBufferD(-vBinormal);
     // // outGBufferD = fEncodeGBufferD(vec3(uv * .1, 1.));
     // #endif
-    
-    #pragma AFTER_OUT
+   
+    // CUSTOM_BEGIN comment out 
+    // #pragma AFTER_OUT
+    // CUSTOM_END
 }

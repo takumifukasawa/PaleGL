@@ -24,7 +24,9 @@ uniform float uRoughness;
 uniform int uShadingModelId;
 uniform vec4 uEmissiveColor;
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 uniform float uTargetWidth;
 uniform float uTargetHeight;

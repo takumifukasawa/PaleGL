@@ -2,7 +2,9 @@
 
 #pragma BASE_ATTRIBUTES
 
-#pragma APPEND_ATTRIBUTES
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_ATTRIBUTES
+// CUSTOM_END
 
 #include <common>
 #include <lighting>
@@ -51,7 +53,9 @@ uniform vec4 uMapTiling;
 uniform float uHeightScale;
 #endif
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 mat4 fGetRotationXMat(float rad) {
     float c = cos(rad);
@@ -248,7 +252,9 @@ mat4 fGetIdentityMat() {
 
 void main() {
 
-    #pragma BEGIN_MAIN
+    // CUSTOM_BEGIN comment out
+    // #pragma BEGIN_MAIN
+    // CUSTOM_END
 
     vec4 localPosition = vec4(aPosition, 1.);
 
@@ -293,7 +299,9 @@ void main() {
     // CUSTOM_END
     // --- end calc skinning
 
-    #pragma LOCAL_POSITION_POST_PROCESS
+    // CUSTOM_BEGIN comment out
+    // #pragma LOCAL_POSITION_POST_PROCESS
+    // CUSTOM_END
 
     // assign common varyings 
     vUv = aUv;
@@ -320,7 +328,9 @@ void main() {
     // --- vat
 
     #ifdef D_VAT
-        #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        // CUSTOM_BEGIN comment out
+        // #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+        // CUSTOM_END
         #if defined(D_TRAIL)
             ivec2 vatUv = ivec2(
                 int(mod(fid, uVATResolution.x)),
@@ -373,7 +383,9 @@ void main() {
         // );
     #endif
     
-    #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+    // CUSTOM_BEGIN comment out
+    // #pragma INSTANCE_TRANSFORM_PRE_PROCESS
+    // CUSTOM_END
 
     worldMatrix = uWorldMatrix * instanceTranslation * instanceRotation * instanceScaling;
 
@@ -444,7 +456,9 @@ void main() {
     worldPosition = worldMatrix * localPosition;
 #endif
 
-    #pragma WORLD_POSITION_POST_PROCESS
+    // CUSTOM_BEGIN comment out
+    // #pragma WORLD_POSITION_POST_PROCESS
+    // CUSTOM_END
 
     // --- vertex color
 
@@ -468,5 +482,7 @@ void main() {
 
     gl_Position = uProjectionMatrix * uViewMatrix * worldPosition;
  
-    #pragma END_MAIN
+    // CUSTOM_BEGIN comment out
+    // #pragma END_MAIN
+    // CUSTOM_END
 }

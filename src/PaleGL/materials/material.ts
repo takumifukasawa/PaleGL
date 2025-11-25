@@ -32,14 +32,15 @@
     UniformBlockName,
     UniformTypes,
     // UniformType
-    VertexShaderModifiers,
+    // CUSTOM_BEGIN comment out
+    // VertexShaderModifiers,
+    // CUSTOM_END
 } from '@/PaleGL/constants';
 import { AttributeDescriptor } from '@/PaleGL/core/attribute.ts';
 import { buildFragmentShader, buildVertexShader, ShaderDefines } from '@/PaleGL/core/buildShader.ts';
 import { Gpu } from '@/PaleGL/core/gpu.ts';
 import { createShader, deleteProgram, Shader } from '@/PaleGL/core/shader.ts';
 import {
-    addUniformValue,
     createUniforms,
     hasUniformValue,
     setUniformValue,
@@ -76,7 +77,9 @@ export type MaterialArgs = {
     fragmentShaderGenerator?: FragmentShaderGenerator;
     depthFragmentShaderGenerator?: DepthFragmentShaderGenerator;
 
-    vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_BEGIN comment out
+    // vertexShaderModifiers?: VertexShaderModifiers;
+    // CUSTOM_END
     fragmentShaderModifiers?: FragmentShaderModifiers;
     depthFragmentShaderModifiers?: DepthFragmentShaderModifiers;
 
@@ -224,7 +227,9 @@ export type Material = {
     vertexShaderGenerator: VertexShaderGenerator | null;
     fragmentShaderGenerator: FragmentShaderGenerator | null;
     depthFragmentShaderGenerator: DepthFragmentShaderGenerator | null;
-    vertexShaderModifiers: VertexShaderModifiers;
+    // CUSTOM_BEGIN comment out
+    // vertexShaderModifiers: VertexShaderModifiers;
+    // CUSTOM_END
     fragmentShaderModifiers: FragmentShaderModifiers;
     depthFragmentShaderModifiers: DepthFragmentShaderModifiers;
     deleteFragmentShaderPragmas: FragmentShaderModifierPragmas[];
@@ -250,7 +255,9 @@ export const createMaterial = (args: MaterialArgs): Material => {
         fragmentShaderGenerator = null,
         depthFragmentShaderGenerator = null,
 
-        vertexShaderModifiers = [],
+        // CUSTOM_BEGIN comment out
+        // vertexShaderModifiers = [],
+        // CUSTOM_END
         fragmentShaderModifiers = [],
         depthFragmentShaderModifiers = [],
 
@@ -439,7 +446,9 @@ export const createMaterial = (args: MaterialArgs): Material => {
         vertexShaderGenerator,
         fragmentShaderGenerator,
         depthFragmentShaderGenerator,
-        vertexShaderModifiers,
+        // CUSTOM_BEGIN comment out
+        // vertexShaderModifiers,
+        // CUSTOM_END
         fragmentShaderModifiers,
         depthFragmentShaderModifiers,
         deleteFragmentShaderPragmas,
@@ -500,8 +509,10 @@ export const startMaterial = (
         const rawVertexShader = buildVertexShader(
             material.vertexShader,
             attributeDescriptors,
-            shaderDefineOptions,
-            material.vertexShaderModifiers
+            shaderDefineOptions
+            // CUSTOM_BEGIN comment out
+            // material.vertexShaderModifiers
+            // CUSTOM_END
         );
         material.rawVertexShader = rawVertexShader;
     }
@@ -528,7 +539,9 @@ export const startMaterial = (
         console.log(
             material.vertexShader,
             shaderDefineOptions,
-            material.vertexShaderModifiers,
+            // CUSTOM_BEGIN comment out
+            // material.vertexShaderModifiers,
+            // CUSTOM_END
             material.rawVertexShader
         );
         // console.log(_fragmentShader, shaderDefineOptions, _fragmentShaderModifier, _rawFragmentShader);

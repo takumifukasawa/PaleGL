@@ -37,7 +37,9 @@ uniform vec4 uMapTiling;
 uniform vec4 uEmissiveColor;
 uniform int uShadingModelId;
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 uniform float uIsPerspective;
 uniform float uUseWorld;
@@ -259,9 +261,13 @@ void main() {
         specBlendRate
     );
     
-    #pragma BEFORE_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma BEFORE_OUT
+    // CUSTOM_END
     
     outColor = resultColor;
 
-    #pragma AFTER_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma AFTER_OUT
+    // CUSTOM_END
 }

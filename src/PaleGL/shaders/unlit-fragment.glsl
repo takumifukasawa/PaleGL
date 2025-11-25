@@ -9,14 +9,18 @@
 // #include <vcolor_fh>
 // CUSTOM_END
 
-#pragma APPEND_INCLUDE
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_INCLUDE
+// CUSTOM_END
 
 uniform vec4 uBaseColor;
 uniform sampler2D uBaseMap;
 uniform vec4 uMapTiling;
 uniform int uShadingModelId;
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 // CUSTOM_BEGIN comment out
 // #include <alpha_test>
@@ -26,11 +30,15 @@ in vec2 vUv;
 in vec3 vNormal;
 in vec3 vWorldPosition;
 
-#pragma APPEND_VARYINGS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_VARYINGS
+// CUSTOM_END
 
 #include <gbuffer_o>
 
-#pragma BEGIN_MAIN
+// CUSTOM_BEGIN comment out
+// #pragma BEGIN_MAIN
+// CUSTOM_END
 
 void main() {
     vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
@@ -48,7 +56,7 @@ void main() {
     vec4 resultColor = baseColor;
 
     // CUSTOM_BEGIN comment out
-    #include <alpha_test_f>
+    // #include <alpha_test_f>
     // CUSTOM_END
 
     // baseColor = fGamma(baseColor); 
@@ -62,5 +70,7 @@ void main() {
     // outGBufferD = fEncodeGBufferD(worldNormal.rgb);
     // outGBufferD = vec4(step(.5, uv.x), 0., 0., 1.);
 
-    #pragma AFTER_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma AFTER_OUT
+    // CUSTOM_END
 }

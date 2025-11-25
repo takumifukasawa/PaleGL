@@ -33,7 +33,9 @@ in float vInstanceId;
 #include <raymarch_sf>
 #include <os_raymarch_f>
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 uniform float uIsPerspective;
 uniform float uUseWorld;
@@ -149,7 +151,9 @@ void main() {
     );
     fOverrideGBufferSurface(gBufferSurface, result);
 
-    #pragma BEFORE_OUT
+    // CUSTOM_BEGIN comment out
+    // #pragma BEFORE_OUT
+    // CUSTOM_END
 
     // outGBufferA = fEncodeGBufferA(resultColor.rgb);
     // outGBufferB = fEncodeGBufferB(worldNormal, uShadingModelId);
@@ -161,5 +165,7 @@ void main() {
     outGBufferC = fEncodeGBufferC(gBufferSurface.smMetallic, gBufferSurface.smRoughness);
     outGBufferD = fEncodeGBufferD(gBufferSurface.smEmissiveColor.rgb);
     
-    #pragma END_MAIN
+    // CUSTOM_BEGIN comment out
+    // #pragma END_MAIN
+    // CUSTOM_END
 }

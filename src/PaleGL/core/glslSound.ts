@@ -73,7 +73,9 @@ export function createGLSLSound(gpu: Gpu, vertexShader: string, duration: number
         /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
         // @ts-ignore
         {},
-        []
+        // CUSTOM_BEGIN comment out
+        // []
+        // CUSTOM_END
     );
 
     return {

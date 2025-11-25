@@ -2,7 +2,9 @@
 
 #pragma BASE_ATTRIBUTES
 
-#pragma APPEND_ATTRIBUTES
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_ATTRIBUTES
+// CUSTOM_END
 
 #include <lighting>
 #include <ub>
@@ -10,7 +12,9 @@
 // varyings
 out vec2 vUv;
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 #include <shape_font_h>
 
@@ -19,7 +23,9 @@ uniform vec2 uUIAnchor; // -1. ~ 1.
 uniform float uUIFontSize;
 
 void main() {
-    #pragma BEGIN_MAIN
+    // CUSTOM_BEGIN comment out
+    // #pragma BEGIN_MAIN
+    // CUSTOM_END
 
     vec4 localPosition = vec4(aPosition, 1.); // -0.5 ~ 0.5
 
@@ -68,5 +74,7 @@ void main() {
     vUv = aUv;
     gl_Position = uProjectionMatrix * uWorldMatrix * localPosition;
     
-    #pragma END_MAIN
+    // CUSTOM_BEGIN comment out
+    // #pragma END_MAIN
+    // CUSTOM_END
 }

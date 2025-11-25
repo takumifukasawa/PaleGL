@@ -1,13 +1,18 @@
-﻿#pragma APPEND_ATTRIBUTES
-
+﻿
 #pragma DEFINES
 
 #pragma BASE_ATTRIBUTES
 
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_ATTRIBUTES
+// CUSTOM_END
+
 #include <lighting>
 #include <ub>
 
-#pragma APPEND_UNIFORMS
+// CUSTOM_BEGIN comment out
+// #pragma APPEND_UNIFORMS
+// CUSTOM_END
 
 out vec2 vUv;
 out vec3 vNormal;
