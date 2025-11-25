@@ -999,7 +999,7 @@ export const MARIONETTER_FBM_NOISE_TEXTURE_CONTROLLER_COMPONENT_INFO_PROPERTY_FA
 // [type, [...data]]
 export type MarionetterGBufferMaterialControllerComponentInfo = [
     MarionetterComponentType,
-    [string, number, number, string, RawVector4, number] // [baseColor, metallic, roughness, emissiveColor, textureTilingOffset, heightScale]
+    [string, number, number, string, RawVector4, number, RawVector4] // [baseColor, metallic, roughness, emissiveColor, textureTilingOffset, heightScale, customProperties0]
 ];
 
 // export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_COMPONENT_INFO_PROPERTY_DATA = NeedsShorten ? 'd' : 'data';
@@ -1009,6 +1009,7 @@ export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_INDEX = 2;
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_INDEX = 3;
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_INDEX = 4;
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_INDEX = 5;
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_INDEX = 6;
 
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME = NeedsShorten ? 'gbm_bc' : 'BaseColor';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME = NeedsShorten ? 'gbm_m' : 'Metallic';
@@ -1016,6 +1017,7 @@ export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAM
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME = NeedsShorten ? 'gbm_ec' : 'EmissiveColor';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME = NeedsShorten ? 'gbm_to' : 'TextureTilingOffset';
 export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME = NeedsShorten ? 'gbm_hs' : 'HeightScale';
+export const MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_PROPERTY_NAME = NeedsShorten ? 'gbm_p0' : 'CustomProperties0';
 
 
 // //
