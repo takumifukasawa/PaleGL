@@ -1,13 +1,5 @@
 import { Renderer } from '@/PaleGL/core/renderer.ts';
-import {
-    Color,
-    RawColor,
-    RAW_COLOR_R_INDEX,
-    RAW_COLOR_G_INDEX,
-    RAW_COLOR_B_INDEX,
-    RAW_COLOR_A_INDEX,
-    setColorChannels,
-} from '@/PaleGL/math/color.ts';
+import { Color, copyColor, createColorFromHex, createColorFromArray } from '@/PaleGL/math/color.ts';
 import {
     RAW_VECTOR3_X_INDEX,
     RAW_VECTOR3_Y_INDEX,
@@ -60,12 +52,18 @@ const assignVector3Converter: AssignVector3Converter = (v: RawVector3, prop: unk
     // @ts-ignore-next-line
     setV3(prop[key] as Vector3, v[RAW_VECTOR3_X_INDEX], v[RAW_VECTOR3_Y_INDEX], v[RAW_VECTOR3_Z_INDEX]);
 };
-type AssignColorConverter = (c: RawColor, prop: unknown, key: string) => void;
-const assignColorConverter: AssignColorConverter = (c: RawColor, prop: unknown, key: string) => {
-    console.log(c,prop,key);
+type AssignColorConverter = (c: string | Float32Array, prop: unknown, key: string) => void;
+const assignColorConverter: AssignColorConverter = (colorValue: string | Float32Array, prop: unknown, key: string) => {
+    let color: Color;
+    console.log(colorValue,prop,key,colorValue instanceof Float32Array)
+    if (colorValue instanceof Float32Array) {
+        color = createColorFromArray(Array.from(colorValue));
+    } else {
+        color = createColorFromHex(colorValue);
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    setColorChannels(prop[key] as Color, c[RAW_COLOR_R_INDEX], c[RAW_COLOR_G_INDEX], c[RAW_COLOR_B_INDEX], c[RAW_COLOR_A_INDEX]);
+    // @ts-ignore-next-line
+    copyColor(prop[key] as Color, color);
 };
 
 export type PostProcessParametersConversionFunctions =

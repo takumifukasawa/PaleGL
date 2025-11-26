@@ -115,10 +115,10 @@ export const createBillboardParticle = (args: BillboardParticleArgs) => {
                             const c = getColorRange(minColor, maxColor);
                             return [
                                 // prettier-ignore
-                                ...c,
-                                ...c,
-                                ...c,
-                                ...c,
+                                ...c.e,
+                                ...c.e,
+                                ...c.e,
+                                ...c.e,
                             ];
                         })
                         .flat()

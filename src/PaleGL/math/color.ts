@@ -1,102 +1,93 @@
 ﻿import { randomRange } from '@/PaleGL/utilities/mathUtilities.ts';
 
-// [r, g, b, a]
-export type RawColor = [number, number, number, number];
-
-// Array indices for RawColor
-export const RAW_COLOR_R_INDEX = 0;
-export const RAW_COLOR_G_INDEX = 1;
-export const RAW_COLOR_B_INDEX = 2;
-export const RAW_COLOR_A_INDEX = 3;
-
-export type Color = Float32Array;
+export type Color = { e: Float32Array };
 
 export const createColor = (r: number = 0, g: number = 0, b: number = 0, a: number = 1): Color => {
-    return new Float32Array([r, g, b, a]);
+    return { e: new Float32Array([r, g, b, a]) };
 }
 
 export const getColorR = (color: Color) => {
-    return color[0];
+    return color.e[0];
 }
 
 export const getColorG = (color: Color) => {
-    return color[1];
+    return color.e[1];
 }
 
 export const getColorB = (color: Color) => {
-    return color[2];
+    return color.e[2];
 }
 
 export const getColorA = (color: Color) => {
-    return color[3];
+    return color.e[3];
 }
 
 export const getColorR255 = (color: Color) => {
-    return color[0] * 255;
+    return color.e[0] * 255;
 }
 
 export const getColorG255 = (color: Color) => {
-    return color[1] * 255;
+    return color.e[1] * 255;
 }
 
 export const getColorB255 = (color: Color) => {
-    return color[2] * 255;
+    return color.e[2] * 255;
 }
 
 export const getColorA255 = (color: Color) => {
-    return color[3] * 255;
+    return color.e[3] * 255;
 }
 
 export const getColorRGBArray = (color: Color) => {
-    return [color[0], color[1], color[2]];
+    return [color.e[0], color.e[1], color.e[2]];
 }
 
 export const setColorR = (color: Color, value: number) => {
-    color[0] = value;
+    color.e[0] = value;
 }
 
 export const setColorG = (color: Color, value: number) => {
-    color[1] = value;
+    color.e[1] = value;
 }
 
 export const setColorB = (color: Color, value: number) => {
-    color[2] = value;
+    color.e[2] = value;
 }
 
 export const setColorA = (color: Color, value: number) => {
-    color[3] = value;
+    color.e[3] = value;
 }
 
 export const setColorChannels = (color: Color, r: number, g: number, b: number, a: number) => {
-    color[0] = r;
-    color[1] = g;
-    color[2] = b;
-    color[3] = a;
+    color.e[0] = r;
+    color.e[1] = g;
+    color.e[2] = b;
+    color.e[3] = a;
 }
 
 export const setColorChannel = (color: Color, key: string, value: number) => {
     switch (key) {
         case 'r':
-            color[0] = value;
+            color.e[0] = value;
             break;
         case 'g':
-            color[1] = value;
+            color.e[1] = value;
             break;
         case 'b':
-            color[2] = value;
+            color.e[2] = value;
             break;
         case 'a':
-            color[3] = value;
+            color.e[3] = value;
             break;
     }
 }
 
 export const multiplyColorScalar = (color: Color, s: number, withAlpha: boolean = false) => {
-    color[0] *= s;
-    color[1] *= s;
-    color[2] *= s;
+    color.e[0] *= s;
+    color.e[1] *= s;
+    color.e[2] *= s;
     if (withAlpha) {
-        color[3] *= s;
+        color.e[3] *= s;
     }
     return color;
 }
@@ -121,14 +112,14 @@ export const getColorHexCoord = (color: Color, withHash = true) => {
 }
 
 export const cloneColor = (color: Color) => {
-    return new Float32Array([color[0], color[1], color[2], color[3]]);
+    return new Float32Array([color.e[0], color.e[1], color.e[2], color.e[3]]);
 }
 
 export const copyColor = (dest: Color, src: Color) => {
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    dest[3] = src[3];
+    dest.e[0] = src.e[0];
+    dest.e[1] = src.e[1];
+    dest.e[2] = src.e[2];
+    dest.e[3] = src.e[3];
 }
     
 
