@@ -135,10 +135,11 @@ void main() {
     // CUSTOM_END
 
     // TODO: metallic map, rough ness map を使う場合、使わない場合で出し分ける？
+    // OSの場合はtriplanner
     float metallic = uMetallic;
-    metallic *= texture(uMetallicMap, uv).r;
+    // metallic *= texture(uMetallicMap, uv).r;
     float roughness = uRoughness;
-    roughness *= texture(uRoughnessMap, uv).r;
+    // roughness *= texture(uRoughnessMap, uv).r;
 
     sGBufferSurface gBufferSurface = fBuildGBufferSurface(
         currentRayPosition,

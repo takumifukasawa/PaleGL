@@ -235,9 +235,9 @@ float fDfTorus(vec3 p, vec2 t)
 //     return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 // }
 
+// h: 高さ
 // ra: 太さ
 // rb: R
-// h: 高さ
 float fDfRoundedCylinder(vec3 p, float h, float ra, float rb)
 {
     vec2 d = vec2(length(p.xz)-2.*ra+rb, abs(p.y) - h);
@@ -308,7 +308,7 @@ float fDfLink(vec3 p, float le, float r1, float r2) {
 
 // // ref:
 // // https://www.shadertoy.com/view/ws3Bzf
-// vec4 fBiplanar( sampler2D sam, in vec3 p, in vec3 n, in float k )
+// vec4 fBiplanar(sampler2D sam, in vec3 p, in vec3 n, in float k)
 // {
 //     // grab coord derivatives for texturing
 //     vec3 dpdx = dFdx(p);
