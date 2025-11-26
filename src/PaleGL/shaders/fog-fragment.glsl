@@ -74,7 +74,13 @@ float fCalcFogHeightUniform(vec3 objectPositionInWorld, vec3 cameraPositionInWor
 float fCalcDistanceFog(vec3 objectPositionInWorld, vec3 cameraPositionInWorld, float expStart, float fogEnd, float expPower) {
     float fdist = length(cameraPositionInWorld - objectPositionInWorld);
     fdist = max(0., fdist - expStart);
-    return max(0., 1. - exp(-fdist * expPower)) * smoothstep(expStart, fogEnd, fdist);
+    // return max(0., 1. - exp(-fdist * expPower)) * smoothstep(expStart, fogEnd, fdist);
+    float distExp = max(0., 1. - exp(-fdist * expPower));
+    float distSmooth = smoothstep(expStart, fogEnd, fdist);
+    return max(
+        distExp * distSmooth,
+        distSmooth
+    );
 }
 
 void main() {

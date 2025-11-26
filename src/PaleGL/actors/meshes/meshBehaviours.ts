@@ -256,7 +256,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 
     // MeshType 固有の処理 (既存)
     updateMeshBehaviour[mesh.meshType]?.(actor, args);
-
+    
     // MaterialType に応じた処理 (新規追加)
     const hasObjectSpaceRaymarch = mesh.materials.some((m) => m.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH);
     if (hasObjectSpaceRaymarch) {
