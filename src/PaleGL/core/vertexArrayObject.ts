@@ -25,12 +25,13 @@ export type VertexArrayObject = GLObjectBase<WebGLVertexArrayObject> & {
     ibo: IndexBufferObject | null;
     indicesCount: number | null,
     attributes: Attribute[],
+    indexType: number | null, // GL_UNSIGNED_SHORT or GL_UNSIGNED_INT or null if no indices
 };
 
 export function createVertexArrayObject({ gpu, attributes = [], indices }: {
     gpu: Gpu;
     attributes: Attribute[];
-    indices?: number[] | Uint16Array | null
+    indices?: number[] | Uint16Array | Uint32Array | null
 }): VertexArrayObject {
     const gl = gpu.gl;
     const vao = gl.createVertexArray();
@@ -42,6 +43,7 @@ export function createVertexArrayObject({ gpu, attributes = [], indices }: {
         ibo: null,
         indicesCount: indices ? indices.length : null,
         attributes,
+        indexType: null,
     };
 
     // bind vertex array to webgl context
@@ -55,6 +57,7 @@ export function createVertexArrayObject({ gpu, attributes = [], indices }: {
 
     if (indices) {
         vertexArrayObject.ibo = createIndexBufferObject(gpu, indices);
+        vertexArrayObject.indexType = vertexArrayObject.ibo.indexType;
     }
 
     // set attribute の方でやってるのでいらないはず

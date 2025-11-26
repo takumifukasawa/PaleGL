@@ -633,12 +633,13 @@ export function drawGPU(
     if (hasIndicesVertexArrayObject(gpu.vao)) {
         // draw by indices
         // drawCount ... use indices count
+        const indexType = gpu.vao.indexType || GL_UNSIGNED_SHORT;
         if (instanceCount !== null) {
             if (instanceCount > 0) {
-                gl.drawElementsInstanced(glPrimitiveType, drawCount, GL_UNSIGNED_SHORT, startOffset, instanceCount);
+                gl.drawElementsInstanced(glPrimitiveType, drawCount, indexType, startOffset, instanceCount);
             }
         } else {
-            gl.drawElements(glPrimitiveType, drawCount, GL_UNSIGNED_SHORT, startOffset);
+            gl.drawElements(glPrimitiveType, drawCount, indexType, startOffset);
         }
     } else {
         // draw by array

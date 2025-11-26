@@ -32,22 +32,22 @@ export const createPlaneGeometryRawData = ({
     const rawNormals: number[] = [];
     const indices: number[] = [];
 
-    const rowCellWidth = width / divColNum; // 列分割数で割った幅
-    const colCellHeight = height / divRowNum; // 行分割数で割った高さ
+    const colCellWidth = width / divColNum; // 列分割数で割った幅
+    const rowCellHeight = height / divRowNum; // 行分割数で割った高さ
 
-    const rowCellUv = 1 / divColNum; // 列分割数で割ったUV幅
-    const colCellUv = 1 / divRowNum; // 行分割数で割ったUV高さ
+    const colCellUv = 1 / divColNum; // 列分割数で割ったUV幅
+    const rowCellUv = 1 / divRowNum; // 行分割数で割ったUV高さ
 
     for (let y = 0; y < divRowNum + 1; y++) {
         for (let x = 0; x < divColNum + 1; x++) {
-            const posX = rowCellWidth * x - width / 2 + v3x(offset);
-            const posY = colCellHeight * y - height / 2 + v3y(offset);
+            const posX = colCellWidth * x - width / 2 + v3x(offset);
+            const posY = rowCellHeight * y - height / 2 + v3y(offset);
             rawPositions.push(posX, posY, v3z(offset));
 
             // UV座標計算
-            const uvX = rowCellUv * x; // 0から1の範囲
+            const uvX = colCellUv * x; // 0から1の範囲
             // flipUvYがtrueならY軸を反転
-            const uvY = flipUvY ? 1 - colCellUv * y : colCellUv * y; // 0から1の範囲
+            const uvY = flipUvY ? 1 - rowCellUv * y : rowCellUv * y; // 0から1の範囲
             rawUvs.push(uvX, uvY);
 
             // 法線ベクトルを追加

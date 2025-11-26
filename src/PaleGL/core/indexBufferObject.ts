@@ -35,16 +35,35 @@
 // }
 
 import { Gpu } from '@/PaleGL/core/gpu.ts';
-import { GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW } from '@/PaleGL/constants.ts';
+import { GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT } from '@/PaleGL/constants.ts';
 import { createGLObject, GLObjectBase } from '@/PaleGL/core/glObject.ts';
 
-export type IndexBufferObject = GLObjectBase<WebGLBuffer>;
+export type IndexBufferObject = GLObjectBase<WebGLBuffer> & {
+    indexType: number; // GL_UNSIGNED_SHORT or GL_UNSIGNED_INT
+};
 
-export function createIndexBufferObject(gpu: Gpu, indices: number[] | Uint16Array): IndexBufferObject {
+export function createIndexBufferObject(gpu: Gpu, indices: number[] | Uint16Array | Uint32Array): IndexBufferObject {
     const ibo = gpu.gl.createBuffer()!;
     bindRawIndexBufferObject(gpu.gl, ibo);
-    gpu.gl.bufferData(GL_ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), GL_STATIC_DRAW);
-    return createGLObject(gpu, ibo);
+
+    // Check if we need 32-bit indices
+    let maxIndex = 0;
+    for (let i = 0; i < indices.length; i++) {
+        if (indices[i] > maxIndex) {
+            maxIndex = indices[i];
+        }
+    }
+
+    const use32Bit = maxIndex > 65535;
+    const indexType = use32Bit ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
+    const indexArray = use32Bit ? new Uint32Array(indices) : new Uint16Array(indices);
+
+    gpu.gl.bufferData(GL_ELEMENT_ARRAY_BUFFER, indexArray, GL_STATIC_DRAW);
+
+    return {
+        ...createGLObject(gpu, ibo),
+        indexType,
+    };
 }
 
 // function bindIndexBufferObject(gpu: Gpu, ibo: IndexBufferObject) {

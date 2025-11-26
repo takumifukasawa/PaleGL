@@ -872,6 +872,7 @@ export const GL_ONE_MINUS_SRC_ALPHA = 771;
 export const GL_ONE = 1;
 
 export const GL_UNSIGNED_SHORT = 5123;
+export const GL_UNSIGNED_INT = 5125;
 
 export const GL_UNIFORM_OFFSET = 35387;
 
