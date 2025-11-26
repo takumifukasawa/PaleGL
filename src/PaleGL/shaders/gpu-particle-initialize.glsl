@@ -19,7 +19,9 @@ void main(void) {
   outVelocity = vec3(0.);
   outUp = vec3(0., 1., 0.);
 
-  #pragma GPU_PARTICLE_MODIFY_INITIALIZE
+  // CUSTOM_BEGIN comment out
+  // #pragma GPU_PARTICLE_MODIFY_INITIALIZE
+  // CUSTOM_END
         
   // for debug
   // ivec2 coord = ivec2(gl_FragCoord.xy);

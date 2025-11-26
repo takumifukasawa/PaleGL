@@ -41,7 +41,9 @@ void main() {
     
     outVelocity = nextVelocity;
     
-    #pragma GPU_PARTICLE_MODIFY_UPDATE
+    // CUSTOM_BEGIN comment out
+    // #pragma GPU_PARTICLE_MODIFY_UPDATE
+    // CUSTOM_END
     
     outPosition = prevPosition + outVelocity;
     outUp = vec3(0., 1., 0.); // TODO: 速度関係なしに一旦

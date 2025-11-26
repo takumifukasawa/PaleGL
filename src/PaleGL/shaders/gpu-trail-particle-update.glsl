@@ -61,7 +61,9 @@ void main() {
 
         outVelocity = nextVelocity;
         
-        #pragma GPU_PARTICLE_MODIFY_UPDATE
+        // CUSTOM_BEGIN comment out
+        // #pragma GPU_PARTICLE_MODIFY_UPDATE
+        // CUSTOM_END
         
         nextPosition = prevPosition + outVelocity;
         vec3 front = normalize(outVelocity);
