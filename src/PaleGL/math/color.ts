@@ -102,9 +102,9 @@ export const getColorRGB = (color: Color) => {
 
 export const getColorHexCoord = (color: Color, withHash = true) => {
     const rgb = getColorRGB(color);
-    const r = rgb.r.toString(16).padStart(2, '0');
-    const g = rgb.g.toString(16).padStart(2, '0');
-    const b = rgb.b.toString(16).padStart(2, '0');
+    const r = Math.floor(rgb.r).toString(16).padStart(2, '0');
+    const g = Math.floor(rgb.g).toString(16).padStart(2, '0');
+    const b = Math.floor(rgb.b).toString(16).padStart(2, '0');
     const str = withHash ? `#${r}${g}${b}` : `${r}${g}${b}`;
     // for debug
     // console.log(rgb, str, this.r, this.g, this.b)

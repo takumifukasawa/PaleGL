@@ -2,7 +2,7 @@ import { Actor } from '@/PaleGL/actors/actor.ts';
 import { ComponentBehaviour, ComponentModel, createComponent } from '@/PaleGL/components/component.ts';
 import { COMPONENT_TYPE_OBJECT_MOVE_AND_LOOK_AT } from '@/PaleGL/constants.ts';
 import { findActorInSceneByName, Scene } from '@/PaleGL/core/scene.ts';
-import { setLookAtActor } from '@/PaleGL/core/transform.ts';
+import { setLookAtActor, setLookAtPosition } from '@/PaleGL/core/transform.ts';
 import { addVector3AndVector3, copyVector3, createVector3Zero, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 export type ObjectMoveAndLookAtControllerBehaviour = ComponentBehaviour & {
@@ -30,12 +30,13 @@ export const createObjectMoveAndLookAtController = (args: {
         copyVector3(currentLocalPosition, localPosition);
         currentLocalPosition = addVector3AndVector3(localPosition, offset);
 
-        // actor.transform.position = localPosition;
         actor.transform.position = currentLocalPosition;
         copyVector3(actor.transform.upVector, upVector);
 
         if (lookAtTargetActor) {
-            setLookAtActor(actor.transform, lookAtTargetActor);
+            // どっち使うか出し分けられる方がよい
+            // setLookAtActor(actor.transform, lookAtTargetActor);
+            setLookAtPosition(actor.transform, lookAtTargetActor.transform.position);
         }
     };
 
@@ -55,7 +56,7 @@ export const createObjectMoveAndLookAtController = (args: {
                 update(actor, scene, localPosition, upVector);
             },
             setOffset: (v: Vector3) => {
-                copyVector3(v, offset);
+                copyVector3(offset, v);
             },
         },
     ];
