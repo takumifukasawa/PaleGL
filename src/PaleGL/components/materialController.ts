@@ -17,14 +17,27 @@ export const createMaterialController = (
     bindings: MaterialTimelineBindings,
     componentArgs?: ComponentArgs
 ): MaterialController => {
+    // for debug
+    // console.log(mesh, bindings, componentArgs);
+
     // 危険だが、component内でuniformを直接追加する
     bindings.forEach((binding) => {
         const [uniformName, uniformType, uniformValue] = binding;
         // uniformtypeが指定されていたらuniformを追加する対象
         // ない場合はすでにあるものとみなす
         if (uniformType) {
-            iterateAllMeshMaterials(mesh, (material) => {
-                tryAddMaterialUniformValue(material, uniformName, uniformType, uniformValue);
+            // こっちを使いたい
+            // iterateAllMeshMaterials(mesh, (material) => {
+            //     tryAddMaterialUniformValue(material, uniformName, uniformType, uniformValue);
+            // });
+
+            // TODO: 子を一括制御してるだけなので正しい対応ではない。無理矢理。主にmulti-spline向け. 一階層まで。
+            [mesh, ...mesh.children].forEach((child) => {
+                if (child.type === ACTOR_TYPE_MESH) {
+                    iterateAllMeshMaterials(child as Mesh, (material) => {
+                        tryAddMaterialUniformValue(material, uniformName, uniformType, uniformValue);
+                    });
+                }
             });
         }
     });

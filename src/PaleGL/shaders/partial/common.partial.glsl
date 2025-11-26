@@ -11,6 +11,11 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
+// CUSTOM_BEGIN additional
+#define RHY 1.033;
+uniform vec4 uCustomProperties0;
+// CUSTOM_END
+
 mat2 fRot(float a) {
     float s = sin(a), c = cos(a);
     return mat2(c, s, -s, c);

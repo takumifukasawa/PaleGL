@@ -1,5 +1,6 @@
 import {
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
+    MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_PROPERTY_NAME,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME,
     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME,
@@ -14,13 +15,15 @@ import {
 } from '@/PaleGL/components/materialController.ts';
 import {
     UNIFORM_NAME_BASE_COLOR,
+    UNIFORM_NAME_CUSTOM_PROPERTIES_0,
     UNIFORM_NAME_EMISSIVE_COLOR,
     UNIFORM_NAME_HEIGHT_SCALE,
     UNIFORM_NAME_MAP_TILING,
     UNIFORM_NAME_METALLIC,
     UNIFORM_NAME_ROUGHNESS,
+    UNIFORM_TYPE_VECTOR4,
 } from '@/PaleGL/constants';
-import { Color } from '@/PaleGL/math/color.ts';
+import { createVector4zero } from '@/PaleGL/math/vector4.ts';
 
 const bindings: MaterialTimelineBindings = new Map([
     // prettier-ignore
@@ -33,14 +36,18 @@ const bindings: MaterialTimelineBindings = new Map([
     [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME, [UNIFORM_NAME_EMISSIVE_COLOR]],
     [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME, [UNIFORM_NAME_MAP_TILING]],
     [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME, [UNIFORM_NAME_HEIGHT_SCALE]],
+    [
+        MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_PROPERTY_NAME,
+        [UNIFORM_NAME_CUSTOM_PROPERTIES_0, UNIFORM_TYPE_VECTOR4, createVector4zero()],
+    ],
 ]);
 
-export type GBufferMaterialControllerInitialValues = {
-    baseColor?: Color;
-    metallic?: number;
-    roughness?: number;
-    emissiveColor?: Color;
-};
+// export type GBufferMaterialControllerInitialValues = {
+//     baseColor?: Color;
+//     metallic?: number;
+//     roughness?: number;
+//     emissiveColor?: Color;
+// };
 
 // timeline から操作される
 export const createGBufferMaterialController = (mesh: Mesh): MaterialController => {
