@@ -2130,7 +2130,7 @@ function updateUniformBlockValue(
                 data.push(...(value as Matrix4).e);
                 break;
             case UNIFORM_TYPE_COLOR:
-                data.push(...(value as Color).e);
+                data.push(...(value as Color));
                 break;
             default:
                 console.error(`invalid uniform type: ${type}`);

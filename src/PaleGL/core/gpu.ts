@@ -387,12 +387,12 @@ export function setGPUUniformValues(gpu: Gpu) {
                 }
                 break;
             case UNIFORM_TYPE_COLOR:
-                gl.uniform4fv(location, (value as Color).e);
+                gl.uniform4fv(location, value as Color);
                 break;
             case UNIFORM_TYPE_COLOR_ARRAY:
                 if (value) {
                     // arg[1] ... use transpose.
-                    gl.uniform4fv(location, (value as Color[]).map((v) => [...v.e]).flat());
+                    gl.uniform4fv(location, (value as Color[]).map((v) => [...v]).flat());
                 }
                 break;
             case UNIFORM_TYPE_TEXTURE:
