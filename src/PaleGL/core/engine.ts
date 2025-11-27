@@ -241,9 +241,9 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
         // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
         traverseScene(engine.scene, (actor) => {
-            if (!isActorEnabledInHierarchy(actor)) {
-                return;
-            }
+            // if (!isActorEnabledInHierarchy(actor)) {
+            //     return;
+            // }
             updateActor(actor, {
                 gpu: engine.renderer.gpu,
                 renderer: engine.renderer,
@@ -288,9 +288,9 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
             engine.onLastUpdate[i]({ time, deltaTime });
         }
         traverseScene(engine.scene, (actor) => {
-            if (!isActorEnabledInHierarchy(actor)) {
-                return;
-            }
+            // if (!isActorEnabledInHierarchy(actor)) {
+            //     return;
+            // }
             lastUpdateActor(actor, {
                 gpu: engine.renderer.gpu,
                 renderer: engine.renderer,
@@ -307,9 +307,9 @@ function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
         // 各種updateが終わったらtransformを整理
         // TODO: fixedupdateでもやっちゃってるのよくない
         traverseScene(engine.scene, (actor) => {
-            if (!isActorEnabledInHierarchy(actor)) {
-                return;
-            }
+            // if (!isActorEnabledInHierarchy(actor)) {
+            //     return;
+            // }
             updateActorTransform(actor);
         });
 }
