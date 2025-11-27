@@ -24,7 +24,7 @@
 //
 // ------------------------------------------------------
 
-import {createVector3, setV3, Vector3} from '@/PaleGL/math/vector3.ts';
+import { createVector3, setV3, Vector3 } from '@/PaleGL/math/vector3.ts';
 
 /**
  * ref: https://techblog.kayac.com/unity-light-weight-bloom-effect
@@ -121,3 +121,5 @@ export const randomOnUnitCircle = (id: number, scale: number, v: Vector3) => {
 };
 
 export const random = () => Math.random();
+
+export const numToBool = (num: number) => num > 0.5;
