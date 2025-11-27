@@ -1,5 +1,12 @@
 #pragma DEFINES
 
+in vec2 vUv;
+in vec3 vLocalPosition;
+in vec3 vNormal;
+in mat4 vWorldMatrix;
+in vec3 vWorldPosition;
+in mat4 vInverseWorldMatrix;
+
 #include <common>
 #include <lighting>
 #include <ub>
@@ -53,12 +60,6 @@ void fOverrideGBufferDepth(
 uniform float uIsPerspective;
 uniform float uUseWorld;
 uniform vec3 uBoundsScale;
-
-in vec2 vUv;
-in vec3 vLocalPosition;
-in mat4 vWorldMatrix;
-in vec3 vWorldPosition;
-in mat4 vInverseWorldMatrix;
 
 out vec4 outColor;
 

@@ -2,7 +2,8 @@
 #define saturate(a) clamp(a,0.,1.)
 
 #define smooth(x) smoothstep(0.,1.,x)
-#define smoothRange(x,a,b,c,d) smoothstep(a,b,x) * (1.-smoothstep(c,d,x))
+#define linearInv(a,b,x) saturate((x-b)/max(b-a,.001))
+#define smoothRange(x,a,b,c,d) smoothstep(a,b,x)*(1.-smoothstep(c,d,x))
 
 #define PI 3.14159265359
 #define PI2 6.28318530718

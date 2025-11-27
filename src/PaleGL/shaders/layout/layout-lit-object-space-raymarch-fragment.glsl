@@ -1,5 +1,17 @@
 #pragma DEFINES
 
+uniform float uIsPerspective;
+uniform float uUseWorld;
+uniform vec3 uBoundsScale;
+
+in vec2 vUv;
+in vec3 vNormal;
+
+in vec3 vLocalPosition;
+in mat4 vWorldMatrix;
+in vec3 vWorldPosition;
+in mat4 vInverseWorldMatrix;
+
 #include <common>
 #include <lighting>
 #include <ub>
@@ -37,18 +49,6 @@ uniform int uShadingModelId;
 // CUSTOM_BEGIN comment out
 // #pragma APPEND_UNIFORMS
 // CUSTOM_END
-
-uniform float uIsPerspective;
-uniform float uUseWorld;
-uniform vec3 uBoundsScale;
-
-in vec2 vUv;
-in vec3 vNormal;
-
-in vec3 vLocalPosition;
-in mat4 vWorldMatrix;
-in vec3 vWorldPosition;
-in mat4 vInverseWorldMatrix;
 
 #pragma GBUFFER_BUILDER_RAYMARCH
 
