@@ -1,5 +1,6 @@
 //
 // human distance functions ---------------------------------------------------
+// custom properties 0 ... fuwafuwa
 //
 
 struct sHuman {
