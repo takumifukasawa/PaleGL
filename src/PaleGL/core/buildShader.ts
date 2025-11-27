@@ -75,11 +75,12 @@ import gbufferBuilderDefaultPartialContent from '@/PaleGL/shaders/partial/gbuffe
 import gbufferBuilderRaymarchPartialContent from '@/PaleGL/shaders/partial/gbuffer-builder-raymarch.partial.glsl';
 import gbufferOutPartialContent from '@/PaleGL/shaders/partial/gbuffer-out.partial.glsl';
 import gbufferPartialContent from '@/PaleGL/shaders/partial/gbuffer.partial.glsl';
-import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
 import lightingPartialContent from '@/PaleGL/shaders/partial/lighting.partial.glsl';
 import msdfHeadreContent from '@/PaleGL/shaders/partial/msdf-header.glsl';
 import normalMapFragmentPartialContent from '@/PaleGL/shaders/partial/normal-map-fragment.partial.glsl';
 import objectSpaceRaymarchFunctionsPartialContent from '@/PaleGL/shaders/partial/object-space-raymarch-fragment-functions.partial.glsl';
+import geometryHeaderPartialContent from '@/PaleGL/shaders/partial/geometry-h.partial.glsl';
+import instancingFragmentHeaderPartialContent from '@/PaleGL/shaders/partial/instancing-fragment-h.partial.glsl';
 import perlinPartialContent from '@/PaleGL/shaders/partial/perlin.partial.glsl';
 import randPartialContent from '@/PaleGL/shaders/partial/rand.partial.glsl';
 import raymarchDistanceFunctionsPartialContent from '@/PaleGL/shaders/partial/raymarch-distance-functions.partial.glsl';
@@ -140,6 +141,7 @@ const includesDict = new Map<string, string>([
     ['<env_map>', envMapPartialContent],
     ['<skybox_h>', skyboxHeaderPartialContent],
     ['<geometry_h>', geometryHeaderPartialContent],
+    ['<inst_fh>', instancingFragmentHeaderPartialContent],
     ['<os_raymarch_f>', objectSpaceRaymarchFunctionsPartialContent],
     ['<perlin>', perlinPartialContent],
     ['<curl_noise>', curlNoisePartialContent],

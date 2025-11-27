@@ -510,6 +510,7 @@ export const UNIFORM_NAME_NORMAL_MAP = 'uNormalMap';
 export const UNIFORM_NAME_HEIGHT_MAP = 'uHeightMap';
 export const UNIFORM_NAME_HEIGHT_SCALE = 'uHeightScale';
 export const UNIFORM_NAME_CUSTOM_PROPERTIES_0 = 'uCustomProperties0';
+export const UNIFORM_NAME_INSTANCE_COUNT = 'uInstanceCount'; // 現在のinstance数。最大値ではないことに注意
 export const UNIFORM_NAME_JOINT_MATRICES = 'uJointMatrices';
 export const UNIFORM_NAME_JOINT_TEXTURE = 'uJointTexture';
 export const UNIFORM_NAME_BONE_COUNT = 'uBoneCount';

@@ -14,14 +14,15 @@
 
 uniform int uShadingModelId;
 
-#ifdef D_INSTANCING
-in float vInstanceId;
-// CUSTOM_BEGIN comment out
-// in vec4 vInstanceColor;
-// in vec4 vInstanceEmissiveColor;
-// in vec4 vInstanceState;
-// CUSTOM_END
-#endif
+#include <inst_fh>
+// #ifdef D_INSTANCING
+// in float vInstanceId;
+// // CUSTOM_BEGIN comment out
+// // in vec4 vInstanceColor;
+// // in vec4 vInstanceEmissiveColor;
+// // in vec4 vInstanceState;
+// // CUSTOM_END
+// #endif
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 

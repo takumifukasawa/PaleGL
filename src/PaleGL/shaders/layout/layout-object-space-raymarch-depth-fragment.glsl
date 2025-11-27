@@ -13,11 +13,11 @@
 
 #include <surface_h>
 
-
-#ifdef D_INSTANCING
-in float vInstanceId;
-in vec4 vInstanceState;
-#endif
+#include <inst_fh>
+// #ifdef D_INSTANCING
+// in float vInstanceId;
+// // in vec4 vInstanceState;
+// #endif
 
 #pragma BLOCK_BEFORE_RAYMARCH_CONTENT
 

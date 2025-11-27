@@ -81,6 +81,7 @@ import {
     UNIFORM_NAME_DIRECTIONAL_LIGHT,
     UNIFORM_NAME_DIRECTIONAL_LIGHT_SHADOW_MAP,
     UNIFORM_NAME_FONT_TILING,
+    UNIFORM_NAME_INSTANCE_COUNT,
     UNIFORM_NAME_INVERSE_PROJECTION_MATRIX,
     UNIFORM_NAME_INVERSE_VIEW_MATRIX,
     UNIFORM_NAME_INVERSE_VIEW_PROJECTION_MATRIX,
@@ -1049,7 +1050,7 @@ export function renderRenderer(
                 break;
         }
     });
-    
+
     // for debug
     // console.log(
     //     "hogehoge",
@@ -1544,6 +1545,11 @@ export function renderMesh(renderer: Renderer, geometry: Geometry, material: Mat
     // )
 
     if (cb) cb();
+
+    // TODO: ここでやるのあんまりよくない
+    if (geometry.instanceCount !== null) {
+        setMaterialUniformValue(material, UNIFORM_NAME_INSTANCE_COUNT, geometry.instanceCount);
+    }
 
     // draw
     drawGPU(
