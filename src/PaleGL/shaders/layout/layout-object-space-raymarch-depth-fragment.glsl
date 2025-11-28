@@ -66,8 +66,8 @@ out vec4 outColor;
 void main() {
     vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
 
-    vec4 baseMapColor = texture(uBaseMap, uv);
-    vec4 baseColor = uBaseColor * baseMapColor;
+    // vec4 baseMapColor = texture(uBaseMap, uv);
+    vec4 baseColor = uBaseColor;
 
     vec4 resultColor = baseColor;
 

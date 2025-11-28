@@ -59,8 +59,8 @@ void main() {
 
     vec2 uv = vUv * uMapTiling.xy + uMapTiling.zw;
 
-    vec4 baseMapColor = texture(uBaseMap, uv);
-    vec4 baseColor = uBaseColor * baseMapColor;
+    // vec4 baseMapColor = texture(uBaseMap, uv);
+    vec4 baseColor = uBaseColor;
 
     vec3 worldNormal = vNormal;
 
