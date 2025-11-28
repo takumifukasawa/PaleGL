@@ -423,11 +423,20 @@ export async function warmRender(
         const mesh = meshes[i];
         mesh.enabled = true;
 
-        // beforeRenderActorを呼び出してマテリアルの動的設定を反映
+        // 一応actorごとにupdate走らせる
+        updateActor(mesh, {
+            gpu,
+            renderer,
+            scene: engine.scene,
+            time: 0,
+            deltaTime: 0,
+        });
+
+        // 一応actorごとにbeforeRender走らせる
         beforeRenderActor(mesh, {
             gpu,
             renderer,
-            scene: engine.scene!,
+            scene: engine.scene,
             time: 0,
             deltaTime: 0,
         });
