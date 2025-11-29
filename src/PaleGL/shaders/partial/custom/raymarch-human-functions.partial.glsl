@@ -730,8 +730,8 @@ sHuman fDfHuman(
     // d = min(d, length(fOpTr(q, vec3(.2, 1.8, 0.))) - .1);
 
     // for debug
-    d = fDfBox(q, vec3(5.));
-    d = fDfSp(q, 2.);
+    // d = fDfBox(q, vec3(5.));
+    // d = fDfSp(q, 2.);
     // p.yz = fOpRo(p.yz, PI * .2);
     // d = fDfRcot(p, .05, .08, .8);
    
