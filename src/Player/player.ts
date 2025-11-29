@@ -199,6 +199,7 @@ export function createPlayer(
                             )
                         )
                     );
+                    // console.log(sceneViewCameraEntity.fov);
                 }
             },
             onBeginPlayer: () => {
