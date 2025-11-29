@@ -96,7 +96,7 @@ export type GpuParticle = GpuParticleBase & {
 
 const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
-const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
 const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
@@ -284,6 +284,10 @@ export const resetGPUParticleByInitialize = (renderer: Renderer, gpuParticle: Gp
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
     renderMRTDoubleBufferAndSwap(renderer, mrtDoubleBuffer, materialForInitialize);
 };
+
+export const getGPUParticleCurrentUpdater = (gpuParticle: GpuParticle) => {
+    return gpuParticle.updaters[gpuParticle.updaterIndex];
+}
 
 export const switchGPUParticleUpdater = (gpuParticle: GpuParticleBase, index: number) => {
     gpuParticle.updaterIndex = index;
