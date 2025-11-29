@@ -94,11 +94,11 @@ export type GpuParticle = GpuParticleBase & {
     useVATLookForward: boolean;
 };
 
-const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getReadVelocityMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[0];
 export const getReadPositionMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[1];
-const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
+export const getReadUpMap = (mrtDoubleBuffer: MRTDoubleBuffer) =>
     getReadMultipleRenderTargetOfMRTDoubleBuffer(mrtDoubleBuffer).textures[2];
 
 export const renderMRTDoubleBufferAndSwap = (
