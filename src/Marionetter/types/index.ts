@@ -249,6 +249,7 @@ export const MARIONETTER_ANIMATION_CLIP_START_INDEX = 2;
 export const MARIONETTER_ANIMATION_CLIP_DURATION_INDEX = 3;
 export const MARIONETTER_ANIMATION_CLIP_POST_EXTRAPORATION_INDEX = 4;
 export const MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX = 5;
+export const MARIONETTER_ANIMATION_CLIP_ANIMATION_CLIP_TYPE_INDEX = 6;
 
 // [name, clipInfoType, start, duration, post-extraporation, ...subclass data, speed?]
 // NOTE: speed is optional and appears as the last element if != 1.0

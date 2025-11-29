@@ -23,6 +23,7 @@ import {
 import { curveUtilityEvaluateCurve } from '@/Marionetter/curveUtilities.ts';
 import { isTimeInClip } from '@/Marionetter/timelineUtilities.ts';
 import {
+    MARIONETTER_ANIMATION_CLIP_ANIMATION_CLIP_TYPE_INDEX,
     MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX,
     MARIONETTER_ANIMATION_CLIP_DURATION_INDEX,
     MARIONETTER_ANIMATION_CLIP_NAME_INDEX,
@@ -470,6 +471,25 @@ function createMarionetterClips(
 ): MarionetterClipKinds[] {
     const marionetterClips = [] as MarionetterClipKinds[];
 
+    // Clip名 → bindings のマップを構築
+    const clipNameToBindingsMap = new Map<string, any>();
+
+    for (let i = 0; i < clips.length; i++) {
+        const clip = clips[i];
+        const clipType = clip[MARIONETTER_ANIMATION_CLIP_TYPE_INDEX];
+
+        if (clipType === MARIONETTER_CLIP_INFO_TYPE_ANIMATION_CLIP) {
+            const animationClipInfo = clip as MarionetterAnimationClipInfo;
+            const clipName = animationClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
+            const bindings = animationClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+
+            // bindingsがあれば、マップに登録
+            if (bindings && bindings.length > 0 && clipName) {
+                clipNameToBindingsMap.set(clipName, bindings);
+            }
+        }
+    }
+
     for (let i = 0; i < clips.length; i++) {
         const clip = clips[i];
         const clipType = clip[MARIONETTER_ANIMATION_CLIP_TYPE_INDEX];
@@ -479,7 +499,8 @@ function createMarionetterClips(
                 marionetterClips.push(
                     createMarionetterAnimationClip(
                         track,
-                        clip as MarionetterAnimationClipInfo
+                        clip as MarionetterAnimationClipInfo,
+                        clipNameToBindingsMap
                         // needsSomeActorsConvertLeftHandAxisToRightHandAxis
                     )
                 );
@@ -517,7 +538,8 @@ function createMarionetterClips(
  */
 function createMarionetterAnimationClip(
     track: MarionetterTimelineDefaultTrack,
-    animationClipInfo: MarionetterAnimationClipInfo
+    animationClipInfo: MarionetterAnimationClipInfo,
+    clipNameToBindingsMap: Map<string, any>
     // needsSomeActorsConvertLeftHandAxisToRightHandAxis = false
 ): MarionetterAnimationClip {
     // TODO: 負荷対策のためにキャッシュしたい
@@ -535,7 +557,12 @@ function createMarionetterAnimationClip(
     // console.log('hogehoge - clip', animationClip);
     const name = animationClipInfo[MARIONETTER_ANIMATION_CLIP_NAME_INDEX];
     const [start, duration, postExtrapolation] = destructureClipInfoBase(animationClipInfo);
-    const bindings = animationClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+    let bindings = animationClipInfo[MARIONETTER_ANIMATION_CLIP_BINDINGS_INDEX];
+
+    // bindingsが空配列の場合、マップから取得
+    if (bindings.length === 0 && name && clipNameToBindingsMap.has(name)) {
+        bindings = clipNameToBindingsMap.get(name);
+    }
 
     const animationClip: MarionetterAnimationClip = {
         name,
