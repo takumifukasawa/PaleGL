@@ -385,7 +385,7 @@ export async function loadPlayer(
 ) {
     // await player.engine.war
     await beforeCb();
-    await warmRender(player.engine, 16, (actor, index, total) => {
+    await warmRender(player.engine, 8, (actor, index, total) => {
         if (onProgress) {
             // 50%から100%の範囲で進捗を更新
             const percent = 50 + ((index + 1) / total) * 50;

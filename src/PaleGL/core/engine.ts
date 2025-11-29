@@ -544,6 +544,8 @@ export async function warmRender(
     onRenderActor?: (actor: Actor, index: number, total: number) => void
 ) {
     await internalWarmRender(engine, waitTime, onRenderActor);
+    await wait(waitTime * 2);
+    await internalWarmRender(engine, waitTime, onRenderActor);
 }
 
 // time[sec]
