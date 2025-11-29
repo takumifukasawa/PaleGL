@@ -29,7 +29,6 @@ import {
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
 import {
-    addVector3AndVector3,
     cloneVector3,
     createForwardV3,
     createRightV3,
@@ -166,11 +165,16 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // // actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
 
         // どっちかはあるのでキャストしちゃう
-        const lookAtTarget = addVector3AndVector3(cloneVector3((
+        // const lookAtTarget = addVector3AndVector3(cloneVector3((
+        //     actor.transform.lookAtTargetActor
+        //         ? actor.transform.lookAtTargetActor.transform.position
+        //         : actor.transform.lookAtTarget
+        // ) as Vector3), actor.transform.lookAtTargetOffset);
+        const lookAtTarget = (
             actor.transform.lookAtTargetActor
                 ? actor.transform.lookAtTargetActor.transform.position
                 : actor.transform.lookAtTarget
-        ) as Vector3), actor.transform.lookAtTargetOffset);
+        ) as Vector3;
         // TODO:
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
         assignMat4Identity(actor.transform.localMatrix);
@@ -183,7 +187,12 @@ export const updateActorTransformMatrix = (actor: Actor) => {
                       actor.transform.upVector,
                       true
                   )
-                : createLookAtMatrixRef(actor.transform.localMatrix, actor.transform.position, lookAtTarget, actor.transform.upVector);
+                : createLookAtMatrixRef(
+                      actor.transform.localMatrix,
+                      actor.transform.position,
+                      lookAtTarget,
+                      actor.transform.upVector
+                  );
         actor.transform.localMatrix = multiplyScalingMatrix(lookAtMatrix, actor.transform.scale);
     } else {
         // tmp
