@@ -29,6 +29,7 @@ import {
     setRotatorRotationDegreeZ,
 } from '@/PaleGL/math/rotator.ts';
 import {
+    addVector3AndVector3,
     cloneVector3,
     createForwardV3,
     createRightV3,
@@ -53,6 +54,7 @@ export type Transform = {
     rotation: Rotator;
     scale: Vector3;
     lookAtTarget: Vector3 | null;
+    lookAtTargetOffset: Vector3;
     lookAtTargetActor: Actor | null;
     upVector: Vector3;
     normalMatrix: Matrix4;
@@ -73,6 +75,7 @@ export function createTransform() {
     const scale: Vector3 = createVector3One();
     // どっちかだけセットされるようにする
     const lookAtTarget: Vector3 | null = null; // world v
+    const lookAtTargetOffset: Vector3 = createVector3Zero(); // world v
     const lookAtTargetActor: Actor | null = null;
 
     const normalMatrix: Matrix4 = createMat4Identity();
@@ -85,6 +88,7 @@ export function createTransform() {
         rotation,
         scale,
         lookAtTarget,
+        lookAtTargetOffset,
         lookAtTargetActor,
         upVector: createVector3Up(),
         normalMatrix,
@@ -162,11 +166,11 @@ export const updateActorTransformMatrix = (actor: Actor) => {
         // // actor.transform.localMatrix = multiplyMat4Array(lookAtMatrix, scalingMatrix);
 
         // どっちかはあるのでキャストしちゃう
-        const lookAtTarget = (
+        const lookAtTarget = addVector3AndVector3(cloneVector3((
             actor.transform.lookAtTargetActor
                 ? actor.transform.lookAtTargetActor.transform.position
                 : actor.transform.lookAtTarget
-        ) as Vector3;
+        ) as Vector3), actor.transform.lookAtTargetOffset);
         // TODO:
         // - parentがあるとlookatの方向が正しくなくなるので親の回転を打ち消す必要がある
         assignMat4Identity(actor.transform.localMatrix);

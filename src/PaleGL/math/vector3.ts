@@ -89,6 +89,7 @@ export const addVector3Scalar = (v: Vector3, s: number) => {
     return v;
 };
 
+// set to sv
 export const addVector3AndVector3 = (sv: Vector3, tv: Vector3) => {
     setV3(sv, v3x(sv) + v3x(tv), v3y(sv) + v3y(tv), v3z(sv) + v3z(tv));
     return sv;
