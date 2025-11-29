@@ -1,7 +1,7 @@
 ﻿import { Actor } from '@/PaleGL/actors/actor.ts';
 import {
     beforeRenderActor,
-    fixedUpdateActor, isActorEnabledInHierarchy,
+    fixedUpdateActor,
     lastUpdateActor,
     setSizeActor,
     updateActor,
@@ -220,98 +220,98 @@ function fixedUpdateEngine(engine: EngineBase, fixedTime: number, fixedDeltaTime
 }
 
 function updateEngine(engine: EngineBase, time: number, deltaTime: number) {
-        //
-        // before update
-        //
+    //
+    // before update
+    //
 
-        for (let i = 0; i < engine.onBeforeUpdate.length; i++) {
-            engine.onBeforeUpdate[i]({ time, deltaTime });
-        }
+    for (let i = 0; i < engine.onBeforeUpdate.length; i++) {
+        engine.onBeforeUpdate[i]({ time, deltaTime });
+    }
 
-        //
-        // update and before render
-        //
+    //
+    // update and before render
+    //
 
-        if (!engine.scene) {
-            console.error('scene is not set');
-            return;
-        }
+    if (!engine.scene) {
+        console.error('scene is not set');
+        return;
+    }
 
-        // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
-        // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
-        // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
-        traverseScene(engine.scene, (actor) => {
-            // if (!isActorEnabledInHierarchy(actor)) {
-            //     return;
-            // }
-            updateActor(actor, {
-                gpu: engine.renderer.gpu,
-                renderer: engine.renderer,
-                scene: engine.scene!,
-                time,
-                deltaTime,
-            });
-            switch (actor.type) {
-                case ACTOR_TYPE_SKYBOX:
-                case ACTOR_TYPE_MESH:
-                    // case ActorTypes.UiActor:
-                    // case ActorTypes.SkinnedMesh:
-                    beforeRenderActor(actor, {
-                        gpu: engine.renderer.gpu,
-                        renderer: engine.renderer,
-                        scene: engine.scene!,
-                        time,
-                        deltaTime,
-                    });
-                    const mesh = actor as Mesh;
-                    mesh.materials.forEach((mat) => {
-                        if (mat) {
-                            checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
-                        }
-                    });
-                    mesh.depthMaterials.forEach((mat) => {
-                        if (mat) {
-                            checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
-                        }
-                    });
-                    break;
-                default:
-                    break;
-            }
+    // 本当はあんまりgpu渡したくないけど、渡しちゃったほうがいろいろと楽
+    // console.log(engine.scene,  engine.scene.children.map(a => a.name).join(","));
+    // TODO: beforeRenderActorはレンダリングしないものも実行した方がいい？
+    traverseScene(engine.scene, (actor) => {
+        // if (!isActorEnabledInHierarchy(actor)) {
+        //     return;
+        // }
+        updateActor(actor, {
+            gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
+            scene: engine.scene!,
+            time,
+            deltaTime,
         });
-
-        //
-        // last update
-        //
-
-        for (let i = 0; i < engine.onLastUpdate.length; i++) {
-            engine.onLastUpdate[i]({ time, deltaTime });
+        switch (actor.type) {
+            case ACTOR_TYPE_SKYBOX:
+            case ACTOR_TYPE_MESH:
+                // case ActorTypes.UiActor:
+                // case ActorTypes.SkinnedMesh:
+                beforeRenderActor(actor, {
+                    gpu: engine.renderer.gpu,
+                    renderer: engine.renderer,
+                    scene: engine.scene!,
+                    time,
+                    deltaTime,
+                });
+                const mesh = actor as Mesh;
+                mesh.materials.forEach((mat) => {
+                    if (mat) {
+                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    }
+                });
+                mesh.depthMaterials.forEach((mat) => {
+                    if (mat) {
+                        checkNeedsBindUniformBufferObjectToMaterial(engine.renderer, mat);
+                    }
+                });
+                break;
+            default:
+                break;
         }
-        traverseScene(engine.scene, (actor) => {
-            // if (!isActorEnabledInHierarchy(actor)) {
-            //     return;
-            // }
-            lastUpdateActor(actor, {
-                gpu: engine.renderer.gpu,
-                renderer: engine.renderer,
-                scene: engine.scene!,
-                time,
-                deltaTime,
-            });
-        });
+    });
 
-        //
-        // update transform
-        //
+    //
+    // last update
+    //
 
-        // 各種updateが終わったらtransformを整理
-        // TODO: fixedupdateでもやっちゃってるのよくない
-        traverseScene(engine.scene, (actor) => {
-            // if (!isActorEnabledInHierarchy(actor)) {
-            //     return;
-            // }
-            updateActorTransform(actor);
+    for (let i = 0; i < engine.onLastUpdate.length; i++) {
+        engine.onLastUpdate[i]({ time, deltaTime });
+    }
+    traverseScene(engine.scene, (actor) => {
+        // if (!isActorEnabledInHierarchy(actor)) {
+        //     return;
+        // }
+        lastUpdateActor(actor, {
+            gpu: engine.renderer.gpu,
+            renderer: engine.renderer,
+            scene: engine.scene!,
+            time,
+            deltaTime,
         });
+    });
+
+    //
+    // update transform
+    //
+
+    // 各種updateが終わったらtransformを整理
+    // TODO: fixedupdateでもやっちゃってるのよくない
+    traverseScene(engine.scene, (actor) => {
+        // if (!isActorEnabledInHierarchy(actor)) {
+        //     return;
+        // }
+        updateActorTransform(actor);
+    });
 }
 
 // export function lastUpdateEngine(engine: Engine, time: number, deltaTime: number) {
@@ -359,11 +359,13 @@ function renderEngine(engine: EngineBase, time: number, deltaTime: number) {
     }
 }
 
-export async function warmRender(
+async function internalWarmRender(
     engine: Engine,
     waitTime: number = 16,
     onRenderActor?: (actor: Actor, index: number, total: number) => void
 ) {
+    await internalWarmRender(engine, waitTime, onRenderActor);
+
     if (!engine.scene) {
         console.error('scene is not set');
         return;
@@ -536,6 +538,14 @@ export async function warmRender(
     renderEngine(engine, 0, 0);
 
     await wait(waitTime);
+}
+
+export async function warmRender(
+    engine: Engine,
+    waitTime: number = 16,
+    onRenderActor?: (actor: Actor, index: number, total: number) => void
+) {
+    await internalWarmRender(engine, waitTime, onRenderActor);
 }
 
 // time[sec]
