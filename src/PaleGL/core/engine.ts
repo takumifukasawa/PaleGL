@@ -364,8 +364,6 @@ async function internalWarmRender(
     waitTime: number = 16,
     onRenderActor?: (actor: Actor, index: number, total: number) => void
 ) {
-    await internalWarmRender(engine, waitTime, onRenderActor);
-
     if (!engine.scene) {
         console.error('scene is not set');
         return;
