@@ -19,6 +19,8 @@ const vec2[4] billboardPositionConverters = vec2[](
     vec2(1., -1.)
 );
 
+uniform vec2 uBillboardSize;
+
 void main() {
     int particleId = int(mod(float(gl_VertexID), 4.));
    
@@ -43,7 +45,8 @@ void main() {
     vWorldPosition = worldPosition.xyz;
     
     vec4 viewPosition = uViewMatrix * worldPosition;
-    viewPosition.xy += billboardPositionConverters[particleId] * aBillboardSize;
+    // viewPosition.xy += billboardPositionConverters[particleId] * uBillboardSize;
+    viewPosition.xy += billboardPositionConverters[particleId] * uBillboardSize;
     vViewPosition = viewPosition;
     
     vec4 clipPosition = uProjectionMatrix * viewPosition;
