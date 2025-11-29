@@ -7,7 +7,7 @@ import { addVector3AndVector3, copyVector3, createVector3Zero, Vector3 } from '@
 
 export type ObjectMoveAndLookAtControllerBehaviour = ComponentBehaviour & {
     execute: (args: { actor: Actor; localPosition: Vector3; upVector: Vector3; scene: Scene }) => void;
-    setOffset: (v: Vector3) => void;
+    setPositionOffset: (v: Vector3) => void;
 };
 
 export type ObjectMoveAndLookAtController = [ComponentModel, ObjectMoveAndLookAtControllerBehaviour];
@@ -55,7 +55,7 @@ export const createObjectMoveAndLookAtController = (args: {
                 const { actor, scene, localPosition, upVector } = args;
                 update(actor, scene, localPosition, upVector);
             },
-            setOffset: (v: Vector3) => {
+            setPositionOffset: (v: Vector3) => {
                 copyVector3(offset, v);
             },
         },
