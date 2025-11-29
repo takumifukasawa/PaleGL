@@ -1,0 +1,66 @@
+// import {
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME,
+//     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME,
+//     TimelinePropertyValue,
+// } from '@/Marionetter/types';
+// import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+// import {
+//     createMaterialController,
+//     MaterialController,
+//     MaterialTimelineBindings,
+// } from '@/PaleGL/components/materialController.ts';
+// import {
+//     UNIFORM_NAME_BASE_COLOR,
+//     UNIFORM_NAME_BLEND_RATE,
+//     UNIFORM_NAME_CUSTOM_PROPERTIES_0,
+//     UNIFORM_NAME_EMISSIVE_COLOR,
+//     UNIFORM_NAME_HEIGHT_SCALE,
+//     UNIFORM_NAME_MAP_TILING,
+//     UNIFORM_NAME_METALLIC,
+//     UNIFORM_NAME_ROUGHNESS,
+//     UNIFORM_TYPE_FLOAT,
+//     UNIFORM_TYPE_VECTOR4,
+// } from '@/PaleGL/constants';
+// import { createVector4zero } from '@/PaleGL/math/vector4.ts';
+// import { Actor } from '@/PaleGL/actors/actor.ts';
+// 
+// const bindings: MaterialTimelineBindings = new Map([
+//     // prettier-ignore
+//     // [
+//     //     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_BASE_COLOR_PROPERTY_NAME,
+//     //     [UNIFORM_NAME_BASE_COLOR]
+//     // ],
+//     // [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_METALLIC_PROPERTY_NAME, [UNIFORM_NAME_METALLIC]],
+//     // [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_ROUGHNESS_PROPERTY_NAME, [UNIFORM_NAME_ROUGHNESS]],
+//     // [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_EMISSIVE_COLOR_PROPERTY_NAME, [UNIFORM_NAME_EMISSIVE_COLOR]],
+//     // [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_TEXTURE_TILING_OFFSET_PROPERTY_NAME, [UNIFORM_NAME_MAP_TILING]],
+//     // [MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_HEIGHT_SCALE_PROPERTY_NAME, [UNIFORM_NAME_HEIGHT_SCALE]],
+//     // [
+//     //     MARIONETTER_GBUFFER_MATERIAL_CONTROLLER_DATA_CUSTOM_PROPERTIES_0_PROPERTY_NAME,
+//     //     [UNIFORM_NAME_CUSTOM_PROPERTIES_0, UNIFORM_TYPE_VECTOR4, createVector4zero()],
+//     // ],
+//     [UNIFORM_NAME_BLEND_RATE, UNIFORM_TYPE_FLOAT, 0],
+// ]);
+// 
+// // export type GBufferMaterialControllerInitialValues = {
+// //     baseColor?: Color;
+// //     metallic?: number;
+// //     roughness?: number;
+// //     emissiveColor?: Color;
+// // };
+// 
+// // timeline から操作される
+// export const createLocalGlitchController = (mesh: Mesh): MaterialController => {
+//     const controller = createMaterialController(mesh, bindings);
+//     return controller;
+// };
+// 
+// export const driveLocalGlitchControllerProperties = (actor: Actor, key: string, value: TimelinePropertyValue) => {
+//     switch (key) {
+//     }
+// }
