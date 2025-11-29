@@ -360,3 +360,26 @@ vec3 fTex3D(sampler2D tex, vec3 p, vec3 n) {
 
     return (xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).rgb;
 }
+
+// --------------------------------------------
+// CUSTOM_BEGIN additional
+
+float fDfMetaCoreBall(
+    vec3 p,
+    float t
+) {
+    float d = 1e4;
+    
+    vec3 _p = p;
+
+    d = fDfSp(_p, .6);
+
+    // d += sin(uTime * 5. + p.x * 20.) * .1 + cos(uTime * 5. + p.x * 20.) * .01;
+    d += (
+        sin(t * 3. + p.x * 14.) * .02 +
+        sin(t * 3. + p.y * 15.) * .02 +
+        cos(t * 3. + p.z * -10.) * .02
+    ) * 1.2;
+
+    return d; 
+}
