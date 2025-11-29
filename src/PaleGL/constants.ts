@@ -1,4 +1,6 @@
-﻿export const MAX_SPOT_LIGHT_COUNT = 2;
+﻿// CUSTOM_BEGIN replace
+export const MAX_SPOT_LIGHT_COUNT = 2;
+// CUSTOM_END
 
 export const MAX_POINT_LIGHT_COUNT = 0;
 

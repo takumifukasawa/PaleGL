@@ -1,6 +1,8 @@
 
+// CUSTOM_BEGIN replace
 #define MAX_SPOT_LIGHT_COUNT 2
 // CUSTOM_BEGIN comment out
+// CUSTOM_END
 // #define MAX_POINT_LIGHT_COUNT 1
 // CUSTOM_END
 
