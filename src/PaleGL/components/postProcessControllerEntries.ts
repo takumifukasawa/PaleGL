@@ -71,11 +71,33 @@ const assignColorConverter: AssignColorConverter = (colorValue: string | Color, 
         copyColor(prop[key] as Color, createColorFromHex(colorValue));
     }
 };
+type AssignColorComponentConverter = (value: number, prop: unknown, key: string) => void;
+const assignColorRConverter: AssignColorComponentConverter = (value: number, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    (prop[key] as Color).e[0] = value;
+};
+const assignColorGConverter: AssignColorComponentConverter = (value: number, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    (prop[key] as Color).e[1] = value;
+};
+const assignColorBConverter: AssignColorComponentConverter = (value: number, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    (prop[key] as Color).e[2] = value;
+};
+const assignColorAConverter: AssignColorComponentConverter = (value: number, prop: unknown, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore-next-line
+    (prop[key] as Color).e[3] = value;
+};
 
 export type PostProcessParametersConversionFunctions =
     | NumToBoolConverter
     | AssignVector3Converter
-    | AssignColorConverter;
+    | AssignColorConverter
+    | AssignColorComponentConverter;
 
 export type PostProcessParameterBindingValue =
     | [unknown, string]
@@ -261,6 +283,22 @@ export const buildPostProcessControllerEntries = (renderer: Renderer) => {
             FogPassParametersPropertyMap.fogColor,
             [renderer.fogPass, FogPassParametersKey.fogColor, assignColorConverter],
         ],
+        [
+            `${FogPassParametersPropertyMap.fogColor}.r`,
+            [renderer.fogPass, FogPassParametersKey.fogColor, assignColorRConverter],
+        ],
+        [
+            `${FogPassParametersPropertyMap.fogColor}.g`,
+            [renderer.fogPass, FogPassParametersKey.fogColor, assignColorGConverter],
+        ],
+        [
+            `${FogPassParametersPropertyMap.fogColor}.b`,
+            [renderer.fogPass, FogPassParametersKey.fogColor, assignColorBConverter],
+        ],
+        [
+            `${FogPassParametersPropertyMap.fogColor}.a`,
+            [renderer.fogPass, FogPassParametersKey.fogColor, assignColorAConverter],
+        ],
         [FogPassParametersPropertyMap.fogStrength, [renderer.fogPass, FogPassParametersKey.fogStrength]],
         [FogPassParametersPropertyMap.fogDensity, [renderer.fogPass, FogPassParametersKey.fogDensity]],
         [
@@ -382,6 +420,22 @@ export const buildPostProcessControllerEntries = (renderer: Renderer) => {
         [
             ColorCurtainPassParametersPropertyMap.color,
             [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorConverter],
+        ],
+        [
+            `${ColorCurtainPassParametersPropertyMap.color}.r`,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorRConverter],
+        ],
+        [
+            `${ColorCurtainPassParametersPropertyMap.color}.g`,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorGConverter],
+        ],
+        [
+            `${ColorCurtainPassParametersPropertyMap.color}.b`,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorBConverter],
+        ],
+        [
+            `${ColorCurtainPassParametersPropertyMap.color}.a`,
+            [renderer.colorCurtainPass, ColorCurtainPassParametersKey.color, assignColorAConverter],
         ],
         [
             ColorCurtainPassParametersPropertyMap.blendRate,

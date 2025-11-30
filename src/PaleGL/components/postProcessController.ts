@@ -72,6 +72,10 @@ export const createPostProcessController = (
         },
         // eslint-disable-next-line
         onProcessPropertyBinder: (_a, _b, key, value) => {
+            // デバッガーから値を適用している場合は、timelineからの更新を無視
+            if ((window as any).__DEBUG_DISABLE_POST_PROCESS_TIMELINE_UPDATE__) {
+                return;
+            }
             assignProperty(bindings, key, value);
         },
         onUpdateCallback: (actor, model, gpu, scene, time, deltaTime) => {
