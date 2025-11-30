@@ -42,7 +42,7 @@ export const injectLocalGlitchBillboardProperties = (mesh: Mesh, key: string, va
     //         break;
     // }a
     if (bindings.has(key)) {
-        const binding = bindings.get(key);
+        const binding = bindings.get(key)!;
         const [uniformName] = binding;
         setUniformValueToAllMeshMaterials(mesh, uniformName, value);
     }
