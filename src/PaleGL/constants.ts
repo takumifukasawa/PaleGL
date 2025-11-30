@@ -586,9 +586,9 @@ export const UNIFORM_NAME_TEXTURE_CELL_SIZE = 'uCellSize';
 
 export const UNIFORM_NAME_BILLBOARD_SIZE = 'uBillboardSize';
 export const UNIFORM_NAME_BILLBOARD_OFFSET = 'uBillboardOffset';
-export const UNIFORM_NAME_SRC_UP_MAP = 'uBillboardSrcUpMap';
-export const UNIFORM_NAME_SRC_POSITION_MAP = 'uBillboardSrcPositionMap';
-export const UNIFORM_NAME_SRC_VELOCITY_MAP = 'uBillboardSrcVelocityMap';
+export const UNIFORM_NAME_SRC_UP_MAP = 'uSrcUpMap';
+export const UNIFORM_NAME_SRC_POSITION_MAP = 'uSrcPositionMap';
+export const UNIFORM_NAME_SRC_VELOCITY_MAP = 'uSrcVelocityMap';
 
 export const UNIFORM_BLOCK_NAME_COMMON = 'ubCommon';
 export const UNIFORM_BLOCK_NAME_TRANSFORMATIONS = 'ubTransformations';
