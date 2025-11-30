@@ -76,7 +76,7 @@ export function startMeshBehaviourBase(mesh: Mesh, args: ActorStartArgs) {
                 fragmentShader: material.depthFragmentShader || defaultDepthFragmentShader(),
                 fragmentShaderModifiers: material.depthFragmentShaderModifiers, // TODO: ややこしいけど、depthのときはfragmentShaderModifiersを使う
                 deleteFragmentShaderPragmas: material.deleteFragmentShaderPragmas,
-                
+
                 uniforms: material.depthUniforms.data, // TODO: deepcopyした方がよい？
                 faceSide: material.faceSide,
                 depthTest: true,
@@ -185,21 +185,22 @@ export const replaceMeshDepthMaterialByArgs = (
 ) => {
     // // depthのshaderも同様に、削除してから新しいマテリアルに差し替え
     // console.log("hogehoge", mesh.depthMaterials, mesh.depthMaterials[index])
-    if (mesh.depthMaterials[index].shader) {
-        deleteProgram(gpu.gl, mesh.depthMaterials[index].shader?.glObject);
-    }
-    mesh.depthMaterials[index] = createMaterial({
-        ...mesh.depthMaterials[index].cachedArgs,
-        ...args,
-    });
-    if (!isCompiledMaterialShader(mesh.depthMaterials[index]) && needsStart) {
-        startMaterial(mesh.depthMaterials[index], {
-            gpu,
-            attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+    if (mesh.depthMaterials[index]) {
+        if (mesh.depthMaterials[index].shader) {
+            deleteProgram(gpu.gl, mesh.depthMaterials[index].shader?.glObject);
+        }
+        mesh.depthMaterials[index] = createMaterial({
+            ...mesh.depthMaterials[index].cachedArgs,
+            ...args,
         });
+        if (!isCompiledMaterialShader(mesh.depthMaterials[index]) && needsStart) {
+            startMaterial(mesh.depthMaterials[index], {
+                gpu,
+                attributeDescriptors: getGeometryAttributeDescriptors(mesh.geometry),
+            });
+        }
     }
 };
-
 
 export const replaceMeshDepthMaterialsByArgs = (mesh: Mesh, gpu: Gpu, args: MaterialArgs = {}, needsStart = true) => {
     // fragmentがsurfaceのケースがある
@@ -256,7 +257,7 @@ export function updateMesh(actor: Actor, args: ActorUpdateArgs) {
 
     // MeshType 固有の処理 (既存)
     updateMeshBehaviour[mesh.meshType]?.(actor, args);
-    
+
     // MaterialType に応じた処理 (新規追加)
     const hasObjectSpaceRaymarch = mesh.materials.some((m) => m.type === MATERIAL_TYPE_OBJECT_SPACE_RAYMARCH);
     if (hasObjectSpaceRaymarch) {

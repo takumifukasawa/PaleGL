@@ -1,5 +1,6 @@
 import { NeedsShorten, TimelinePropertyValue } from '@/Marionetter/types';
 import { Mesh } from '@/PaleGL/actors/meshes/mesh.ts';
+import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
 import {
     createMaterialController,
     MaterialController,
@@ -10,11 +11,13 @@ import {
     UNIFORM_NAME_BILLBOARD_SIZE,
     UNIFORM_NAME_BLEND_RATE,
 } from '@/PaleGL/constants';
-import { setUniformValueToAllMeshMaterials } from '@/PaleGL/actors/meshes/meshBehaviours.ts';
+import { numToBool } from '@/PaleGL/utilities/mathUtilities.ts';
 
 const GLITCH_BLEND_RATE_PROPERTY_NAME = NeedsShorten ? 'lg_br' : 'BlendRate';
 const GLITCH_BILLBOARD_SIZE_PROPERTY_NAME = NeedsShorten ? 'lg_bs' : 'BillboardSize';
 const GLITCH_BILLBOARD_OFFSET_PROPERTY_NAME = NeedsShorten ? 'lg_bo' : 'BillboardOffset';
+
+const GLITCH_BILLBOARD_ENABLED_PROPERTY_NAME = NeedsShorten ? 'lg_be' : 'BillboardEnabled';
 
 const bindings: MaterialTimelineBindings = new Map([
     // prettier-ignore
@@ -45,5 +48,10 @@ export const injectLocalGlitchBillboardProperties = (mesh: Mesh, key: string, va
         const binding = bindings.get(key)!;
         const [uniformName] = binding;
         setUniformValueToAllMeshMaterials(mesh, uniformName, value);
+        return;
     }
-}
+
+    if (key === GLITCH_BILLBOARD_ENABLED_PROPERTY_NAME) {
+        mesh.enabled = numToBool(value as number);
+    }
+};
