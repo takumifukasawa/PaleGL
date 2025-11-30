@@ -13,7 +13,7 @@
 #define EPSILON 1e-6
 
 // CUSTOM_BEGIN additional
-#define RHY 1.033;
+#define RHY 1.033
 uniform vec4 uCustomProperties0;
 // CUSTOM_END
 
